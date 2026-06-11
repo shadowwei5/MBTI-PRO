@@ -1,0 +1,56 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Question {
+  id            Int     @id
+  text          String  // objective question text (likert uses textLeft/textRight)
+  textLeft      String? // bipolar left-pole statement (likert only)
+  textRight     String? // bipolar right-pole statement (likert only)
+  dimension     String  // E_I, S_N, T_F, P_J
+  type          String  // likert, objective
+  options       String  // JSON array
+  correctAnswer String? // only for objective type
+  sortOrder     Int     @default(0)
+
+  @@index([dimension])
+  @@index([type])
+}
+
+model PersonalityType {
+  code            String @id // e.g. "ENTJ", "ABCA"
+  name            String // Chinese descriptive name
+  isTraditional   Boolean @default(false) // true for classic 16 types
+  overview        String // 1-2 paragraph personality overview
+  strengths       String // JSON array of 3-5 strengths
+  growthAreas     String // JSON array of 3-5 growth suggestions
+  careers         String // JSON array of 5-8 recommended careers
+  suitableFields  String // JSON array of suitable work fields
+  population      String? // e.g. "约 5.6%"
+  celebrities     String? // JSON array of famous people names
+  // Dimension-specific module descriptions (3 per dimension × 4 = 12 modules)
+  eiModule        String?
+  snModule        String?
+  tfModule        String?
+  pjModule        String?
+
+  @@index([isTraditional])
+}
+
+model TestRecord {
+  id        String   @id @default(cuid())
+  typeCode  String   // resulting 4-char type code
+  scores    String   // JSON: {"E_I":15,"S_N":-8,"T_F":32,"P_J":5}
+  chars     String   // JSON: {"E_I":"E","S_N":"B","T_F":"T","P_J":"D"}
+  answers   String   // JSON: {"1":"A","2":"B",...}
+  duration  Int      // seconds spent on test
+  createdAt DateTime @default(now())
+
+  @@index([typeCode])
+  @@index([createdAt])
+}
