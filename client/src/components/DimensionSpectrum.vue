@@ -4,33 +4,37 @@ const props = defineProps<{
   typeName: string
   scores: { E_I: number; S_N: number; T_F: number; P_J: number }
   chars: { E_I: string; S_N: string; T_F: string; P_J: string }
+  dimTotals?: { E_I: number; S_N: number; T_F: number; P_J: number }
+  dimAnswered?: { E_I: number; S_N: number; T_F: number; P_J: number }
 }>()
-
-function dotPosition(score: number, dimKey: string): number {
-  if (dimKey === 'T_F') {
-    if (score < 10)       return Math.max(3,  ((score + 10) / 20) * 27 + 3)
-    if (score <= 29)      return ((score - 10) / 19) * 30 + 33
-    return Math.min(94, ((score - 29) / 21) * 26 + 68)
-  }
-  if (score < -17)       return Math.max(3,  ((score + 40) / 23) * 27 + 3)
-  if (score <= 16)       return ((score + 17) / 33) * 30 + 33
-  return Math.min(94, ((score - 16) / 24) * 26 + 68)
-}
 
 function normalizedScore(score: number, dimKey: string): number {
   if (dimKey === 'T_F') {
-    // T_F range: -10 (F extreme) to +50 (T extreme)
-    if (score >= 0) return Math.round((score / 50) * 100)
-    return Math.round((score / 10) * 100)
+    // T_F range: -20 (F extreme) to +40 (T extreme), span 60
+    if (score >= 0) return Math.round((score / 40) * 100)
+    return Math.round((score / 20) * 100)
   }
-  // E_I / S_N / P_J range: -50 to +50 (25 questions × [-2,+2])
+  // E_I / S_N / P_J range: -50 to +50 (25 questions × [-2,+2]), span 100
   return Math.round((score / 50) * 100)
+}
+
+// Dot position strictly proportional to normalized score (-100..+100) → (3%..97%)
+function dotPosition(score: number, dimKey: string): number {
+  const norm = normalizedScore(score, dimKey)
+  return 3 + ((norm + 100) / 200) * 94
+}
+
+function confidence(dimKey: string): string {
+  if (!props.dimAnswered || !props.dimTotals) return ''
+  const a = props.dimAnswered[dimKey as keyof typeof props.dimAnswered] ?? 0
+  const t = props.dimTotals[dimKey as keyof typeof props.dimTotals] ?? 0
+  if (t === 0) return ''
+  return `${Math.round((a / t) * 100)}%`
 }
 </script>
 
 <template>
   <div class="w-full max-w-md mx-auto">
-    <!-- Dimension spectrum bars -->
     <div class="flex flex-col gap-5">
       <div
         v-for="dim in [
@@ -62,7 +66,7 @@ function normalizedScore(score: number, dimKey: string): number {
             </span>
           </div>
         </div>
-        <div class="text-center mt-1">
+        <div class="flex items-center justify-center gap-2 mt-1">
           <span
             class="text-xs font-bold px-2 py-0.5 rounded-full"
             :class="{
@@ -73,6 +77,12 @@ function normalizedScore(score: number, dimKey: string): number {
             }"
           >
             {{ chars[dim.key] }}
+          </span>
+          <span
+            v-if="confidence(dim.key)"
+            class="text-[10px] text-text-muted"
+          >
+            置信度 {{ confidence(dim.key) }}
           </span>
         </div>
       </div>

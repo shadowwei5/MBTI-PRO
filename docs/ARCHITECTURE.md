@@ -1,6 +1,6 @@
 # MBTI-PRO 人格测试系统 - 架构设计文档
 
-> 版本: v1.2 | 日期: 2026-06-12 | 状态: MVP 架构就绪
+> 版本: v1.3 | 日期: 2026-06-13 | 状态: MVP 架构就绪，16 型概览 700+ 字
 
 ---
 
@@ -157,7 +157,7 @@ model PersonalityType {
   code           String @id // "ENTJ", "EABJ", etc.
   name           String     // "指挥官型", etc.
   isTraditional  Boolean
-  overview       String     // 600-800字叙事概览
+  overview       String     // 700字+叙事概览
   strengths      String     // JSON array (8项)
   growthAreas    String     // JSON array (4项)
   careers        String     // JSON array (7个)
@@ -192,9 +192,10 @@ buildTypeContent(code)
   ├─ 职业映射：FULL_CAREER_MAP[code] (81型精准映射)
   └─ 名人数据：16型手写 + 65型推导
 
-handCraftedTypes (16型手写精品)
+handCraftedTypes (16型手写精品，均已扩至 700字+，零 16 型框架遗留表述)
   └─ INTJ, ENTJ, INTP, ENTP, ISTJ, ISFJ, INFJ, ISTP,
      ISFP, INFP, ESTP, ESFP, ENFP, ESTJ, ESFJ, ENFJ
+  全部概览已清除"在16型中"类表述，与 81 型体系完全吻合
 ```
 
 ---

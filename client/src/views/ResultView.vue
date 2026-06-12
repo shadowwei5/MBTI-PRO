@@ -11,6 +11,8 @@ const route = useRoute()
 const typeCode = computed(() => route.params.type as string)
 const scores = ref({ E_I: 0, S_N: 0, T_F: 0, P_J: 0 })
 const chars = ref({ E_I: '', S_N: '', T_F: '', P_J: '' })
+const dimTotals = ref({ E_I: 0, S_N: 0, T_F: 0, P_J: 0 })
+const dimAnswered = ref({ E_I: 0, S_N: 0, T_F: 0, P_J: 0 })
 const isLoaded = ref(false)
 const typeData = ref<PersonalityType | null>(null)
 const fetchError = ref('')
@@ -22,6 +24,8 @@ onMounted(async () => {
   try {
     if (route.query.scores) scores.value = JSON.parse(route.query.scores as string)
     if (route.query.chars) chars.value = JSON.parse(route.query.chars as string)
+    if (route.query.dimTotals) dimTotals.value = JSON.parse(route.query.dimTotals as string)
+    if (route.query.dimAnswered) dimAnswered.value = JSON.parse(route.query.dimAnswered as string)
   } catch { /* use defaults */ }
 
   if (typeCode.value.length === 4) {
@@ -180,6 +184,8 @@ const defaultItems = {
             :typeName="typeName"
             :scores="scores"
             :chars="chars"
+            :dimTotals="dimTotals"
+            :dimAnswered="dimAnswered"
           />
         </div>
 
@@ -213,7 +219,7 @@ const defaultItems = {
               <div>
                 <p class="text-xs text-text-muted mb-0.5">{{ dim.label }}</p>
                 <p class="text-sm font-semibold text-charcoal">
-                  {{ dim.dLabel[chars[dim.key] === 'A' ? 'mid' : chars[dim.key] === 'E' || chars[dim.key] === 'S' || chars[dim.key] === 'T' || chars[dim.key] === 'J' ? 'right' : 'left'] }}
+                  {{ dim.dLabel[['A','B','C','D'].includes(chars[dim.key]) ? 'mid' : ['E','S','T','J'].includes(chars[dim.key]) ? 'right' : 'left'] }}
                 </p>
                 <p class="text-xs text-text-secondary mt-0.5">{{ nicknames[dim.key] }}</p>
               </div>

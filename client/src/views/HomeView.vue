@@ -2,7 +2,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { api, type PersonalityType } from '../services/api'
-import { getTypeColor, getTypeHex, getTypeColorFamily, getTemperamentColor } from '../utils/colors'
+import { getTypeHex, getTypeColorFamily } from '../utils/colors'
 import TypeAvatar from '../components/TypeAvatar.vue'
 
 const router = useRouter()
@@ -10,46 +10,35 @@ const loaded = ref(false)
 const allTypes = ref<Pick<PersonalityType, 'code' | 'name' | 'isTraditional' | 'population' | 'celebrities'>[]>([])
 const fetchError = ref(false)
 
-// 9 groups: EN, EB, ES, AN, AB, AS, IN, IB, IS
-const NINE_GROUPS = [
-  { prefix: 'EN', label: '暖紫组', desc: '外向直觉 · 远见传播型' },
-  { prefix: 'EB', label: '珊瑚组', desc: '外向均衡 · 活跃多面型' },
-  { prefix: 'ES', label: '琥珀组', desc: '外向实感 · 行动实践型' },
-  { prefix: 'AN', label: '薰紫组', desc: '平衡直觉 · 独立洞察型' },
-  { prefix: 'AB', label: '青灰组', desc: '平衡均衡 · 全面适应型' },
-  { prefix: 'AS', label: '鼠尾草组', desc: '平衡实感 · 稳健实践型' },
-  { prefix: 'IN', label: '靛蓝组', desc: '内向直觉 · 深度思想型' },
-  { prefix: 'IB', label: '钢蓝组', desc: '内向均衡 · 内省务实型' },
-  { prefix: 'IS', label: '深青组', desc: '内向实感 · 专注务实型' },
+// 12 色系分组：4 气质色系 × 3 能级（E外向/A均衡/I内向）
+// 每组内所有类型的实际颜色一致，消除原9组方案的颜色混乱
+const EI_LABELS: Record<string, string> = { E: '外向', A: '均衡', I: '内向' }
+const FAMILY_INFO: Record<string, { name: string; hex: string; fullName: string }> = {
+  purple: { name: '紫', hex: '#8869A5', fullName: 'NT 分析师' },
+  green:  { name: '绿', hex: '#33A474', fullName: 'NF 外交家' },
+  blue:   { name: '蓝', hex: '#4298B4', fullName: 'SJ 守护者' },
+  gold:   { name: '金', hex: '#E4AE3A', fullName: 'SP 探险家' },
+}
+
+const COLOR_GROUPS = [
+  { family: 'purple' as const, ei: 'E' }, { family: 'purple' as const, ei: 'A' }, { family: 'purple' as const, ei: 'I' },
+  { family: 'green' as const,  ei: 'E' }, { family: 'green' as const,  ei: 'A' }, { family: 'green' as const,  ei: 'I' },
+  { family: 'blue' as const,   ei: 'E' }, { family: 'blue' as const,   ei: 'A' }, { family: 'blue' as const,   ei: 'I' },
+  { family: 'gold' as const,   ei: 'E' }, { family: 'gold' as const,   ei: 'A' }, { family: 'gold' as const,   ei: 'I' },
 ]
 
-// Group types by their first 2 letters (E_I × S_N)
+// Group types by actual color family + E_I energy level
 const groupedTypes = computed(() => {
   const groups: Record<string, typeof allTypes.value> = {}
   for (const t of allTypes.value) {
-    const prefix = t.code.slice(0, 2)
-    if (!groups[prefix]) groups[prefix] = []
-    groups[prefix].push(t)
+    const family = getTypeColorFamily(t.code)
+    const ei = t.code[0]
+    const key = `${family}-${ei}`
+    if (!groups[key]) groups[key] = []
+    groups[key].push(t)
   }
   return groups
 })
-
-// 计算每组的主色调（该组内出现最多的气质色系）
-function getDominantFamily(types: typeof allTypes.value): 'purple' | 'green' | 'blue' | 'gold' {
-  const count: Record<string, number> = { purple: 0, green: 0, blue: 0, gold: 0 }
-  for (const t of types) {
-    count[getTypeColorFamily(t.code)]++
-  }
-  return Object.entries(count).sort((a, b) => b[1] - a[1])[0][0] as 'purple' | 'green' | 'blue' | 'gold'
-}
-
-// 气质色系对应的图标色
-const familyBorderColors: Record<string, string> = {
-  purple: '#8869A5',
-  green: '#33A474',
-  blue: '#4298B4',
-  gold: '#E4AE3A',
-}
 
 onMounted(async () => {
   setTimeout(() => { loaded.value = true }, 100)
@@ -75,10 +64,10 @@ function goToType(code: string) {
     <main class="flex-1 flex flex-col items-center justify-center px-5 py-16 md:py-24">
       <div class="w-full max-w-2xl mx-auto text-center stagger">
         <!-- Brand Badge -->
-        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-surface-alt border border-border mb-8">
+        <div class="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-charcoal border border-coral/30 mb-8 shadow-lg">
           <span class="w-2 h-2 rounded-full bg-coral animate-breathe" />
-          <span class="text-sm text-warm-gray font-medium tracking-wide">
-            全新 81 型人格分类体系
+          <span class="text-sm text-cream font-bold tracking-wider">
+            MBTI-PRO：全新 81 型人格分类体系
           </span>
         </div>
 
@@ -109,7 +98,7 @@ function goToType(code: string) {
         <div class="flex flex-wrap items-center justify-center gap-6 mt-8 text-sm text-text-muted">
           <div class="flex items-center gap-2">
             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-            <span>100 道精选题目</span>
+            <span>90 道精选题目</span>
           </div>
           <div class="flex items-center gap-2">
             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10" /><path stroke-linecap="round" d="M12 6v6l4 2" /></svg>
@@ -179,6 +168,122 @@ function goToType(code: string) {
       </div>
     </section>
 
+    <!-- 81型由来 -->
+    <section class="py-16 md:py-24 bg-surface-alt/30 border-t border-border/50">
+      <div class="max-w-4xl mx-auto px-5">
+        <div class="text-center mb-12">
+          <h2 class="text-2xl md:text-3xl font-display font-bold text-charcoal mb-4">什么是 MBTI-PRO 的全新 81 型人格分类体系？</h2>
+          <p class="text-text-secondary max-w-2xl mx-auto leading-relaxed">
+            传统 MBTI 将每个维度一分为二（如 E 或 I），组合出 16 种人格类型。但真实的人性格分布更接近连续光谱——
+            每个人在四个维度上都有自己独特的位置，而非简单的"非此即彼"。
+          </p>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-6 mb-8">
+          <div class="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-border/50 shadow-sm">
+            <h3 class="font-semibold text-charcoal mb-3">从二分到三分</h3>
+            <p class="text-sm text-text-secondary leading-relaxed">
+              在每个维度上，除了两个极端倾向之外，MBTI-PRO 新增了<strong>中间均衡型</strong>。
+              例如，能量来源维度不仅有 E（外向）和 I（内向），还有 A（平衡型）；决策方式维度在 T（思考）和 F（情感）之间加入了 C（复合型）。
+              这使得每个维度从 2 种选择扩展为 3 种。
+            </p>
+          </div>
+          <div class="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-border/50 shadow-sm">
+            <h3 class="font-semibold text-charcoal mb-3">3 × 3 × 3 × 3 = 81</h3>
+            <p class="text-sm text-text-secondary leading-relaxed">
+              四个维度各自有三种可能的位置，组合起来就是 3×3×3×3 = <strong>81 种人格类型</strong>。
+              这比传统 16 型精细了整整 5 倍——能够更准确地捕捉到那些"介于两者之间"的真实人格特征，
+              让测试结果不再是非黑即白的粗暴分类。
+            </p>
+          </div>
+        </div>
+
+        <!-- 12 维度位置详解 -->
+        <div class="bg-white/70 backdrop-blur-sm rounded-3xl p-6 md:p-8 border border-border shadow-sm">
+          <h3 class="text-lg font-display font-bold text-charcoal mb-6 text-center">12 个维度位置</h3>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-5">
+            <!-- E_I 维度 -->
+            <div class="text-center p-4 rounded-xl bg-surface-alt/50">
+              <p class="text-sm font-semibold text-charcoal mb-3">能量来源</p>
+              <div class="flex justify-center gap-3">
+                <div class="flex flex-col items-center gap-0.5">
+                  <span class="text-lg font-bold text-[#5C8DFF] leading-tight">I</span>
+                  <span class="text-xs text-text-muted">内向</span>
+                </div>
+                <div class="flex flex-col items-center gap-0.5">
+                  <span class="text-lg font-bold text-sage leading-tight">A</span>
+                  <span class="text-xs text-text-muted">平衡</span>
+                </div>
+                <div class="flex flex-col items-center gap-0.5">
+                  <span class="text-lg font-bold text-[#5C8DFF] leading-tight">E</span>
+                  <span class="text-xs text-text-muted">外向</span>
+                </div>
+              </div>
+            </div>
+            <!-- S_N 维度 -->
+            <div class="text-center p-4 rounded-xl bg-surface-alt/50">
+              <p class="text-sm font-semibold text-charcoal mb-3">认知方式</p>
+              <div class="flex justify-center gap-3">
+                <div class="flex flex-col items-center gap-0.5">
+                  <span class="text-lg font-bold text-[#9C6FFF] leading-tight">N</span>
+                  <span class="text-xs text-text-muted">直觉</span>
+                </div>
+                <div class="flex flex-col items-center gap-0.5">
+                  <span class="text-lg font-bold text-sage leading-tight">B</span>
+                  <span class="text-xs text-text-muted">均衡</span>
+                </div>
+                <div class="flex flex-col items-center gap-0.5">
+                  <span class="text-lg font-bold text-[#9C6FFF] leading-tight">S</span>
+                  <span class="text-xs text-text-muted">实感</span>
+                </div>
+              </div>
+            </div>
+            <!-- T_F 维度 -->
+            <div class="text-center p-4 rounded-xl bg-surface-alt/50">
+              <p class="text-sm font-semibold text-charcoal mb-3">决策方式</p>
+              <div class="flex justify-center gap-3">
+                <div class="flex flex-col items-center gap-0.5">
+                  <span class="text-lg font-bold text-[#1DA8FF] leading-tight">F</span>
+                  <span class="text-xs text-text-muted">情感</span>
+                </div>
+                <div class="flex flex-col items-center gap-0.5">
+                  <span class="text-lg font-bold text-sage leading-tight">C</span>
+                  <span class="text-xs text-text-muted">复合</span>
+                </div>
+                <div class="flex flex-col items-center gap-0.5">
+                  <span class="text-lg font-bold text-[#1DA8FF] leading-tight">T</span>
+                  <span class="text-xs text-text-muted">思考</span>
+                </div>
+              </div>
+            </div>
+            <!-- P_J 维度 -->
+            <div class="text-center p-4 rounded-xl bg-surface-alt/50">
+              <p class="text-sm font-semibold text-charcoal mb-3">生活态度</p>
+              <div class="flex justify-center gap-3">
+                <div class="flex flex-col items-center gap-0.5">
+                  <span class="text-lg font-bold text-[#E6B800] leading-tight">P</span>
+                  <span class="text-xs text-text-muted">感知</span>
+                </div>
+                <div class="flex flex-col items-center gap-0.5">
+                  <span class="text-lg font-bold text-sage leading-tight">D</span>
+                  <span class="text-xs text-text-muted">动态</span>
+                </div>
+                <div class="flex flex-col items-center gap-0.5">
+                  <span class="text-lg font-bold text-[#E6B800] leading-tight">J</span>
+                  <span class="text-xs text-text-muted">判断</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <p class="text-center text-sm text-text-muted mt-8 max-w-2xl mx-auto leading-relaxed">
+          你的四个维度位置共同构成一个唯一的四字母代码——这就是你在 MBTI-PRO 中的专属人格类型。
+          无论你是偏传统的纯端值类型，还是带有中间维度的独特组合，81 种类型中总有一种最接近真实的你。
+        </p>
+      </div>
+    </section>
+
     <!-- MBTI-PRO Advantages -->
     <section class="py-16 md:py-24 bg-surface-alt/50 border-t border-border/50">
       <div class="max-w-4xl mx-auto px-5">
@@ -232,7 +337,7 @@ function goToType(code: string) {
               <tr>
                 <td class="px-6 py-4 font-medium text-charcoal">题目数量</td>
                 <td class="px-6 py-4 text-text-secondary border-l border-border/50">通常 60-93 题</td>
-                <td class="px-6 py-4 text-coral font-medium border-l border-border/50">100 题（含 20 道客观推理）</td>
+                <td class="px-6 py-4 text-coral font-medium border-l border-border/50">90 题（含 10 道客观推理）</td>
               </tr>
               <tr>
                 <td class="px-6 py-4 font-medium text-charcoal">题目设计</td>
@@ -264,11 +369,11 @@ function goToType(code: string) {
               <svg class="w-5 h-5 text-coral" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
             </div>
             <h3 class="font-semibold text-charcoal mb-2">深度内容</h3>
-            <p class="text-sm text-text-secondary leading-relaxed">每种人格含 8 项优势 + 4 项成长建议 + 7 个职业推荐 + 代表人物参考。</p>
+            <p class="text-sm text-text-secondary leading-relaxed">每种人格含 8 项优势 + 4 项成长建议 + 代表人物参考。</p>
           </div>
-          <div class="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-indigo/30 shadow-sm text-center">
-            <div class="w-10 h-10 mx-auto mb-3 rounded-xl bg-indigo/10 flex items-center justify-center">
-              <svg class="w-5 h-5 text-indigo" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 4h1m-1 4h1m5-4v1m0 3v1m5-5h1m-1 4h1M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2zm6-4l4-4-4-4" /></svg>
+          <div class="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-[#88619A]/30 shadow-sm text-center">
+            <div class="w-10 h-10 mx-auto mb-3 rounded-xl bg-[#88619A]/10 flex items-center justify-center">
+              <svg class="w-5 h-5 text-[#88619A]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 4h1m-1 4h1m5-4v1m0 3v1m5-5h1m-1 4h1M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2zm6-4l4-4-4-4" /></svg>
             </div>
             <h3 class="font-semibold text-charcoal mb-2">双极正面描述</h3>
             <p class="text-sm text-text-secondary leading-relaxed">每题两端均为积极描述，避免某一方被"先入为主"地认为是正确答案。</p>
@@ -317,22 +422,33 @@ function goToType(code: string) {
           <p class="text-text-muted">人格类型数据加载失败，请刷新页面重试。</p>
         </div>
 
-        <!-- 9 Groups -->
-        <div v-else class="space-y-16">
-          <div v-for="group in NINE_GROUPS" :key="group.prefix">
+        <!-- 12 Color Groups (4气质 × 3能级) -->
+        <div v-else class="space-y-12">
+          <div v-for="group in COLOR_GROUPS" :key="`${group.family}-${group.ei}`">
             <!-- Group Header -->
-            <div class="flex items-center gap-3 mb-5">
-              <span class="text-sm font-semibold text-text-muted tracking-wider shrink-0">
-                {{ group.label }}
+            <div class="flex items-center gap-3 mb-4">
+              <span
+                class="w-3 h-3 rounded-full shrink-0"
+                :style="{ background: FAMILY_INFO[group.family].hex }"
+              />
+              <span class="text-sm font-semibold tracking-wider shrink-0"
+                :style="{ color: FAMILY_INFO[group.family].hex }"
+              >
+                {{ FAMILY_INFO[group.family].fullName }} · {{ EI_LABELS[group.ei] }}
               </span>
-              <span class="text-xs text-text-muted/60 hidden sm:inline">{{ group.desc }}</span>
-              <div class="h-px flex-1 bg-border/40 ml-3" />
+              <span class="text-xs text-text-muted/60 hidden sm:inline">
+                {{ groupedTypes[`${group.family}-${group.ei}`]?.length || 0 }} 型
+              </span>
+              <div
+                class="h-px flex-1 ml-3"
+                :style="{ background: `linear-gradient(to right, ${FAMILY_INFO[group.family].hex}30, transparent)` }"
+              />
             </div>
 
-            <!-- Type Cards Grid (3 cols × 3 rows) -->
+            <!-- Type Cards Grid -->
             <div class="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
               <button
-                v-for="t in groupedTypes[group.prefix]"
+                v-for="t in groupedTypes[`${group.family}-${group.ei}`]"
                 :key="t.code"
                 @click="goToType(t.code)"
                 class="group relative bg-white/70 backdrop-blur-sm rounded-2xl p-4 md:p-5 border border-border/40 shadow-sm text-left transition-all duration-300 hover:shadow-md hover:-translate-y-0.5"

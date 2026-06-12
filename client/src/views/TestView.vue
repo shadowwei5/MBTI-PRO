@@ -56,9 +56,9 @@ async function fetchQuestions() {
     }))
     const likert = parsed.filter(q => q.type === 'likert')
     const objective = parsed.filter(q => q.type === 'objective')
-    // Randomly select 20 objective questions
+    // Randomly select 10 objective questions
     const shuffled = [...objective].sort(() => Math.random() - 0.5)
-    const selected = shuffled.slice(0, 20).map((q, i) => ({ ...q, sortOrder: 81 + i }))
+    const selected = shuffled.slice(0, 10).map((q, i) => ({ ...q, sortOrder: 81 + i }))
     questions.value = [...likert, ...selected]
   } catch {
     loadError.value = '题目加载失败，请检查网络后刷新重试。'
@@ -143,8 +143,8 @@ function submitTest() {
   // Classify
   function classify(score: number, dim: string): string {
     if (dim === 'T_F') {
-      if (score > 29) return 'T'
-      if (score < 10) return 'F'
+      if (score > 19) return 'T'
+      if (score < 0) return 'F'
       return 'C'
     }
     if (score > 16) {
@@ -180,6 +180,16 @@ function submitTest() {
     duration: Math.round((Date.now() - startTime.value) / 1000),
   }).catch(() => { /* non-critical */ })
 
+  // Count answered questions per dimension
+  const dimAnswered = { E_I: 0, S_N: 0, T_F: 0, P_J: 0 }
+  const dimTotals = { E_I: 0, S_N: 0, T_F: 0, P_J: 0 }
+  questions.value.forEach(q => {
+    if (q.dimension in dimTotals) {
+      dimTotals[q.dimension as keyof typeof dimTotals]++
+      if (answers.value[q.id]) dimAnswered[q.dimension as keyof typeof dimAnswered]++
+    }
+  })
+
   // Navigate to result
   router.push({
     name: 'result',
@@ -187,6 +197,8 @@ function submitTest() {
     query: {
       scores: JSON.stringify({ ...scores, T_F: T_F_total }),
       chars: JSON.stringify(chars),
+      dimTotals: JSON.stringify(dimTotals),
+      dimAnswered: JSON.stringify(dimAnswered),
     },
   })
 }
