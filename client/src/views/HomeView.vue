@@ -2,7 +2,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { api, type PersonalityType } from '../services/api'
-import { getTypeHex, getTypeColorFamily } from '../utils/colors'
+import { getTypeHex, getNineGroupCode } from '../utils/colors'
 import TypeAvatar from '../components/TypeAvatar.vue'
 
 const router = useRouter()
@@ -10,30 +10,26 @@ const loaded = ref(false)
 const allTypes = ref<Pick<PersonalityType, 'code' | 'name' | 'isTraditional' | 'population' | 'celebrities'>[]>([])
 const fetchError = ref(false)
 
-// 12 色系分组：4 气质色系 × 3 能级（E外向/A均衡/I内向）
-// 每组内所有类型的实际颜色一致，消除原9组方案的颜色混乱
-const EI_LABELS: Record<string, string> = { E: '外向', A: '均衡', I: '内向' }
-const FAMILY_INFO: Record<string, { name: string; hex: string; fullName: string }> = {
-  purple: { name: '紫', hex: '#8869A5', fullName: 'NT 分析师' },
-  green:  { name: '绿', hex: '#33A474', fullName: 'NF 外交家' },
-  blue:   { name: '蓝', hex: '#4298B4', fullName: 'SJ 守护者' },
-  gold:   { name: '金', hex: '#E4AE3A', fullName: 'SP 探险家' },
+// 9组颜色分类：严格按 81型人格颜色分类.xlsx 定义
+const NINE_GROUP_META: Record<string, { name: string; hex: string; description: string }> = {
+  SP: { name: 'SP 暖金组', hex: '#C8963E', description: 'S 系 + 灵活感知 P → 工匠/表演者气质' },
+  SD: { name: 'SD 琥珀组', hex: '#C87D3E', description: 'S 系 + 动态平衡 D → 秩序与灵活兼备' },
+  SJ: { name: 'SJ 藏蓝组', hex: '#2C5F8A', description: 'S 系 + 秩序判断 J → 护卫者气质' },
+  BT: { name: 'BT 深炭灰组', hex: '#4A4A4A', description: 'B 系 + 理性思考 T → 实务技术/管理' },
+  BC: { name: 'BC 月光银灰组', hex: '#8B95A0', description: 'B 系 + 复合决策 C → 终极中间态' },
+  BF: { name: 'BF 暖燕麦组', hex: '#B8956A', description: 'B 系 + 情感共情 F → 治愈型支持者' },
+  NT: { name: 'NT 深紫组', hex: '#6B3FA0', description: 'N 系 + 理性思考 T → 理性者/战略家' },
+  NC: { name: 'NC 靛青组', hex: '#3D7B8A', description: 'N 系 + 复合决策 C → 高阶认知统筹' },
+  NF: { name: 'NF 翠绿组', hex: '#2D8A4E', description: 'N 系 + 情感共情 F → 理想主义者/外交家' },
 }
 
-const COLOR_GROUPS = [
-  { family: 'purple' as const, ei: 'E' }, { family: 'purple' as const, ei: 'A' }, { family: 'purple' as const, ei: 'I' },
-  { family: 'green' as const,  ei: 'E' }, { family: 'green' as const,  ei: 'A' }, { family: 'green' as const,  ei: 'I' },
-  { family: 'blue' as const,   ei: 'E' }, { family: 'blue' as const,   ei: 'A' }, { family: 'blue' as const,   ei: 'I' },
-  { family: 'gold' as const,   ei: 'E' }, { family: 'gold' as const,   ei: 'A' }, { family: 'gold' as const,   ei: 'I' },
-]
+const NINE_GROUP_ORDER = ['SP', 'SD', 'SJ', 'BT', 'BC', 'BF', 'NT', 'NC', 'NF']
 
-// Group types by actual color family + E_I energy level
+// 按9组归类
 const groupedTypes = computed(() => {
   const groups: Record<string, typeof allTypes.value> = {}
   for (const t of allTypes.value) {
-    const family = getTypeColorFamily(t.code)
-    const ei = t.code[0]
-    const key = `${family}-${ei}`
+    const key = getNineGroupCode(t.code)
     if (!groups[key]) groups[key] = []
     groups[key].push(t)
   }
@@ -67,7 +63,7 @@ function goToType(code: string) {
         <div class="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-charcoal border border-coral/30 mb-8 shadow-lg">
           <span class="w-2 h-2 rounded-full bg-coral animate-breathe" />
           <span class="text-sm text-cream font-bold tracking-wider">
-            MBTI-PRO：全新 81 型人格分类体系
+            MBTI PRO：全新 81 型人格分类体系
           </span>
         </div>
 
@@ -172,7 +168,7 @@ function goToType(code: string) {
     <section class="py-16 md:py-24 bg-surface-alt/30 border-t border-border/50">
       <div class="max-w-4xl mx-auto px-5">
         <div class="text-center mb-12">
-          <h2 class="text-2xl md:text-3xl font-display font-bold text-charcoal mb-4">什么是 MBTI-PRO 的全新 81 型人格分类体系？</h2>
+          <h2 class="text-2xl md:text-3xl font-display font-bold text-charcoal mb-4">什么是 MBTI PRO 的全新 81 型人格分类体系？</h2>
           <p class="text-text-secondary max-w-2xl mx-auto leading-relaxed">
             传统 MBTI 将每个维度一分为二（如 E 或 I），组合出 16 种人格类型。但真实的人性格分布更接近连续光谱——
             每个人在四个维度上都有自己独特的位置，而非简单的"非此即彼"。
@@ -183,7 +179,7 @@ function goToType(code: string) {
           <div class="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-border/50 shadow-sm">
             <h3 class="font-semibold text-charcoal mb-3">从二分到三分</h3>
             <p class="text-sm text-text-secondary leading-relaxed">
-              在每个维度上，除了两个极端倾向之外，MBTI-PRO 新增了<strong>中间均衡型</strong>。
+              在每个维度上，除了两个极端倾向之外，MBTI PRO 新增了<strong>中间均衡型</strong>。
               例如，能量来源维度不仅有 E（外向）和 I（内向），还有 A（平衡型）；决策方式维度在 T（思考）和 F（情感）之间加入了 C（复合型）。
               这使得每个维度从 2 种选择扩展为 3 种。
             </p>
@@ -278,23 +274,23 @@ function goToType(code: string) {
         </div>
 
         <p class="text-center text-sm text-text-muted mt-8 max-w-2xl mx-auto leading-relaxed">
-          你的四个维度位置共同构成一个唯一的四字母代码——这就是你在 MBTI-PRO 中的专属人格类型。
+          你的四个维度位置共同构成一个唯一的四字母代码——这就是你在 MBTI PRO 中的专属人格类型。
           无论你是偏传统的纯端值类型，还是带有中间维度的独特组合，81 种类型中总有一种最接近真实的你。
         </p>
       </div>
     </section>
 
-    <!-- MBTI-PRO Advantages -->
+    <!-- MBTI PRO Advantages -->
     <section class="py-16 md:py-24 bg-surface-alt/50 border-t border-border/50">
       <div class="max-w-4xl mx-auto px-5">
         <div class="text-center mb-12">
           <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-coral/10 border border-coral/20 mb-6">
-            <span class="text-sm text-coral font-semibold tracking-wide">MBTI-PRO 优势</span>
+            <span class="text-sm text-coral font-semibold tracking-wide">MBTI PRO 优势</span>
           </div>
-          <h2 class="text-2xl md:text-3xl font-display font-bold text-charcoal mb-4">为什么选择 MBTI-PRO？</h2>
+          <h2 class="text-2xl md:text-3xl font-display font-bold text-charcoal mb-4">为什么选择 MBTI PRO？</h2>
           <p class="text-text-secondary max-w-2xl mx-auto leading-relaxed">
             传统 MBTI 用二分法将人简单分为两类（如：你要么是外向 E，要么是内向 I），但真实的人格分布并非如此绝对。
-            MBTI-PRO 在每个维度增加了<strong>中间型</strong>，让分类更贴近真实的你。
+            MBTI PRO 在每个维度增加了<strong>中间型</strong>，让分类更贴近真实的你。
           </p>
         </div>
 
@@ -305,7 +301,7 @@ function goToType(code: string) {
               <tr class="border-b border-border">
                 <th class="text-left px-6 py-4 font-semibold text-charcoal w-1/4">对比维度</th>
                 <th class="text-left px-6 py-4 font-semibold text-text-muted w-3/8 border-l border-border/50">传统 MBTI</th>
-                <th class="text-left px-6 py-4 font-semibold text-coral w-3/8 border-l border-border/50">MBTI-PRO</th>
+                <th class="text-left px-6 py-4 font-semibold text-coral w-3/8 border-l border-border/50">MBTI PRO</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-border/50">
@@ -403,10 +399,15 @@ function goToType(code: string) {
           </div>
           <h2 class="text-2xl md:text-3xl font-display font-bold text-charcoal mb-4">探索全部 81 种人格类型</h2>
           <p class="text-text-secondary max-w-2xl mx-auto leading-relaxed">
-            按传统四气质色系着色：<span class="text-[#8869A5] font-semibold">紫(NT分析师)</span> ·
-            <span class="text-[#33A474] font-semibold">绿(NF外交家)</span> ·
-            <span class="text-[#4298B4] font-semibold">蓝(SJ守护者)</span> ·
-            <span class="text-[#E4AE3A] font-semibold">金(SP探险家)</span><br />
+            按9组颜色分类严格着色：<span class="text-[#6B3FA0] font-semibold">NT深紫</span> ·
+            <span class="text-[#3D7B8A] font-semibold">NC靛青</span> ·
+            <span class="text-[#2D8A4E] font-semibold">NF翠绿</span> ·
+            <span class="text-[#4A4A4A] font-semibold">BT深炭灰</span> ·
+            <span class="text-[#8B95A0] font-semibold">BC月光银灰</span> ·
+            <span class="text-[#B8956A] font-semibold">BF暖燕麦</span><br />
+            <span class="text-[#C8963E] font-semibold">SP暖金</span> ·
+            <span class="text-[#C87D3E] font-semibold">SD琥珀</span> ·
+            <span class="text-[#2C5F8A] font-semibold">SJ藏蓝</span><br />
             点击任意类型即可查看详细人格描述。
           </p>
         </div>
@@ -422,42 +423,45 @@ function goToType(code: string) {
           <p class="text-text-muted">人格类型数据加载失败，请刷新页面重试。</p>
         </div>
 
-        <!-- 12 Color Groups (4气质 × 3能级) -->
+        <!-- 9 Groups (按81型人格颜色分类) -->
         <div v-else class="space-y-12">
-          <div v-for="group in COLOR_GROUPS" :key="`${group.family}-${group.ei}`">
+          <div v-for="groupCode in NINE_GROUP_ORDER" :key="groupCode">
             <!-- Group Header -->
             <div class="flex items-center gap-3 mb-4">
               <span
                 class="w-3 h-3 rounded-full shrink-0"
-                :style="{ background: FAMILY_INFO[group.family].hex }"
+                :style="{ background: NINE_GROUP_META[groupCode].hex }"
               />
               <span class="text-sm font-semibold tracking-wider shrink-0"
-                :style="{ color: FAMILY_INFO[group.family].hex }"
+                :style="{ color: NINE_GROUP_META[groupCode].hex }"
               >
-                {{ FAMILY_INFO[group.family].fullName }} · {{ EI_LABELS[group.ei] }}
+                {{ NINE_GROUP_META[groupCode].name }}
               </span>
               <span class="text-xs text-text-muted/60 hidden sm:inline">
-                {{ groupedTypes[`${group.family}-${group.ei}`]?.length || 0 }} 型
+                {{ groupedTypes[groupCode]?.length || 0 }} 型
+              </span>
+              <span class="text-xs text-text-muted/50 hidden md:inline">
+                &middot; {{ NINE_GROUP_META[groupCode].description }}
               </span>
               <div
                 class="h-px flex-1 ml-3"
-                :style="{ background: `linear-gradient(to right, ${FAMILY_INFO[group.family].hex}30, transparent)` }"
+                :style="{ background: `linear-gradient(to right, ${NINE_GROUP_META[groupCode].hex}30, transparent)` }"
               />
             </div>
 
             <!-- Type Cards Grid -->
             <div class="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
               <button
-                v-for="t in groupedTypes[`${group.family}-${group.ei}`]"
+                v-for="t in groupedTypes[groupCode]"
                 :key="t.code"
                 @click="goToType(t.code)"
                 class="group relative bg-white/70 backdrop-blur-sm rounded-2xl p-4 md:p-5 border border-border/40 shadow-sm text-left transition-all duration-300 hover:shadow-md hover:-translate-y-0.5"
-                :style="{ borderColor: getTypeColorFamily(t.code) === 'purple' ? '#8869A520' : getTypeColorFamily(t.code) === 'green' ? '#33A47420' : getTypeColorFamily(t.code) === 'blue' ? '#4298B420' : '#E4AE3A20' }"
+                :style="{ borderColor: NINE_GROUP_META[groupCode].hex + '20' }"
               >
                 <!-- Accent bar at top -->
                 <div
                   class="absolute top-0 left-4 right-4 h-0.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                  :style="{ background: getTypeHex(t.code) }"
+                  :style="{ background: NINE_GROUP_META[groupCode].hex }"
                 />
                 <div class="flex items-center gap-3 mb-2">
                   <div class="shrink-0 transition-transform duration-300 group-hover:scale-110">
@@ -476,7 +480,7 @@ function goToType(code: string) {
 
                 <!-- Hover: right arrow -->
                 <div class="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <svg class="w-4 h-4" :style="{ color: getTypeHex(t.code) }" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <svg class="w-4 h-4" :style="{ color: NINE_GROUP_META[groupCode].hex }" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
                   </svg>
                 </div>

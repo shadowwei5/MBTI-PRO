@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import ProgressBar from '../components/ProgressBar.vue'
 import OptionGroup from '../components/OptionGroup.vue'
@@ -24,15 +24,39 @@ const loading = ref(true)
 const loadError = ref('')
 const currentIndex = ref(0)
 const answers = ref<Record<number, string>>({})
-const showConfirm = ref(false)
+const showSubmitConfirm = ref(false)
 const startTime = ref(Date.now())
+
+// 客观题相关状态
+const objectiveIntroShown = ref(false)
+const showObjectiveIntro = ref(false)
+const objectiveSeconds = ref(20)
+const timerRemaining = ref<Record<number, number>>({})  // 每道客观题的剩余秒数
+let objectiveTimerInterval: ReturnType<typeof setInterval> | null = null
+
+// 检测是否是第一道客观题的索引
+const firstObjectiveIndex = computed(() => {
+  const idx = questions.value.findIndex(q => q.type === 'objective')
+  return idx === -1 ? Infinity : idx
+})
+
+// 当前是否在客观题答题中（已确认开始）
+const isInObjectiveMode = computed(() => {
+  const q = currentQuestion.value
+  return q?.type === 'objective' && objectiveIntroShown.value && !showObjectiveIntro.value
+})
+
+// 当前客观题是否已锁定（计时器归零，不可修改答案）
+const isObjectiveLocked = computed(() => {
+  const q = currentQuestion.value
+  return q?.type === 'objective' && timerRemaining.value[q.id] !== undefined && timerRemaining.value[q.id] <= 0
+})
 
 // Fetch questions from API & restore saved progress
 async function fetchQuestions() {
   loading.value = true
   loadError.value = ''
 
-  // Check localStorage for saved test session
   const saved = localStorage.getItem('mbti-pro-test')
   if (saved) {
     try {
@@ -41,13 +65,14 @@ async function fetchQuestions() {
         questions.value = parsed.questions
         answers.value = parsed.answers || {}
         currentIndex.value = parsed.currentIndex || 0
+        objectiveIntroShown.value = parsed.objectiveIntroShown || false
+        timerRemaining.value = parsed.timerRemaining || {}
         loading.value = false
         return
       }
     } catch { /* ignore */ }
   }
 
-  // Fresh test: fetch all questions, randomly select 20 objective
   try {
     const data = await api.getQuestions()
     const parsed = data.map(q => ({
@@ -56,7 +81,6 @@ async function fetchQuestions() {
     }))
     const likert = parsed.filter(q => q.type === 'likert')
     const objective = parsed.filter(q => q.type === 'objective')
-    // Randomly select 10 objective questions
     const shuffled = [...objective].sort(() => Math.random() - 0.5)
     const selected = shuffled.slice(0, 10).map((q, i) => ({ ...q, sortOrder: 81 + i }))
     questions.value = [...likert, ...selected]
@@ -71,12 +95,14 @@ onMounted(() => {
   fetchQuestions()
 })
 
-// Save progress (includes question list for persistence)
-watch([answers, currentIndex], () => {
+// Save progress
+watch([answers, currentIndex, objectiveIntroShown, timerRemaining], () => {
   localStorage.setItem('mbti-pro-test', JSON.stringify({
     questions: questions.value,
     answers: answers.value,
     currentIndex: currentIndex.value,
+    objectiveIntroShown: objectiveIntroShown.value,
+    timerRemaining: timerRemaining.value,
   }))
 }, { deep: true })
 
@@ -88,9 +114,51 @@ const isLastQuestion = computed(() => currentIndex.value >= questions.value.leng
 
 let autoAdvanceTimer: ReturnType<typeof setTimeout> | null = null
 
+// 客观题倒计时
+function startObjectiveTimer(initialSeconds = 20) {
+  stopObjectiveTimer()
+  objectiveSeconds.value = initialSeconds
+  objectiveTimerInterval = setInterval(() => {
+    objectiveSeconds.value--
+    if (objectiveSeconds.value <= 0) {
+      onObjectiveTimeout()
+    }
+  }, 1000)
+}
+
+function stopObjectiveTimer() {
+  if (objectiveTimerInterval) {
+    clearInterval(objectiveTimerInterval)
+    objectiveTimerInterval = null
+  }
+}
+
+function saveTimerRemaining() {
+  const q = currentQuestion.value
+  if (q?.type === 'objective' && objectiveTimerInterval) {
+    timerRemaining.value[q.id] = objectiveSeconds.value
+  }
+}
+
+function onObjectiveTimeout() {
+  stopObjectiveTimer()
+  timerRemaining.value[currentQuestion.value.id] = 0
+  // 已作答的不再自动跳转
+  if (answers.value[currentQuestion.value.id]) return
+  if (isLastQuestion.value) {
+    showSubmitConfirm.value = true
+  } else if (currentIndex.value < questions.value.length - 1) {
+    currentIndex.value++
+  }
+}
+
 function selectOption(key: string) {
+  if (isObjectiveLocked.value) return
   answers.value[currentQuestion.value.id] = key
-  // Clear any pending auto-advance from a previous selection
+  if (currentQuestion.value.type === 'objective') {
+    saveTimerRemaining()
+    stopObjectiveTimer()
+  }
   if (autoAdvanceTimer) clearTimeout(autoAdvanceTimer)
   autoAdvanceTimer = setTimeout(() => {
     goNext()
@@ -99,34 +167,67 @@ function selectOption(key: string) {
 
 function goNext() {
   if (autoAdvanceTimer) { clearTimeout(autoAdvanceTimer); autoAdvanceTimer = null }
+  saveTimerRemaining()
+  stopObjectiveTimer()
+
   if (isLastQuestion.value) {
-    showConfirm.value = true
+    showSubmitConfirm.value = true
     return
   }
+
+  const nextIdx = currentIndex.value + 1
+  // 检测是否即将进入第一道客观题
+  if (nextIdx >= firstObjectiveIndex.value && !objectiveIntroShown.value) {
+    currentIndex.value = nextIdx
+    showObjectiveIntro.value = true
+    return
+  }
+
   if (currentIndex.value < questions.value.length - 1) {
     currentIndex.value++
   }
 }
 
+function confirmObjectiveIntro() {
+  showObjectiveIntro.value = false
+  objectiveIntroShown.value = true
+  startObjectiveTimer()
+}
+
+function cancelObjectiveIntro() {
+  showObjectiveIntro.value = false
+  if (currentIndex.value > 0) {
+    currentIndex.value--
+  }
+}
+
 function goPrev() {
   if (autoAdvanceTimer) { clearTimeout(autoAdvanceTimer); autoAdvanceTimer = null }
+  saveTimerRemaining()
+  stopObjectiveTimer()
   if (currentIndex.value > 0) {
     currentIndex.value--
   }
 }
 
 function submitTest() {
-  showConfirm.value = false
+  showSubmitConfirm.value = false
+  stopObjectiveTimer()
   localStorage.removeItem('mbti-pro-test')
 
-  // Calculate score (simplified demo logic)
   const scores = { E_I: 0, S_N: 0, T_F_obj: 0, T_F_sub: 0, P_J: 0 }
   questions.value.forEach(q => {
     const answer = answers.value[q.id]
-    if (!answer) return
     if (q.type === 'objective') {
-      if (answer === q.correctAnswer) scores.T_F_obj += 2
+      if (!answer) {
+        scores.T_F_obj -= 2  // 未答/超时 = -2
+      } else if (answer === q.correctAnswer) {
+        scores.T_F_obj += 2  // 答对 +2
+      } else {
+        scores.T_F_obj -= 2  // 答错 -2
+      }
     } else {
+      if (!answer) return
       const valMap: Record<string, number> = { A: 2, B: 1, C: 0, D: -1, E: -2 }
       const val = valMap[answer] || 0
       if (q.dimension === 'T_F') {
@@ -140,25 +241,23 @@ function submitTest() {
   // Merge T_F
   const T_F_total = scores.T_F_sub + scores.T_F_obj
 
-  // Classify
+  // Classify (四个维度统一阈值 ±17)
   function classify(score: number, dim: string): string {
-    if (dim === 'T_F') {
-      if (score > 19) return 'T'
-      if (score < 0) return 'F'
-      return 'C'
-    }
     if (score > 16) {
       if (dim === 'E_I') return 'E'
       if (dim === 'S_N') return 'S'
+      if (dim === 'T_F') return 'T'
       return 'J'
     }
     if (score < -17) {
       if (dim === 'E_I') return 'I'
       if (dim === 'S_N') return 'N'
+      if (dim === 'T_F') return 'F'
       return 'P'
     }
     if (dim === 'E_I') return 'A'
     if (dim === 'S_N') return 'B'
+    if (dim === 'T_F') return 'C'
     return 'D'
   }
 
@@ -171,7 +270,7 @@ function submitTest() {
 
   const typeCode = chars.E_I + chars.S_N + chars.T_F + chars.P_J
 
-  // Save record (fire-and-forget, non-blocking)
+  // Save record
   api.saveRecord({
     typeCode,
     scores: { ...scores, T_F: T_F_total },
@@ -190,7 +289,6 @@ function submitTest() {
     }
   })
 
-  // Navigate to result
   router.push({
     name: 'result',
     params: { type: typeCode },
@@ -205,14 +303,31 @@ function submitTest() {
 
 function jumpTo(index: number) {
   if (autoAdvanceTimer) { clearTimeout(autoAdvanceTimer); autoAdvanceTimer = null }
+  saveTimerRemaining()
+  stopObjectiveTimer()
   if (index >= 0 && index <= questions.value.length - 1) {
     currentIndex.value = index
   }
 }
 
+// 监听进入客观题自动启动计时（有剩余秒数则恢复，已归零则不再启动）
+watch(currentIndex, () => {
+  const q = currentQuestion.value
+  if (q?.type === 'objective' && objectiveIntroShown.value && !showObjectiveIntro.value) {
+    const saved = timerRemaining.value[q.id]
+    if (saved === undefined) {
+      startObjectiveTimer(20)  // 首次进入
+    } else if (saved > 0) {
+      startObjectiveTimer(saved)  // 恢复剩余时间
+    } else {
+      objectiveSeconds.value = 0  // 已超时，显示 0
+    }
+  }
+})
+
 // Keyboard navigation
 function onKeydown(e: KeyboardEvent) {
-  if (showConfirm.value) return
+  if (showSubmitConfirm.value || showObjectiveIntro.value) return
   const q = currentQuestion.value
   if (!q) return
 
@@ -229,7 +344,10 @@ onMounted(() => {
   window.addEventListener('keydown', onKeydown)
 })
 
-// Cleanup listener on unmount (Vue auto-handles via onUnmounted)
+onUnmounted(() => {
+  window.removeEventListener('keydown', onKeydown)
+  stopObjectiveTimer()
+})
 </script>
 
 <template>
@@ -263,7 +381,7 @@ onMounted(() => {
           :key="currentQuestion.id"
           class="w-full max-w-2xl mx-auto stagger"
         >
-          <!-- Question type badge -->
+          <!-- Question type badge + timer -->
           <div class="flex items-center gap-3 mb-8">
             <span
               class="text-xs font-semibold px-3 py-1 rounded-full tracking-wide"
@@ -274,6 +392,19 @@ onMounted(() => {
               {{ currentQuestion.type === 'objective' ? '客观推理题' : '主观选择题' }}
             </span>
             <span class="text-xs text-text-muted">第 {{ currentIndex + 1 }} 题 / 共 {{ totalQuestions }} 题</span>
+
+            <!-- 客观题倒计时 -->
+            <span
+              v-if="isInObjectiveMode"
+              class="ml-auto text-sm font-mono font-bold tabular-nums"
+              :class="objectiveSeconds <= 5 ? 'text-coral animate-pulse' : 'text-charcoal'"
+            >
+              <svg class="w-4 h-4 inline-block mr-1 -mt-0.5" :class="objectiveSeconds <= 5 ? 'text-coral' : 'text-gold'" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10" />
+                <path stroke-linecap="round" d="M12 6v6l4 2" />
+              </svg>
+              {{ objectiveSeconds }}s
+            </span>
           </div>
 
           <!-- Question text (objective) -->
@@ -298,6 +429,7 @@ onMounted(() => {
             v-if="currentQuestion.type === 'objective'"
             :options="currentQuestion.options"
             :modelValue="answers[currentQuestion.id] ?? null"
+            :disabled="isObjectiveLocked"
             @update:modelValue="selectOption"
           />
 
@@ -320,7 +452,6 @@ onMounted(() => {
           ← 上一题
         </button>
 
-        <!-- Dot indicators -->
         <div class="hidden md:flex items-center gap-1.5">
           <button
             v-for="(_, idx) in questions"
@@ -342,10 +473,56 @@ onMounted(() => {
       </div>
     </footer>
 
+    <!-- 客观题介绍弹窗 -->
+    <Transition name="modal">
+      <div v-if="showObjectiveIntro" class="fixed inset-0 z-50 flex items-center justify-center p-5">
+        <div class="absolute inset-0 bg-charcoal/50 backdrop-blur-sm" />
+        <div class="relative bg-cream rounded-3xl p-8 max-w-sm w-full shadow-2xl animate-scale-in">
+          <div class="w-12 h-12 mx-auto mb-4 rounded-2xl bg-gold/10 flex items-center justify-center">
+            <svg class="w-6 h-6 text-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+            </svg>
+          </div>
+          <h3 class="text-xl font-display font-bold text-charcoal mb-3 text-center">即将进入逻辑推理挑战</h3>
+          <div class="text-sm text-text-secondary leading-relaxed mb-6 space-y-2">
+            <p>接下来是 <span class="font-bold text-charcoal">10 道客观推理题</span>，请注意以下规则：</p>
+            <ul class="space-y-1.5 text-text-secondary">
+              <li class="flex items-start gap-2">
+                <span class="w-1.5 h-1.5 rounded-full bg-gold mt-1.5 shrink-0" />
+                <span>每题限时 <span class="font-bold text-coral">20 秒</span>，超时视为答错</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="w-1.5 h-1.5 rounded-full bg-sage mt-1.5 shrink-0" />
+                <span>答对 <span class="font-bold text-sage">+2 分</span>，答错 <span class="font-bold text-coral">-2 分</span></span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="w-1.5 h-1.5 rounded-full bg-[#82B1FF] mt-1.5 shrink-0" />
+                <span>选择后自动跳转下一题，不可返回修改</span>
+              </li>
+            </ul>
+          </div>
+          <div class="flex gap-3">
+            <button
+              @click="cancelObjectiveIntro"
+              class="flex-1 px-4 py-3 text-sm font-medium text-text-secondary border border-border rounded-xl hover:bg-surface-alt transition-all duration-300"
+            >
+              返回上一题
+            </button>
+            <button
+              @click="confirmObjectiveIntro"
+              class="flex-1 px-4 py-3 text-sm font-semibold bg-gold text-white rounded-xl hover:brightness-110 transition-all duration-300"
+            >
+              准备好了
+            </button>
+          </div>
+        </div>
+      </div>
+    </Transition>
+
     <!-- Submit Confirm Modal -->
     <Transition name="modal">
-      <div v-if="showConfirm" class="fixed inset-0 z-50 flex items-center justify-center p-5">
-        <div class="absolute inset-0 bg-charcoal/40 backdrop-blur-sm" @click="showConfirm = false" />
+      <div v-if="showSubmitConfirm" class="fixed inset-0 z-50 flex items-center justify-center p-5">
+        <div class="absolute inset-0 bg-charcoal/40 backdrop-blur-sm" @click="showSubmitConfirm = false" />
         <div class="relative bg-cream rounded-3xl p-8 max-w-sm w-full shadow-2xl animate-scale-in">
           <h3 class="text-xl font-display font-bold text-charcoal mb-3">确认提交？</h3>
           <p class="text-text-secondary mb-2">
@@ -356,7 +533,7 @@ onMounted(() => {
           </p>
           <div class="flex gap-3">
             <button
-              @click="showConfirm = false"
+              @click="showSubmitConfirm = false"
               class="flex-1 px-4 py-3 text-sm font-medium text-text-secondary border border-border rounded-xl hover:bg-surface-alt transition-all duration-300"
             >
               继续答题

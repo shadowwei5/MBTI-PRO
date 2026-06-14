@@ -1,12 +1,18 @@
 <script setup lang="ts">
-defineProps<{
+const props = defineProps<{
   options: { key: string; label: string }[]
   modelValue: string | null
+  disabled?: boolean
 }>()
 
-defineEmits<{
+const emit = defineEmits<{
   'update:modelValue': [value: string]
 }>()
+
+function onClick(key: string) {
+  if (props.disabled) return
+  emit('update:modelValue', key)
+}
 </script>
 
 <template>
@@ -14,11 +20,14 @@ defineEmits<{
     <button
       v-for="opt in options"
       :key="opt.key"
-      class="group relative w-full text-left px-6 py-4 rounded-2xl border-2 transition-all duration-300 cursor-pointer"
-      :class="modelValue === opt.key
-        ? 'border-coral bg-coral/10 shadow-lg shadow-coral/10'
-        : 'border-border bg-white/60 hover:border-warm-gray hover:bg-surface'"
-      @click="$emit('update:modelValue', opt.key)"
+      class="group relative w-full text-left px-6 py-4 rounded-2xl border-2 transition-all duration-300"
+      :class="disabled
+        ? 'border-border bg-surface-alt/50 opacity-60 cursor-not-allowed'
+        : modelValue === opt.key
+          ? 'border-coral bg-coral/10 shadow-lg shadow-coral/10 cursor-pointer'
+          : 'border-border bg-white/60 hover:border-warm-gray hover:bg-surface cursor-pointer'"
+      :disabled="disabled"
+      @click="onClick(opt.key)"
     >
       <div class="flex items-center gap-3">
         <span

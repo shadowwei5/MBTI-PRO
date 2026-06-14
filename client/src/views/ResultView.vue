@@ -4,7 +4,7 @@ import { useRoute } from 'vue-router'
 import DimensionSpectrum from '../components/DimensionSpectrum.vue'
 import TypeAvatar from '../components/TypeAvatar.vue'
 import { api, type PersonalityType } from '../services/api'
-import { getTypeColor, getTypeHex, getTemperament, TEMPERAMENT_COLORS, getTypeColorFamily } from '../utils/colors'
+import { getTypeColor, getTypeHex, getTemperament, TEMPERAMENT_COLORS, getNineGroupCode, getNineGroupColor } from '../utils/colors'
 
 const route = useRoute()
 
@@ -66,9 +66,10 @@ const isTraditional = computed(() => {
   return !['A', 'B', 'C', 'D'].some(c => typeCode.value.includes(c))
 })
 
-// 四气质色系
+// 9组颜色分类
 const typeColor = computed(() => getTypeColor(typeCode.value))
-const family = computed(() => getTypeColorFamily(typeCode.value))
+const groupCode = computed(() => getNineGroupCode(typeCode.value))
+const groupColor = computed(() => getNineGroupColor(groupCode.value))
 const temperament = computed(() => getTemperament(typeCode.value))
 const temperamentColor = computed(() => temperament.value ? TEMPERAMENT_COLORS[temperament.value] : null)
 
@@ -122,7 +123,7 @@ const defaultItems = {
               :style="{ background: typeColor.hex + '18', color: typeColor.hex, borderColor: typeColor.hex + '40' }"
             >
               <span class="w-1.5 h-1.5 rounded-full" :style="{ background: typeColor.hex }" />
-              {{ family === 'purple' ? '分析师 NT' : family === 'green' ? '外交家 NF' : family === 'blue' ? '守护者 SJ' : '探险家 SP' }}
+              {{ groupColor.name }}
             </div>
             <!-- 传统四气质徽章（纯端值16型） -->
             <div
@@ -138,7 +139,7 @@ const defaultItems = {
               v-if="!isTraditional"
               class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-coral/10 text-coral border border-coral/30"
             >
-              MBTI-PRO 独有
+              MBTI PRO 独有
             </div>
           </div>
 
@@ -176,7 +177,7 @@ const defaultItems = {
               :style="{ background: typeColor.hex + '18', color: typeColor.hex }"
             >
               <span class="w-1.5 h-1.5 rounded-full" :style="{ background: typeColor.hex }" />
-              {{ family === 'purple' ? '分析师色系' : family === 'green' ? '外交家色系' : family === 'blue' ? '守护者色系' : '探险家色系' }}
+              {{ groupColor.name }}
             </span>
           </h2>
           <DimensionSpectrum
@@ -196,7 +197,7 @@ const defaultItems = {
             {{ typeData.overview }}
           </div>
           <p v-else class="text-text-secondary leading-relaxed">
-            {{ typeCode }} 型人格{{ isTraditional ? '属于经典的MBTI 16型之一。' : '是MBTI-PRO 81型分类体系中的独特类型。' }}
+            {{ typeCode }} 型人格{{ isTraditional ? '属于经典的MBTI 16型之一。' : '是MBTI PRO 81型分类体系中的独特类型。' }}
             你在四个核心维度上展现出独特的偏好组合。
           </p>
         </div>

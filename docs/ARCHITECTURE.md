@@ -1,6 +1,6 @@
 # MBTI-PRO 人格测试系统 - 架构设计文档
 
-> 版本: v1.3 | 日期: 2026-06-13 | 状态: MVP 架构就绪，16 型概览 700+ 字
+> 版本: v1.4 | 日期: 2026-06-14 | 状态: MVP 架构就绪，全部 81 型概览 700 字达标，65 型 AI 图像提示词就绪
 
 ---
 
@@ -128,6 +128,18 @@ server/src/
         ├── 16 型手写精品描述 handCraftedTypes
         ├── buildTypeContent()  # 组装引擎
         └── generateAllTypeCodes()
+
+server/ (根目录工具脚本)
+├── expand_overviews.py         # V1 概览扩充 (23型 → 529-615字)
+├── expand_overviews_v2.py      # V2 概览扩充 (42型 → 480-584字)
+├── expand_overviews_v3.py      # V3 概览扩充 (46型重写/扩充 → 535-814字)
+├── generate_image_prompts.py   # 65型 AI 图像提示词生成器
+│   ├── 9 组颜色定义 (hex/视觉关键词/形状/纹理/情绪)
+│   ├── 完整提示词 + 简短提示词 双输出
+│   └── 输出 json + markdown 双格式
+├── image_prompts_65.json       # 机器可读提示词数据
+├── image_prompts_65.md         # 人类可读提示词文档 (9组组织)
+└── update_overviews.py         # 概览批量写入工具
 ```
 
 ### 3.2 API 端点
@@ -181,7 +193,39 @@ model TestRecord {
 }
 ```
 
-### 3.4 81型内容引擎
+### 3.4 9组颜色分类架构
+
+基于感知维度(S/N/B) × 判断维度(T/C/F) 交叉形成 9 组配色方案，用于 AI 图像生成：
+
+```
+getColorGroup(code)
+  ├─ 提取感知维度 = S | B | N
+  ├─ 提取判断维度 = T | C | F
+  ├─ 查表 → 9组之一 (G1-G9)
+  └─ 返回 { groupName, hexColor, visualKeywords, shapeStyle, texture, mood }
+
+9 组定义：
+  S×T → G1 岩灰组   S×C → G2 钢蓝组   S×F → G3 琥珀组
+  B×T → G4 银灰组   B×C → G5 燕麦组   B×F → G6 炭灰组
+  N×T → G7 靛青组   N×C → G8 翠绿组   N×F → G9 深紫组
+```
+
+### 3.5 AI 图像提示词生成架构
+
+```
+generate_image_prompts.py
+  ├─ 定义 9 组颜色方案 (组名/hex/关键词/形状/纹理/情绪)
+  ├─ 遍历 65 新型人格类型
+  ├─ 按代码推导感知×判断组合 → 匹配颜色组
+  ├─ 生成完整提示词 (风格/色彩/构图/纹理/氛围/情绪/维度特质)
+  ├─ 生成简短提示词 (核心视觉要素浓缩)
+  ├─ 输出 image_prompts_65.json (机器可读)
+  └─ 输出 image_prompts_65.md  (人类可读，按9组组织)
+
+推荐国内 AI 模型：通义万相 (首选) → 即梦 Dreamina (备选) → 文心一格 (第三)
+```
+
+### 3.6 81型内容引擎
 
 ```
 buildTypeContent(code)
@@ -192,10 +236,10 @@ buildTypeContent(code)
   ├─ 职业映射：FULL_CAREER_MAP[code] (81型精准映射)
   └─ 名人数据：16型手写 + 65型推导
 
-handCraftedTypes (16型手写精品，均已扩至 700字+，零 16 型框架遗留表述)
-  └─ INTJ, ENTJ, INTP, ENTP, ISTJ, ISFJ, INFJ, ISTP,
-     ISFP, INFP, ESTP, ESFP, ENFP, ESTJ, ESFJ, ENFJ
-  全部概览已清除"在16型中"类表述，与 81 型体系完全吻合
+概览内容 (81型全部达标)：
+  └─ 传统16型平均 693 字，新65型平均 663 字，全局81型平均 669 字
+  └─ 全部概览已清除"在16型中"类表述，与 81 型体系完全吻合
+  └─ 三轮扩充 (V1/V2/V3) 将 23 型从 400 字以下扩展至 535 字以上
 ```
 
 ---
