@@ -1,6 +1,6 @@
 # MBTI-PRO 人格测试系统 - 完整实施方案
 
-> 版本: v1.0 | 日期: 2026-06-10 | 基于：项目计划书 + 2份调研报告 + 网络调研
+> 版本: v1.1 | 日期: 2026-06-16 | 基于：项目计划书 + 2份调研报告 + 网络调研
 
 ---
 
@@ -180,10 +180,19 @@ Phase 3: 完善发布        Phase 4: 运营迭代              │
 
 **Phase 2 里程碑验收标准：**
 - [ ] 81型全部人格描述文案完成并入库
-- [ ] 81型头像全部完成
+- [x] 81型头像全部完成 ✅ (2026-06-16，Low Poly矢量风格，Doubao-Seedream-5.0 API批量生成)
 - [ ] 结果页面支持81型展示（含中间值状态视觉区分）
 - [ ] 分享海报功能可用
 - [ ] 管理后台可CRUD题目和文案
+
+**Phase 2 实际进度更新 (2026-06-16)：**
+- P2-07/P2-08 图像生成已完成：81张Low Poly低多边形矢量插画，每张约200KB
+  - 采用豆包Seedream-5.0 API（火山引擎ARK），非原计划的Midjourney
+  - 9组颜色分类（暖金/琥珀/藏蓝/深炭灰/月光银灰/暖燕麦/深紫/靛青/翠绿）×9型
+  - 米白纯色背景 + 分组色通过服装/配饰/发色表达
+  - 每型配有3字中文称号 + 精细角色描述（发型/服装/配饰/道具/姿态/表情）
+  - 输出目录：`server/generated_images/`（81张JPG，共16.2MB）
+  - 生成脚本：`server/scripts/generate_images.py`
 
 ---
 
@@ -347,15 +356,13 @@ Vue SPA构建产物 → OSS → CDN → 用户浏览器
 - 重新绘制或AI生成 + 人工后期
 - 保持原色系，统一风格
 
-**新增65型头像：**
-- 使用Midjourney/DALL-E/Stable Diffusion批量生成
-- 每个头像生成3-5个候选，人工筛选
-- 统一风格：扁平插画风、低饱和色系、中性友好
-
-**头像规格：**
-- 格式：WebP（主）+ PNG（降级）
-- 尺寸：400×400px（@2x）
-- 背景：透明
+**✅ 新增65型头像（已完成 2026-06-16）：**
+- 实际采用**豆包Seedream-5.0 API**（火山引擎ARK）批量生成，替代原计划Midjourney
+- Low Poly低多边形矢量插画风格，纯色几何色块拼接，无渐变无阴影
+- 米白纯色背景 + 9组颜色分类通过服装/配饰/发色表达
+- 每型配有3字中文称号 + 精细角色原型描述
+- 脚本位置：`server/scripts/generate_images.py`
+- 输出目录：`server/generated_images/`（81张JPG，共16.2MB）
 
 ---
 
@@ -507,15 +514,17 @@ Vue SPA构建产物 → OSS → CDN → 用户浏览器
 |------|------|------|
 | PRD | `docs/PRD.md` | 产品需求文档 |
 | 架构设计 | `docs/ARCHITECTURE.md` | 系统架构设计文档 |
-| 项目状态 | `docs/STATUS.md` | 项目状态跟踪 |
-| 实施方案 | `IMPLEMENTATION_PLAN.md` | 本文件 |
+| 项目状态 | `STATUS.md` | 项目状态跟踪（2026-06-16更新） |
+| 实施方案 | `IMPLEMENTATION_PLAN.md` | 本文件（v1.1） |
 | 参考01-08 | `references/` | 8份参考文档 |
+| 图像生成脚本 | `server/scripts/generate_images.py` | 81型角色图像批量生成 |
+| 图像输出 | `server/generated_images/` | 81张JPG（16.2MB） |
 
-### B. 项目目录结构（计划）
+### B. 项目目录结构（当前实际）
 
 ```
 MBTI-PRO/
-├── client/                    # 前端项目
+├── client/                    # 前端项目 (Vue3+Vite+TS)
 │   ├── src/
 │   │   ├── components/       # 组件
 │   │   ├── composables/      # 组合式函数
@@ -526,7 +535,7 @@ MBTI-PRO/
 │   │   └── utils/            # 工具函数
 │   ├── public/               # 静态资源
 │   └── package.json
-├── server/                   # 后端项目
+├── server/                   # 后端项目 (Express+TS+Prisma)
 │   ├── src/
 │   │   ├── controllers/      # 控制器
 │   │   ├── services/         # 业务逻辑
@@ -534,8 +543,11 @@ MBTI-PRO/
 │   │   ├── routes/           # 路由
 │   │   └── utils/            # 工具函数
 │   ├── prisma/               # 数据库Schema
+│   ├── scripts/              # 工具脚本
+│   │   └── generate_images.py  # 81型图像批量生成
+│   ├── generated_images/     # AI生成人格图像（81张JPG）
 │   └── package.json
-├── docs/                     # 文档
+├── docs/                     # 文档（待创建）
 │   ├── PRD.md
 │   ├── ARCHITECTURE.md
 │   └── STATUS.md
@@ -547,12 +559,10 @@ MBTI-PRO/
 │   ├── 05-评分算法参考.md
 │   ├── 06-81型人格分类体系.md
 │   ├── 07-技术选型参考.md
-│   └── 08-法律法规与合规.md
-├── IMPLEMENTATION_PLAN.md    # 本文件
+│   ├── 08-法律法规与合规.md
+│   └── 09-UI设计方案与图像生成.md
+├── IMPLEMENTATION_PLAN.md    # 完整实施方案（v1.1）
+├── STATUS.md                 # 项目状态跟踪
 ├── docker-compose.yml
 └── README.md
 ```
-
----
-
-> **下一步：** 确认技术栈选型 → 搭建开发环境 → 开始题库开发
