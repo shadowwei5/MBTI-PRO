@@ -202,6 +202,7 @@ function cancelObjectiveIntro() {
 }
 
 function goPrev() {
+  if (isInObjectiveMode.value) return
   if (autoAdvanceTimer) { clearTimeout(autoAdvanceTimer); autoAdvanceTimer = null }
   saveTimerRemaining()
   stopObjectiveTimer()
@@ -220,7 +221,7 @@ function submitTest() {
     const answer = answers.value[q.id]
     if (q.type === 'objective') {
       if (!answer) {
-        scores.T_F_obj -= 2  // 未答/超时 = -2
+        // 未作答不扣分，保持中立
       } else if (answer === q.correctAnswer) {
         scores.T_F_obj += 2  // 答对 +2
       } else {
@@ -302,6 +303,7 @@ function submitTest() {
 }
 
 function jumpTo(index: number) {
+  if (isInObjectiveMode.value) return
   if (autoAdvanceTimer) { clearTimeout(autoAdvanceTimer); autoAdvanceTimer = null }
   saveTimerRemaining()
   stopObjectiveTimer()
@@ -337,7 +339,7 @@ function onKeydown(e: KeyboardEvent) {
   if (e.key === 'ArrowRight' || e.key === 'Enter') {
     if (canGoNext.value) goNext()
   }
-  if (e.key === 'ArrowLeft') goPrev()
+  if (e.key === 'ArrowLeft' && !isInObjectiveMode.value) goPrev()
 }
 
 onMounted(() => {
@@ -446,8 +448,8 @@ onUnmounted(() => {
       <div class="max-w-2xl mx-auto px-5 py-4 flex items-center justify-between">
         <button
           @click="goPrev"
-          :disabled="currentIndex === 0"
-          class="px-5 py-2.5 text-sm font-medium text-text-secondary rounded-xl transition-all duration-300 hover:bg-surface-alt disabled:opacity-30 disabled:cursor-not-allowed"
+          :disabled="currentIndex === 0 || isInObjectiveMode"
+          class="px-5 py-3 min-h-[44px] text-sm font-medium text-text-secondary rounded-xl transition-all duration-300 hover:bg-surface-alt disabled:opacity-30 disabled:cursor-not-allowed"
         >
           ← 上一题
         </button>
@@ -466,7 +468,7 @@ onUnmounted(() => {
 
         <button
           @click="goNext"
-          class="px-6 py-2.5 text-sm font-semibold rounded-xl transition-all duration-300 bg-charcoal text-cream hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0"
+          class="px-6 py-3 min-h-[44px] text-sm font-semibold rounded-xl transition-all duration-300 bg-charcoal text-cream hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0"
         >
           {{ isLastQuestion ? '提交结果' : '下一题 →' }}
         </button>
@@ -489,11 +491,7 @@ onUnmounted(() => {
             <ul class="space-y-1.5 text-text-secondary">
               <li class="flex items-start gap-2">
                 <span class="w-1.5 h-1.5 rounded-full bg-gold mt-1.5 shrink-0" />
-                <span>每题限时 <span class="font-bold text-coral">20 秒</span>，超时视为答错</span>
-              </li>
-              <li class="flex items-start gap-2">
-                <span class="w-1.5 h-1.5 rounded-full bg-sage mt-1.5 shrink-0" />
-                <span>答对 <span class="font-bold text-sage">+2 分</span>，答错 <span class="font-bold text-coral">-2 分</span></span>
+                <span>每题限时 <span class="font-bold text-coral">20 秒</span>，超时自动跳过</span>
               </li>
               <li class="flex items-start gap-2">
                 <span class="w-1.5 h-1.5 rounded-full bg-[#82B1FF] mt-1.5 shrink-0" />

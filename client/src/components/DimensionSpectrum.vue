@@ -9,13 +9,16 @@ const props = defineProps<{
 }>()
 
 function normalizedScore(score: number, dimKey: string): number {
-  if (dimKey === 'T_F') {
-    // T_F range: -20 (F extreme) to +40 (T extreme), span 60
-    if (score >= 0) return Math.round((score / 40) * 100)
-    return Math.round((score / 20) * 100)
+  // 使用实际题目数计算最大分值，确保所有维度对称归一化
+  // T_F: 10道likert + 10道客观题 = 20题 × ±2 = ±40
+  // E_I/S_N/P_J: 各约23道likert题 × ±2 ≈ ±46
+  const dimTotal = props.dimTotals?.[dimKey as keyof typeof props.dimTotals] ?? 0
+  if (dimTotal > 0) {
+    const maxScore = dimTotal * 2
+    return Math.round((score / maxScore) * 100)
   }
-  // E_I / S_N / P_J range: -50 to +50 (25 questions × [-2,+2]), span 100
-  return Math.round((score / 50) * 100)
+  // 无测试数据时的兜底（不应出现，因维度分析仅在 hasTestData 时显示）
+  return 0
 }
 
 // Dot position strictly proportional to normalized score (-100..+100) → (3%..97%)

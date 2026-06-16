@@ -34,7 +34,7 @@ const poleRight = '#5C6BC0'
         <!-- Buttons -->
         <div class="flex gap-2 px-4 md:px-5 pb-4 md:pb-5 mt-auto">
           <button
-            class="flex-1 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 cursor-pointer"
+            class="flex-1 px-3 py-3 rounded-xl text-sm font-semibold transition-all duration-300 cursor-pointer min-h-[44px]"
             :style="modelValue === 'A'
               ? { background: poleLeft, color: '#fff', boxShadow: '0 2px 12px ' + poleLeft + '40' }
               : { background: poleLeft + '18', color: poleLeft, border: '1.5px solid ' + poleLeft + '40' }"
@@ -43,7 +43,7 @@ const poleRight = '#5C6BC0'
             非常认同
           </button>
           <button
-            class="flex-1 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 cursor-pointer"
+            class="flex-1 px-3 py-3 rounded-xl text-sm font-semibold transition-all duration-300 cursor-pointer min-h-[44px]"
             :style="modelValue === 'B'
               ? { background: poleLeft, color: '#fff', boxShadow: '0 2px 12px ' + poleLeft + '40' }
               : { background: poleLeft + '18', color: poleLeft, border: '1.5px solid ' + poleLeft + '40' }"
@@ -57,7 +57,7 @@ const poleRight = '#5C6BC0'
       <!-- Neutral column -->
       <div class="flex md:flex-col items-center justify-center py-2 md:py-0 shrink-0">
         <button
-          class="px-6 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 cursor-pointer border-2 whitespace-nowrap"
+          class="px-6 py-3 rounded-xl text-sm font-semibold transition-all duration-300 cursor-pointer border-2 whitespace-nowrap min-h-[44px]"
           :style="modelValue === 'C'
             ? { background: '#8A827C', color: '#fff', borderColor: '#8A827C', boxShadow: '0 2px 12px rgba(138,130,124,0.3)' }
             : { background: '#ffffff99', color: '#9C958E', borderColor: '#E0D8CC' }"
@@ -83,7 +83,7 @@ const poleRight = '#5C6BC0'
         <!-- Buttons -->
         <div class="flex gap-2 px-4 md:px-5 pb-4 md:pb-5 mt-auto">
           <button
-            class="flex-1 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 cursor-pointer"
+            class="flex-1 px-3 py-3 rounded-xl text-sm font-semibold transition-all duration-300 cursor-pointer min-h-[44px]"
             :style="modelValue === 'D'
               ? { background: poleRight, color: '#fff', boxShadow: '0 2px 12px ' + poleRight + '40' }
               : { background: poleRight + '18', color: poleRight, border: '1.5px solid ' + poleRight + '40' }"
@@ -92,7 +92,7 @@ const poleRight = '#5C6BC0'
             认同
           </button>
           <button
-            class="flex-1 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 cursor-pointer"
+            class="flex-1 px-3 py-3 rounded-xl text-sm font-semibold transition-all duration-300 cursor-pointer min-h-[44px]"
             :style="modelValue === 'E'
               ? { background: poleRight, color: '#fff', boxShadow: '0 2px 12px ' + poleRight + '40' }
               : { background: poleRight + '18', color: poleRight, border: '1.5px solid ' + poleRight + '40' }"
