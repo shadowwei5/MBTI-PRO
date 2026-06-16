@@ -7,7 +7,7 @@ import TypeAvatar from '../components/TypeAvatar.vue'
 
 const router = useRouter()
 const loaded = ref(false)
-const allTypes = ref<Pick<PersonalityType, 'code' | 'name' | 'isTraditional' | 'population' | 'celebrities'>[]>([])
+const allTypes = ref<Pick<PersonalityType, 'code' | 'name' | 'isTraditional' | 'population' | 'celebrities'> & { imageUrl?: string }[]>([])
 const fetchError = ref(false)
 
 // 9组颜色分类：严格按 81型人格颜色分类.xlsx 定义
@@ -295,8 +295,8 @@ function goToType(code: string) {
         </div>
 
         <!-- Comparison Table -->
-        <div class="bg-white/70 backdrop-blur-sm rounded-3xl border border-border shadow-sm overflow-hidden mb-8">
-          <table class="w-full text-sm">
+        <div class="bg-white/70 backdrop-blur-sm rounded-3xl border border-border shadow-sm overflow-x-auto mb-8">
+          <table class="w-full text-sm min-w-[500px]">
             <thead>
               <tr class="border-b border-border">
                 <th class="text-left px-6 py-4 font-semibold text-charcoal w-1/4">对比维度</th>
@@ -455,34 +455,48 @@ function goToType(code: string) {
                 v-for="t in groupedTypes[groupCode]"
                 :key="t.code"
                 @click="goToType(t.code)"
-                class="group relative bg-white/70 backdrop-blur-sm rounded-2xl p-4 md:p-5 border border-border/40 shadow-sm text-left transition-all duration-300 hover:shadow-md hover:-translate-y-0.5"
+                class="group relative bg-white/70 backdrop-blur-sm rounded-2xl border border-border/40 shadow-sm text-left transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 overflow-hidden"
                 :style="{ borderColor: NINE_GROUP_META[groupCode].hex + '20' }"
               >
-                <!-- Accent bar at top -->
-                <div
-                  class="absolute top-0 left-4 right-4 h-0.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                  :style="{ background: NINE_GROUP_META[groupCode].hex }"
-                />
-                <div class="flex items-center gap-3 mb-2">
-                  <div class="shrink-0 transition-transform duration-300 group-hover:scale-110">
-                    <TypeAvatar :type-code="t.code" :size="44" />
-                  </div>
-                  <div class="min-w-0">
-                    <p
-                      class="text-sm md:text-base font-display font-bold tracking-wide"
-                      :style="{ color: getTypeHex(t.code) }"
-                    >
-                      {{ t.code }}
-                    </p>
-                    <p class="text-xs text-text-muted truncate">{{ t.name?.replace('型', '') }}</p>
-                  </div>
+                <!-- Image thumbnail -->
+                <div class="relative w-full aspect-[4/3] overflow-hidden bg-surface-alt/30">
+                  <img
+                    :src="t.imageUrl || `/api/images/${t.code}`"
+                    :alt="`${t.code}`"
+                    class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    loading="lazy"
+                    @error="($event.target as HTMLImageElement).style.display = 'none'"
+                  />
+                  <!-- Gradient overlay -->
+                  <div class="absolute inset-0 bg-gradient-to-t from-white/60 to-transparent" />
                 </div>
-
-                <!-- Hover: right arrow -->
-                <div class="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <svg class="w-4 h-4" :style="{ color: NINE_GROUP_META[groupCode].hex }" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-                  </svg>
+                <!-- Type info -->
+                <div class="p-3 md:p-4 relative">
+                  <!-- Accent bar at top -->
+                  <div
+                    class="absolute top-0 left-4 right-4 h-0.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                    :style="{ background: NINE_GROUP_META[groupCode].hex }"
+                  />
+                  <div class="flex items-center gap-3">
+                    <div class="shrink-0 transition-transform duration-300 group-hover:scale-110">
+                      <TypeAvatar :type-code="t.code" :size="36" />
+                    </div>
+                    <div class="min-w-0">
+                      <p
+                        class="text-sm md:text-base font-display font-bold tracking-wide"
+                        :style="{ color: getTypeHex(t.code) }"
+                      >
+                        {{ t.code }}
+                      </p>
+                      <p class="text-xs text-text-muted truncate">{{ t.name?.replace('型', '') }}</p>
+                    </div>
+                    <!-- Hover: right arrow -->
+                    <div class="ml-auto opacity-0 group-hover:opacity-100 transition-opacity duration-300 shrink-0">
+                      <svg class="w-4 h-4" :style="{ color: NINE_GROUP_META[groupCode].hex }" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                      </svg>
+                    </div>
+                  </div>
                 </div>
               </button>
             </div>

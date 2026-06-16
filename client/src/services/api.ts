@@ -38,6 +38,7 @@ export interface PersonalityType {
   snModule?: string | null
   tfModule?: string | null
   pjModule?: string | null
+  imageUrl?: string
 }
 
 export interface TestRecordPayload {

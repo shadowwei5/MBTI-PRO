@@ -25,7 +25,7 @@ export interface NineGroupMeta {
 /** 9组完整颜色定义 */
 const NINE_GROUPS: Record<string, GroupColor> = {
   SP: { name: 'SP 暖金组', hex: '#C8963E', text: '#A67A2E' },
-  SD: { name: 'SD 琥珀组', hex: '#C87D3E', text: '#A5632E' },
+  SD: { name: 'SD 琥珀组', hex: '#D4782F', text: '#A85E22' },
   SJ: { name: 'SJ 藏蓝组', hex: '#2C5F8A', text: '#1E4A70' },
   BT: { name: 'BT 深炭灰组', hex: '#4A4A4A', text: '#3A3A3A' },
   BC: { name: 'BC 月光银灰组', hex: '#8B95A0', text: '#6E7A87' },

@@ -3,8 +3,10 @@ import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import DimensionSpectrum from '../components/DimensionSpectrum.vue'
 import TypeAvatar from '../components/TypeAvatar.vue'
+import SharePoster from '../components/SharePoster.vue'
 import { api, type PersonalityType } from '../services/api'
 import { getTypeColor, getTypeHex, getTemperament, TEMPERAMENT_COLORS, getNineGroupCode, getNineGroupColor } from '../utils/colors'
+import { useShareMeta } from '../composables/useShareMeta'
 
 const route = useRoute()
 
@@ -16,6 +18,7 @@ const dimAnswered = ref({ E_I: 0, S_N: 0, T_F: 0, P_J: 0 })
 const isLoaded = ref(false)
 const typeData = ref<PersonalityType | null>(null)
 const fetchError = ref('')
+const showSharePoster = ref(false)
 
 // 是否来自真实测试（有分数数据）
 const hasTestData = computed(() => !!route.query.scores)
@@ -88,6 +91,22 @@ const nicknames = computed(() => ({
   P_J: dimNicknames.P_J[chars.value.P_J] || '',
 }))
 
+// 一句话描述（用于分享海报）
+const oneLiner = computed(() => {
+  if (typeData.value?.overview) {
+    const firstSentence = typeData.value.overview.split(/[。.！!？?\n]/)[0]
+    if (firstSentence && firstSentence.length > 4) return firstSentence
+  }
+  return `${groupColor.value.name} · ${typeName.value}`
+})
+
+// 动态更新分享元标签
+useShareMeta(
+  () => `${typeCode.value} ${typeData.value?.name || typeName.value}`,
+  () => oneLiner.value,
+  () => typeData.value?.imageUrl || `/api/images/${typeCode.value}`,
+)
+
 // Fallback defaults
 const defaultItems = {
   strengths: [
@@ -146,6 +165,24 @@ const defaultItems = {
           <!-- Geometric Avatar -->
           <div class="mb-6 flex justify-center">
             <TypeAvatar :type-code="typeCode" :size="96" />
+          </div>
+
+          <!-- AI-Generated Personality Image -->
+          <div class="mb-8 flex justify-center">
+            <div class="relative w-72 h-72 md:w-80 md:h-80 rounded-3xl overflow-hidden shadow-xl border-2 border-border/30 bg-surface-alt/50">
+              <img
+                :src="typeData?.imageUrl || `/api/images/${typeCode}`"
+                :alt="`${typeCode} 人格类型画像`"
+                class="w-full h-full object-cover transition-opacity duration-700"
+                :class="{ 'opacity-0': !isLoaded }"
+                @load="$event.target.classList.remove('opacity-0')"
+                @error="$event.target.style.display = 'none'"
+              />
+              <!-- Loading placeholder -->
+              <div class="absolute inset-0 flex items-center justify-center bg-surface-alt/30">
+                <div class="w-8 h-8 rounded-full border-3 border-coral-soft border-t-coral animate-spin" />
+              </div>
+            </div>
           </div>
 
           <!-- Type Code -->
@@ -208,15 +245,39 @@ const defaultItems = {
           <div class="grid md:grid-cols-2 gap-4">
             <div
               v-for="dim in [
-                { key: 'E_I', emoji: '⚡', label: '能量来源', dLabel: dimensionLabels.E_I },
-                { key: 'S_N', emoji: '🧠', label: '认知方式', dLabel: dimensionLabels.S_N },
-                { key: 'T_F', emoji: '❤️', label: '决策方式', dLabel: dimensionLabels.T_F },
-                { key: 'P_J', emoji: '📋', label: '生活态度', dLabel: dimensionLabels.P_J },
+                { key: 'E_I', icon: 'energy', label: '能量来源', dLabel: dimensionLabels.E_I, accent: '#82B1FF' },
+                { key: 'S_N', icon: 'cognition', label: '认知方式', dLabel: dimensionLabels.S_N, accent: '#B388FF' },
+                { key: 'T_F', icon: 'decision', label: '决策方式', dLabel: dimensionLabels.T_F, accent: '#40C4FF' },
+                { key: 'P_J', icon: 'lifestyle', label: '生活态度', dLabel: dimensionLabels.P_J, accent: '#FFD740' },
               ]"
               :key="dim.key"
-              class="flex items-start gap-3 p-4 rounded-2xl bg-surface-alt/50"
+              class="flex items-start gap-4 p-4 rounded-2xl bg-surface-alt/50 group hover:bg-surface-alt/80 transition-colors duration-300"
             >
-              <span class="text-xl shrink-0">{{ dim.emoji }}</span>
+              <!-- 维度图标 -->
+              <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" :style="{ background: dim.accent + '18' }">
+                <!-- 能量来源：同心波纹 -->
+                <svg v-if="dim.icon === 'energy'" class="w-5 h-5" viewBox="0 0 20 20" fill="none">
+                  <circle cx="10" cy="10" r="2.5" :stroke="dim.accent" stroke-width="1.8" />
+                  <circle cx="10" cy="10" r="6.5" :stroke="dim.accent" stroke-width="1.2" opacity="0.5" />
+                </svg>
+                <!-- 认知方式：六边形网格 -->
+                <svg v-if="dim.icon === 'cognition'" class="w-5 h-5" viewBox="0 0 20 20" fill="none">
+                  <path d="M10 2L17.5 6.5V15.5L10 20L2.5 15.5V6.5L10 2Z" :stroke="dim.accent" stroke-width="1.5" stroke-linejoin="round" />
+                  <circle cx="10" cy="11" r="3" :stroke="dim.accent" stroke-width="1.2" opacity="0.5" />
+                </svg>
+                <!-- 决策方式：天平 -->
+                <svg v-if="dim.icon === 'decision'" class="w-5 h-5" viewBox="0 0 20 20" fill="none">
+                  <path d="M10 3v14M5 8l-3 2 3 2M15 8l3 2-3 2" :stroke="dim.accent" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                  <circle cx="10" cy="8" r="1.5" :fill="dim.accent" opacity="0.3" />
+                </svg>
+                <!-- 生活态度：罗盘 -->
+                <svg v-if="dim.icon === 'lifestyle'" class="w-5 h-5" viewBox="0 0 20 20" fill="none">
+                  <circle cx="10" cy="10" r="7.5" :stroke="dim.accent" stroke-width="1.5" />
+                  <path d="M10 2.5v15M2.5 10h15" :stroke="dim.accent" stroke-width="1" opacity="0.4" />
+                  <circle cx="10" cy="10" r="2" :stroke="dim.accent" stroke-width="1.5" />
+                  <path d="M10 4l2 6-2 6" :stroke="dim.accent" stroke-width="1.2" opacity="0.6" />
+                </svg>
+              </div>
               <div>
                 <p class="text-xs text-text-muted mb-0.5">{{ dim.label }}</p>
                 <p class="text-sm font-semibold text-charcoal">
@@ -275,20 +336,21 @@ const defaultItems = {
         <div class="flex flex-col sm:flex-row gap-4 justify-center">
           <button
             @click="$router.push('/')"
-            class="px-8 py-4 bg-charcoal text-cream font-semibold rounded-2xl hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
+            class="px-8 py-4 min-h-[52px] bg-charcoal text-cream font-semibold rounded-2xl hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
           >
             {{ hasTestData ? '重新测试' : '开始测试' }}
           </button>
           <button
             v-if="hasTestData"
-            class="px-8 py-4 bg-coral text-white font-semibold rounded-2xl hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
+            @click="showSharePoster = true"
+            class="px-8 py-4 min-h-[52px] bg-coral text-white font-semibold rounded-2xl hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
           >
             分享结果
           </button>
           <button
             v-else
             @click="$router.push('/')"
-            class="px-8 py-4 bg-coral text-white font-semibold rounded-2xl hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
+            class="px-8 py-4 min-h-[52px] bg-coral text-white font-semibold rounded-2xl hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
           >
             返回首页
           </button>
@@ -301,5 +363,17 @@ const defaultItems = {
         </p>
       </div>
     </div>
+
+    <!-- Share Poster Modal -->
+    <SharePoster
+      v-if="showSharePoster"
+      :typeCode="typeCode"
+      :typeName="typeData?.name || typeName"
+      :typeColor="typeColor"
+      :groupColor="groupColor"
+      :oneLiner="oneLiner"
+      :imageUrl="typeData?.imageUrl || `/api/images/${typeCode}`"
+      @close="showSharePoster = false"
+    />
   </div>
 </template>
