@@ -49,6 +49,25 @@ export interface TestRecordPayload {
   duration: number
 }
 
+export interface ScoreResponse {
+  typeCode: string
+  scores: {
+    E_I: number
+    S_N: number
+    T_F: number
+    P_J: number
+    T_F_sub: number
+    T_F_obj: number
+  }
+  chars: {
+    E_I: string
+    S_N: string
+    T_F: string
+    P_J: string
+  }
+  confidence: number
+}
+
 export const api = {
   getQuestions: () => request<ApiQuestion[]>('/questions'),
 
@@ -61,6 +80,12 @@ export const api = {
 
   getAllTypes: () =>
     request<Pick<PersonalityType, 'code' | 'name' | 'isTraditional' | 'population' | 'celebrities'>[]>('/results'),
+
+  submitScore: (answers: Record<string, string>, questionIds?: number[]) =>
+    request<ScoreResponse>('/results/score', {
+      method: 'POST',
+      body: JSON.stringify({ answers, questionIds }),
+    }),
 
   saveRecord: (payload: TestRecordPayload) =>
     request<{ id: string }>('/records', {

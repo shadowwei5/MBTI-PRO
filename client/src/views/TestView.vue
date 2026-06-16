@@ -211,76 +211,11 @@ function goPrev() {
   }
 }
 
-function submitTest() {
+async function submitTest() {
   showSubmitConfirm.value = false
   stopObjectiveTimer()
-  localStorage.removeItem('mbti-pro-test')
 
-  const scores = { E_I: 0, S_N: 0, T_F_obj: 0, T_F_sub: 0, P_J: 0 }
-  questions.value.forEach(q => {
-    const answer = answers.value[q.id]
-    if (q.type === 'objective') {
-      if (!answer) {
-        // 未作答不扣分，保持中立
-      } else if (answer === q.correctAnswer) {
-        scores.T_F_obj += 2  // 答对 +2
-      } else {
-        scores.T_F_obj -= 2  // 答错 -2
-      }
-    } else {
-      if (!answer) return
-      const valMap: Record<string, number> = { A: 2, B: 1, C: 0, D: -1, E: -2 }
-      const val = valMap[answer] || 0
-      if (q.dimension === 'T_F') {
-        scores.T_F_sub += val
-      } else {
-        scores[q.dimension as keyof typeof scores] += val
-      }
-    }
-  })
-
-  // Merge T_F
-  const T_F_total = scores.T_F_sub + scores.T_F_obj
-
-  // Classify (四个维度统一阈值 ±17)
-  function classify(score: number, dim: string): string {
-    if (score > 16) {
-      if (dim === 'E_I') return 'E'
-      if (dim === 'S_N') return 'S'
-      if (dim === 'T_F') return 'T'
-      return 'J'
-    }
-    if (score < -17) {
-      if (dim === 'E_I') return 'I'
-      if (dim === 'S_N') return 'N'
-      if (dim === 'T_F') return 'F'
-      return 'P'
-    }
-    if (dim === 'E_I') return 'A'
-    if (dim === 'S_N') return 'B'
-    if (dim === 'T_F') return 'C'
-    return 'D'
-  }
-
-  const chars = {
-    E_I: classify(scores.E_I, 'E_I'),
-    S_N: classify(scores.S_N, 'S_N'),
-    T_F: classify(T_F_total, 'T_F'),
-    P_J: classify(scores.P_J, 'P_J'),
-  }
-
-  const typeCode = chars.E_I + chars.S_N + chars.T_F + chars.P_J
-
-  // Save record
-  api.saveRecord({
-    typeCode,
-    scores: { ...scores, T_F: T_F_total },
-    chars,
-    answers: { ...answers.value },
-    duration: Math.round((Date.now() - startTime.value) / 1000),
-  }).catch(() => { /* non-critical */ })
-
-  // Count answered questions per dimension
+  // Count answered questions per dimension (for display in result)
   const dimAnswered = { E_I: 0, S_N: 0, T_F: 0, P_J: 0 }
   const dimTotals = { E_I: 0, S_N: 0, T_F: 0, P_J: 0 }
   questions.value.forEach(q => {
@@ -290,16 +225,33 @@ function submitTest() {
     }
   })
 
-  router.push({
-    name: 'result',
-    params: { type: typeCode },
-    query: {
-      scores: JSON.stringify({ ...scores, T_F: T_F_total }),
-      chars: JSON.stringify(chars),
-      dimTotals: JSON.stringify(dimTotals),
-      dimAnswered: JSON.stringify(dimAnswered),
-    },
-  })
+  try {
+    const presentedIds = questions.value.map(q => q.id)
+    const score = await api.submitScore({ ...answers.value }, presentedIds)
+    localStorage.removeItem('mbti-pro-test')
+
+    api.saveRecord({
+      typeCode: score.typeCode,
+      scores: score.scores,
+      chars: score.chars,
+      answers: { ...answers.value },
+      duration: Math.round((Date.now() - startTime.value) / 1000),
+    }).catch(() => { /* non-critical */ })
+
+    router.push({
+      name: 'result',
+      params: { type: score.typeCode },
+      query: {
+        scores: JSON.stringify(score.scores),
+        chars: JSON.stringify(score.chars),
+        confidence: String(score.confidence),
+        dimTotals: JSON.stringify(dimTotals),
+        dimAnswered: JSON.stringify(dimAnswered),
+      },
+    })
+  } catch (err) {
+    loadError.value = (err instanceof Error ? err.message : '评分失败') + '，请稍后重试。'
+  }
 }
 
 function jumpTo(index: number) {
