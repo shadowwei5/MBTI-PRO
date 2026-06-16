@@ -1,6 +1,6 @@
 # MBTI-PRO 人格测试系统 - 架构设计文档
 
-> 版本: v1.4 | 日期: 2026-06-14 | 状态: MVP 架构就绪，全部 81 型概览 700 字达标，65 型 AI 图像提示词就绪
+> 版本: v1.5 | 日期: 2026-06-16 | 状态: MVP 闭环上线，后端评分服务 + AI 大图托管 + 分享海报已交付
 
 ---
 
@@ -60,15 +60,18 @@ client/src/
 ├── components/
 │   ├── TypeAvatar.vue          # 81型算法式 SVG 几何头像
 │   ├── DimensionSpectrum.vue   # 四维度光谱可视化（含得分圆圈）
+│   ├── OptionGroupBipolar.vue  # 双极 likert 选项组件
+│   ├── SharePosterModal.vue    # 分享海报弹窗 (Canvas 750×1334 + QR)
 │   └── ProgressBar.vue         # 答题进度条
 ├── views/
 │   ├── HomeView.vue            # 首页（品牌 + 介绍 + 81型网格全览）
-│   ├── TestView.vue            # 答题页（100题 + 断点续答 + 自动跳转）
-│   └── ResultView.vue          # 结果页（头像 + 概览 + 光谱 + 日常画像 + 优劣势）
+│   ├── TestView.vue            # 答题页（100题 + 断点续答 + 客观题倒计时 + 后端评分）
+│   └── ResultView.vue          # 结果页（头像 + AI大图 + 概览 + 光谱 + 日常画像 + 优劣势 + 海报）
 ├── services/
-│   └── api.ts                  # API 服务层（5 个端点）
+│   └── api.ts                  # API 服务层（含 submitScore POST /api/results/score）
 ├── utils/
-│   └── colors.ts               # 四气质12色调色板 + 色彩分配引擎
+│   ├── colors.ts               # 四气质12色调色板 + 色彩分配引擎
+│   └── meta.ts                 # OG / Twitter 动态 meta 注入
 ├── router/
 │   └── index.ts
 ├── App.vue
@@ -99,11 +102,15 @@ colors.ts
 ### 2.4 核心数据流
 
 ```
-用户答题 → localStorage 缓存储存 → 提交 → POST /api/records
-    ↓                                        ↓
-前端评分计算（离线备选）          GET /api/results/:typeCode
-    ↓                                        ↓
-跳转 /result/:type? scores=&chars=    ResultView 渲染
+用户答题 → localStorage 缓存储存 → 提交（携带 presentedIds）
+    ↓
+POST /api/results/score (后端纯函数评分)
+    ↓
+返回 { typeCode, scores, chars, confidence }
+    ↓
+POST /api/records (写入测试记录)
+    ↓
+跳转 /result/:type?scores=&chars= → ResultView 渲染（头像 + AI大图 + 概览 + 光谱 + 海报）
 ```
 
 ---
@@ -118,8 +125,13 @@ server/src/
 ├── seed.ts                     # 种子脚本 (100题 + 81型)
 ├── routes/
 │   ├── questions.ts            # GET /api/questions
-│   ├── results.ts              # GET /api/results, /api/results/:code
-│   └── records.ts              # POST /api/records
+│   ├── results.ts              # GET /api/results, /api/results/:code, POST /api/results/score
+│   ├── records.ts              # POST /api/records
+│   └── images.ts               # GET /api/images/:typeCode (24h 缓存静态托管)
+├── services/
+│   ├── scoring.ts              # 纯函数评分引擎（双源合并 T_F + 三级阈值 + 置信度）
+│   └── __tests__/
+│       └── scoring.test.ts     # vitest 20 个用例（边界/阈值/置信度/元数据）
 └── content/
     └── types.ts                # 81型内容引擎
         ├── 12 维度模块 (ei/sn/tf/pj × 3位置)
@@ -129,17 +141,15 @@ server/src/
         ├── buildTypeContent()  # 组装引擎
         └── generateAllTypeCodes()
 
-server/ (根目录工具脚本)
-├── expand_overviews.py         # V1 概览扩充 (23型 → 529-615字)
-├── expand_overviews_v2.py      # V2 概览扩充 (42型 → 480-584字)
-├── expand_overviews_v3.py      # V3 概览扩充 (46型重写/扩充 → 535-814字)
+server/ (根目录脚本与产物)
+├── scripts/
+│   ├── generate_images.py      # 豆包 Seedream-5.0 批量生成 81 张人格大图
+│   └── config.py               # 生成参数与 API 配置
+├── generated_images/           # 81 张 JPG 输出 (16.2MB, 米白纯色背景)
+├── expand_overviews.py         # 概览扩充工具 (V1/V2/V3 三轮)
 ├── generate_image_prompts.py   # 65型 AI 图像提示词生成器
-│   ├── 9 组颜色定义 (hex/视觉关键词/形状/纹理/情绪)
-│   ├── 完整提示词 + 简短提示词 双输出
-│   └── 输出 json + markdown 双格式
 ├── image_prompts_65.json       # 机器可读提示词数据
-├── image_prompts_65.md         # 人类可读提示词文档 (9组组织)
-└── update_overviews.py         # 概览批量写入工具
+└── image_prompts_65.md         # 人类可读提示词文档 (9组组织)
 ```
 
 ### 3.2 API 端点
@@ -148,8 +158,24 @@ server/ (根目录工具脚本)
 |------|------|------|
 | GET | `/api/questions` | 获取全部 100 题 |
 | GET | `/api/results` | 获取全部 81 型列表（网格用） |
-| GET | `/api/results/:typeCode` | 获取指定类型详情（概览+优势+成长+职业+名人） |
+| GET | `/api/results/:typeCode` | 获取指定类型详情（概览+优势+成长+职业+名人+维度模块） |
+| POST | `/api/results/score` | 后端评分（接收 answers + 可选 questionIds，返回 typeCode/scores/chars/confidence） |
 | POST | `/api/records` | 保存测试记录 |
+| GET | `/api/images/:typeCode` | 81 型 AI 大图静态托管（24h 浏览器缓存） |
+
+### 3.2.1 评分服务
+
+```
+services/scoring.ts (纯函数)
+  ├─ classifySymmetric(score)   # E_I/S_N/P_J 对称阈值: <-17 / [-17,+16] / >+16
+  ├─ classifyTF(score)          # T_F 不对称阈值: <10 / [10,29] / >29
+  ├─ computeConfidence(scores)  # 各维度归一化到最近阈值距离的平均
+  └─ calculateScore(answers, questions)
+       ├─ Likert: A/B/C/D/E → +2/+1/0/-1/-2 (反向题取反)
+       ├─ 客观题: 答对 +2 / 答错或未答 -2 (中立化)
+       ├─ T_F 双源: T_F_sub (主观) + T_F_obj (客观) 合并
+       └─ 输出: { typeCode, scores, chars, confidence }
+```
 
 ### 3.3 数据库设计（Prisma + SQLite）
 
@@ -276,9 +302,10 @@ Nginx (静态资源 + 反向代理)
 ## 六、扩展规划
 
 ### V1.1
-- 分享海报（Canvas 生成）
+- ~~分享海报（Canvas 生成）~~ ✅ 已上线
 - 用户注册/登录
-- 历史测试记录
+- 历史测试记录（基于 TestRecord）
+- Playwright E2E 自动化
 
 ### V2.0
 - 微信小程序
