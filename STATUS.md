@@ -1,14 +1,14 @@
 # MBTI-PRO 项目状态
 
-> 最后更新: 2026-06-16 | 版本: v1.1
+> 最后更新: 2026-06-16 | 版本: v1.2
 
 ---
 
-## 当前阶段：Phase 2 内容扩展（进行中）
+## 当前阶段：Phase 2 内容扩展（核心闭环已通）
 
 ```
 Phase 0: 基础搭建        Phase 1: 核心闭环        Phase 2: 内容扩展
-[████████████] 100%      [░░░░░░░░░░░░] 进行中     [████░░░░░░░░] 40%
+[████████████] 100%      [██████████░░] 85%        [██████░░░░░░] 55%
 ```
 
 ---
@@ -17,7 +17,7 @@ Phase 0: 基础搭建        Phase 1: 核心闭环        Phase 2: 内容扩展
 
 ### 环境与基础设施
 - [x] 前端脚手架 (Vue3 + Vite + TypeScript + Tailwind CSS)
-- [x] 后端脚手架 (Express + TypeScript + Prisma + MySQL)
+- [x] 后端脚手架 (Express + TypeScript + Prisma + SQLite dev / MySQL prod)
 - [x] Docker 开发环境 (前端:5174 + API:3001 + MySQL:3306)
 - [x] 项目仓库 + CI/CD 配置
 - [x] Git 版本管理
@@ -35,6 +35,33 @@ Phase 0: 基础搭建        Phase 1: 核心闭环        Phase 2: 内容扩展
 - [x] 米白纯色背景 + 分组色服装/配饰/发色
 - [x] 生成脚本：`server/scripts/generate_images.py`
 - [x] 输出目录：`server/generated_images/` (81张JPG, 16.2MB)
+- [x] 图像静态托管 API：`GET /api/images/:typeCode`（24h 缓存）
+
+### 题库 ✅ (100 题入库)
+- [x] 24 道 E_I 主观 likert 题
+- [x] 23 道 S_N 主观 likert 题
+- [x] 10 道 T_F 主观 likert 题
+- [x] 23 道 P_J 主观 likert 题
+- [x] 20 道 T_F 客观推理题（10 类×2 题：演绎/数字/条件/排序/因果/组合/概率/谬误/谜题/博弈）
+- [x] 测试时随机抽取 10 道客观题
+
+### 评分引擎 ✅ (2026-06-16 完成)
+- [x] `server/src/services/scoring.ts` 纯函数评分
+- [x] Likert：A/B/C/D/E → +2/+1/0/-1/-2
+- [x] 客观题：答对 +2 / 答错或未答 -2
+- [x] T_F 阈值：F<10 / C∈[10,29] / T>29（不对称，依据 references/05）
+- [x] E_I/S_N/P_J 阈值：<-17 / [-17,+16] / >+16
+- [x] 置信度：各维度归一化到最近阈值距离的平均
+- [x] vitest 单元测试 20 个用例（边界、阈值、置信度、元数据）
+- [x] `POST /api/results/score` 路由（支持 questionIds 限定本次抽题）
+
+### 前端答题与结果
+- [x] 答题页：单题单页 + 进度条 + 双极 likert + 客观题倒计时
+- [x] 进度持久化（localStorage 支持中途刷新）
+- [x] 客观题介绍弹窗 + 20s 倒计时锁定
+- [x] 结果页：维度光谱 + 81型人格描述 + AI 大图
+- [x] 分享海报（750×1334 Canvas + QR 码）
+- [x] OG / Twitter 动态 meta 注入
 
 ### 参考文档
 - [x] 01-项目计划书摘要
@@ -53,23 +80,20 @@ Phase 0: 基础搭建        Phase 1: 核心闭环        Phase 2: 内容扩展
 
 ## 进行中 / 待完成
 
-### 前后端核心开发
-- [ ] 评分引擎开发（评分算法 + 单元测试）
-- [ ] 题库API (题目/评分/人格内容接口)
-- [ ] 前端答题页面（单题单页 + 进度条）
-- [ ] 前端结果页面（81型展示 + 维度图表）
-- [ ] 前后端联调 + E2E测试
+### 端到端打磨
+- [ ] 前后端联调全链路验证（dev server 实测）
+- [ ] E2E 测试（Playwright，关键用户流）
+- [ ] 历史记录页（基于 TestRecord）
 
-### 内容开发
-- [ ] 100道题目编写（主观80题 + 客观20题）
-- [ ] 81型描述文案入库
-- [ ] 81型职业匹配数据
+### 内容扩展
+- [ ] 81型职业匹配数据校审
+- [ ] 81型 eiModule/snModule/tfModule/pjModule 内容补全
+- [ ] 8 套对比图片对应文案
 
 ### 功能扩展
-- [ ] 分享海报功能
 - [ ] 内容管理后台
-- [ ] 响应式适配
 - [ ] 暗色模式
+- [ ] PWA / 离线缓存
 
 ---
 
@@ -79,8 +103,9 @@ Phase 0: 基础搭建        Phase 1: 核心闭环        Phase 2: 内容扩展
 |------|------|
 | 前端 | Vue 3 + Vite + TypeScript + Tailwind CSS + Pinia |
 | 后端 | Express.js + TypeScript + Prisma ORM |
-| 数据库 | MySQL 8.0 |
+| 数据库 | SQLite (dev) / MySQL 8.0 (prod) |
 | 缓存 | Redis 7.x |
+| 测试 | Vitest（后端单测）+ Playwright（E2E，待引入）|
 | 部署 | Docker + Nginx |
 | AI图像 | 豆包 Seedream-5.0 (火山引擎ARK) |
 
@@ -89,17 +114,20 @@ Phase 0: 基础搭建        Phase 1: 核心闭环        Phase 2: 内容扩展
 ## 关键路径
 
 ```
-server/generated_images/      # 81张人格图像（已完成）
-server/scripts/generate_images.py  # 图像生成脚本
-references/                   # 9份参考文档
-IMPLEMENTATION_PLAN.md        # 完整实施方案
+server/src/services/scoring.ts                    # 评分引擎（纯函数）
+server/src/services/__tests__/scoring.test.ts    # 评分引擎单测
+server/src/routes/results.ts                      # /score + /:typeCode 等
+server/generated_images/                          # 81张人格图像
+client/src/views/TestView.vue                     # 答题页（已切到后端评分）
+client/src/views/ResultView.vue                   # 结果页
+references/05-评分算法参考.md                     # 评分算法权威依据
 ```
 
 ---
 
 ## 下一步
 
-1. 完成评分引擎核心算法 + 单元测试
-2. 搭建题库API
-3. 开发前端答题页 + 结果页
-4. 100道题目编写
+1. 启动 dev server 端到端实测一遍完整答题流
+2. 引入 Playwright 写 1~2 个 E2E 关键流程
+3. 补全各型 eiModule/snModule/tfModule/pjModule 详细文案
+4. 上线前的法律合规与免责声明落地
