@@ -2,7 +2,7 @@
 65 型人格 Low Poly 矢量图片批量生成脚本
 风格：Low Poly 扁平 + 纯色分组背景 + 角色职业形象 + 底部中文标题
 """
-import os, re, sys, json, time, urllib.request
+import sys, json, time, urllib.request
 from pathlib import Path
 
 # Windows 终端 UTF-8
@@ -12,10 +12,11 @@ if sys.platform == "win32":
     except Exception:
         pass
 
+from config import IMAGE_API_URL, VOLCENGINE_IMAGE_MODEL, volcengine_headers
+
 # === 配置 ===
-API_URL = "https://ark.cn-beijing.volces.com/api/v3/images/generations"
-API_KEY = os.environ.get("ANTHROPIC_API_KEY", "ark-9d3207ba-19da-4877-b78c-3a73cf5da416-a9438")
-MODEL = "doubao-seedream-5-0-lite-260128"
+API_URL = IMAGE_API_URL
+MODEL = VOLCENGINE_IMAGE_MODEL
 SIZE = "2k"
 OUTPUT_DIR = Path(__file__).resolve().parent.parent / "generated_images"
 STATE_FILE = OUTPUT_DIR / "_generation_state.json"
@@ -679,7 +680,8 @@ ROLE_ARCHETYPES = {
 NEGATIVE_PROMPT = (
     "写实照片，3D渲染，厚涂手绘，渐变色彩，复杂阴影，模糊失焦，"
     "人物畸形，文字错乱，模糊不清，水印，多余装饰，杂乱背景，"
-    "真人肖像，笔触纹理，画面噪点，多余肢体"
+    "真人肖像，笔触纹理，画面噪点，多余肢体，"
+    "任何文字、字母、数字、标题、标签、签名、水印、字体、排版"
 )
 
 # === 正面提示词模板 ===
@@ -690,7 +692,7 @@ POSITIVE_TEMPLATE = """low poly 低多边形矢量插画，扁平化卡通风格
 
 背景为干净的米白色纯色。
 
-画面底部标注清晰深灰色印刷体文字：{title}（换行）{type_code}。"""
+画面中不出现任何文字、字母、数字、标题或标签。"""
 
 
 def build_prompt(type_code: str) -> tuple[str, str]:
@@ -724,10 +726,7 @@ def call_seedream(positive: str, negative: str, max_retries: int = 3) -> str | N
         "watermark": False,
     }
     data = json.dumps(payload).encode("utf-8")
-    headers = {
-        "Content-Type": "application/json",
-        "Authorization": f"Bearer {API_KEY}",
-    }
+    headers = volcengine_headers()
     for attempt in range(max_retries):
         try:
             req = urllib.request.Request(API_URL, data=data, headers=headers, method="POST")

@@ -1,5 +1,8 @@
 import express from 'express'
 import cors from 'cors'
+import path from 'path'
+import { fileURLToPath } from 'url'
+import fs from 'fs'
 import { PrismaClient } from '@prisma/client'
 import { questionRoutes } from './routes/questions.js'
 import { resultRoutes } from './routes/results.js'
@@ -9,6 +12,7 @@ export const prisma = new PrismaClient()
 
 const app = express()
 const PORT = process.env.PORT || 3001
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 app.use(cors({ origin: ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:4173'] }))
 app.use(express.json())
@@ -16,6 +20,19 @@ app.use(express.json())
 app.use('/api/questions', questionRoutes)
 app.use('/api/results', resultRoutes)
 app.use('/api/records', recordRoutes)
+
+// Serve AI-generated personality type images
+const imagesDir = path.resolve(__dirname, '..', 'generated_images')
+app.get('/api/images/:typeCode', (req, res) => {
+  const typeCode = req.params.typeCode.toUpperCase()
+  const imagePath = path.join(imagesDir, `${typeCode}.jpg`)
+  if (fs.existsSync(imagePath)) {
+    res.setHeader('Cache-Control', 'public, max-age=86400')
+    res.sendFile(imagePath)
+  } else {
+    res.status(404).json({ success: false, error: 'Image not found' })
+  }
+})
 
 // Health check
 app.get('/api/health', (_req, res) => {

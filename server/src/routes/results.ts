@@ -21,6 +21,7 @@ resultRoutes.get('/', async (_req, res, next) => {
       data: types.map(t => ({
         ...t,
         celebrities: JSON.parse(t.celebrities || '[]'),
+        imageUrl: `/api/images/${t.code}`,
       })),
     })
   } catch (err) {
@@ -67,6 +68,7 @@ resultRoutes.get('/:typeCode', async (req, res, next) => {
         careers: JSON.parse(type.careers),
         suitableFields: JSON.parse(type.suitableFields),
         celebrities: JSON.parse(type.celebrities || '[]'),
+        imageUrl: `/api/images/${type.code}`,
       },
     })
   } catch (err) {
