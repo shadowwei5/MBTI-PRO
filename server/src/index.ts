@@ -27,7 +27,7 @@ app.get('/api/images/:typeCode', (req, res) => {
   const typeCode = req.params.typeCode.toUpperCase()
   const imagePath = path.join(imagesDir, `${typeCode}.jpg`)
   if (fs.existsSync(imagePath)) {
-    res.setHeader('Cache-Control', 'public, max-age=86400')
+    res.setHeader('Cache-Control', 'public, max-age=60')
     res.sendFile(imagePath)
   } else {
     res.status(404).json({ success: false, error: 'Image not found' })

@@ -81,9 +81,7 @@ async function fetchQuestions() {
     }))
     const likert = parsed.filter(q => q.type === 'likert')
     const objective = parsed.filter(q => q.type === 'objective')
-    const shuffled = [...objective].sort(() => Math.random() - 0.5)
-    const selected = shuffled.slice(0, 10).map((q, i) => ({ ...q, sortOrder: 81 + i }))
-    questions.value = [...likert, ...selected]
+    questions.value = [...likert, ...objective]
   } catch {
     loadError.value = '题目加载失败，请检查网络后刷新重试。'
   } finally {
@@ -227,7 +225,13 @@ async function submitTest() {
 
   try {
     const presentedIds = questions.value.map(q => q.id)
-    const score = await api.submitScore({ ...answers.value }, presentedIds)
+    const timedOut: Record<number, boolean> = {}
+    for (const q of questions.value) {
+      if (q.type === 'objective') {
+        timedOut[q.id] = timerRemaining.value[q.id] === 0 && !answers.value[q.id]
+      }
+    }
+    const score = await api.submitScore({ ...answers.value }, presentedIds, timedOut)
     localStorage.removeItem('mbti-pro-test')
 
     api.saveRecord({

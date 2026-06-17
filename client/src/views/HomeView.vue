@@ -94,7 +94,7 @@ function goToType(code: string) {
         <div class="flex flex-wrap items-center justify-center gap-6 mt-8 text-sm text-text-muted">
           <div class="flex items-center gap-2">
             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-            <span>90 道精选题目</span>
+            <span>100 道精选题目</span>
           </div>
           <div class="flex items-center gap-2">
             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10" /><path stroke-linecap="round" d="M12 6v6l4 2" /></svg>
@@ -333,7 +333,7 @@ function goToType(code: string) {
               <tr>
                 <td class="px-6 py-4 font-medium text-charcoal">题目数量</td>
                 <td class="px-6 py-4 text-text-secondary border-l border-border/50">通常 60-93 题</td>
-                <td class="px-6 py-4 text-coral font-medium border-l border-border/50">90 题（含 10 道客观推理）</td>
+                <td class="px-6 py-4 text-coral font-medium border-l border-border/50">100 题（含 10 道客观推理）</td>
               </tr>
               <tr>
                 <td class="px-6 py-4 font-medium text-charcoal">题目设计</td>

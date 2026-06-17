@@ -11,6 +11,7 @@ resultRoutes.post('/score', async (req, res, next) => {
       answers?: Record<string, string>
       questionIds?: number[]
       duration?: number
+      timedOut?: Record<string, boolean>
     } | undefined
     if (!body || typeof body.answers !== 'object' || body.answers === null) {
       res.status(400).json({ success: false, error: 'answers (object) required' })
@@ -43,7 +44,16 @@ resultRoutes.post('/score', async (req, res, next) => {
       correctAnswer: r.correctAnswer ?? null,
     }))
 
-    const result = calculateScore(answers, questions)
+    // Parse timedOut: convert string-number keys to number keys
+    const timedOut: Record<number, boolean> = {}
+    if (body.timedOut && typeof body.timedOut === 'object') {
+      for (const [k, v] of Object.entries(body.timedOut)) {
+        const id = Number(k)
+        if (Number.isInteger(id) && id > 0) timedOut[id] = !!v
+      }
+    }
+
+    const result = calculateScore(answers, questions, timedOut)
 
     res.json({
       success: true,

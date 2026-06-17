@@ -1,7 +1,4 @@
-"""
-65 型人格 Low Poly 矢量图片批量生成脚本
-风格：Low Poly 扁平 + 纯色分组背景 + 角色职业形象 + 底部中文标题
-"""
+"""81 型人格 Low Poly 矢量图片批量生成脚本 — Low Poly 扁平 + 纯色分组背景 + 角色职业形象（无文字）"""
 import sys, json, time, urllib.request
 from pathlib import Path
 
@@ -681,7 +678,9 @@ NEGATIVE_PROMPT = (
     "写实照片，3D渲染，厚涂手绘，渐变色彩，复杂阴影，模糊失焦，"
     "人物畸形，文字错乱，模糊不清，水印，多余装饰，杂乱背景，"
     "真人肖像，笔触纹理，画面噪点，多余肢体，"
-    "任何文字、字母、数字、标题、标签、签名、水印、字体、排版"
+    "任何文字、字母、数字、标题、标签、签名、水印、字体、排版、"
+    "汉字、英文、符号、字符、字母数字组合、标识语、口号、"
+    "typography, letters, words, characters, text, alphabet, calligraphy"
 )
 
 # === 正面提示词模板 ===
@@ -692,7 +691,7 @@ POSITIVE_TEMPLATE = """low poly 低多边形矢量插画，扁平化卡通风格
 
 背景为干净的米白色纯色。
 
-画面中不出现任何文字、字母、数字、标题或标签。"""
+CRITICAL: 画面中绝对不出现任何形式的文字、字母、数字、汉字、符号、标题、标签、签名或水印。背景保持纯色空白。"""
 
 
 def build_prompt(type_code: str) -> tuple[str, str]:

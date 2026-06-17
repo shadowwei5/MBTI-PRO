@@ -19,6 +19,7 @@ const isLoaded = ref(false)
 const typeData = ref<PersonalityType | null>(null)
 const fetchError = ref('')
 const showSharePoster = ref(false)
+const imageLoaded = ref(false)
 
 // 是否来自真实测试（有分数数据）
 const hasTestData = computed(() => !!route.query.scores)
@@ -169,17 +170,17 @@ const defaultItems = {
 
           <!-- AI-Generated Personality Image -->
           <div class="mb-8 flex justify-center">
-            <div class="relative w-72 h-72 md:w-80 md:h-80 rounded-3xl overflow-hidden shadow-xl border-2 border-border/30 bg-surface-alt/50">
+            <div class="relative w-56 h-56 sm:w-72 sm:h-72 md:w-96 md:h-96 rounded-3xl overflow-hidden shadow-xl border-2 border-border/20 bg-surface-alt/30">
               <img
                 :src="typeData?.imageUrl || `/api/images/${typeCode}`"
                 :alt="`${typeCode} 人格类型画像`"
-                class="w-full h-full object-cover transition-opacity duration-700"
-                :class="{ 'opacity-0': !isLoaded }"
-                @load="$event.target.classList.remove('opacity-0')"
-                @error="$event.target.style.display = 'none'"
+                class="w-full h-full object-cover object-center transition-opacity duration-700"
+                :class="{ 'opacity-0': !imageLoaded }"
+                loading="eager"
+                @load="imageLoaded = true"
+                @error="imageLoaded = true; ($event.target as HTMLImageElement).style.display = 'none'"
               />
-              <!-- Loading placeholder -->
-              <div class="absolute inset-0 flex items-center justify-center bg-surface-alt/30">
+              <div v-if="!imageLoaded" class="absolute inset-0 flex items-center justify-center bg-surface-alt/30">
                 <div class="w-8 h-8 rounded-full border-3 border-coral-soft border-t-coral animate-spin" />
               </div>
             </div>

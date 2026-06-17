@@ -81,10 +81,10 @@ export const api = {
   getAllTypes: () =>
     request<Pick<PersonalityType, 'code' | 'name' | 'isTraditional' | 'population' | 'celebrities'>[]>('/results'),
 
-  submitScore: (answers: Record<string, string>, questionIds?: number[]) =>
+  submitScore: (answers: Record<string, string>, questionIds?: number[], timedOut?: Record<number, boolean>) =>
     request<ScoreResponse>('/results/score', {
       method: 'POST',
-      body: JSON.stringify({ answers, questionIds }),
+      body: JSON.stringify({ answers, questionIds, timedOut }),
     }),
 
   saveRecord: (payload: TestRecordPayload) =>

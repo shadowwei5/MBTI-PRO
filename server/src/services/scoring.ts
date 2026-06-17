@@ -1,7 +1,7 @@
 /**
  * MBTI-PRO 评分引擎
  *
- * 维度：E_I, S_N, T_F, P_J，每维三级分类。
+ * 维度：E_I, S_N, T_F, P_J，每维三级分类，四维各 25 题。
  *
  * Likert 双极题：A=+2, B=+1, C=0, D=-1, E=-2（左侧正向 → 右侧负向）
  *  - 正分 → 左侧倾向 (E/N/T/J)
@@ -9,13 +9,13 @@
  *  - 中区 → 平衡型 (A/B/C/D)
  *
  * T_F 维度由两路汇合：
- *  - 主观 likert（10 题，范围 [-20, +20]）
- *  - 客观推理（20 题，答对 +2 / 答错或未答 -2，范围 [-40, +40]）
- *  实测计入：主观 + 客观，总范围 [-60, +60]
+ *  - 主观 likert（15 题，范围 [-30, +30]）
+ *  - 客观推理（10 题，范围 [-20, +20]）
+ *  - 答对 +2 / 答错 -2 / 超时 -2 / 未答且未超时 0
+ *  实测计入：主观 + 客观，总范围 [-50, +50]
  *
- * 三级阈值（参考 references/05-评分算法参考.md）：
- *  - E_I/S_N/P_J: < -17 / [-17, +16] / > +16
- *  - T_F:         < 10 / [10, 29]   / > 29   （依据正态假设，T_F 期望偏向 T 侧）
+ * 三级阈值（四维统一对称 ±17）：
+ *  - E_I/S_N/P_J/T_F: < -17 / [-17, +16] / > +16
  */
 
 export interface QuestionMeta {
@@ -63,9 +63,10 @@ export interface ScoreResult {
 
 const LIKERT_VALUE: Record<AnswerKey, number> = { A: 2, B: 1, C: 0, D: -1, E: -2 }
 
-/** 客观题：答对 +2，答错或未答 -2 */
-function scoreObjective(answer: AnswerKey | undefined, correct: string | null): number {
+/** 客观题：答对 +2，答错 -2，超时 -2，未答且未超时 0 */
+function scoreObjective(answer: AnswerKey | undefined, correct: string | null, timedOut: boolean): number {
   if (!correct) return 0
+  if (!answer) return timedOut ? -2 : 0
   return answer === correct ? 2 : -2
 }
 
@@ -76,33 +77,30 @@ function classifySymmetric(score: number, dim: 'E_I' | 'S_N' | 'P_J'): string {
 }
 
 function classifyTF(score: number): 'T' | 'C' | 'F' {
-  if (score > 29) return 'T'
-  if (score < 10) return 'F'
+  if (score > 16) return 'T'
+  if (score < -17) return 'F'
   return 'C'
 }
 
 function computeConfidence(scores: DimensionScores, dimTotals: ScoreResult['dimTotals']): number {
   const distances: number[] = []
 
-  // E_I/S_N/P_J: 最近阈值距离 / 最大可能分（dimTotals×2）
-  for (const dim of ['E_I', 'S_N', 'P_J'] as const) {
+  for (const dim of ['E_I', 'S_N', 'T_F', 'P_J'] as const) {
     const max = dimTotals[dim] * 2 || 1
     const s = scores[dim]
     const distToThreshold = s > 16 ? s - 16 : s < -17 ? -17 - s : Math.min(16 - s, s + 17)
     distances.push(Math.max(0, distToThreshold) / max)
   }
 
-  // T_F: 阈值 10 / 29，最大可能分 = (likert题×2) + (obj题×2)
-  const tfMax = dimTotals.T_F * 2 || 1
-  const t = scores.T_F
-  const distTF = t > 29 ? t - 29 : t < 10 ? 10 - t : Math.min(29 - t, t - 10)
-  distances.push(Math.max(0, distTF) / tfMax)
-
   const avg = distances.reduce((a, b) => a + b, 0) / distances.length
   return Math.min(1, Math.max(0, avg))
 }
 
-export function calculateScore(answers: Answers, questions: QuestionMeta[]): ScoreResult {
+export function calculateScore(
+  answers: Answers,
+  questions: QuestionMeta[],
+  timedOut: Record<number, boolean> = {},
+): ScoreResult {
   const scores: DimensionScores = { E_I: 0, S_N: 0, T_F: 0, P_J: 0, T_F_sub: 0, T_F_obj: 0 }
   const dimAnswered = { E_I: 0, S_N: 0, T_F: 0, P_J: 0 }
   const dimTotals = { E_I: 0, S_N: 0, T_F: 0, P_J: 0 }
@@ -112,9 +110,8 @@ export function calculateScore(answers: Answers, questions: QuestionMeta[]): Sco
     const a = answers[q.id]
 
     if (q.type === 'objective') {
-      // 客观题：答对/答错/未答都"参与计分"，但仅当用户作答才计入 dimAnswered
       if (a) dimAnswered[q.dimension]++
-      scores.T_F_obj += scoreObjective(a, q.correctAnswer)
+      scores.T_F_obj += scoreObjective(a, q.correctAnswer, timedOut[q.id] ?? false)
     } else {
       // likert：未答跳过（不计分也不计入 answered）
       if (!a) continue
