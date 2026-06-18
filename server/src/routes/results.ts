@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import { prisma } from '../index.js'
 import { calculateScore, type Answers, type QuestionMeta, type AnswerKey } from '../services/scoring.js'
+import { getTypeDimensionModules } from '../content/dimension-modules.js'
 
 export const resultRoutes = Router()
 
@@ -124,11 +125,18 @@ resultRoutes.get('/:typeCode', async (req, res, next) => {
       res.status(404).json({ success: false, error: 'Type not found' })
       return
     }
+    // 使用81型独立维度模块（覆盖DB中的旧值，确保81型全部有独立文案）
+    const dimModules = getTypeDimensionModules(type.code)
+
     // Parse JSON fields
     res.json({
       success: true,
       data: {
         ...type,
+        eiModule: dimModules.eiModule,
+        snModule: dimModules.snModule,
+        tfModule: dimModules.tfModule,
+        pjModule: dimModules.pjModule,
         strengths: JSON.parse(type.strengths),
         growthAreas: JSON.parse(type.growthAreas),
         careers: JSON.parse(type.careers),
