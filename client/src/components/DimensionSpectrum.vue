@@ -43,10 +43,10 @@ function confidence(dimKey: string): string {
         ]"
         :key="dim.key"
       >
-        <div class="flex justify-between text-xs text-text-muted mb-2 px-0.5">
-          <span>{{ dim.left }}</span>
+        <div class="flex justify-between text-xs mb-2 px-0.5">
+          <span class="font-semibold" :style="{ color: ['#5C8DFF','#9C6FFF','#1DA8FF','#E6B800'][['E_I','S_N','T_F','P_J'].indexOf(dim.key)] }">{{ dim.left }}</span>
           <span class="font-medium text-text-secondary">{{ dim.mid }}</span>
-          <span>{{ dim.right }}</span>
+          <span class="font-semibold" :style="{ color: ['#FF8A65','#69F0AE','#FFD740','#82B1FF'][['E_I','S_N','T_F','P_J'].indexOf(dim.key)] }">{{ dim.right }}</span>
         </div>
         <div class="relative h-6 bg-surface-alt rounded-full overflow-visible mb-7">
           <!-- Center neutral zone -->
@@ -66,12 +66,14 @@ function confidence(dimKey: string): string {
         </div>
         <div class="flex items-center justify-center gap-2 mt-1">
           <span
-            class="text-xs font-bold px-2 py-0.5 rounded-full"
-            :class="{
-              'bg-[#82B1FF]/15 text-[#5C8DFF]': dim.key === 'E_I',
-              'bg-[#B388FF]/15 text-[#9C6FFF]': dim.key === 'S_N',
-              'bg-[#40C4FF]/15 text-[#1DA8FF]': dim.key === 'T_F',
-              'bg-[#FFD740]/15 text-[#E6B800]': dim.key === 'P_J',
+            class="text-xs font-bold px-2 py-0.5 rounded-full text-white shadow-sm"
+            :style="{
+              background: {
+                'E_I': '#5C8DFF',
+                'S_N': '#9C6FFF',
+                'T_F': '#1DA8FF',
+                'P_J': '#E6B800',
+              }[dim.key],
             }"
           >
             {{ chars[dim.key] }}

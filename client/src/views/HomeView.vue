@@ -68,8 +68,10 @@ function goToType(code: string) {
         </div>
 
         <!-- Hero Headline -->
-        <h1 class="text-4xl md:text-6xl lg:text-7xl font-display font-black text-charcoal leading-[1.08] mb-6 tracking-tight">
-          发现<span class="text-coral italic">真实的</span><br />自己
+        <h1 class="text-4xl md:text-6xl lg:text-7xl font-display font-black leading-[1.08] mb-6 tracking-tight">
+          <span class="shimmer-text" style="--tw-shimmer-from: #2D2A26; --tw-shimmer-via: #E8816B;">发现</span>
+          <span class="text-coral italic">真实的</span><br />
+          <span class="shimmer-text" style="--tw-shimmer-from: #2D2A26; --tw-shimmer-via: #E8816B;">自己</span>
         </h1>
 
         <!-- Subheadline -->
@@ -454,8 +456,9 @@ function goToType(code: string) {
               <button
                 v-for="t in groupedTypes[groupCode]"
                 :key="t.code"
+                v-magnet="6"
                 @click="goToType(t.code)"
-                class="group relative bg-white/70 backdrop-blur-sm rounded-2xl border border-border/40 shadow-sm text-left transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 overflow-hidden"
+                class="group relative bg-white/70 backdrop-blur-sm rounded-2xl border border-border/40 shadow-sm text-left transition-shadow duration-300 hover:shadow-lg overflow-hidden"
                 :style="{ borderColor: NINE_GROUP_META[groupCode].hex + '20' }"
               >
                 <!-- Image thumbnail -->

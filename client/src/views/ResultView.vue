@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
 import DimensionSpectrum from '../components/DimensionSpectrum.vue'
 import TypeAvatar from '../components/TypeAvatar.vue'
@@ -48,6 +48,9 @@ onMounted(async () => {
   }
 
   setTimeout(() => { isLoaded.value = true }, 200)
+
+  // 注入 JSON-LD 结构化数据
+  injectJsonLd()
 })
 
 // Dimension display data
@@ -101,12 +104,40 @@ const oneLiner = computed(() => {
   return `${groupColor.value.name} · ${typeName.value}`
 })
 
-// 动态更新分享元标签
+// 动态更新分享元标签 + SEO
 useShareMeta(
   () => `${typeCode.value} ${typeData.value?.name || typeName.value}`,
   () => oneLiner.value,
   () => typeData.value?.imageUrl || `/api/images/${typeCode.value}`,
+  () => typeCode.value,
 )
+
+// JSON-LD 结构化数据（搜索引擎富文本卡片）
+let jsonLdScript: HTMLScriptElement | null = null
+function injectJsonLd() {
+  const code = typeCode.value
+  const name = typeData.value?.name || typeName.value
+  const desc = oneLiner.value
+  const img = typeData.value?.imageUrl || `/api/images/${code}`
+  const ld = {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: `${code} — ${name.replace('型', '')} | MBTI-PRO`,
+    description: desc,
+    image: img,
+    url: `${window.location.origin}/result/${code}`,
+    about: {
+      '@type': 'Thing',
+      name: `${code} 人格类型`,
+      description: `${code} 是 MBTI-PRO 81型人格体系中的一种独特类型，在能量来源、认知方式、决策方式和生活态度四个维度上展现出独特的偏好组合。`,
+    },
+  }
+  jsonLdScript = document.createElement('script')
+  jsonLdScript.type = 'application/ld+json'
+  jsonLdScript.textContent = JSON.stringify(ld)
+  document.head.appendChild(jsonLdScript)
+}
+onUnmounted(() => { jsonLdScript?.remove() })
 
 // Fallback defaults
 const defaultItems = {
@@ -191,11 +222,13 @@ const defaultItems = {
             class="relative inline-block mb-4 px-8 py-4 rounded-3xl"
             :style="{ background: `linear-gradient(135deg, ${typeColor.hex}12, ${typeColor.hex}08)` }"
           >
-            <h1
-              class="text-5xl md:text-7xl font-display font-black tracking-widest"
-              :style="{ color: typeColor.hex }"
-            >
-              {{ typeCode }}
+            <h1 class="text-5xl md:text-7xl font-display font-black tracking-widest">
+              <span
+                v-for="(ch, i) in typeCode.split('')"
+                :key="i"
+                class="pop-char inline-block"
+                :style="{ color: typeColor.hex, animationDelay: `${0.3 + i * 0.1}s` }"
+              >{{ ch }}</span>
             </h1>
           </div>
           <p v-if="typeData?.name" class="text-xl md:text-2xl font-display font-bold text-charcoal mb-3">
@@ -374,6 +407,8 @@ const defaultItems = {
       :groupColor="groupColor"
       :oneLiner="oneLiner"
       :imageUrl="typeData?.imageUrl || `/api/images/${typeCode}`"
+      :scores="hasTestData ? scores : undefined"
+      :chars="hasTestData ? chars : undefined"
       @close="showSharePoster = false"
     />
   </div>

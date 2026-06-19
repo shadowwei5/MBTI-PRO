@@ -48,7 +48,9 @@
 
   body {
     font-family: var(--font-body);
-    background: var(--color-cream);
+    background: linear-gradient(135deg, #FDF8F0 0%, #F5F0E8 25%, #EDE6D8 50%, #F5F0E8 75%, #FDF8F0 100%);
+    background-size: 400% 400%;
+    animation: bg-drift 20s ease infinite;
     color: var(--color-text-primary);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -111,6 +113,25 @@
   50% { transform: scale(1.04); }
 }
 
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+@keyframes pop-char {
+  0% { opacity: 0; transform: translateY(20px) scale(0.5); }
+  60% { transform: translateY(-4px) scale(1.08); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes bg-drift {
+  0% { background-position: 0% 50%; }
+  25% { background-position: 100% 0%; }
+  50% { background-position: 100% 100%; }
+  75% { background-position: 0% 100%; }
+  100% { background-position: 0% 50%; }
+}
+
 .animate-fade-up {
   animation: fade-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
@@ -127,14 +148,44 @@
   animation: breathe 3s ease-in-out infinite;
 }
 
-/* Stagger children */
+/* Shimmer text (首页标题发光) */
+.shimmer-text {
+  background: linear-gradient(90deg, var(--tw-shimmer-from, #6B6560) 0%, var(--tw-shimmer-via, #E8816B) 50%, var(--tw-shimmer-from, #6B6560) 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer 3s linear infinite;
+}
+
+/* Pop character (结果页字母逐个弹出) */
+.pop-char {
+  display: inline-block;
+  opacity: 0;
+  animation: pop-char 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Dynamic background (动态背景) */
+.dynamic-bg {
+  background: linear-gradient(135deg, #FDF8F0 0%, #F5F0E8 25%, #EDE6D8 50%, #F5F0E8 75%, #FDF8F0 100%);
+  background-size: 400% 400%;
+  animation: bg-drift 20s ease infinite;
+}
+
+/* Stagger children (扩展至12级) */
 .stagger > * {
   opacity: 0;
   animation: fade-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
-.stagger > *:nth-child(1) { animation-delay: 0.05s; }
-.stagger > *:nth-child(2) { animation-delay: 0.12s; }
-.stagger > *:nth-child(3) { animation-delay: 0.19s; }
-.stagger > *:nth-child(4) { animation-delay: 0.26s; }
-.stagger > *:nth-child(5) { animation-delay: 0.33s; }
-.stagger > *:nth-child(6) { animation-delay: 0.40s; }
+.stagger > *:nth-child(1) { animation-delay: 0.04s; }
+.stagger > *:nth-child(2) { animation-delay: 0.08s; }
+.stagger > *:nth-child(3) { animation-delay: 0.12s; }
+.stagger > *:nth-child(4) { animation-delay: 0.16s; }
+.stagger > *:nth-child(5) { animation-delay: 0.20s; }
+.stagger > *:nth-child(6) { animation-delay: 0.24s; }
+.stagger > *:nth-child(7) { animation-delay: 0.28s; }
+.stagger > *:nth-child(8) { animation-delay: 0.32s; }
+.stagger > *:nth-child(9) { animation-delay: 0.36s; }
+.stagger > *:nth-child(10) { animation-delay: 0.40s; }
+.stagger > *:nth-child(11) { animation-delay: 0.44s; }
+.stagger > *:nth-child(12) { animation-delay: 0.48s; }

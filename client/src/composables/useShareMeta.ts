@@ -4,6 +4,7 @@ export function useShareMeta(
   title: () => string,
   description: () => string,
   imageUrl?: () => string,
+  typeCode?: () => string,
 ) {
   function setMeta(property: string, content: string) {
     let el = document.querySelector(`meta[property="${property}"]`) as HTMLMetaElement | null
@@ -35,6 +36,17 @@ export function useShareMeta(
       setNameMeta('description', d)
       setNameMeta('twitter:title', `${t} | MBTI-PRO`)
       setNameMeta('twitter:description', d)
+      // Canonical URL
+      const code = typeCode?.()
+      if (code) {
+        let el = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null
+        if (!el) {
+          el = document.createElement('link')
+          el.setAttribute('rel', 'canonical')
+          document.head.appendChild(el)
+        }
+        el.setAttribute('href', `${window.location.origin}/result/${code}`)
+      }
       if (i) {
         setMeta('og:image', i)
         setNameMeta('twitter:image', i)

@@ -1,0 +1,26 @@
+# MBTI-PRO 后端 — Render 免费部署配置
+
+services:
+  - type: web
+    name: mbti-pro-api
+    env: node
+    region: singapore
+    plan: free
+    buildCommand: cd server && npm install --include=dev && npx prisma generate
+    startCommand: cd server && bash start.sh
+    healthCheckPath: /api/health
+    envVars:
+      - key: PORT
+        value: 3001
+      - key: CLIENT_ORIGIN
+        value: https://mbti-pro.vercel.app
+      - key: VOLCENGINE_API_KEY
+        sync: false
+      - key: VOLCENGINE_BASE_URL
+        value: https://ark.cn-beijing.volces.com
+      - key: VOLCENGINE_IMAGE_MODEL
+        value: doubao-seedream-5-0-lite-260128
+    disk:
+      name: persist
+      mountPath: /opt/render/project/persist
+      sizeGB: 1

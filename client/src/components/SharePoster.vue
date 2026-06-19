@@ -9,6 +9,8 @@ const props = defineProps<{
   groupColor: { hex: string; name: string }
   oneLiner: string
   imageUrl: string
+  scores?: { E_I: number; S_N: number; T_F: number; P_J: number }
+  chars?: { E_I: string; S_N: string; T_F: string; P_J: string }
 }>()
 
 const emit = defineEmits<{
@@ -179,9 +181,68 @@ async function drawPoster() {
     ctx.fillText(line, W / 2, y + 20)
     y += 32
   })
-  y += 36
+  y += 20
 
-  // 8. 分隔线
+  // 8. 四维状态条（仅测试后有数据时绘制）
+  if (props.scores && props.chars) {
+    const dims = [
+      { key: 'E_I' as const, label: '能量来源', left: 'I', right: 'E', leftColor: '#5C8DFF', rightColor: '#FF8A65' },
+      { key: 'S_N' as const, label: '认知方式', left: 'N', right: 'S', leftColor: '#9C6FFF', rightColor: '#69F0AE' },
+      { key: 'T_F' as const, label: '决策方式', left: 'F', right: 'T', leftColor: '#1DA8FF', rightColor: '#FFD740' },
+      { key: 'P_J' as const, label: '生活态度', left: 'P', right: 'J', leftColor: '#E6B800', rightColor: '#82B1FF' },
+    ]
+    const barW = 560
+    const barH = 28
+    const barX = (W - barW) / 2
+    const dimGap = 44
+    const dimStartY = y
+
+    dims.forEach((dim, i) => {
+      const dy = dimStartY + i * dimGap
+      const score = props.scores![dim.key]
+      const pos = Math.max(3, Math.min(97, 50 + (score / 50) * 47))
+
+      // 标签
+      ctx.font = 'bold 18px "Noto Sans SC", sans-serif'
+      ctx.textAlign = 'left'
+      ctx.fillStyle = dim.leftColor
+      ctx.fillText(dim.left, barX - 48, dy + barH / 2 + 6)
+      ctx.textAlign = 'right'
+      ctx.fillStyle = dim.rightColor
+      ctx.fillText(dim.right, barX + barW + 48, dy + barH / 2 + 6)
+
+      // 背景条
+      ctx.fillStyle = '#F0EDE6'
+      roundRect(ctx, barX, dy, barW, barH, barH / 2)
+      ctx.fill()
+
+      // 中间区域
+      ctx.fillStyle = '#D8D4CA30'
+      ctx.fillRect(barX + barW / 3, dy, barW / 3, barH)
+
+      // 圆点指示器
+      const dotX = barX + (barW * pos) / 100
+      const dotY = dy + barH / 2
+      const dotR = 10
+      ctx.beginPath()
+      ctx.arc(dotX, dotY, dotR, 0, Math.PI * 2)
+      ctx.fillStyle = dim.leftColor
+      ctx.fill()
+      ctx.strokeStyle = '#fff'
+      ctx.lineWidth = 2
+      ctx.stroke()
+
+      // 字母标签
+      ctx.font = 'bold 12px "Noto Sans SC", sans-serif'
+      ctx.fillStyle = '#fff'
+      ctx.textAlign = 'center'
+      ctx.fillText(props.chars![dim.key], dotX, dotY + 4)
+    })
+
+    y = dimStartY + dims.length * dimGap + 36
+  }
+
+  // 9. 分隔线
   ctx.strokeStyle = '#E0D8CC'
   ctx.lineWidth = 1
   ctx.beginPath()
