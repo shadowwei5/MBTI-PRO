@@ -1,0 +1,30 @@
+name: Auto Deploy to Tencent Cloud
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd /opt/MBTI-PRO
+            git pull origin master
+            cd server
+            npm install --include=dev
+            npx prisma generate
+            npx prisma db push
+            npx tsx scripts/generate-thumbs.ts 2>&1 | tail -5
+            cd ../client
+            npm install
+            npm run build 2>&1 | tail -5
+            pm2 restart mbti-pro-api
+            nginx -t && systemctl reload nginx || systemctl restart nginx
+            echo "✅ Deploy completed"
