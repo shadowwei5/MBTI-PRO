@@ -61,20 +61,34 @@ else
 fi
 
 # ============================================================
-# Step 2: 安装 Node.js 20 (使用 NodeSource)
+# Step 2: 安装 Node.js 20
 # ============================================================
 info "[2/7] 安装 Node.js 20..."
 
 if ! command -v node >/dev/null 2>&1 || [ "$(node -v | cut -d'v' -f2 | cut -d'.' -f1)" -lt 20 ]; then
+    # 动态获取最新 v20 LTS 版本号
     if [ "$IS_CHINA" = true ]; then
-        # 国内用 npmmirror 加速
-        curl -fsSL https://mirrors.ustc.edu.cn/nodejs-release/v20.19.6/node-v20.19.6-linux-x64.tar.xz -o /tmp/node.tar.xz
-        tar -xJf /tmp/node.tar.xz -C /usr/local --strip-components=1
-        rm /tmp/node.tar.xz
+        NODE_MIRROR="https://mirrors.tuna.tsinghua.edu.cn/nodejs-release"
     else
-        curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
-        apt-get install -y -qq nodejs
+        NODE_MIRROR="https://nodejs.org/dist"
     fi
+
+    NODE_VERSION=$(curl -fsSL "$NODE_MIRROR/latest-v20.x/SHASUMS256.txt" 2>/dev/null | head -1 | grep -oP 'v20\.\d+\.\d+' | head -1)
+
+    if [ -z "$NODE_VERSION" ]; then
+        # 降级：直接用已知稳定版本
+        NODE_VERSION="v20.19.2"
+    fi
+
+    info "  安装 Node.js ${NODE_VERSION}..."
+
+    ARCH=$(uname -m)
+    if [ "$ARCH" = "x86_64" ]; then NODE_ARCH="x64"; else NODE_ARCH="arm64"; fi
+
+    NODE_URL="$NODE_MIRROR/$NODE_VERSION/node-$NODE_VERSION-linux-$NODE_ARCH.tar.xz"
+    curl -fsSL "$NODE_URL" -o /tmp/node.tar.xz
+    tar -xJf /tmp/node.tar.xz -C /usr/local --strip-components=1
+    rm /tmp/node.tar.xz
 fi
 
 info "  Node.js $(node -v) ✓"
