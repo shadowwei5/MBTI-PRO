@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { getTypeHex, getTypeColorFamily } from '../utils/colors'
+import { getTypeHex } from '../utils/colors'
 
 const props = defineProps<{
   typeCode: string
@@ -9,7 +9,6 @@ const props = defineProps<{
 
 const size = computed(() => props.size ?? 48)
 const hex = computed(() => getTypeHex(props.typeCode))
-const family = computed(() => getTypeColorFamily(props.typeCode))
 
 const chars = computed(() => ({
   ei: props.typeCode[0],
@@ -25,17 +24,10 @@ const seed = computed(() => {
   return Math.abs(h)
 })
 
-// Background gradient stops
-const bgGradient = computed(() => {
-  const c = chars.value
-  const sat = c.sn === 'N' ? 0.28 : c.sn === 'B' ? 0.2 : 0.14
-  const light = c.ei === 'E' ? 0.94 : c.ei === 'A' ? 0.9 : 0.85
-  return { sat, light }
-})
 
 // Primary geometric shape parameters
 const primary = computed(() => {
-  const { ei, sn, tf, pj } = chars.value
+  const { sn, tf, pj } = chars.value
   const s = size.value
   const cx = s / 2
   const cy = s / 2

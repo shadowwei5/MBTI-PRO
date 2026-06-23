@@ -1,5 +1,5 @@
 // 磁吸效果：鼠标悬停时卡片轻微跟随光标移动
-import { ref, onUnmounted, type Ref } from 'vue'
+import { ref, type Ref } from 'vue'
 
 export function useMagnet(elRef: Ref<HTMLElement | null>, strength = 8) {
   const transform = ref('')

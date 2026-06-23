@@ -114,7 +114,7 @@ async function drawPoster() {
   ctx.fillStyle = topGrad
   ctx.fillRect(0, 0, W, 2)
 
-  const padX = 64
+
   let y = 80
 
   // 3. Brand

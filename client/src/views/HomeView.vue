@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { api, type PersonalityType } from '../services/api'
+import { api } from '../services/api'
 import { getTypeHex, getNineGroupCode } from '../utils/colors'
 import TypeAvatar from '../components/TypeAvatar.vue'
 
 const router = useRouter()
 const loaded = ref(false)
-const allTypes = ref<Pick<PersonalityType, 'code' | 'name' | 'isTraditional' | 'population' | 'celebrities'> & { imageUrl?: string }[]>([])
+const allTypes = ref<{ code: string; name: string; isTraditional: boolean; population?: string | null; celebrities?: string[] | null; imageUrl?: string }[]>([])
 const fetchError = ref(false)
 
 // 9组颜色分类：严格按 81型人格颜色分类.xlsx 定义

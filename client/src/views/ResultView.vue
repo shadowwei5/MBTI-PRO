@@ -5,7 +5,7 @@ import DimensionSpectrum from '../components/DimensionSpectrum.vue'
 import TypeAvatar from '../components/TypeAvatar.vue'
 import SharePoster from '../components/SharePoster.vue'
 import { api, type PersonalityType } from '../services/api'
-import { getTypeColor, getTypeHex, getTemperament, TEMPERAMENT_COLORS, getNineGroupCode, getNineGroupColor } from '../utils/colors'
+import { getTypeColor, getTemperament, TEMPERAMENT_COLORS, getNineGroupCode, getNineGroupColor } from '../utils/colors'
 import { useShareMeta } from '../composables/useShareMeta'
 
 const route = useRoute()
@@ -62,7 +62,6 @@ const dimensionLabels: Record<string, { label: string; left: string; mid: string
 }
 
 const typeName = computed(() => {
-  const d = dimensionLabels
   return `${chars.value.E_I === 'A' ? '平衡型' : chars.value.E_I === 'E' ? '外向型' : '内向型'} ·
     ${chars.value.S_N === 'B' ? '均衡型' : chars.value.S_N === 'N' ? '直觉型' : '实感型'} ·
     ${chars.value.T_F === 'C' ? '复合型' : chars.value.T_F === 'T' ? '思考型' : '情感型'} ·

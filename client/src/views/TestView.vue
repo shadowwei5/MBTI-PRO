@@ -4,7 +4,7 @@ import { useRouter } from 'vue-router'
 import ProgressBar from '../components/ProgressBar.vue'
 import OptionGroup from '../components/OptionGroup.vue'
 import OptionGroupBipolar from '../components/OptionGroupBipolar.vue'
-import { api, type ApiQuestion } from '../services/api'
+import { api } from '../services/api'
 
 const router = useRouter()
 
