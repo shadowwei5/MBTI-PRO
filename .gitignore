@@ -13,6 +13,7 @@ _generation_state.json
 
 # Local Claude Code settings (per-machine)
 .claude/settings.local.json
+.claude/skills/
 
 # Image generation backups (kept locally only)
 server/generated_images_backup/
