@@ -459,15 +459,18 @@ function goToType(code: string) {
                 v-magnet="6"
                 @click="goToType(t.code)"
                 class="group relative bg-white/70 backdrop-blur-sm rounded-2xl border border-border/40 shadow-sm text-left transition-shadow duration-300 hover:shadow-lg overflow-hidden"
+                style="content-visibility: auto; contain-intrinsic-size: auto 280px"
                 :style="{ borderColor: NINE_GROUP_META[groupCode].hex + '20' }"
               >
                 <!-- Image thumbnail -->
                 <div class="relative w-full aspect-[4/3] overflow-hidden bg-surface-alt/30">
                   <img
-                    :src="t.imageUrl || `/api/images/${t.code}`"
+                    :src="t.imageUrl || `/api/thumbs/${t.code}`"
                     :alt="`${t.code}`"
                     class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                     loading="lazy"
+                    decoding="async"
+                    fetchpriority="low"
                     @error="($event.target as HTMLImageElement).style.display = 'none'"
                   />
                   <!-- Gradient overlay -->

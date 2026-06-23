@@ -47,7 +47,7 @@ echo ""
 # ============================================================
 # Step 1: 安装系统依赖
 # ============================================================
-info "[1/7] 安装系统依赖..."
+info "[1/8] 安装系统依赖..."
 
 if command -v apt-get >/dev/null 2>&1; then
     # Debian/Ubuntu
@@ -66,7 +66,7 @@ fi
 # ============================================================
 # Step 2: 安装 Node.js 20
 # ============================================================
-info "[2/7] 安装 Node.js 20..."
+info "[2/8] 安装 Node.js 20..."
 
 if ! command -v node >/dev/null 2>&1 || [ "$(node -v | cut -d'v' -f2 | cut -d'.' -f1)" -lt 20 ]; then
     NODE_INSTALLED=false
@@ -141,16 +141,16 @@ info "  npm $(npm -v) ✓"
 # Step 3: 配置 npm 镜像（国内加速）
 # ============================================================
 if [ "$IS_CHINA" = true ]; then
-    info "[3/7] 配置 npm 国内镜像..."
+    info "[3/8] 配置 npm 国内镜像..."
     npm config set registry https://registry.npmmirror.com
 else
-    info "[3/7] npm 使用默认 registry"
+    info "[3/8] npm 使用默认 registry"
 fi
 
 # ============================================================
 # Step 4: 克隆/更新代码
 # ============================================================
-info "[4/7] 部署代码..."
+info "[4/8] 部署代码..."
 
 if [ -d "$APP_DIR/.git" ]; then
     info "  检测到已有仓库，执行 git pull..."
@@ -167,7 +167,7 @@ fi
 # ============================================================
 # Step 5: 安装后端依赖 & 初始化数据库
 # ============================================================
-info "[5/7] 安装后端依赖 & 初始化数据库..."
+info "[5/8] 安装后端依赖 & 初始化数据库..."
 
 cd "$APP_DIR/server"
 npm install --include=dev
@@ -183,26 +183,41 @@ else
     info "  数据库已有 $QUESTION_COUNT 题，跳过种子导入"
 fi
 
+# 生成图片缩略图（首页性能关键，每个 250KB→10KB）
+info "[6/8] 生成图片缩略图..."
+npx tsx scripts/generate-thumbs.ts 2>&1 | tail -5
+info "  缩略图生成完成"
+
 # ============================================================
-# Step 6: 构建前端
+# Step 7: 构建前端
 # ============================================================
-info "[6/7] 构建前端..."
+info "[7/8] 构建前端..."
 
 cd "$APP_DIR/client"
 npm install
 npm run build
 
 # ============================================================
-# Step 7: 配置 Nginx & 启动服务
+# Step 8: 配置 Nginx & 启动服务
 # ============================================================
-info "[7/7] 配置 Nginx & 启动服务..."
+info "[8/8] 配置 Nginx & 启动服务..."
 
-# -- Nginx 配置 --
+# -- 清理默认站点（会劫持 IPv6 和未匹配域名请求）--
+rm -f /etc/nginx/conf.d/default.conf 2>/dev/null || true
+for default_conf in /etc/nginx/sites-enabled/default /etc/nginx/default.d/default.conf; do
+  if [ -f "$default_conf" ]; then
+    mv "$default_conf" "${default_conf}.disabled" 2>/dev/null || true
+    info "  已禁用: $default_conf"
+  fi
+done
+
+# -- Nginx 配置（IPv4 + IPv6 双栈监听）--
 cat > /etc/nginx/conf.d/mbti-pro.conf << 'NGINX_EOF'
 # MBTI-PRO 站点配置
 server {
     listen 80;
-    server_name _;
+    listen [::]:80;
+    server_name mbti-pro.duckdns.org _;
 
     # 前端静态文件
     root /opt/MBTI-PRO/client/dist;
@@ -210,9 +225,15 @@ server {
 
     # Gzip 压缩
     gzip on;
-    gzip_types text/css application/javascript image/svg+xml application/json;
-    gzip_min_length 512;
-    gzip_comp_level 6;
+    gzip_types text/css application/javascript image/svg+xml application/json image/webp;
+    gzip_min_length 256;
+    gzip_comp_level 5;
+
+    # 静态资源长期缓存（带 hash 的文件名）
+    location /assets/ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+    }
 
     # API 反向代理
     location /api/ {
@@ -221,10 +242,17 @@ server {
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
     }
 
-    # 图片代理
-    location /generated_images/ {
+    # 缩略图强缓存（WebP，文件名不变）
+    location /api/thumbs/ {
+        proxy_pass http://127.0.0.1:3001;
+        proxy_cache_valid 200 7d;
+    }
+
+    # 原图缓存
+    location /api/images/ {
         proxy_pass http://127.0.0.1:3001;
         proxy_cache_valid 200 1d;
     }
@@ -285,15 +313,18 @@ echo "║    pm2 logs mbti-pro-api  # 查看日志     ║"
 echo "║    pm2 restart mbti-pro-api # 重启服务   ║"
 echo "║                                          ║"
 echo "║  更新代码:                                ║"
-echo "║    cd /opt/MBTI-PRO && git pull           ║"
-echo "║    cd server && npx prisma db push        ║"
-echo "║    cd ../client && npm run build          ║"
-echo "║    pm2 restart mbti-pro-api              ║"
-echo "║    systemctl reload nginx                ║"
+echo "║    update-mbti                           ║"
+echo "║                                          ║"
+echo "║  HTTPS 配置（免费，2 分钟）:               ║"
+echo "║    1. 注册 duckdns.org                   ║"
+echo "║    2. 创建子域名指向 ''          ║"
+echo "║    3. certbot --nginx -d xxx.duckdns.org ║"
 echo "╚══════════════════════════════════════════╝"
 echo ""
-
-info "下一步: 配置 SSL 证书（HTTPS）"
-echo "  certbot --nginx -d your-domain.com"
+echo "下一步: 配置 HTTPS（免费，约 2 分钟）"
+echo "  1. 浏览器打开 https://www.duckdns.org → 用 GitHub/Google 登录"
+echo "  2. 创建子域名（如 mbti-pro），填入 IP: ''"
+echo "  3. 返回服务器运行: certbot --nginx -d mbti-pro.duckdns.org"
+echo "  4. 之后即可通过 https://mbti-pro.duckdns.org 安全访问"
 echo ""
 info "部署脚本执行完毕"

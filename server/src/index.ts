@@ -27,16 +27,44 @@ app.use('/api/questions', questionRoutes)
 app.use('/api/results', resultRoutes)
 app.use('/api/records', recordRoutes)
 
-// Serve AI-generated personality type images
+// Serve AI-generated personality type images (full resolution, for detail page & poster)
 const imagesDir = path.resolve(__dirname, '..', 'generated_images')
+const thumbsDir = path.join(imagesDir, 'thumbs')
+
+// 公用图片响应头
+function setImageCacheHeaders(res: express.Response, maxAge: number, immutable = false) {
+  res.setHeader('Cache-Control', `public, max-age=${maxAge}${immutable ? ', immutable' : ''}`)
+  res.setHeader('Access-Control-Allow-Origin', '*')
+}
+
 app.get('/api/images/:typeCode', (req, res) => {
   const typeCode = req.params.typeCode.toUpperCase()
   const imagePath = path.join(imagesDir, `${typeCode}.jpg`)
   if (fs.existsSync(imagePath)) {
-    res.setHeader('Cache-Control', 'public, max-age=86400')
+    setImageCacheHeaders(res, 86400)
     res.sendFile(imagePath)
   } else {
     res.status(404).json({ success: false, error: 'Image not found' })
+  }
+})
+
+// 缩略图端点: 首页网格用 WebP 缩略图 (~10KB)，比原图小 20-40 倍
+app.get('/api/thumbs/:typeCode', (req, res) => {
+  const typeCode = req.params.typeCode.toUpperCase()
+  const thumbPath = path.join(thumbsDir, `${typeCode}.webp`)
+  if (fs.existsSync(thumbPath)) {
+    setImageCacheHeaders(res, 604800, true)
+    res.setHeader('Content-Type', 'image/webp')
+    res.sendFile(thumbPath)
+  } else {
+    // 降级: 缩略图不存在时回退到原图
+    const imagePath = path.join(imagesDir, `${typeCode}.jpg`)
+    if (fs.existsSync(imagePath)) {
+      setImageCacheHeaders(res, 86400)
+      res.sendFile(imagePath)
+    } else {
+      res.status(404).json({ success: false, error: 'Image not found' })
+    }
   }
 })
 
