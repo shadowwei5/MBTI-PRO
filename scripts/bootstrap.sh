@@ -11,6 +11,9 @@
 # ============================================================
 set -e
 
+# 确保 /usr/local/bin 在 PATH 中（OpenCloudOS/CentOS 非登录shell可能缺失）
+export PATH="/usr/local/bin:/usr/bin:/usr/sbin:$PATH"
+
 # ---- 颜色输出 ----
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -66,37 +69,69 @@ fi
 info "[2/7] 安装 Node.js 20..."
 
 if ! command -v node >/dev/null 2>&1 || [ "$(node -v | cut -d'v' -f2 | cut -d'.' -f1)" -lt 20 ]; then
-    # 动态获取最新 v20 LTS 版本号
-    if [ "$IS_CHINA" = true ]; then
-        NODE_MIRROR="https://mirrors.tuna.tsinghua.edu.cn/nodejs-release"
-    else
-        NODE_MIRROR="https://nodejs.org/dist"
+    NODE_INSTALLED=false
+
+    # 方法1: dnf module (RHEL/CentOS/OpenCloudOS 原生方案，最可靠)
+    if command -v dnf >/dev/null 2>&1; then
+        info "  尝试 dnf module 安装..."
+        if dnf module enable nodejs:20 -y 2>/dev/null && dnf install -y nodejs 2>/dev/null; then
+            NODE_INSTALLED=true
+        fi
     fi
 
-    NODE_VERSION=$(curl -fsSL "$NODE_MIRROR/latest-v20.x/SHASUMS256.txt" 2>/dev/null | head -1 | grep -oP 'v20\.\d+\.\d+' | head -1)
-
-    if [ -z "$NODE_VERSION" ]; then
-        # 降级：直接用已知稳定版本
-        NODE_VERSION="v20.19.2"
+    # 方法2: yum (旧版 CentOS)
+    if [ "$NODE_INSTALLED" = false ] && command -v yum >/dev/null 2>&1; then
+        info "  尝试 NodeSource RPM 安装..."
+        curl -fsSL https://rpm.nodesource.com/setup_20.x | bash - 2>/dev/null
+        if yum install -y nodejs 2>/dev/null; then
+            NODE_INSTALLED=true
+        fi
     fi
 
-    info "  安装 Node.js ${NODE_VERSION}..."
+    # 方法3: apt (Debian/Ubuntu)
+    if [ "$NODE_INSTALLED" = false ] && command -v apt-get >/dev/null 2>&1; then
+        info "  尝试 NodeSource DEB 安装..."
+        curl -fsSL https://deb.nodesource.com/setup_20.x | bash - 2>/dev/null
+        if apt-get install -y nodejs 2>/dev/null; then
+            NODE_INSTALLED=true
+        fi
+    fi
 
-    ARCH=$(uname -m)
-    if [ "$ARCH" = "x86_64" ]; then NODE_ARCH="x64"; else NODE_ARCH="arm64"; fi
+    # 方法4: 直接下载二进制包（兜底方案）
+    if [ "$NODE_INSTALLED" = false ]; then
+        info "  使用二进制包安装..."
+        if [ "$IS_CHINA" = true ]; then
+            NODE_MIRROR="https://npmmirror.com/mirrors/node"
+        else
+            NODE_MIRROR="https://nodejs.org/dist"
+        fi
+        NODE_VERSION=$(curl -fsSL "$NODE_MIRROR/latest-v20.x/SHASUMS256.txt" 2>/dev/null | head -1 | grep -oP 'v20\.\d+\.\d+' | head -1)
+        [ -z "$NODE_VERSION" ] && NODE_VERSION="v20.19.2"
 
-    NODE_URL="$NODE_MIRROR/$NODE_VERSION/node-$NODE_VERSION-linux-$NODE_ARCH.tar.xz"
-    curl -fsSL "$NODE_URL" -o /tmp/node.tar.xz
-    tar -xJf /tmp/node.tar.xz -C /usr/local --strip-components=1
-    rm /tmp/node.tar.xz
+        ARCH=$(uname -m)
+        [ "$ARCH" = "x86_64" ] && NODE_ARCH="x64" || NODE_ARCH="arm64"
 
-    # 确保当前 shell 能找到 node（OpenCloudOS/CentOS 非登录 shell 可能缺少 /usr/local/bin）
-    export PATH="/usr/local/bin:$PATH"
-    # 创建全局软链接（万无一失）
-    ln -sf /usr/local/bin/node /usr/bin/node
-    ln -sf /usr/local/bin/npm /usr/bin/npm
-    ln -sf /usr/local/bin/npx /usr/bin/npx
-    hash -r 2>/dev/null || true
+        NODE_URL="$NODE_MIRROR/$NODE_VERSION/node-$NODE_VERSION-linux-$NODE_ARCH.tar.xz"
+        curl -fsSL "$NODE_URL" -o /tmp/node.tar.xz || {
+            error "Node.js 下载失败，请手动安装: dnf install nodejs"
+            exit 1
+        }
+        tar -xJf /tmp/node.tar.xz -C /usr/local --strip-components=1
+        rm /tmp/node.tar.xz
+
+        # 软链接到全局 PATH
+        export PATH="/usr/local/bin:$PATH"
+        ln -sf /usr/local/bin/node /usr/bin/node
+        ln -sf /usr/local/bin/npm /usr/bin/npm
+        ln -sf /usr/local/bin/npx /usr/bin/npx
+        hash -r 2>/dev/null || true
+        NODE_INSTALLED=true
+    fi
+
+    if ! command -v node >/dev/null 2>&1; then
+        error "Node.js 安装失败，请手动执行: dnf install nodejs"
+        exit 1
+    fi
 fi
 
 info "  Node.js $(node -v) ✓"
