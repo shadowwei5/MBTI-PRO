@@ -89,6 +89,14 @@ if ! command -v node >/dev/null 2>&1 || [ "$(node -v | cut -d'v' -f2 | cut -d'.'
     curl -fsSL "$NODE_URL" -o /tmp/node.tar.xz
     tar -xJf /tmp/node.tar.xz -C /usr/local --strip-components=1
     rm /tmp/node.tar.xz
+
+    # 确保当前 shell 能找到 node（OpenCloudOS/CentOS 非登录 shell 可能缺少 /usr/local/bin）
+    export PATH="/usr/local/bin:$PATH"
+    # 创建全局软链接（万无一失）
+    ln -sf /usr/local/bin/node /usr/bin/node
+    ln -sf /usr/local/bin/npm /usr/bin/npm
+    ln -sf /usr/local/bin/npx /usr/bin/npx
+    hash -r 2>/dev/null || true
 fi
 
 info "  Node.js $(node -v) ✓"
