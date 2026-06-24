@@ -37,6 +37,7 @@ const groupedTypes = computed(() => {
 })
 
 onMounted(async () => {
+  window.scrollTo({ top: 0, behavior: 'instant' })
   setTimeout(() => { loaded.value = true }, 100)
   try {
     allTypes.value = await api.getAllTypes()

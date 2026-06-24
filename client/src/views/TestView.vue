@@ -163,6 +163,14 @@ function selectOption(key: string) {
   }, 150)
 }
 
+// 找到下一道未答的题目
+function findNextUnanswered(): number {
+  for (let i = currentIndex.value + 1; i < questions.value.length; i++) {
+    if (!answers.value[questions.value[i].id]) return i
+  }
+  return -1 // 没有未答的
+}
+
 function goNext() {
   if (autoAdvanceTimer) { clearTimeout(autoAdvanceTimer); autoAdvanceTimer = null }
   saveTimerRemaining()
@@ -173,16 +181,18 @@ function goNext() {
     return
   }
 
-  const nextIdx = currentIndex.value + 1
-  // 检测是否即将进入第一道客观题
-  if (nextIdx >= firstObjectiveIndex.value && !objectiveIntroShown.value) {
-    currentIndex.value = nextIdx
-    showObjectiveIntro.value = true
-    return
-  }
-
-  if (currentIndex.value < questions.value.length - 1) {
-    currentIndex.value++
+  const next = findNextUnanswered()
+  if (next >= 0) {
+    // 检测是否即将进入第一道客观题
+    if (next >= firstObjectiveIndex.value && !objectiveIntroShown.value) {
+      currentIndex.value = next
+      showObjectiveIntro.value = true
+      return
+    }
+    currentIndex.value = next
+  } else {
+    // 全部答完，跳到最后一题提交
+    currentIndex.value = questions.value.length - 1
   }
 }
 
@@ -199,14 +209,21 @@ function cancelObjectiveIntro() {
   }
 }
 
+// 找到上一道未答的题目
+function findPrevUnanswered(): number {
+  for (let i = currentIndex.value - 1; i >= 0; i--) {
+    if (!answers.value[questions.value[i].id]) return i
+  }
+  return -1 // 没有未答的，回到第一题
+}
+
 function goPrev() {
   if (isInObjectiveMode.value) return
   if (autoAdvanceTimer) { clearTimeout(autoAdvanceTimer); autoAdvanceTimer = null }
   saveTimerRemaining()
   stopObjectiveTimer()
-  if (currentIndex.value > 0) {
-    currentIndex.value--
-  }
+  const prev = findPrevUnanswered()
+  currentIndex.value = prev >= 0 ? prev : 0
 }
 
 async function submitTest() {
@@ -407,7 +424,7 @@ onUnmounted(() => {
           :disabled="currentIndex === 0 || isInObjectiveMode"
           class="px-5 py-3 min-h-[44px] text-sm font-medium text-text-secondary rounded-xl transition-all duration-300 hover:bg-surface-alt disabled:opacity-30 disabled:cursor-not-allowed"
         >
-          ← 上一题
+          ← 上道未答
         </button>
 
         <div class="hidden md:flex items-center gap-1.5">
@@ -426,7 +443,7 @@ onUnmounted(() => {
           @click="goNext"
           class="px-6 py-3 min-h-[44px] text-sm font-semibold rounded-xl transition-all duration-300 bg-charcoal text-cream hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0"
         >
-          {{ isLastQuestion ? '提交结果' : '下一题 →' }}
+          {{ isLastQuestion ? '提交结果' : '下道未答 →' }}
         </button>
       </div>
     </footer>
@@ -460,7 +477,7 @@ onUnmounted(() => {
               @click="cancelObjectiveIntro"
               class="flex-1 px-4 py-3 text-sm font-medium text-text-secondary border border-border rounded-xl hover:bg-surface-alt transition-all duration-300"
             >
-              返回上一题
+              返回上道未答
             </button>
             <button
               @click="confirmObjectiveIntro"
