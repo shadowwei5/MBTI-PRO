@@ -136,7 +136,7 @@ async function drawPoster() {
 
   // 9. 底部区域：左侧文字 + 右侧小二维码
   const qrSize = 100; const qrX = W - qrSize - 52
-  const textX = 60; const textW = qrX - textX - 24
+  const textX = 60
 
   // 左侧文字
   ctx.textAlign = 'left'
