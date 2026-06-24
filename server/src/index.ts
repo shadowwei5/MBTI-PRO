@@ -48,7 +48,32 @@ app.get('/api/images/:typeCode', (req, res) => {
   }
 })
 
-// 缩略图端点: 首页网格用 WebP 缩略图 (~10KB)，比原图小 20-40 倍
+// 缩略图端点: 首页网格用 320px WebP (~4KB)
+// 中图端点: 详情页+海报用 640px WebP (~15KB)
+const mediumsDir = path.join(imagesDir, 'mediums')
+
+app.get('/api/mediums/:typeCode', (req, res) => {
+  const typeCode = req.params.typeCode.toUpperCase()
+  const mediumPath = path.join(mediumsDir, `${typeCode}.webp`)
+  if (fs.existsSync(mediumPath)) {
+    setImageCacheHeaders(res, 604800, true)
+    res.setHeader('Content-Type', 'image/webp')
+    res.sendFile(mediumPath)
+  } else {
+    const thumbPath = path.join(thumbsDir, `${typeCode}.webp`)
+    if (fs.existsSync(thumbPath)) {
+      setImageCacheHeaders(res, 604800, true)
+      res.setHeader('Content-Type', 'image/webp')
+      res.sendFile(thumbPath)
+    } else {
+      const imagePath = path.join(imagesDir, `${typeCode}.jpg`)
+      if (fs.existsSync(imagePath)) { setImageCacheHeaders(res, 86400); res.sendFile(imagePath) }
+      else res.status(404).json({ success: false, error: 'Image not found' })
+    }
+  }
+})
+
+// 缩略图端点: 首页网格用 320px WebP (~4KB)
 app.get('/api/thumbs/:typeCode', (req, res) => {
   const typeCode = req.params.typeCode.toUpperCase()
   const thumbPath = path.join(thumbsDir, `${typeCode}.webp`)

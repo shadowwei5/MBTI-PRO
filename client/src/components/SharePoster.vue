@@ -93,7 +93,7 @@ async function drawPoster() {
 
   // 4. AI 人格图片（使用缩略图加速，海报显示尺寸约 480px）
   try {
-    const thumbUrl = props.imageUrl.replace('/api/images/', '/api/thumbs/').replace('.jpg', '.webp')
+    const thumbUrl = `/api/mediums/${props.typeCode}`
     const avatar = await loadImage(thumbUrl)
     const imgSize = 480
     const imgX = (W - imgSize) / 2
