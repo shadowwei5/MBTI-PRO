@@ -297,54 +297,42 @@ function goToType(code: string) {
           </p>
         </div>
 
-        <!-- Comparison Table -->
-        <div class="bg-white/70 backdrop-blur-sm rounded-3xl border border-border shadow-sm overflow-x-auto mb-8">
-          <table class="w-full text-sm min-w-[500px]">
+        <!-- Comparison Table — Responsive: 桌面表格 / 手机卡片 -->
+        <div class="hidden sm:block bg-white/70 backdrop-blur-sm rounded-3xl border border-border shadow-sm overflow-hidden mb-8">
+          <table class="w-full text-sm">
             <thead>
               <tr class="border-b border-border">
-                <th class="text-left px-6 py-4 font-semibold text-charcoal w-1/4">对比维度</th>
-                <th class="text-left px-6 py-4 font-semibold text-text-muted w-3/8 border-l border-border/50">传统 MBTI</th>
-                <th class="text-left px-6 py-4 font-semibold text-coral w-3/8 border-l border-border/50">MBTI PRO</th>
+                <th class="text-left px-4 py-3 font-semibold text-charcoal">对比维度</th>
+                <th class="text-left px-4 py-3 font-semibold text-text-muted border-l border-border/50">传统 MBTI</th>
+                <th class="text-left px-4 py-3 font-semibold text-coral border-l border-border/50">MBTI PRO</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-border/50">
-              <tr>
-                <td class="px-6 py-4 font-medium text-charcoal">类型数量</td>
-                <td class="px-6 py-4 text-text-secondary border-l border-border/50">16 型（4×2）</td>
-                <td class="px-6 py-4 text-coral font-medium border-l border-border/50">81 型（4×3）</td>
-              </tr>
-              <tr>
-                <td class="px-6 py-4 font-medium text-charcoal">分类方式</td>
-                <td class="px-6 py-4 text-text-secondary border-l border-border/50">非此即彼的二分法</td>
-                <td class="px-6 py-4 text-coral font-medium border-l border-border/50">三分法：包含中间均衡型</td>
-              </tr>
-              <tr>
-                <td class="px-6 py-4 font-medium text-charcoal">中间状态</td>
-                <td class="px-6 py-4 text-text-secondary border-l border-border/50">无法识别，强制选边</td>
-                <td class="px-6 py-4 text-coral font-medium border-l border-border/50">A/B/C/D 四种中间态精确识别</td>
-              </tr>
-              <tr>
-                <td class="px-6 py-4 font-medium text-charcoal">精度提升</td>
-                <td class="px-6 py-4 text-text-secondary border-l border-border/50">—</td>
-                <td class="px-6 py-4 text-coral font-medium border-l border-border/50">5 倍于传统 MBTI 的精细度</td>
-              </tr>
-              <tr>
-                <td class="px-6 py-4 font-medium text-charcoal">测评方法</td>
-                <td class="px-6 py-4 text-text-secondary border-l border-border/50">纯主观自评量表</td>
-                <td class="px-6 py-4 text-coral font-medium border-l border-border/50">自评量表 + 客观逻辑推理题</td>
-              </tr>
-              <tr>
-                <td class="px-6 py-4 font-medium text-charcoal">题目数量</td>
-                <td class="px-6 py-4 text-text-secondary border-l border-border/50">通常 60-93 题</td>
-                <td class="px-6 py-4 text-coral font-medium border-l border-border/50">100 题（含 10 道客观推理）</td>
-              </tr>
-              <tr>
-                <td class="px-6 py-4 font-medium text-charcoal">题目设计</td>
-                <td class="px-6 py-4 text-text-secondary border-l border-border/50">单极量表，某端表述更"正面"</td>
-                <td class="px-6 py-4 text-coral font-medium border-l border-border/50">双极正面描述，两端同等认可</td>
-              </tr>
+              <tr><td class="px-4 py-3 font-medium text-charcoal">类型数量</td><td class="px-4 py-3 text-text-secondary border-l border-border/50">16 型（4×2）</td><td class="px-4 py-3 text-coral font-medium border-l border-border/50">81 型（4×3）</td></tr>
+              <tr><td class="px-4 py-3 font-medium text-charcoal">分类方式</td><td class="px-4 py-3 text-text-secondary border-l border-border/50">非此即彼二分法</td><td class="px-4 py-3 text-coral font-medium border-l border-border/50">三分法含中间均衡型</td></tr>
+              <tr><td class="px-4 py-3 font-medium text-charcoal">中间状态</td><td class="px-4 py-3 text-text-secondary border-l border-border/50">无法识别强制选边</td><td class="px-4 py-3 text-coral font-medium border-l border-border/50">A/B/C/D 四种中间态</td></tr>
+              <tr><td class="px-4 py-3 font-medium text-charcoal">精度提升</td><td class="px-4 py-3 text-text-secondary border-l border-border/50">—</td><td class="px-4 py-3 text-coral font-medium border-l border-border/50">5 倍于传统 MBTI</td></tr>
+              <tr><td class="px-4 py-3 font-medium text-charcoal">测评方法</td><td class="px-4 py-3 text-text-secondary border-l border-border/50">纯主观自评量表</td><td class="px-4 py-3 text-coral font-medium border-l border-border/50">自评 + 客观逻辑推理题</td></tr>
+              <tr><td class="px-4 py-3 font-medium text-charcoal">题目数量</td><td class="px-4 py-3 text-text-secondary border-l border-border/50">通常 60-93 题</td><td class="px-4 py-3 text-coral font-medium border-l border-border/50">100 题(含10道推理)</td></tr>
+              <tr><td class="px-4 py-3 font-medium text-charcoal">题目设计</td><td class="px-4 py-3 text-text-secondary border-l border-border/50">单极量表某端更"正面"</td><td class="px-4 py-3 text-coral font-medium border-l border-border/50">双极正面两端同等认可</td></tr>
             </tbody>
           </table>
+        </div>
+        <!-- 手机端：卡片式对比 -->
+        <div class="sm:hidden space-y-3 mb-8">
+          <div v-for="item in [
+            {label:'类型数量',old:'16 型（4×2）',pro:'81 型（4×3）'},
+            {label:'分类方式',old:'非此即彼二分法',pro:'三分法含中间均衡型'},
+            {label:'中间状态',old:'无法识别强制选边',pro:'A/B/C/D 四种中间态'},
+            {label:'精度提升',old:'—',pro:'5 倍于传统 MBTI'},
+            {label:'测评方法',old:'纯主观自评量表',pro:'自评+客观逻辑推理题'},
+            {label:'题目数量',old:'通常 60-93 题',pro:'100 题(含10道推理)'},
+            {label:'题目设计',old:'单极量表某端更正面',pro:'双极正面两端同等认可'},
+          ]" :key="item.label" class="bg-white/70 backdrop-blur-sm rounded-2xl border border-border/50 p-4 flex items-center gap-3">
+            <span class="text-xs font-bold text-charcoal bg-surface-alt rounded-lg px-2 py-1 shrink-0 w-16 text-center">{{item.label}}</span>
+            <span class="text-xs text-text-muted flex-1 text-right">{{item.old}}</span>
+            <span class="text-xs text-coral font-semibold flex-1 text-right">{{item.pro}}</span>
+          </div>
         </div>
 
         <!-- Key differentiators -->
