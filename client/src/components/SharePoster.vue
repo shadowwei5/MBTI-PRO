@@ -57,18 +57,6 @@ function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: numbe
   ctx.arcTo(x, y, x + r, y, r); ctx.closePath()
 }
 
-function wrapText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string[] {
-  const lines: string[] = []
-  let current = ''
-  for (const char of text) {
-    const test = current + char
-    if (ctx.measureText(test).width > maxWidth && current.length > 0) { lines.push(current); current = char }
-    else { current = test }
-  }
-  if (current) lines.push(current)
-  return lines
-}
-
 async function drawPoster() {
   const canvas = document.createElement('canvas')
   canvas.width = W * 2
