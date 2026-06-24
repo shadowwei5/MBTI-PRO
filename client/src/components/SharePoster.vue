@@ -18,7 +18,6 @@ const generatedImageUrl = ref('')
 const isGenerating = ref(true)
 const showModal = ref(false)
 const hasError = ref(false)
-
 const W = 750; const H = 1334
 const DIM_COLORS: Record<string, string> = {
   I: '#3D6FFF', E: '#FF5722', N: '#6A1B9A', S: '#00796B',
@@ -26,7 +25,7 @@ const DIM_COLORS: Record<string, string> = {
 }
 
 async function generateQR() {
-  try { qrDataUrl.value = await QRCode.toDataURL(`${location.origin}/#/test?ref=share`, { width: 100, margin: 0, color: { dark: '#1A1A1A', light: '#FFFFFF' } }) } catch {}
+  try { qrDataUrl.value = await QRCode.toDataURL(`${location.origin}/#/test?ref=share`, { width: 90, margin: 0, color: { dark: '#1A1A1A', light: '#FFFFFF' } }) } catch {}
 }
 function loadImage(s: string): Promise<HTMLImageElement> { return new Promise((rs, rj) => { const i = new Image(); i.crossOrigin = 'anonymous'; i.onload = () => rs(i); i.onerror = rj; i.src = s }) }
 function rRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
@@ -41,29 +40,25 @@ async function drawPoster() {
   const cvs = document.createElement('canvas'); cvs.width = W * 2; cvs.height = H * 2
   const ctx = cvs.getContext('2d')!; ctx.scale(2, 2)
 
-  // 背景
   const bg = ctx.createLinearGradient(0, 0, 0, H)
-  bg.addColorStop(0, '#FAF8F5'); bg.addColorStop(0.3, '#FFFFFF'); bg.addColorStop(1, '#FAF8F5')
+  bg.addColorStop(0, '#FAF8F5'); bg.addColorStop(0.35, '#FFFFFF'); bg.addColorStop(1, '#FAF8F5')
   ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H)
 
   // 顶部色条
-  ctx.fillStyle = props.typeColor.hex; ctx.fillRect(0, 0, W, 6)
-  const tg = ctx.createLinearGradient(0, 6, 0, 140)
-  tg.addColorStop(0, props.typeColor.hex + '18'); tg.addColorStop(1, 'transparent')
-  ctx.fillStyle = tg; ctx.fillRect(0, 6, W, 140)
+  ctx.fillStyle = props.typeColor.hex; ctx.fillRect(0, 0, W, 5)
+  const tg = ctx.createLinearGradient(0, 5, 0, 120); tg.addColorStop(0, props.typeColor.hex + '15'); tg.addColorStop(1, 'transparent')
+  ctx.fillStyle = tg; ctx.fillRect(0, 5, W, 120)
 
-  let y = 40
-
-  // Brand
+  let y = 36
   ctx.font = 'bold 11px "Noto Sans SC"'; ctx.fillStyle = '#B0A89E'; ctx.textAlign = 'center'
-  ctx.fillText('MBTI PRO · 81 型人格深度测试', W / 2, y); y += 28
+  ctx.fillText('MBTI PRO · 81 型人格深度测试', W / 2, y); y += 26
 
-  // 圆形图片
-  const imgSz = 300
+  // 图片 — 加大到 320px
+  const imgSz = 320
   try {
     const avatar = await loadImage(`/api/mediums/${props.typeCode}`)
     ctx.save()
-    ctx.shadowColor = 'rgba(0,0,0,0.12)'; ctx.shadowBlur = 24; ctx.shadowOffsetY = 6
+    ctx.shadowColor = 'rgba(0,0,0,0.12)'; ctx.shadowBlur = 20; ctx.shadowOffsetY = 4
     ctx.beginPath(); ctx.arc(W / 2, y + imgSz / 2, imgSz / 2, 0, Math.PI * 2)
     ctx.fillStyle = '#fff'; ctx.fill()
     ctx.restore()
@@ -71,23 +66,18 @@ async function drawPoster() {
     ctx.beginPath(); ctx.arc(W / 2, y + imgSz / 2, imgSz / 2, 0, Math.PI * 2); ctx.clip()
     ctx.drawImage(avatar, W / 2 - imgSz / 2, y, imgSz, imgSz)
     ctx.restore()
-    // 底部渐变遮罩
-    const mk = ctx.createLinearGradient(0, y + imgSz * 0.7, 0, y + imgSz)
-    mk.addColorStop(0, 'transparent'); mk.addColorStop(1, props.typeColor.hex + '18')
-    ctx.fillStyle = mk
-    ctx.beginPath(); ctx.arc(W / 2, y + imgSz / 2, imgSz / 2, 0, Math.PI * 2); ctx.fill()
-    y += imgSz + 24
+    y += imgSz + 22
   } catch { y += 16 }
 
   // 类型代码
-  ctx.font = '900 80px "Playfair Display", serif'; ctx.fillStyle = props.typeColor.hex; ctx.textAlign = 'center'
-  ctx.fillText(props.typeCode, W / 2, y + 64); y += 80
+  ctx.font = '900 76px "Playfair Display", serif'; ctx.fillStyle = props.typeColor.hex
+  ctx.fillText(props.typeCode, W / 2, y + 60); y += 74
 
   // 类型名称
-  ctx.font = 'bold 26px "Noto Sans SC"'; ctx.fillStyle = '#2D2D2D'
-  ctx.fillText(props.typeName.replace('型', ''), W / 2, y + 20); y += 46
+  ctx.font = 'bold 24px "Noto Sans SC"'; ctx.fillStyle = '#2D2D2D'
+  ctx.fillText(props.typeName.replace('型', ''), W / 2, y + 18); y += 38
 
-  // 四维状态条 — 加大尺寸和间距
+  // 四维状态条 — 主打内容，占更多空间
   if (props.scores && props.chars) {
     const dims = [
       { key: 'E_I' as const, left: 'I', right: 'E' },
@@ -95,8 +85,8 @@ async function drawPoster() {
       { key: 'T_F' as const, left: 'F', right: 'T' },
       { key: 'P_J' as const, left: 'P', right: 'J' },
     ]
-    const barW = 530; const barH = 24; const barX = (W - barW) / 2
-    const dimGap = 56
+    const barW = 540; const barH = 26; const barX = (W - barW) / 2
+    const dimGap = 54
 
     dims.forEach((dim, i) => {
       const dy = y + i * dimGap; const score = props.scores![dim.key]
@@ -109,9 +99,9 @@ async function drawPoster() {
 
       ctx.fillStyle = '#EAE7E0'; rRect(ctx, barX, dy, barW, barH, barH / 2); ctx.fill()
       ctx.fillStyle = '#D4D0C8'; ctx.fillRect(barX + barW / 2 - 1.5, dy, 3, barH)
-      const lg = ctx.createLinearGradient(barX, 0, barX + barW / 2, 0); lg.addColorStop(0, lc + '40'); lg.addColorStop(1, '#EAE7E0')
+      const lg = ctx.createLinearGradient(barX, 0, barX + barW / 2, 0); lg.addColorStop(0, lc + '45'); lg.addColorStop(1, '#EAE7E0')
       ctx.fillStyle = lg; ctx.fillRect(barX, dy, barW / 2, barH)
-      const rg = ctx.createLinearGradient(barX + barW / 2, 0, barX + barW, 0); rg.addColorStop(0, '#EAE7E0'); rg.addColorStop(1, rc + '40')
+      const rg = ctx.createLinearGradient(barX + barW / 2, 0, barX + barW, 0); rg.addColorStop(0, '#EAE7E0'); rg.addColorStop(1, rc + '45')
       ctx.fillStyle = rg; ctx.fillRect(barX + barW / 2, dy, barW / 2, barH)
 
       const dotX = barX + (barW * pos) / 100; const dotY = dy + barH / 2; const dotR = 10
@@ -122,33 +112,33 @@ async function drawPoster() {
       ctx.font = 'bold 10px "DM Mono", monospace'; ctx.fillStyle = '#fff'; ctx.textAlign = 'center'
       ctx.fillText(score > 0 ? `+${score}` : `${score}`, dotX, dotY + 3)
     })
-    y += dims.length * dimGap + 40
+    y += dims.length * dimGap + 28
   }
 
   // 分隔线
   ctx.strokeStyle = '#E0D8CC'; ctx.lineWidth = 1; ctx.beginPath()
-  ctx.moveTo((W - 60) / 2, y); ctx.lineTo((W + 60) / 2, y); ctx.stroke()
-  y += 24
+  ctx.moveTo((W - 80) / 2, y); ctx.lineTo((W + 80) / 2, y); ctx.stroke()
+  y += 20
 
-  // 底部: 左文字 + 右极小二维码（紧凑一排）
-  const qrS = 88; const qrX = W - qrS - 56
+  // 底部紧凑区：左文字 + 右极小二维码
+  const qrS = 82; const qrX = W - qrS - 56
   ctx.textAlign = 'left'
-  ctx.font = 'bold 16px "Noto Sans SC"'; ctx.fillStyle = '#2D2D2D'
-  ctx.fillText('扫码测测你的人格类型', 56, y + 18)
-  ctx.font = '12px "Noto Sans SC"'; ctx.fillStyle = '#9C958E'
-  ctx.fillText('发现你的 81 型专属人格画像', 56, y + 38)
+  ctx.font = 'bold 15px "Noto Sans SC"'; ctx.fillStyle = '#2D2D2D'
+  ctx.fillText('扫码测测你的人格类型', 56, y + 16)
+  ctx.font = '11px "Noto Sans SC"'; ctx.fillStyle = '#9C958E'
+  ctx.fillText('发现你的 81 型专属人格画像', 56, y + 34)
 
   try {
     const qrImg = await loadImage(qrDataUrl.value)
-    rRect(ctx, qrX - 6, y - 6, qrS + 12, qrS + 12, 10)
+    rRect(ctx, qrX - 5, y - 5, qrS + 10, qrS + 10, 8)
     ctx.fillStyle = '#fff'; ctx.fill()
     ctx.drawImage(qrImg, qrX, y, qrS, qrS)
   } catch {}
-  y += qrS + 20
+  y += qrS + 12
 
-  // 免责（紧贴二维码下方）
+  // 免责（紧贴）
   ctx.textAlign = 'center'; ctx.font = '10px "Noto Sans SC"'; ctx.fillStyle = '#B0A89E'
-  ctx.fillText('测试结果仅供个人参考，不构成任何临床诊断依据', W / 2, y + 6)
+  ctx.fillText('测试结果仅供个人参考，不构成任何临床诊断依据', W / 2, y)
 
   generatedImageUrl.value = cvs.toDataURL('image/jpeg', 0.92)
 }
@@ -162,7 +152,6 @@ onMounted(async () => {
 function downloadPoster() { if (!generatedImageUrl.value) return; const a = document.createElement('a'); a.href = generatedImageUrl.value; a.download = `MBTI-PRO-${props.typeCode}.jpg`; a.click() }
 async function copyToClipboard() { if (!generatedImageUrl.value) return; try { const b = await (await fetch(generatedImageUrl.value)).blob(); await navigator.clipboard.write([new ClipboardItem({ [b.type]: b })]) } catch { downloadPoster() } }
 const showShare = computed(() => showModal.value && !isGenerating.value && !hasError.value)
-
 </script>
 
 <template>

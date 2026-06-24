@@ -25,6 +25,7 @@ const loadError = ref('')
 const currentIndex = ref(0)
 const answers = ref<Record<number, string>>({})
 const showSubmitConfirm = ref(false)
+const submitting = ref(false)
 const startTime = ref(Date.now())
 
 // 客观题相关状态
@@ -227,6 +228,7 @@ function goPrev() {
 }
 
 async function submitTest() {
+  submitting.value = true
   showSubmitConfirm.value = false
   stopObjectiveTimer()
 
@@ -510,10 +512,10 @@ onUnmounted(() => {
               继续答题
             </button>
             <button
-              @click="submitTest"
+              @click="submitTest" :disabled="submitting"
               class="flex-1 px-4 py-3 text-sm font-semibold bg-coral text-white rounded-xl hover:bg-clay transition-all duration-300"
             >
-              确认提交
+              {{ submitting ? '提交中...' : '确认提交' }}
             </button>
           </div>
         </div>
