@@ -319,7 +319,14 @@ function goToType(code: string) {
           </table>
         </div>
         <!-- 手机端：卡片式对比 -->
-        <div class="sm:hidden space-y-3 mb-8">
+        <div class="sm:hidden mb-8">
+          <!-- 列标题 -->
+          <div class="flex items-center gap-3 px-1 mb-2">
+            <span class="text-xs font-bold text-charcoal w-16 shrink-0 text-center">维度</span>
+            <span class="text-xs font-semibold text-text-muted flex-1 text-center">传统MBTI</span>
+            <span class="text-xs font-semibold text-coral flex-1 text-center">MBTI PRO</span>
+          </div>
+          <div class="space-y-2">
           <div v-for="item in [
             {label:'类型数量',old:'16 型（4×2）',pro:'81 型（4×3）'},
             {label:'分类方式',old:'非此即彼二分法',pro:'三分法含中间均衡型'},
@@ -332,6 +339,7 @@ function goToType(code: string) {
             <span class="text-xs font-bold text-charcoal bg-surface-alt rounded-lg px-2 py-1 shrink-0 w-16 text-center">{{item.label}}</span>
             <span class="text-xs text-text-muted flex-1 text-right">{{item.old}}</span>
             <span class="text-xs text-coral font-semibold flex-1 text-right">{{item.pro}}</span>
+          </div>
           </div>
         </div>
 
