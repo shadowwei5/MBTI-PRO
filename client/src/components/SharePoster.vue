@@ -13,9 +13,7 @@ const props = defineProps<{
   chars?: { E_I: string; S_N: string; T_F: string; P_J: string }
 }>()
 
-const emit = defineEmits<{
-  close: []
-}>()
+const emit = defineEmits<{ close: [] }>()
 
 const qrDataUrl = ref('')
 const generatedImageUrl = ref('')
@@ -26,16 +24,22 @@ const hasError = ref(false)
 const W = 750
 const H = 1334
 
-// 二维码指向测试页（带追踪参数，便于统计分享转化）
+// 高对比度维度颜色 — 确保在任何背景上都清晰可见
+const DIM_COLORS: Record<string, string> = {
+  I: '#3D6FFF', E: '#FF5722',
+  N: '#6A1B9A', S: '#00796B',
+  F: '#0277BD', T: '#E65100',
+  P: '#BF8C00', J: '#1565C0',
+}
+
 async function generateQR() {
   try {
     const baseUrl = window.location.origin
     qrDataUrl.value = await QRCode.toDataURL(`${baseUrl}/#/test?ref=share`, {
-      width: 180,
-      margin: 1,
-      color: { dark: '#2D2D2D', light: '#FFFFFF' },
+      width: 160, margin: 1,
+      color: { dark: '#1A1A1A', light: '#FFFFFF' },
     })
-  } catch { /* fallback */ }
+  } catch {}
 }
 
 function loadImage(src: string): Promise<HTMLImageElement> {
@@ -59,144 +63,160 @@ function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: numbe
 
 async function drawPoster() {
   const canvas = document.createElement('canvas')
-  canvas.width = W * 2
-  canvas.height = H * 2
+  canvas.width = W * 2; canvas.height = H * 2
   const ctx = canvas.getContext('2d')!
   ctx.scale(2, 2)
 
-  // 1. 背景
-  const bgGrad = ctx.createLinearGradient(0, 0, W, H)
-  bgGrad.addColorStop(0, props.typeColor.hex + '10')
-  bgGrad.addColorStop(0.3, props.typeColor.hex + '25')
-  bgGrad.addColorStop(0.65, '#FAFAF8')
-  bgGrad.addColorStop(1, props.typeColor.hex + '15')
-  ctx.fillStyle = bgGrad
+  // 1. 纯白底色 + 深邃装饰
+  ctx.fillStyle = '#FFFFFF'
   ctx.fillRect(0, 0, W, H)
 
-  // 2. 顶部装饰条
-  const topGrad = ctx.createLinearGradient(0, 0, W, 0)
-  topGrad.addColorStop(0, props.typeColor.hex)
-  topGrad.addColorStop(1, props.groupColor.hex)
-  ctx.fillStyle = topGrad
-  ctx.fillRect(0, 0, W, 2)
+  // 2. 顶部深色区域（深灰渐变）
+  const headerH = 420
+  const headerGrad = ctx.createLinearGradient(0, 0, 0, headerH)
+  headerGrad.addColorStop(0, '#1A1A2E')
+  headerGrad.addColorStop(1, '#2D2D44')
+  ctx.fillStyle = headerGrad
+  ctx.fillRect(0, 0, W, headerH)
 
-  let y = 72
+  // 3. 类型色装饰弧线
+  ctx.beginPath()
+  ctx.arc(W / 2, headerH, 380, Math.PI, 0)
+  ctx.fillStyle = props.typeColor.hex + '12'; ctx.fill()
 
-  // 3. Brand
-  ctx.fillStyle = '#9C958E'
-  ctx.font = '12px "Noto Sans SC", sans-serif'
-  ctx.textAlign = 'center'
-  ctx.fillText('MBTI PRO', W / 2, y); y += 20
+  let y = 62
+
+  // 4. Brand（顶部导航栏区域）
+  ctx.font = 'bold 13px "Noto Sans SC", sans-serif'
+  ctx.fillStyle = '#FFFFFF60'; ctx.textAlign = 'center'
+  ctx.fillText('MBTI PRO', W / 2, y); y += 22
   ctx.font = '10px "Noto Sans SC", sans-serif'
-  ctx.fillStyle = '#9C958E99'
-  ctx.fillText('81 型人格深度测试', W / 2, y); y += 44
+  ctx.fillStyle = '#FFFFFF30'
+  ctx.fillText('81 型人格深度测试', W / 2, y); y += 36
 
-  // 4. AI 人格图片（使用缩略图加速，海报显示尺寸约 480px）
+  // 5. AI 人格图片（圆形容器，高清原图）
   try {
-    const thumbUrl = `/api/mediums/${props.typeCode}`
-    const avatar = await loadImage(thumbUrl)
-    const imgSize = 480
-    const imgX = (W - imgSize) / 2
+    const imgUrl = `/api/images/${props.typeCode}`
+    const avatar = await loadImage(imgUrl)
+    const imgSize = 280; const imgX = (W - imgSize) / 2
     ctx.save()
-    ctx.shadowColor = 'rgba(0,0,0,0.15)'; ctx.shadowBlur = 40; ctx.shadowOffsetY = 8
-    roundRect(ctx, imgX, y, imgSize, imgSize, 48)
-    ctx.fillStyle = '#fff'; ctx.fill()
+    ctx.beginPath()
+    ctx.arc(W / 2, y + imgSize / 2, imgSize / 2 + 4, 0, Math.PI * 2)
+    ctx.fillStyle = '#FFFFFF18'; ctx.fill()
     ctx.restore()
     ctx.save()
-    roundRect(ctx, imgX, y, imgSize, imgSize, 48); ctx.clip()
+    ctx.beginPath()
+    ctx.arc(W / 2, y + imgSize / 2, imgSize / 2, 0, Math.PI * 2)
+    ctx.clip()
     ctx.drawImage(avatar, imgX, y, imgSize, imgSize)
-    const maskGrad = ctx.createLinearGradient(0, y + imgSize * 0.67, 0, y + imgSize)
-    maskGrad.addColorStop(0, 'transparent'); maskGrad.addColorStop(1, props.typeColor.hex + '30')
-    ctx.fillStyle = maskGrad; ctx.fillRect(imgX, y, imgSize, imgSize)
     ctx.restore()
-    y += imgSize + 44
+    y += imgSize + 32
   } catch { y += 16 }
 
-  // 5. 类型代码
-  ctx.font = '900 88px "Playfair Display", serif'
-  ctx.fillStyle = props.typeColor.hex
-  ctx.textAlign = 'center'
-  ctx.fillText(props.typeCode, W / 2, y + 72); y += 100
+  // 6. 类型代码
+  ctx.font = '900 80px "Playfair Display", serif'
+  ctx.fillStyle = '#FFFFFF'; ctx.textAlign = 'center'
+  ctx.fillText(props.typeCode, W / 2, y + 64); y += 88
 
-  // 6. 类型名称
-  ctx.font = 'bold 28px "Noto Sans SC", sans-serif'
-  ctx.fillStyle = '#2D2D2D'
-  ctx.fillText(props.typeName, W / 2, y + 22); y += 44
+  // 7. 类型名称
+  ctx.font = 'bold 26px "Noto Sans SC", sans-serif'
+  ctx.fillStyle = '#FFFFFFE0'
+  ctx.fillText(props.typeName.replace('型', ''), W / 2, y + 20)
+  y = headerH + 46
 
-  // 7.四维状态条 — 圆圈中显示数字得分
+  // 8. 四维状态条（白色背景区域）
   if (props.scores && props.chars) {
     const dims = [
-      { key: 'E_I' as const, label: '能量来源', left: 'I', right: 'E', leftColor: '#5C8DFF', rightColor: '#FF8A65' },
-      { key: 'S_N' as const, label: '认知方式', left: 'N', right: 'S', leftColor: '#9C6FFF', rightColor: '#69F0AE' },
-      { key: 'T_F' as const, label: '决策方式', left: 'F', right: 'T', leftColor: '#1DA8FF', rightColor: '#FFD740' },
-      { key: 'P_J' as const, label: '生活态度', left: 'P', right: 'J', leftColor: '#E6B800', rightColor: '#82B1FF' },
+      { key: 'E_I' as const, label: '能量来源', left: 'I', right: 'E' },
+      { key: 'S_N' as const, label: '认知方式', left: 'N', right: 'S' },
+      { key: 'T_F' as const, label: '决策方式', left: 'F', right: 'T' },
+      { key: 'P_J' as const, label: '生活态度', left: 'P', right: 'J' },
     ]
-    const barW = 520; const barH = 28; const barX = (W - barW) / 2
-    const dimGap = 42; const dimStartY = y
+    const barW = 540; const barH = 22; const barX = (W - barW) / 2
+    const dimGap = 48; const dimStartY = y
 
     dims.forEach((dim, i) => {
       const dy = dimStartY + i * dimGap
       const score = props.scores![dim.key]
       const pos = Math.max(3, Math.min(97, 50 + (score / 50) * 47))
+      const leftColor = DIM_COLORS[dim.left]
+      const rightColor = DIM_COLORS[dim.right]
 
+      // 标签
       ctx.font = 'bold 16px "Noto Sans SC", sans-serif'
-      ctx.textAlign = 'left'; ctx.fillStyle = dim.leftColor
-      ctx.fillText(dim.left, barX - 44, dy + barH / 2 + 6)
-      ctx.textAlign = 'right'; ctx.fillStyle = dim.rightColor
-      ctx.fillText(dim.right, barX + barW + 44, dy + barH / 2 + 6)
+      ctx.textAlign = 'left'; ctx.fillStyle = leftColor
+      ctx.fillText(dim.left, barX - 52, dy + barH / 2 + 6)
+      ctx.textAlign = 'right'; ctx.fillStyle = rightColor
+      ctx.fillText(dim.right, barX + barW + 52, dy + barH / 2 + 6)
 
-      // 背景条
-      ctx.fillStyle = '#F0EDE6'; roundRect(ctx, barX, dy, barW, barH, barH / 2); ctx.fill()
-      ctx.fillStyle = '#D8D4CA30'; ctx.fillRect(barX + barW / 3, dy, barW / 3, barH)
+      // 滑动条底色
+      ctx.fillStyle = '#E8E5DF'
+      roundRect(ctx, barX, dy, barW, barH, barH / 2); ctx.fill()
 
-      // 圆点 — 显示数字得分
-      const dotX = barX + (barW * pos) / 100; const dotY = dy + barH / 2; const dotR = 11
+      // 左半段渐变色（从左侧颜色到中间灰色）
+      const leftGrad = ctx.createLinearGradient(barX, 0, barX + barW / 2, 0)
+      leftGrad.addColorStop(0, leftColor + '50'); leftGrad.addColorStop(1, '#E8E5DF')
+      ctx.fillStyle = leftGrad
+      ctx.fillRect(barX, dy, barW / 2, barH)
+
+      // 右半段渐变色
+      const rightGrad = ctx.createLinearGradient(barX + barW / 2, 0, barX + barW, 0)
+      rightGrad.addColorStop(0, '#E8E5DF'); rightGrad.addColorStop(1, rightColor + '50')
+      ctx.fillStyle = rightGrad
+      ctx.fillRect(barX + barW / 2, dy, barW / 2, barH)
+
+      // 中心刻度线
+      ctx.fillStyle = '#D0CCC4'; ctx.fillRect(barX + barW / 2 - 1, dy, 2, barH)
+
+      // 圆点指示器（深色填充 + 白边）
+      const dotX = barX + (barW * pos) / 100; const dotY = dy + barH / 2; const dotR = 10
       ctx.beginPath(); ctx.arc(dotX, dotY, dotR, 0, Math.PI * 2)
-      ctx.fillStyle = dim.leftColor; ctx.fill()
-      ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.stroke()
+      const dotColor = pos >= 50 ? rightColor : leftColor
+      ctx.fillStyle = dotColor; ctx.fill()
+      ctx.strokeStyle = '#FFFFFF'; ctx.lineWidth = 2.5; ctx.stroke()
 
-      // 数字得分（非字母）
+      // 数字得分
       ctx.font = 'bold 10px "DM Mono", monospace'
-      ctx.fillStyle = '#fff'; ctx.textAlign = 'center'
+      ctx.fillStyle = '#FFFFFF'; ctx.textAlign = 'center'
       const displayScore = score > 0 ? `+${score}` : `${score}`
       ctx.fillText(displayScore, dotX, dotY + 3)
     })
 
-    y = dimStartY + dims.length * dimGap + 32
+    y = dimStartY + dims.length * dimGap + 40
   }
 
-  // 8. 分隔线
+  // 9. 分隔线
   ctx.strokeStyle = '#E0D8CC'; ctx.lineWidth = 1; ctx.beginPath()
-  ctx.moveTo((W - 96) / 2, y); ctx.lineTo((W + 96) / 2, y); ctx.stroke()
-  y += 48
+  ctx.moveTo((W - 80) / 2, y); ctx.lineTo((W + 80) / 2, y); ctx.stroke()
+  y += 44
 
-  // 9. 二维码（白底+圆角确保完整显示）
+  // 10. 二维码
   try {
     const qrImg = await loadImage(qrDataUrl.value)
-    const qrSize = 156; const qrX = (W - qrSize) / 2
+    const qrSize = 140; const qrX = (W - qrSize) / 2
     ctx.save()
-    ctx.shadowColor = 'rgba(0,0,0,0.08)'; ctx.shadowBlur = 16; ctx.shadowOffsetY = 4
-    roundRect(ctx, qrX - 16, y - 16, qrSize + 32, qrSize + 32, 20)
-    ctx.fillStyle = '#ffffff'; ctx.fill()
+    ctx.shadowColor = 'rgba(0,0,0,0.06)'; ctx.shadowBlur = 12; ctx.shadowOffsetY = 3
+    roundRect(ctx, qrX - 14, y - 14, qrSize + 28, qrSize + 28, 16)
+    ctx.fillStyle = '#FFFFFF'; ctx.fill()
     ctx.restore()
     ctx.drawImage(qrImg, qrX, y, qrSize, qrSize)
-    y += qrSize + 28
+    y += qrSize + 24
   } catch { y += 16 }
 
-  // 10. 扫码文字
-  ctx.font = '600 18px "Noto Sans SC", sans-serif'
+  // 11. 扫码文字
+  ctx.font = '600 17px "Noto Sans SC", sans-serif'
   ctx.fillStyle = '#2D2D2D'
-  ctx.fillText('扫码测测你的人格类型', W / 2, y + 16); y += 30
+  ctx.fillText('扫码测测你的人格类型', W / 2, y + 14); y += 28
   ctx.font = '13px "Noto Sans SC", sans-serif'
   ctx.fillStyle = '#9C958E'
-  ctx.fillText('发现你的 81 型专属人格画像', W / 2, y + 12); y += 50
+  ctx.fillText('发现你的 81 型专属人格画像', W / 2, y + 10); y += 46
 
-  // 11. Footer
+  // 12. Footer
   ctx.font = '11px "Noto Sans SC", sans-serif'
-  ctx.fillStyle = '#9C958E80'
-  ctx.fillText('测试结果仅供个人参考，不构成任何临床诊断依据', W / 2, y + 10)
+  ctx.fillStyle = '#B0A89E'
+  ctx.fillText('测试结果仅供个人参考，不构成任何临床诊断依据', W / 2, y + 8)
 
-  generatedImageUrl.value = canvas.toDataURL('image/jpeg', 0.90)
+  generatedImageUrl.value = canvas.toDataURL('image/jpeg', 0.92)
 }
 
 onMounted(async () => {
@@ -247,9 +267,9 @@ const showError = computed(() => showModal.value && !isGenerating.value && hasEr
           <img :src="generatedImageUrl" :alt="`${typeCode} 分享海报`" class="w-full" />
         </div>
         <div class="flex gap-3">
-          <button @click="emit('close')" class="flex-1 px-4 py-3 text-sm font-medium text-text-secondary border border-border rounded-xl hover:bg-surface-alt transition-all duration-300">关闭</button>
-          <button @click="downloadPoster" class="flex-1 px-4 py-3 text-sm font-semibold bg-charcoal text-cream rounded-xl hover:shadow-lg transition-all duration-300">保存图片</button>
-          <button @click="copyToClipboard" class="flex-1 px-4 py-3 text-sm font-semibold text-white rounded-xl hover:shadow-lg transition-all duration-300" :style="{ background: typeColor.hex }">复制图片</button>
+          <button @click="emit('close')" class="flex-1 px-4 py-3 text-sm font-medium text-text-secondary border border-border rounded-xl">关闭</button>
+          <button @click="downloadPoster" class="flex-1 px-4 py-3 text-sm font-semibold bg-charcoal text-cream rounded-xl">保存图片</button>
+          <button @click="copyToClipboard" class="flex-1 px-4 py-3 text-sm font-semibold text-white rounded-xl" :style="{ background: props.typeColor.hex }">复制图片</button>
         </div>
       </div>
     </div>
@@ -258,21 +278,16 @@ const showError = computed(() => showModal.value && !isGenerating.value && hasEr
   <Transition name="modal">
     <div v-if="showError" class="fixed inset-0 z-50 flex items-center justify-center p-5">
       <div class="absolute inset-0 bg-charcoal/50 backdrop-blur-sm" @click="emit('close')" />
-      <div class="relative bg-cream rounded-3xl p-6 max-w-sm w-full shadow-2xl animate-scale-in">
-        <h3 class="text-lg font-display font-bold text-charcoal mb-2 text-center">分享你的人格画像</h3>
-        <p class="text-sm text-text-muted text-center mb-5">长按保存下方卡片，分享到朋友圈</p>
-        <div class="rounded-2xl p-5 mb-5 flex flex-col items-center" :style="{ background: `linear-gradient(160deg, ${typeColor.hex}10 0%, ${typeColor.hex}25 30%, #FAFAF8 65%, ${typeColor.hex}15 100%)` }">
-          <p class="text-[48px] font-black tracking-[0.08em] leading-none mb-2" :style="{ color: typeColor.hex }">{{ typeCode }}</p>
+      <div class="relative bg-cream rounded-3xl p-6 max-w-sm w-full shadow-2xl animate-scale-in text-center">
+        <h3 class="text-lg font-bold text-charcoal mb-2">分享你的人格画像</h3>
+        <p class="text-sm text-text-muted mb-5">长按保存下方卡片</p>
+        <div class="rounded-2xl p-5 flex flex-col items-center" :style="{ background: `linear-gradient(160deg, ${typeColor.hex}10, ${typeColor.hex}25, #FAFAF8)` }">
+          <p class="text-5xl font-black tracking-wide mb-2" :style="{ color: typeColor.hex }">{{ typeCode }}</p>
           <p class="text-lg font-bold text-charcoal mb-1">{{ typeName }}</p>
-          <p class="text-xs text-text-secondary text-center mb-4">{{ oneLiner }}</p>
-          <div v-if="qrDataUrl" class="bg-white rounded-2xl p-3 mb-2">
-            <img :src="qrDataUrl" alt="QR" class="w-[120px] h-[120px]" />
-          </div>
-          <p class="text-[10px] text-text-muted">扫码测测你的人格类型</p>
+          <div v-if="qrDataUrl" class="bg-white rounded-2xl p-3 mb-2"><img :src="qrDataUrl" class="w-28 h-28" /></div>
+          <p class="text-xs text-text-muted">扫码测测你的人格类型</p>
         </div>
-        <div class="flex gap-3">
-          <button @click="emit('close')" class="flex-1 px-4 py-3 text-sm font-medium text-text-secondary border border-border rounded-xl hover:bg-surface-alt transition-all duration-300">关闭</button>
-        </div>
+        <button @click="emit('close')" class="mt-4 px-4 py-3 text-sm text-text-secondary border border-border rounded-xl w-full">关闭</button>
       </div>
     </div>
   </Transition>
