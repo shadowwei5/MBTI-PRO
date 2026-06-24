@@ -162,7 +162,7 @@ onMounted(async () => {
 function downloadPoster() { if (!generatedImageUrl.value) return; const a = document.createElement('a'); a.href = generatedImageUrl.value; a.download = `MBTI-PRO-${props.typeCode}.jpg`; a.click() }
 async function copyToClipboard() { if (!generatedImageUrl.value) return; try { const b = await (await fetch(generatedImageUrl.value)).blob(); await navigator.clipboard.write([new ClipboardItem({ [b.type]: b })]) } catch { downloadPoster() } }
 const showShare = computed(() => showModal.value && !isGenerating.value && !hasError.value)
-const showError = computed(() => showModal.value && !isGenerating.value && hasError.value)
+
 </script>
 
 <template>
