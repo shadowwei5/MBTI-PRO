@@ -17,3 +17,7 @@ _generation_state.json
 
 # Image generation backups (kept locally only)
 server/generated_images_backup/
+video/6月26日/
+video/6月26日(1)/
+video/6月27日*/
+video/output/*.mp4

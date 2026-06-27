@@ -38,8 +38,7 @@ body{width:1024px;height:1365px;overflow:hidden;font-family:'Noto Sans SC','Ping
 .c{width:1024px;height:1365px;position:relative;overflow:hidden;
 background:linear-gradient(170deg,#1a1a2e 0%,#16213e 38%,#0f3460 72%,#0D0D0D 100%)}
 .brand{position:absolute;top:56px;left:50%;transform:translateX(-50%);z-index:3;display:flex;align-items:center;gap:10px}
-.brand-dot{width:16px;height:16px;border-radius:50%;background:#E8816B}
-.brand-text{font-size:40px;font-weight:700;color:#FFF;letter-spacing:.06em}
+.brand-text{font-size:52px;font-weight:700;color:#FFF;letter-spacing:.04em;white-space:nowrap}
 .zone{position:absolute;top:50%;left:50%;transform:translate(-50%,-55%);z-index:3;text-align:center}
 .code{font-family:'Georgia',serif;font-size:200px;font-weight:700;color:#FFF;letter-spacing:.08em;line-height:1;text-shadow:0 6px 60px rgba(0,0,0,.5)}
 .name{font-size:52px;font-weight:700;color:rgba(255,255,255,.85);margin-top:20px}
@@ -47,7 +46,7 @@ background:linear-gradient(170deg,#1a1a2e 0%,#16213e 38%,#0f3460 72%,#0D0D0D 100
 .cta{position:absolute;bottom:70px;left:50%;transform:translateX(-50%);z-index:3;text-align:center;font-size:28px;color:rgba(255,255,255,.5)}
 .ds{position:absolute;bottom:190px;left:50%;transform:translateX(-50%);display:flex;gap:7px;z-index:3}
 </style></head><body><div class="c">
-<div class="brand"><span class="brand-dot"></span><span class="brand-text">MBTI-PRO · 81 型人格测试</span></div>
+<div class="brand"><span class="brand-text">MBTI-PRO · 81 型人格测试</span></div>
 <div class="zone"><div class="code">???</div><div class="name">你是什么人格类型？</div><div class="tag">免费测试 · 发现真实的自己</div></div>
 <div class="ds">${dotStrip}</div>
 </div></body></html>`
@@ -76,15 +75,14 @@ body{width:1024px;height:1365px;overflow:hidden;font-family:'Noto Sans SC','Ping
 .c{width:1024px;height:1365px;position:relative;overflow:hidden;
 background:linear-gradient(170deg,#1a1a2e 0%,#16213e 38%,${colorInfo.hex}22 72%,#0D0D0D 100%)}
 .brand{position:absolute;top:56px;left:50%;transform:translateX(-50%);z-index:3;display:flex;align-items:center;gap:10px}
-.brand-dot{width:16px;height:16px;border-radius:50%;background:#E8816B}
-.brand-text{font-size:40px;font-weight:700;color:#FFF;letter-spacing:.06em}
+.brand-text{font-size:52px;font-weight:700;color:#FFF;letter-spacing:.04em;white-space:nowrap}
 .zone{position:absolute;top:50%;left:50%;transform:translate(-50%,-55%);z-index:3;text-align:center}
 .code{font-family:'Georgia',serif;font-size:200px;font-weight:700;color:${colorInfo.hex};letter-spacing:.08em;line-height:1;text-shadow:0 6px 60px rgba(0,0,0,.5)}
 .name{font-size:52px;font-weight:700;color:rgba(255,255,255,.85);margin-top:20px}
 .tag{display:inline-block;margin-top:18px;padding:8px 24px;border-radius:20px;font-size:26px;font-weight:600;background:${colorInfo.hex}22;color:${colorInfo.hex};border:1px solid ${colorInfo.hex}44}
 .ds{position:absolute;bottom:190px;left:50%;transform:translateX(-50%);display:flex;gap:7px;z-index:3}
 </style></head><body><div class="c">
-<div class="brand"><span class="brand-dot"></span><span class="brand-text">MBTI-PRO · 81 型人格测试</span></div>
+<div class="brand"><span class="brand-text">MBTI-PRO · 81 型人格测试</span></div>
 <div class="zone"><div class="code">${code}</div><div class="name">${typeData.name}</div><div class="tag">${groupInfo.name}</div></div>
 <div class="ds">${dotStrip}</div>
 </div></body></html>`

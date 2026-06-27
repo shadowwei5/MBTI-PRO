@@ -81,7 +81,7 @@ body{width:1024px;height:1365px;overflow:hidden;font-family:'Noto Sans SC','Ping
 background:linear-gradient(170deg,#1a1a2e 0%,#16213e 38%,#0f3460 72%,#0D0D0D 100%)}
 .brand{position:absolute;top:56px;left:50%;transform:translateX(-50%);z-index:3;display:flex;align-items:center;gap:10px}
 .brand-dot{width:12px;height:12px;border-radius:50%;background:#E8816B}
-.brand-text{font-size:40px;font-weight:700;color:#FFF;letter-spacing:.06em}
+.brand-text{font-size:52px;font-weight:700;color:#FFF;letter-spacing:.04em;white-space:nowrap}
 .type-zone{position:absolute;top:50%;left:50%;transform:translate(-50%,-55%);z-index:3;text-align:center}
 .code{font-family:'Georgia','Times New Roman',serif;font-size:200px;font-weight:700;color:#FFF;letter-spacing:.08em;line-height:1;text-shadow:0 6px 50px rgba(0,0,0,.45)}
 .name{font-size:52px;font-weight:700;color:rgba(255,255,255,.85);margin-top:20px}

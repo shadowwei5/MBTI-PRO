@@ -43,9 +43,11 @@ async function drawPoster() {
   const cvs = document.createElement('canvas'); cvs.width = W * 2; cvs.height = H * 2
   const ctx = cvs.getContext('2d')!; ctx.scale(2, 2)
 
-  // 背景铺满
+  // 背景 — 类型专属渐变色系，低饱和度不干扰文字
+  const tc = props.typeColor.hex // 如 #6B3FA0
   const bg = ctx.createLinearGradient(0, 0, 0, H)
-  bg.addColorStop(0, '#FAF8F5'); bg.addColorStop(0.3, '#FFFFFF'); bg.addColorStop(1, '#FAF8F5')
+  bg.addColorStop(0, tc + '0D'); bg.addColorStop(0.25, '#FFFFFF'); bg.addColorStop(0.5, tc + '08')
+  bg.addColorStop(0.75, '#FFFFFF'); bg.addColorStop(1, tc + '0D')
   ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H)
 
   // 顶部色条
