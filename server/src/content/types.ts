@@ -637,7 +637,7 @@ const TYPE_NAMES: Record<string, string> = {
   // ===== ES 琥珀组 (外向实感) - 行动实践型 =====
   ESTJ: '总经理型', ESTD: '操盘手型', ESTP: '企业家型',
   ESCJ: '组织者型', ESCD: '实干家型', ESCP: '行动派型',
-  ESFJ: '执政官型', ESFD: '照顾者型', ESFP: '表演者型',
+  ESFJ: '执政官型', ESFD: '呵护者型', ESFP: '表演者型',
 
   // ===== AN 薰紫组 (平衡直觉) - 独立洞察型 =====
   ANTJ: '策划者型', ANTD: '构想家型', ANTP: '思辨者型',
@@ -646,8 +646,8 @@ const TYPE_NAMES: Record<string, string> = {
 
   // ===== AB 青灰组 (平衡均衡) - 全面适应型 =====
   ABTJ: '执行师型', ABTD: '适应者型', ABTP: '灵活者型',
-  ABCJ: '平衡者型', ABCD: '中庸者型', ABCP: '随性者型',
-  ABFJ: '和事佬型', ABFD: '随和者型', ABFP: '乐活者型',
+  ABCJ: '平衡者型', ABCD: '全能者型', ABCP: '洒脱者型',
+  ABFJ: '和谐者型', ABFD: '温润者型', ABFP: '悠然者型',
 
   // ===== AS 鼠尾草组 (平衡实感) - 稳健实践型 =====
   ASTJ: '管理者型', ASTD: '常务者型', ASTP: '匠人型',

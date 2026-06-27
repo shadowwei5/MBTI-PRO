@@ -1,0 +1,102 @@
+# ============================================================
+# MBTI-PRO 日常81型视频模板配置
+# 控制视频时间轴、动画参数、内容映射
+# ============================================================
+
+# 视频规格
+video:
+  width: 1080
+  height: 1920
+  fps: 30
+  duration_seconds: 30
+
+# 帧渲染策略
+rendering:
+  keyframe_interval: 3  # 每 N 秒截一个关键帧
+  device_scale_factor: 2  # 2x 超采样
+  screenshot_format: png
+
+# 时间轴（秒）
+timeline:
+  - segment: brand_badge
+    start: 0
+    end: 2
+    description: 品牌徽章 + "MBTI PRO · 81型人格"
+    animation: fadeInDown
+
+  - segment: group_tag
+    start: 2
+    end: 3
+    description: 9组颜色标签（如 "NF 翠绿组"）
+    animation: fadeInScale
+
+  - segment: type_code
+    start: 3
+    end: 8
+    description: 4位类型代码大字（如 "ENFJ"）
+    animation: fadeInUp
+
+  - segment: type_name
+    start: 3.5
+    end: 8
+    description: 类型中文名称（如 "主人公型"）
+    animation: fadeInUp
+
+  - segment: quote
+    start: 8
+    end: 15
+    description: 名人名言或优势金句
+    animation: fadeInUp
+
+  - segment: overview
+    start: 15
+    end: 23
+    description: 人格概览摘录（前80字）
+    animation: fadeInUp
+
+  - segment: spectrum
+    start: 20
+    end: 26
+    description: 四维光谱条动画
+    animation: fadeInUp
+
+  - segment: cta
+    start: 27
+    end: 30
+    description: 尾帧CTA + QR码
+    animation: fadeInUp
+
+# 内容数据源映射
+content_mapping:
+  type_code: "{{data.code}}"
+  type_name: "{{data.name}}"
+  group_tag: "{{data._groupName}}"
+  accent_color: "{{data._colorHex}}"
+  quote_text: "{{data.strengths[0]}} 是你的核心优势之一"
+  quote_author: "{{data.celebrities[0]}}"
+  overview_snippet: "{{data.overview | truncate 80}}"
+
+# 各平台发布配置
+platforms:
+  douyin:
+    title_template: "你是{{data.name}}吗？#MBTI #人格测试"
+    max_title_length: 30
+    tags: ["MBTI", "人格测试", "性格分析", "81型人格", "{{data._groupName}}"]
+    video_format: "mp4"
+    aspect_ratio: "9:16"
+
+  bilibili:
+    title_template: "【MBTI-PRO】{{data.code}} {{data.name}}深度解析 | 81型人格测试"
+    max_title_length: 80
+    tags: ["MBTI", "人格测试", "心理学", "性格分析", "MBTI-PRO"]
+    category: "知识"
+
+  xiaohongshu:
+    title_template: "你是{{data.name}}型人格吗？🤔 #MBTI测试"
+    max_title_length: 20
+    tags: ["MBTI", "人格测试", "自我认知", "性格分析", "心理测试"]
+    cover_aspect_ratio: "3:4"
+
+  wechat:
+    title_template: "【81型人格】{{data.code}} {{data.name}}：{{data.overview | truncate 30}}"
+    article_template: "daily-type-article"

@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<style>
+/* ============================================================
+   MBTI-PRO 81型日常视频模板 v2 — 1080×1920
+   修复: 增大内容占比 / 提升字体大小 / 优化移动端观感
+   ============================================================ */
+* { margin:0; padding:0; box-sizing:border-box; }
+:root { --canvas-w:1080px; --canvas-h:1920px; }
+body { background:#0D0D0D; overflow:hidden; }
+#canvas {
+  width:var(--canvas-w); height:var(--canvas-h); position:relative; overflow:hidden;
+  font-family:'Noto Sans SC','PingFang SC','Microsoft YaHei',sans-serif; color:#FFF;
+}
+
+/* 背景图片 + Ken Burns */
+.bg-layer { position:absolute; inset:0; z-index:1; }
+.bg-layer img { width:100%; height:100%; object-fit:cover; animation:kenburns 30s ease-in-out infinite; }
+@keyframes kenburns {
+  0% { transform:scale(1) translate(0,0); }
+  50% { transform:scale(1.15) translate(-2%,-1%); }
+  100% { transform:scale(1) translate(0,0); }
+}
+.bg-overlay {
+  position:absolute; inset:0; z-index:2;
+  background:linear-gradient(180deg,
+    rgba(0,0,0,.35) 0%, rgba(0,0,0,.12) 30%, rgba(0,0,0,.05) 55%,
+    rgba(0,0,0,.55) 78%, rgba(0,0,0,.88) 100%);
+}
+
+/* 品牌徽章 0-2s */
+.brand-badge {
+  position:absolute; top:60px; left:50%; transform:translateX(-50%); z-index:10;
+  display:flex; align-items:center; gap:14px;
+  background:rgba(0,0,0,.5); backdrop-filter:blur(16px);
+  border:1px solid rgba(255,255,255,.12); border-radius:50px;
+  padding:18px 40px; opacity:0;
+  animation: fadeInDown .6s .2s ease-out forwards;
+}
+.brand-badge .dot { width:14px; height:14px; border-radius:50%; background:var(--accent-color,#E8816B); animation:breathe 2s ease-in-out infinite; }
+.brand-badge .text { font-size:32px; font-weight:600; letter-spacing:.06em; }
+@keyframes breathe { 0%,100%{ opacity:.35; transform:scale(.8); } 50%{ opacity:1; transform:scale(1.2); } }
+@keyframes fadeInDown { from{ opacity:0; transform:translateX(-50%) translateY(-24px); } to{ opacity:1; transform:translateX(-50%) translateY(0); } }
+
+/* 9组颜色标签 2-3s */
+.group-tag {
+  position:absolute; top:200px; left:50%; transform:translateX(-50%); z-index:10;
+  padding:14px 36px; border-radius:30px; font-size:30px; font-weight:600; letter-spacing:.04em;
+  opacity:0; animation:fadeInScale .5s 2s ease-out forwards;
+}
+@keyframes fadeInScale { from{ opacity:0; transform:translateX(-50%) scale(.8); } to{ opacity:1; transform:translateX(-50%) scale(1); } }
+
+/* 类型代码 3-8s */
+.type-code {
+  position:absolute; top:540px; left:50%; transform:translateX(-50%); z-index:10;
+  font-size:240px; font-weight:900; letter-spacing:.08em; line-height:1;
+  opacity:0; animation:fadeInUp .7s 3s ease-out forwards;
+  text-shadow:0 4px 40px rgba(0,0,0,.5);
+}
+/* 类型名称 4-8s */
+.type-name {
+  position:absolute; top:840px; left:50%; transform:translateX(-50%); z-index:10;
+  font-size:56px; font-weight:700; letter-spacing:.08em;
+  opacity:0; animation:fadeInUp .6s 3.5s ease-out forwards;
+}
+@keyframes fadeInUp { from{ opacity:0; transform:translateX(-50%) translateY(36px); } to{ opacity:1; transform:translateX(-50%) translateY(0); } }
+
+/* 金句 8-15s */
+.quote-block {
+  position:absolute; bottom:620px; left:80px; right:80px; z-index:10; text-align:center;
+  opacity:0; animation:fadeInUp .7s 8s ease-out forwards;
+}
+.quote-mark { font-size:100px; color:var(--accent-color,#E8816B); line-height:.5; opacity:.35; }
+.quote-text { font-size:44px; font-weight:500; line-height:1.5; color:rgba(255,255,255,.9); margin-top:-10px; }
+.quote-author { font-size:30px; color:var(--accent-color,#E8816B); margin-top:24px; font-weight:500; }
+
+/* 概览 15-23s */
+.overview-block {
+  position:absolute; bottom:400px; left:80px; right:80px; z-index:10; text-align:center;
+  opacity:0; animation:fadeInUp .7s 15s ease-out forwards;
+}
+.overview-text { font-size:36px; line-height:1.7; color:rgba(255,255,255,.85); font-weight:400; }
+
+/* 光谱 20-26s */
+.spectrum-block {
+  position:absolute; bottom:240px; left:100px; right:100px; z-index:10;
+  display:flex; flex-direction:column; gap:22px;
+  opacity:0; animation:fadeInUp .7s 20s ease-out forwards;
+}
+.spec-row { display:flex; align-items:center; gap:14px; }
+.spec-l { width:60px; text-align:right; font-size:28px; font-weight:500; color:rgba(255,255,255,.55); }
+.spec-r { width:60px; text-align:left; font-size:28px; font-weight:500; color:rgba(255,255,255,.55); }
+.spec-bar { flex:1; height:12px; border-radius:6px; position:relative; }
+.spec-dot {
+  position:absolute; top:50%; transform:translate(-50%,-50%);
+  width:26px; height:26px; border-radius:50%; background:#FFF;
+  border:3px solid var(--accent-color,#E8816B); box-shadow:0 0 20px rgba(255,255,255,.5);
+}
+.spec-char { width:60px; font-size:38px; font-weight:800; color:var(--accent-color,#E8816B); text-align:center; }
+
+/* CTA 尾帧 27-30s */
+.cta-block {
+  position:absolute; bottom:80px; left:50%; transform:translateX(-50%); z-index:10; text-align:center;
+  opacity:0; animation:fadeInUp .6s 27s ease-out forwards;
+}
+.cta-text { font-size:42px; font-weight:700; color:#FFF; margin-bottom:16px; }
+.cta-sub { font-size:28px; color:rgba(255,255,255,.5); }
+.qr-code { margin-top:20px; width:120px; height:120px; background:#FFF; border-radius:16px; padding:8px; }
+</style>
+</head>
+<body>
+<div id="canvas">
+  <div class="bg-layer"><img id="typeImage" src="" alt="" /></div>
+  <div class="bg-overlay"></div>
+
+  <div class="brand-badge">
+    <span class="dot" style="background:var(--accent-color)"></span>
+    <span class="text">MBTI PRO · 81 型人格</span>
+  </div>
+
+  <div class="group-tag" id="groupTag">NF 翠绿组</div>
+
+  <div class="type-code" id="typeCode" style="color:var(--accent-color)">ENFJ</div>
+  <div class="type-name" id="typeName">主人公型</div>
+
+  <div class="quote-block">
+    <div class="quote-mark">"</div>
+    <div class="quote-text" id="quoteText">领导力是你的核心优势之一</div>
+    <div class="quote-author" id="quoteAuthor">—— 纳尔逊·曼德拉</div>
+  </div>
+
+  <div class="overview-block">
+    <div class="overview-text" id="overviewText">你是天生的领导者和沟通者...</div>
+  </div>
+
+  <div class="spectrum-block" id="spectrumBlock"></div>
+
+  <div class="cta-block">
+    <div class="cta-text">测测你是什么人格类型</div>
+    <div class="cta-sub">MBTI-PRO · 81 型精细分类</div>
+    <img class="qr-code" id="qrCode" src="" alt="扫码测试" />
+  </div>
+</div>
+
+<script>
+window.typeData = window.typeData || {
+  code:'ENFJ',name:'主人公型',overview:'你是天生的领导者和沟通者...',
+  celebrities:['纳尔逊·曼德拉','奥普拉·温弗瑞'],
+  _colorHex:'#2D8A4E',_colorTextHex:'#1F6E3A',_groupCode:'NF',
+  strengths:['领导力','共情力'],chars:{E_I:'E',S_N:'N',T_F:'F',P_J:'J'},
+};
+
+(function fill(){
+  var d=window.typeData;
+  var accent=d._colorHex||'#E8816B';
+  document.documentElement.style.setProperty('--accent-color',accent);
+
+  var img=document.getElementById('typeImage');
+  if(img&&d.code){
+    img.src='http://localhost:3001/api/images/'+d.code;
+    img.onerror=function(){this.style.display='none';};
+  }
+
+  var gc=d._groupCode;
+  var gNames={SP:'SP 暖金组',SD:'SD 琥珀组',SJ:'SJ 藏蓝组',BT:'BT 深炭灰组',BC:'BC 月光银灰组',BF:'BF 暖燕麦组',NT:'NT 深紫组',NC:'NC 靛青组',NF:'NF 翠绿组'};
+  var gColors={SP:'#C8963E',SD:'#D4782F',SJ:'#2C5F8A',BT:'#4A4A4A',BC:'#8B95A0',BF:'#B8956A',NT:'#6B3FA0',NC:'#3D7B8A',NF:'#2D8A4E'};
+  var gt=document.getElementById('groupTag');
+  gt.textContent=gNames[gc]||gc;
+  gt.style.background=(gColors[gc]||'#888')+'33';
+  gt.style.border='1px solid '+(gColors[gc]||'#888')+'55';
+  gt.style.color=gColors[gc]||'#888';
+
+  document.getElementById('typeCode').textContent=d.code;
+  document.getElementById('typeCode').style.color=accent;
+  document.getElementById('typeName').textContent=d.name;
+
+  var celebs=d.celebrities||[];
+  document.getElementById('quoteAuthor').textContent=celebs.length?'—— '+celebs[0]:'';
+  var strengths=d.strengths||[];
+  var quotes=[strengths[0]+'是你的核心优势之一','你天生擅长'+strengths[0]+'与'+(strengths[1]||'创新思维'),'在'+strengths[0]+'方面，你有着超越常人的天赋'];
+  document.getElementById('quoteText').textContent=quotes[0];
+
+  var ov=d.overview||'';
+  document.getElementById('overviewText').textContent=ov.length>80?ov.substring(0,80)+'…':ov;
+
+  // 光谱
+  var chars=d.chars||{E_I:'E',S_N:'N',T_F:'T',P_J:'J'};
+  var dims=[
+    {key:'E_I',left:'I',right:'E',lc:'#6B8FBF',rc:'#E8A860'},
+    {key:'S_N',left:'S',right:'N',lc:'#C8963E',rc:'#9C6FFF'},
+    {key:'T_F',left:'F',right:'T',lc:'#E8816B',rc:'#5C8DFF'},
+    {key:'P_J',left:'P',right:'J',lc:'#8BA888',rc:'#D4782F'},
+  ];
+  var sb=document.getElementById('spectrumBlock');
+  sb.innerHTML='';
+  dims.forEach(function(dim){
+    var ch=chars[dim.key]||'A';
+    var pos=50;
+    if(ch===dim.right) pos=85; else if(ch===dim.left) pos=15;
+    var row=document.createElement('div'); row.className='spec-row';
+    row.innerHTML='<span class="spec-l">'+dim.left+'</span>'+
+      '<div class="spec-bar" style="background:linear-gradient(90deg,'+dim.lc+','+dim.rc+')">'+
+      '<div class="spec-dot" style="left:'+pos+'%"></div></div>'+
+      '<span class="spec-r">'+dim.right+'</span>'+
+      '<span class="spec-char">'+ch+'</span>';
+    sb.appendChild(row);
+  });
+
+  var qr=document.getElementById('qrCode');
+  if(qr) qr.src='data:image/svg+xml,'+encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="104" height="104"><rect width="104" height="104" fill="white"/><text x="52" y="46" text-anchor="middle" font-size="18" fill="black">扫码</text><text x="52" y="72" text-anchor="middle" font-size="18" fill="black">测MBTI</text></svg>');
+})();
+</script>
+</body>
+</html>

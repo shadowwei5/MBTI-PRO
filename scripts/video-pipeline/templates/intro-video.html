@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<style>
+/* ============================================================
+   MBTI-PRO 介绍视频模板 v2 — 1080×1920 9:16 竖屏
+   修复: 去重叠标签 / 增大内容占比 / 提升视觉密度
+   ============================================================ */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --accent: #E8816B;
+  --bg: #0D0D0D;
+}
+body { background: var(--bg); overflow: hidden; }
+#canvas {
+  width: 1080px; height: 1920px; position: relative; overflow: hidden;
+  font-family: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  color: #FFFFFF;
+}
+
+/* 背景渐变 */
+.bg-gradient {
+  position: absolute; inset: 0; z-index: 0;
+  background: linear-gradient(160deg, #1a1a2e 0%, #16213e 25%, #0f3460 50%, #1a1a2e 75%, #0D0D0D 100%);
+}
+.particles { position: absolute; inset: 0; z-index: 1; overflow: hidden; }
+.particle {
+  position: absolute; border-radius: 50%; background: rgba(255,255,255,0.06);
+  animation: float 6s ease-in-out infinite;
+}
+.particle:nth-child(1) { width:8px; height:8px; top:8%; left:20%; }
+.particle:nth-child(2) { width:5px; height:5px; top:22%; left:72%; animation-delay:1.2s; }
+.particle:nth-child(3) { width:10px; height:10px; top:48%; left:14%; animation-delay:2.5s; }
+.particle:nth-child(4) { width:4px; height:4px; top:62%; left:82%; animation-delay:1.8s; }
+.particle:nth-child(5) { width:6px; height:6px; top:78%; left:38%; animation-delay:3.5s; }
+.particle:nth-child(6) { width:7px; height:7px; top:35%; left:52%; animation-delay:4s; }
+@keyframes float {
+  0%,100% { transform:translateY(0) scale(1); opacity:.2; }
+  50% { transform:translateY(-40px) scale(1.4); opacity:.7; }
+}
+
+/* ====== 场景通用 ====== */
+.scene {
+  position: absolute; inset: 0; z-index: 10;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 80px 60px;
+}
+@keyframes sceneIn  { from { opacity:0; transform:translateY(30px); } to { opacity:1; transform:translateY(0); } }
+@keyframes sceneOut { from { opacity:1; transform:translateY(0); } to { opacity:0; transform:translateY(-20px); } }
+
+/* ====== 场景1: Hook (0-3s) ====== */
+.s1 { opacity:0; animation: sceneIn .6s .2s ease-out forwards, sceneOut .4s 4s ease-in forwards; }
+.s1 .hook-title { font-size:120px; font-weight:900; text-align:center; line-height:1.25; letter-spacing:.02em; }
+.s1 .hook-title .hl { color: var(--accent); }
+.s1 .hook-sub { margin-top:40px; font-size:44px; color:rgba(255,255,255,.65); }
+
+/* ====== 场景2: 问题 (3-10s) ====== */
+.s2 { opacity:0; animation: sceneIn .5s 4.2s ease-out forwards, sceneOut .3s 10s ease-in forwards; }
+.s2 .s2-title { font-size:56px; font-weight:700; margin-bottom:24px; }
+.s2 .s2-sub { font-size:40px; color:rgba(255,255,255,.55); margin-bottom:36px; }
+.s2 .card-grid { display:flex; gap:28px; margin-bottom:16px; }
+.s2 .card {
+  width:420px; padding:44px 30px; border-radius:28px; text-align:center;
+  font-size:52px; font-weight:700;
+}
+.s2 .card.ei { background: linear-gradient(135deg, #5C8DFF33, #E8A86033); border:2px solid rgba(92,141,255,.25); }
+.s2 .card.sn { background: linear-gradient(135deg, #C8963E33, #9C6FFF33); border:2px solid rgba(200,150,62,.25); }
+.s2 .card.tf { background: linear-gradient(135deg, #E8816B33, #5C8DFF33); border:2px solid rgba(232,129,107,.25); }
+.s2 .card.jp { background: linear-gradient(135deg, #8BA88833, #D4782F33); border:2px solid rgba(139,168,136,.25); }
+.s2 .card-label { font-size:28px; color:rgba(255,255,255,.4); margin-top:10px; }
+.s2 .big-num { font-size:96px; font-weight:900; color:var(--accent); margin-top:40px; text-align:center; }
+.s2 .big-num-sub { font-size:34px; color:rgba(255,255,255,.45); margin-top:10px; }
+
+/* ====== 场景3: 方案 (10-18s) ====== */
+.s3 { opacity:0; animation: sceneIn .5s 10.2s ease-out forwards, sceneOut .3s 22s ease-in forwards; }
+.s3 .s3-title { font-size:54px; font-weight:700; margin-bottom:20px; }
+.s3 .s3-sub { font-size:38px; color:rgba(255,255,255,.6); margin-bottom:40px; }
+.s3 .dim-rows { display:flex; flex-direction:column; gap:24px; }
+.s3 .dim-row { display:flex; align-items:center; justify-content:center; gap:16px; }
+.s3 .dim-opt {
+  padding:14px 32px; border-radius:18px; font-size:52px; font-weight:700;
+  color:rgba(255,255,255,.35); transition: all .3s;
+}
+.s3 .dim-opt.active {
+  background:rgba(232,129,107,.18); border:2px solid rgba(232,129,107,.45);
+  color:var(--accent); transform:scale(1.08);
+}
+.s3 .formula { display:flex; align-items:center; gap:20px; margin-top:48px; }
+.s3 .formula-old { font-size:72px; color:rgba(255,255,255,.25); text-decoration:line-through; }
+.s3 .formula-arrow { font-size:56px; color:var(--accent); }
+.s3 .formula-new { font-size:110px; font-weight:900; color:var(--accent); }
+.s3 .formula-sub { font-size:36px; color:var(--accent); margin-top:14px; }
+
+/* ====== 场景4: 特色 (18-26s) ====== */
+.s4 { opacity:0; animation: sceneIn .5s 22.2s ease-out forwards, sceneOut .3s 34s ease-in forwards; }
+.s4 .s4-title { font-size:54px; font-weight:700; margin-bottom:36px; }
+.s4 .color-strip { display:flex; gap:10px; margin-bottom:40px; }
+.s4 .color-dot { width:56px; height:56px; border-radius:16px; animation:popIn .3s ease-out both; }
+.s4 .color-dot:nth-child(1) { background:#C8963E; animation-delay:0s; }
+.s4 .color-dot:nth-child(2) { background:#D4782F; animation-delay:.1s; }
+.s4 .color-dot:nth-child(3) { background:#2C5F8A; animation-delay:.2s; }
+.s4 .color-dot:nth-child(4) { background:#4A4A4A; animation-delay:.3s; }
+.s4 .color-dot:nth-child(5) { background:#8B95A0; animation-delay:.4s; }
+.s4 .color-dot:nth-child(6) { background:#B8956A; animation-delay:.5s; }
+.s4 .color-dot:nth-child(7) { background:#6B3FA0; animation-delay:.6s; }
+.s4 .color-dot:nth-child(8) { background:#3D7B8A; animation-delay:.7s; }
+.s4 .color-dot:nth-child(9) { background:#2D8A4E; animation-delay:.8s; }
+@keyframes popIn { from { transform:scale(0); opacity:0; } to { transform:scale(1); opacity:1; } }
+.s4 .feat-list { display:flex; flex-direction:column; gap:24px; }
+.s4 .feat-item { display:flex; align-items:center; gap:20px; font-size:42px; font-weight:500; }
+.s4 .feat-check { color:#2D8A4E; font-size:50px; }
+
+/* ====== 场景5: CTA (26-42s) ====== */
+.s5 { opacity:0; animation: sceneIn .6s 34.2s ease-out forwards; }
+.s5 .cta-card {
+  background:rgba(255,255,255,.06); backdrop-filter:blur(20px);
+  border:1px solid rgba(255,255,255,.1); border-radius:36px;
+  padding:60px 70px; text-align:center;
+}
+.s5 .cta-main { font-size:72px; font-weight:800; margin-bottom:24px; line-height:1.3; }
+.s5 .cta-main .accent { color:var(--accent); }
+.s5 .cta-sub { font-size:36px; color:rgba(255,255,255,.6); margin-bottom:40px; }
+.s5 .stats { display:flex; gap:60px; justify-content:center; }
+.s5 .stat { text-align:center; }
+.s5 .stat-num { font-size:68px; font-weight:900; color:var(--accent); }
+.s5 .stat-label { font-size:28px; color:rgba(255,255,255,.45); margin-top:8px; }
+.s5 .cta-btn {
+  display:inline-block; margin-top:48px; padding:24px 72px;
+  background:var(--accent); color:#FFF; font-size:46px; font-weight:700;
+  border-radius:60px; animation:pulse 2s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%,100% { box-shadow:0 0 0 0 rgba(232,129,107,.4); }
+  50% { box-shadow:0 0 0 32px rgba(232,129,107,0); }
+}
+</style>
+</head>
+<body>
+<div id="canvas">
+  <div class="bg-gradient"></div>
+  <div class="particles">
+    <div class="particle"></div><div class="particle"></div><div class="particle"></div>
+    <div class="particle"></div><div class="particle"></div><div class="particle"></div>
+  </div>
+
+  <!-- 场景1: Hook 0-3s -->
+  <div class="scene s1">
+    <div class="hook-title">你测的<span class="hl">MBTI</span><br>可能根本<span class="hl">不准</span></div>
+    <div class="hook-sub">因为真实的人不会只有 16 种</div>
+  </div>
+
+  <!-- 场景2: 问题 3-10s -->
+  <div class="scene s2">
+    <div class="s2-title">传统测试的陷阱</div>
+    <div class="s2-sub">四个维度 · 非此即彼</div>
+    <div class="card-grid">
+      <div class="card ei">E 还是 I ?<div class="card-label">外向 vs 内向</div></div>
+      <div class="card sn">N 还是 S ?<div class="card-label">直觉 vs 实感</div></div>
+    </div>
+    <div class="card-grid">
+      <div class="card tf">T 还是 F ?<div class="card-label">思考 vs 情感</div></div>
+      <div class="card jp">J 还是 P ?<div class="card-label">判断 vs 感知</div></div>
+    </div>
+    <div class="big-num">2×2×2×2 = 16</div>
+    <div class="big-num-sub">但大部分人卡在中间</div>
+  </div>
+
+  <!-- 场景3: 方案 10-18s (修复: 去重叠标签) -->
+  <div class="scene s3">
+    <div class="s3-title">MBTI-PRO 的创新方案</div>
+    <div class="s3-sub">每个维度增加一个中间值</div>
+    <div class="dim-rows">
+      <div class="dim-row">
+        <span class="dim-opt">E</span><span class="dim-opt active">A</span><span class="dim-opt">I</span>
+      </div>
+      <div class="dim-row">
+        <span class="dim-opt">N</span><span class="dim-opt active">B</span><span class="dim-opt">S</span>
+      </div>
+      <div class="dim-row">
+        <span class="dim-opt">T</span><span class="dim-opt active">C</span><span class="dim-opt">F</span>
+      </div>
+      <div class="dim-row">
+        <span class="dim-opt">J</span><span class="dim-opt active">D</span><span class="dim-opt">P</span>
+      </div>
+    </div>
+    <div class="formula">
+      <span class="formula-old">2⁴ = 16</span>
+      <span class="formula-arrow">→</span>
+      <span class="formula-new">3⁴ = 81</span>
+    </div>
+    <div class="formula-sub">比传统 MBTI 精准 5 倍</div>
+  </div>
+
+  <!-- 场景4: 特色 18-26s -->
+  <div class="scene s4">
+    <div class="s4-title">81 型人格 · 全维度体验</div>
+    <div class="color-strip">
+      <div class="color-dot"></div><div class="color-dot"></div><div class="color-dot"></div>
+      <div class="color-dot"></div><div class="color-dot"></div><div class="color-dot"></div>
+      <div class="color-dot"></div><div class="color-dot"></div><div class="color-dot"></div>
+    </div>
+    <div class="feat-list">
+      <div class="feat-item"><span class="feat-check">✓</span> 9 组颜色分类 · 一眼识别你的气质</div>
+      <div class="feat-item"><span class="feat-check">✓</span> 81 张 AI 专属插画 · 独一无二的你</div>
+      <div class="feat-item"><span class="feat-check">✓</span> 700 字深度人格画像 · 8 项优势分析</div>
+      <div class="feat-item"><span class="feat-check">✓</span> 100 题科学测评 · 含 20 道逻辑推理题</div>
+      <div class="feat-item"><span class="feat-check">✓</span> 完全免费 · 无需注册 · 隐私保护</div>
+    </div>
+  </div>
+
+  <!-- 场景5: CTA 26-42s -->
+  <div class="scene s5">
+    <div class="cta-card">
+      <div class="cta-main">发现<span class="accent">真实的</span>自己</div>
+      <div class="cta-sub">不再被简单的四个字母定义</div>
+      <div class="stats">
+        <div class="stat"><div class="stat-num">81</div><div class="stat-label">人格类型</div></div>
+        <div class="stat"><div class="stat-num">100</div><div class="stat-label">精选题目</div></div>
+        <div class="stat"><div class="stat-num">9</div><div class="stat-label">颜色分组</div></div>
+      </div>
+      <div class="cta-btn">主页查看免费测试网址 →</div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

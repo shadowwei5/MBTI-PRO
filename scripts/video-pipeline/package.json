@@ -1,0 +1,26 @@
+{
+  "name": "mbti-pro-video-pipeline",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "generate": "tsx index.ts",
+    "generate:batch": "tsx index.ts --batch",
+    "fetch": "tsx fetch-type-data.ts",
+    "render": "tsx render-frames.ts",
+    "compose": "tsx compose-video.ts",
+    "publish": "tsx publish.ts",
+    "cover": "tsx generate-cover.ts"
+  },
+  "dependencies": {
+    "@ffmpeg-installer/ffmpeg": "^1.1.0",
+    "edge-tts": "^1.0.1",
+    "playwright": "^1.61.0",
+    "sharp": "^0.33.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.12.3",
+    "tsx": "^4.21.0",
+    "typescript": "~6.0.2"
+  }
+}
