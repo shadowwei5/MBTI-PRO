@@ -1,4 +1,4 @@
-name: Auto Deploy to Tencent Cloud
+name: Deploy to Tencent Cloud
 
 on:
   push:
@@ -14,17 +14,12 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT || 22 }}
           script: |
             cd /opt/MBTI-PRO
+            git stash
             git pull origin master
-            cd server
-            npm install --include=dev
-            npx prisma generate
-            npx prisma db push
-            npx tsx scripts/generate-thumbs.ts 2>&1 | tail -5
-            cd ../client
-            npm install
-            npm run build 2>&1 | tail -5
-            pm2 restart mbti-pro-api
-            nginx -t && systemctl reload nginx || systemctl restart nginx
-            echo "✅ Deploy completed"
+            cd server && npx prisma generate && npx prisma db push
+            cd ../client && npm install && npm run build
+            pm2 restart mbti-pro || pm2 start src/index.ts --name mbti-pro
+            echo "✅ Deploy done"
