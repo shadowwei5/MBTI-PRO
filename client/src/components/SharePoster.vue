@@ -43,15 +43,8 @@ async function drawPoster() {
   const cvs = document.createElement('canvas'); cvs.width = W * 2; cvs.height = H * 2
   const ctx = cvs.getContext('2d')!; ctx.scale(2, 2)
 
-  // 背景 — 顶部和底部带色渐变，中间纯白不干扰文字
-  const tc = props.typeColor.hex
-  const bg = ctx.createLinearGradient(0, 0, 0, H)
-  bg.addColorStop(0, tc + '0D')
-  bg.addColorStop(0.12, '#FFFFFF')
-  bg.addColorStop(0.5, '#FFFFFF')
-  bg.addColorStop(0.88, '#FFFFFF')
-  bg.addColorStop(1, tc + '0D')
-  ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H)
+  // 纯米白背景 — 干净统一
+  ctx.fillStyle = '#FAF8F5'; ctx.fillRect(0, 0, W, H)
 
   // 顶部色条
   ctx.fillStyle = props.typeColor.hex; ctx.fillRect(0, 0, W, 5)
