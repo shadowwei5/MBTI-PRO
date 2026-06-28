@@ -23,6 +23,8 @@ jobs:
             git stash
             git pull origin master
             cd server && npx prisma generate && npx prisma db push
+            # 修复6个中文名(数据库层面)
+            npx tsx scripts/fix-names.ts
             cd ../client && npm install && npm run build
             (pm2 restart mbti-pro 2>/dev/null) || (pm2 start src/index.ts --name mbti-pro 2>/dev/null) || (npx pm2 restart mbti-pro 2>/dev/null) || (npx pm2 start server/src/index.ts --name mbti-pro 2>/dev/null) || (cd /opt/MBTI-PRO/server && npx tsx src/index.ts &)
             echo "✅ Deploy done"
