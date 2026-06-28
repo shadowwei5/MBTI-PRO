@@ -38,8 +38,24 @@ model PersonalityType {
   snModule        String?
   tfModule        String?
   pjModule        String?
+  // Deep report content (付费解锁)
+  deepOverview    String?  // 深度概览 500+字
+  compatibility   String?  // 相处兼容性 JSON
+  traitTags       String?  // 网络特质标签 JSON ["药水姐","逻辑鬼才"]
 
   @@index([isTraditional])
+}
+
+model UserFeedback {
+  id            String   @id @default(uuid())
+  userType      String   // 用户自己的人格类型
+  likedType     String   // 相处愉快的类型
+  dislikedType  String   // 相处痛苦的类型
+  createdAt     DateTime @default(now())
+
+  @@index([userType])
+  @@index([likedType])
+  @@index([dislikedType])
 }
 
 model TestRecord {

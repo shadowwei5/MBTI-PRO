@@ -4,6 +4,8 @@ import { useRoute } from 'vue-router'
 import DimensionSpectrum from '../components/DimensionSpectrum.vue'
 import TypeAvatar from '../components/TypeAvatar.vue'
 import SharePoster from '../components/SharePoster.vue'
+import PaywallSection from '../components/PaywallSection.vue'
+import FeedbackCollector from '../components/FeedbackCollector.vue'
 import { api, type PersonalityType } from '../services/api'
 import { getTypeColor, getTemperament, TEMPERAMENT_COLORS, getNineGroupCode, getNineGroupColor } from '../utils/colors'
 import { useShareMeta } from '../composables/useShareMeta'
@@ -364,6 +366,32 @@ const defaultItems = {
             </ul>
           </div>
         </div>
+
+        <!-- 🔒 付费深度报告 -->
+        <PaywallSection
+          v-if="typeData"
+          :type-code="typeData.code"
+          :type-name="typeData.name"
+          :type-color="typeColor.hex"
+        >
+          <div class="deep-content space-y-4 mt-2">
+            <div v-if="typeData.eiModule" class="text-text-secondary text-sm leading-relaxed">
+              <strong class="text-charcoal">能量来源：</strong>{{ typeData.eiModule }}
+            </div>
+            <div v-if="typeData.snModule" class="text-text-secondary text-sm leading-relaxed">
+              <strong class="text-charcoal">认知方式：</strong>{{ typeData.snModule }}
+            </div>
+            <div v-if="typeData.tfModule" class="text-text-secondary text-sm leading-relaxed">
+              <strong class="text-charcoal">决策方式：</strong>{{ typeData.tfModule }}
+            </div>
+            <div v-if="typeData.pjModule" class="text-text-secondary text-sm leading-relaxed">
+              <strong class="text-charcoal">生活态度：</strong>{{ typeData.pjModule }}
+            </div>
+          </div>
+        </PaywallSection>
+
+        <!-- 💡 数据收集（仅测试后显示） -->
+        <FeedbackCollector v-if="hasTestData" :user-type="typeCode" />
 
         <!-- Actions -->
         <div class="flex flex-col sm:flex-row gap-4 justify-center">

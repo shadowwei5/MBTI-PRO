@@ -93,4 +93,10 @@ export const api = {
       method: 'POST',
       body: JSON.stringify(payload),
     }),
+
+  submitFeedback: (userType: string, likedType: string, dislikedType: string) =>
+    request<{ id: string }>('/feedback', {
+      method: 'POST',
+      body: JSON.stringify({ userType, likedType, dislikedType }),
+    }),
 }
