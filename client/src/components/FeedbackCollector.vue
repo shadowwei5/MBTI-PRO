@@ -3,6 +3,7 @@ import { ref, computed } from 'vue'
 import { api } from '../services/api'
 
 const props = defineProps<{ userType: string }>()
+const emit = defineEmits<{ submitted: [] }>()
 
 const TYPES = ['INTJ','INTP','ENTJ','ENTP','INFJ','INFP','ENFJ','ENFP','ISTJ','ISFJ','ESTJ','ESFJ','ISTP','ISFP','ESTP','ESFP']
 const TYPE_NAMES: Record<string, string> = {
@@ -27,6 +28,7 @@ async function submit() {
   try {
     await api.submitFeedback(props.userType, likedType.value, dislikedType.value)
     submitted.value = true
+    emit('submitted')
   } catch { submitting.value = false }
 }
 </script>

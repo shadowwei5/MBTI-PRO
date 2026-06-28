@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router'
 import ProgressBar from '../components/ProgressBar.vue'
 import OptionGroup from '../components/OptionGroup.vue'
 import OptionGroupBipolar from '../components/OptionGroupBipolar.vue'
+import FeedbackCollector from '../components/FeedbackCollector.vue'
 import { api } from '../services/api'
 
 const router = useRouter()
@@ -27,6 +28,34 @@ const answers = ref<Record<number, string>>({})
 const showSubmitConfirm = ref(false)
 const submitting = ref(false)
 const startTime = ref(Date.now())
+
+// 反馈收集（答题完成后、展示结果前 — 必须完成反馈才能查看结果）
+const showFeedbackAfterTest = ref(false)
+const pendingResult = ref<{
+  typeCode: string
+  scores: Record<string, number>
+  chars: Record<string, string>
+  confidence: number
+  dimTotals: Record<string, number>
+  dimAnswered: Record<string, number>
+} | null>(null)
+
+function onFeedbackSubmitted() {
+  showFeedbackAfterTest.value = false
+  if (!pendingResult.value) return
+  const r = pendingResult.value
+  router.push({
+    name: 'result',
+    params: { type: r.typeCode },
+    query: {
+      scores: JSON.stringify(r.scores),
+      chars: JSON.stringify(r.chars),
+      confidence: String(r.confidence),
+      dimTotals: JSON.stringify(r.dimTotals),
+      dimAnswered: JSON.stringify(r.dimAnswered),
+    },
+  })
+}
 
 // 客观题相关状态
 const objectiveIntroShown = ref(false)
@@ -261,18 +290,19 @@ async function submitTest() {
       duration: Math.round((Date.now() - startTime.value) / 1000),
     }).catch(() => { /* non-critical */ })
 
-    router.push({
-      name: 'result',
-      params: { type: score.typeCode },
-      query: {
-        scores: JSON.stringify(score.scores),
-        chars: JSON.stringify(score.chars),
-        confidence: String(score.confidence),
-        dimTotals: JSON.stringify(dimTotals),
-        dimAnswered: JSON.stringify(dimAnswered),
-      },
-    })
+    // 保存评分结果，先展示反馈收集，完成后再跳转结果页
+    pendingResult.value = {
+      typeCode: score.typeCode,
+      scores: score.scores,
+      chars: score.chars,
+      confidence: score.confidence,
+      dimTotals,
+      dimAnswered,
+    }
+    showFeedbackAfterTest.value = true
+    submitting.value = false
   } catch (err) {
+    submitting.value = false
     loadError.value = (err instanceof Error ? err.message : '评分失败') + '，请稍后重试。'
   }
 }
@@ -304,7 +334,7 @@ watch(currentIndex, () => {
 
 // Keyboard navigation
 function onKeydown(e: KeyboardEvent) {
-  if (showSubmitConfirm.value || showObjectiveIntro.value) return
+  if (showSubmitConfirm.value || showObjectiveIntro.value || showFeedbackAfterTest.value) return
   const q = currentQuestion.value
   if (!q) return
 
@@ -518,6 +548,30 @@ onUnmounted(() => {
               {{ submitting ? '提交中...' : '确认提交' }}
             </button>
           </div>
+        </div>
+      </div>
+    </Transition>
+
+    <!-- 反馈收集弹窗（答题完成后必须填写才能查看结果） -->
+    <Transition name="modal">
+      <div v-if="showFeedbackAfterTest" class="fixed inset-0 z-50 flex items-center justify-center p-5">
+        <div class="absolute inset-0 bg-charcoal/50 backdrop-blur-sm" />
+        <div class="relative bg-cream rounded-3xl p-6 md:p-8 max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl animate-scale-in">
+          <div class="text-center mb-5">
+            <div class="w-14 h-14 mx-auto mb-3 rounded-2xl bg-coral/10 flex items-center justify-center">
+              <svg class="w-7 h-7 text-coral" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+              </svg>
+            </div>
+            <h3 class="text-xl font-display font-bold text-charcoal mb-2">最后一步！</h3>
+            <p class="text-sm text-text-secondary leading-relaxed">
+              答题已完成 ✨ 请先帮助我们完成下面两项选择，<br />即可<strong class="text-charcoal">免费查看</strong>你的完整测试结果。
+            </p>
+          </div>
+          <FeedbackCollector
+            :user-type="pendingResult?.typeCode || ''"
+            @submitted="onFeedbackSubmitted"
+          />
         </div>
       </div>
     </Transition>
