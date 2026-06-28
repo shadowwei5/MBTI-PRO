@@ -81,19 +81,6 @@ function stopPolling() {
 
 onUnmounted(() => stopPolling())
 
-function shareToUnlock() {
-  const shareText = `我刚测了MBTI-PRO的81型人格测试，我是${props.typeName}！你也来测测你是哪种人格？`
-  const shareUrl = `https://mbti-pro.com/?ref=share&type=${props.typeCode}`
-  if (navigator.share) {
-    navigator.share({ title: 'MBTI-PRO 81型人格测试', text: shareText, url: shareUrl })
-      .then(() => { isUnlocked.value = true })
-      .catch(() => {})
-  } else {
-    navigator.clipboard.writeText(`${shareText}\n${shareUrl}`).then(() => {
-      isUnlocked.value = true
-    })
-  }
-}
 
 // 将 weixin:// 链接转成可扫描的二维码图片
 function getQRImageUrl(data: string): string {
@@ -118,9 +105,6 @@ function getQRImageUrl(data: string): string {
         >
           <span v-if="qrLoading" class="spinner" />
           {{ qrLoading ? '生成中...' : '¥4.9 立即解锁' }}
-        </button>
-        <button class="btn-share" @click="shareToUnlock">
-          📤 邀请 1 位好友测试 → 免费解锁
         </button>
       </div>
 
@@ -172,11 +156,6 @@ function getQRImageUrl(data: string): string {
 }
 .btn-unlock:hover:not(:disabled) { transform: scale(1.03); }
 .btn-unlock:disabled { opacity: 0.7; cursor: not-allowed; }
-.btn-share {
-  background: none; border: 1.5px solid #E0D8CC; border-radius: 14px;
-  padding: 12px 28px; font-size: 16px; color: #6B6560; cursor: pointer;
-}
-.btn-share:hover { background: #F8F4EC; }
 
 .qr-section { margin-top: 24px; }
 .qr-hint { font-size: 14px; color: #6B6560; margin-bottom: 16px; }

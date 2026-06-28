@@ -192,7 +192,7 @@ const defaultItems = {
               v-if="!isTraditional"
               class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-coral/10 text-coral border border-coral/30"
             >
-              MBTI PRO 独有
+              MBTI-PRO 独有
             </div>
           </div>
 
@@ -279,7 +279,7 @@ const defaultItems = {
                 {{ typeData.overview }}
               </div>
               <p v-else class="text-text-secondary leading-relaxed">
-                {{ typeCode }} 型人格{{ isTraditional ? '属于经典的MBTI 16型之一。' : '是MBTI PRO 81型分类体系中的独特类型。' }}
+                {{ typeCode }} 型人格{{ isTraditional ? '属于经典的MBTI 16型之一。' : '是MBTI-PRO 81型分类体系中的独特类型。' }}
                 你在四个核心维度上展现出独特的偏好组合。
               </p>
             </div>

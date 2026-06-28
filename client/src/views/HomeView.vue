@@ -61,10 +61,9 @@ function goToType(code: string) {
     <main class="flex-1 flex flex-col items-center justify-center px-5 py-16 md:py-24">
       <div class="w-full max-w-2xl mx-auto text-center stagger">
         <!-- Brand Badge -->
-        <div class="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-charcoal border border-coral/30 mb-8 shadow-lg">
-          <span class="w-2 h-2 rounded-full bg-coral animate-breathe" />
-          <span class="text-sm text-cream font-bold tracking-wider">
-            MBTI PRO：全新 81 型人格分类体系
+        <div class="inline-flex items-center px-6 py-3 rounded-full bg-charcoal border border-coral/30 mb-8 shadow-lg">
+          <span class="text-xl md:text-2xl text-cream font-bold tracking-wider">
+            MBTI-PRO：全新 81 型人格分类体系
           </span>
         </div>
 
@@ -171,7 +170,7 @@ function goToType(code: string) {
     <section class="py-16 md:py-24 bg-surface-alt/30 border-t border-border/50">
       <div class="max-w-4xl mx-auto px-5">
         <div class="text-center mb-12">
-          <h2 class="text-2xl md:text-3xl font-display font-bold text-charcoal mb-4">什么是 MBTI PRO 的全新 81 型人格分类体系？</h2>
+          <h2 class="text-2xl md:text-3xl font-display font-bold text-charcoal mb-4">什么是 MBTI-PRO 的全新 81 型人格分类体系？</h2>
           <p class="text-text-secondary max-w-2xl mx-auto leading-relaxed">
             传统 MBTI 将每个维度一分为二（如 E 或 I），组合出 16 种人格类型。但真实的人性格分布更接近连续光谱——
             每个人在四个维度上都有自己独特的位置，而非简单的"非此即彼"。
@@ -182,7 +181,7 @@ function goToType(code: string) {
           <div class="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-border/50 shadow-sm">
             <h3 class="font-semibold text-charcoal mb-3">从二分到三分</h3>
             <p class="text-sm text-text-secondary leading-relaxed">
-              在每个维度上，除了两个极端倾向之外，MBTI PRO 新增了<strong>中间均衡型</strong>。
+              在每个维度上，除了两个极端倾向之外，MBTI-PRO 新增了<strong>中间均衡型</strong>。
               例如，能量来源维度不仅有 E（外向）和 I（内向），还有 A（平衡型）；决策方式维度在 T（思考）和 F（情感）之间加入了 C（复合型）。
               这使得每个维度从 2 种选择扩展为 3 种。
             </p>
@@ -277,23 +276,23 @@ function goToType(code: string) {
         </div>
 
         <p class="text-center text-sm text-text-muted mt-8 max-w-2xl mx-auto leading-relaxed">
-          你的四个维度位置共同构成一个唯一的四字母代码——这就是你在 MBTI PRO 中的专属人格类型。
+          你的四个维度位置共同构成一个唯一的四字母代码——这就是你在 MBTI-PRO 中的专属人格类型。
           无论你是偏传统的纯端值类型，还是带有中间维度的独特组合，81 种类型中总有一种最接近真实的你。
         </p>
       </div>
     </section>
 
-    <!-- MBTI PRO Advantages -->
+    <!-- MBTI-PRO Advantages -->
     <section class="py-16 md:py-24 bg-surface-alt/50 border-t border-border/50">
       <div class="max-w-4xl mx-auto px-5">
         <div class="text-center mb-12">
           <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-coral/10 border border-coral/20 mb-6">
-            <span class="text-sm text-coral font-semibold tracking-wide">MBTI PRO 优势</span>
+            <span class="text-sm text-coral font-semibold tracking-wide">MBTI-PRO 优势</span>
           </div>
-          <h2 class="text-2xl md:text-3xl font-display font-bold text-charcoal mb-4">为什么选择 MBTI PRO？</h2>
+          <h2 class="text-2xl md:text-3xl font-display font-bold text-charcoal mb-4">为什么选择 MBTI-PRO？</h2>
           <p class="text-text-secondary max-w-2xl mx-auto leading-relaxed">
             传统 MBTI 用二分法将人简单分为两类（如：你要么是外向 E，要么是内向 I），但真实的人格分布并非如此绝对。
-            MBTI PRO 在每个维度增加了<strong>中间型</strong>，让分类更贴近真实的你。
+            MBTI-PRO 在每个维度增加了<strong>中间型</strong>，让分类更贴近真实的你。
           </p>
         </div>
 
@@ -304,7 +303,7 @@ function goToType(code: string) {
               <tr class="border-b border-border">
                 <th class="text-left px-4 py-3 font-semibold text-charcoal">对比维度</th>
                 <th class="text-left px-4 py-3 font-semibold text-text-muted border-l border-border/50">传统 MBTI</th>
-                <th class="text-left px-4 py-3 font-semibold text-coral border-l border-border/50">MBTI PRO</th>
+                <th class="text-left px-4 py-3 font-semibold text-coral border-l border-border/50">MBTI-PRO</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-border/50">
@@ -324,7 +323,7 @@ function goToType(code: string) {
           <div class="flex items-center gap-3 px-1 mb-2">
             <span class="text-xs font-bold text-charcoal w-16 shrink-0 text-center">维度</span>
             <span class="text-xs font-semibold text-text-muted flex-1 text-center">传统MBTI</span>
-            <span class="text-xs font-semibold text-coral flex-1 text-center">MBTI PRO</span>
+            <span class="text-xs font-semibold text-coral flex-1 text-center">MBTI-PRO</span>
           </div>
           <div class="space-y-2">
           <div v-for="item in [

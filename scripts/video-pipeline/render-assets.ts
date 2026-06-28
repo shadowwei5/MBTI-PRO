@@ -23,7 +23,7 @@ async function renderAsset(name: string, html: string, width: number, height: nu
 }
 
 // ─── 头像 v3: 200×200 ───
-// 设计要点: MBTI PRO 为主视觉 / 81 为点缀 / 9 色光环加粗可见
+// 设计要点: MBTI-PRO 为主视觉 / 81 为点缀 / 9 色光环加粗可见
 const nineGradient = NINE_COLORS.join(',')
 const AVATAR_HTML = `<!DOCTYPE html><html lang="zh"><head><meta charset="UTF-8"><style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -40,7 +40,7 @@ body{width:200px;height:200px;overflow:hidden;background:transparent}
   mask:radial-gradient(circle,transparent 64%,#000 76%);
   opacity:.92;
 }
-/* 文字区域: MBTI PRO 为主 */
+/* 文字区域: MBTI-PRO 为主 */
 .txt{position:absolute;inset:0;z-index:3;display:flex;flex-direction:column;align-items:center;justify-content:center}
 .label{font-size:24px;font-weight:700;color:#FFF;letter-spacing:.08em;line-height:1}
 .sub{font-size:13px;font-weight:400;color:rgba(255,255,255,.5);letter-spacing:.16em;margin-top:3px}

@@ -8,7 +8,7 @@ load_dotenv(Path(__file__).resolve().parent.parent / ".env")
 VOLCENGINE_API_KEY = os.environ["VOLCENGINE_API_KEY"]
 VOLCENGINE_BASE_URL = os.environ.get("VOLCENGINE_BASE_URL", "https://ark.cn-beijing.volces.com")
 VOLCENGINE_CODE_MODEL = os.environ.get("VOLCENGINE_CODE_MODEL", "ark-code-latest")
-VOLCENGINE_IMAGE_MODEL = os.environ.get("VOLCENGINE_IMAGE_MODEL", "doubao-seedream-5-0-lite-260128")
+VOLCENGINE_IMAGE_MODEL = os.environ.get("VOLCENGINE_IMAGE_MODEL", "doubao-seedream-4-5-251128")
 
 # 各端点 URL
 IMAGE_API_URL = f"{VOLCENGINE_BASE_URL}/api/v3/images/generations"

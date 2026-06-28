@@ -21,7 +21,7 @@ timeline:
   - segment: brand_badge
     start: 0
     end: 2
-    description: 品牌徽章 + "MBTI PRO · 81型人格"
+    description: 品牌徽章 + "MBTI-PRO · 81型人格"
     animation: fadeInDown
 
   - segment: group_tag
