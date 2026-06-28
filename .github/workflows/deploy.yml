@@ -20,8 +20,9 @@ jobs:
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
             cd /opt/MBTI-PRO
-            git stash
-            git pull origin master
+            git fetch --unshallow origin 2>/dev/null || true
+            git fetch origin master
+            git reset --hard origin/master
             cd server && npx prisma generate && npx prisma db push
             # 修复6个中文名(数据库层面)
             npx tsx scripts/fix-names.ts
