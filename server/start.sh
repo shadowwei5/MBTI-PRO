@@ -10,13 +10,10 @@ PRISMA_DIR="$SCRIPT_DIR/prisma"
 # 初始化持久化目录
 mkdir -p "$PERSIST_DIR/images"
 
-# 首次部署：复制图片到持久化磁盘
-if [ ! -f "$PERSIST_DIR/.initialized" ]; then
-    echo "[init] first deploy — copying assets..."
-    if [ -d "$IMAGES_DIR" ]; then
-        cp -r "$IMAGES_DIR"/* "$PERSIST_DIR/images/" 2>/dev/null || true
-    fi
-    touch "$PERSIST_DIR/.initialized"
+# 每次启动都同步新图片到持久化磁盘（覆盖同名，保留旧图）
+if [ -d "$IMAGES_DIR" ]; then
+    echo "[init] syncing images to persistent disk..."
+    cp -r "$IMAGES_DIR"/* "$PERSIST_DIR/images/" 2>/dev/null || true
 fi
 
 # 链接持久化目录
