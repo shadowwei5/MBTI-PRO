@@ -8,6 +8,7 @@ import { questionRoutes } from './routes/questions.js'
 import { resultRoutes } from './routes/results.js'
 import { recordRoutes } from './routes/records.js'
 import feedbackRoutes from './routes/feedback.js'
+import { paymentRoutes } from './routes/payment.js'
 
 export const prisma = new PrismaClient()
 
@@ -28,6 +29,7 @@ app.use('/api/questions', questionRoutes)
 app.use('/api/results', resultRoutes)
 app.use('/api/records', recordRoutes)
 app.use('/api/feedback', feedbackRoutes)
+app.use('/api/payment', paymentRoutes)
 
 // Serve AI-generated personality type images (full resolution, for detail page & poster)
 const imagesDir = path.resolve(__dirname, '..', 'generated_images')
