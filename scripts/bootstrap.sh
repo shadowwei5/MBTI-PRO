@@ -217,7 +217,7 @@ cat > /etc/nginx/conf.d/mbti-pro.conf << 'NGINX_EOF'
 server {
     listen 80;
     listen [::]:80;
-    server_name mbti-pro.duckdns.org _;
+    server_name mbti-pro.com _;
 
     # 前端静态文件
     root /opt/MBTI-PRO/client/dist;

@@ -12,7 +12,7 @@ scripts/         视频管线、图片生成、数据脚本
 
 ## 线上地址
 
-- 网站：https://mbti-pro.duckdns.org/
+- 网站：https://mbti-pro.com/
 - 自动部署：push 到 `master` 分支 → GitHub Actions → SSH 到腾讯云 → git pull + build + pm2 restart
 
 ## 服务器关键路径
@@ -64,7 +64,7 @@ git add . && git commit -m "..." && git push origin master
 
 部署验证：
 ```bash
-curl -s "https://mbti-pro.duckdns.org/api/results/ABCD" | grep -o '"name":"[^"]*"'
+curl -s "https://mbti-pro.com/api/results/ABCD" | grep -o '"name":"[^"]*"'
 # 预期输出: "name":"全能者型"
 ```
 

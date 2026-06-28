@@ -9,7 +9,7 @@ const unlockedByShare = ref(false)
 
 function shareToUnlock() {
   const shareText = `我刚测了MBTI-PRO的81型人格测试，我是${props.typeName}！你也来测测你是哪种人格？`
-  const shareUrl = `https://mbti-pro.duckdns.org/?ref=share&type=${props.typeCode}`
+  const shareUrl = `https://mbti-pro.com/?ref=share&type=${props.typeCode}`
   if (navigator.share) {
     navigator.share({ title: 'MBTI-PRO 81型人格测试', text: shareText, url: shareUrl })
       .then(() => { isUnlocked.value = true; unlockedByShare.value = true })
