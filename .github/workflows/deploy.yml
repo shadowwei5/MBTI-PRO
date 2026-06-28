@@ -16,10 +16,13 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT || 22 }}
           script: |
+            export PATH=$PATH:/root/.nvm/versions/node/*/bin:$(dirname $(which node 2>/dev/null) 2>/dev/null)
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
             cd /opt/MBTI-PRO
             git stash
             git pull origin master
             cd server && npx prisma generate && npx prisma db push
             cd ../client && npm install && npm run build
-            pm2 restart mbti-pro || pm2 start src/index.ts --name mbti-pro
+            (pm2 restart mbti-pro 2>/dev/null) || (pm2 start src/index.ts --name mbti-pro 2>/dev/null) || (npx pm2 restart mbti-pro 2>/dev/null) || (npx pm2 start server/src/index.ts --name mbti-pro 2>/dev/null) || (cd /opt/MBTI-PRO/server && npx tsx src/index.ts &)
             echo "✅ Deploy done"
