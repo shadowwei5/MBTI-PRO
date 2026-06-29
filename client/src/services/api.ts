@@ -28,6 +28,7 @@ export interface PersonalityType {
   code: string
   name: string
   isTraditional: boolean
+  summary?: string | null
   overview: string
   strengths: string[]
   growthAreas: string[]

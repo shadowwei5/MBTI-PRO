@@ -239,6 +239,13 @@ const defaultItems = {
           <p class="text-lg text-text-secondary leading-relaxed max-w-md mx-auto">
             {{ typeName }}
           </p>
+
+          <!-- 人格总结（免费可见） -->
+          <div v-if="typeData?.summary" class="mt-6 bg-cream/80 rounded-2xl px-6 py-4 border border-border/30 max-w-lg mx-auto">
+            <p class="text-sm text-text-secondary leading-relaxed italic">
+              "{{ typeData.summary }}"
+            </p>
+          </div>
         </div>
 
         <!-- Dimension Spectrum (仅测试后显示) -->

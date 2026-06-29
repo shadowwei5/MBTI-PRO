@@ -2,6 +2,7 @@ import { Router } from 'express'
 import { prisma } from '../index.js'
 import { calculateScore, type Answers, type QuestionMeta, type AnswerKey } from '../services/scoring.js'
 import { getTypeDimensionModules } from '../content/dimension-modules.js'
+import { TYPE_SUMMARIES } from '../content/types.js'
 
 export const resultRoutes = Router()
 
@@ -133,6 +134,7 @@ resultRoutes.get('/:typeCode', async (req, res, next) => {
       success: true,
       data: {
         ...type,
+        summary: TYPE_SUMMARIES[type.code] ?? null,
         eiModule: dimModules.eiModule,
         snModule: dimModules.snModule,
         tfModule: dimModules.tfModule,
