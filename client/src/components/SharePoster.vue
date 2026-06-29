@@ -150,9 +150,51 @@ onMounted(async () => {
   finally { isGenerating.value = false; showModal.value = true }
 })
 
-function downloadPoster() { if (!generatedImageUrl.value) return; const a = document.createElement('a'); a.href = generatedImageUrl.value; a.download = `MBTI-PRO-${props.typeCode}.jpg`; a.click() }
-async function copyToClipboard() { if (!generatedImageUrl.value) return; try { const b = await (await fetch(generatedImageUrl.value)).blob(); await navigator.clipboard.write([new ClipboardItem({ [b.type]: b })]) } catch { downloadPoster() } }
-const showShare = computed(() => showModal.value && !isGenerating.value && !hasError.value)
+const isMobile = ref(false)
+const showLongPressHint = ref(false)
+
+function downloadPoster() {
+  if (!generatedImageUrl.value) return
+  // 移动端：无法通过JS触发下载，显示长按提示
+  if (isMobile.value) {
+    showLongPressHint.value = true
+    setTimeout(() => { showLongPressHint.value = false }, 4000)
+    return
+  }
+  // 桌面端：正常下载
+  const a = document.createElement('a')
+  a.href = generatedImageUrl.value
+  a.download = `MBTI-PRO-${props.typeCode}.jpg`
+  document.body.appendChild(a)
+  a.click()
+  document.body.removeChild(a)
+}
+
+async function sharePoster() {
+  if (!generatedImageUrl.value) return
+  // 尝试 Web Share API (支持图片分享的移动浏览器)
+  if (navigator.share && navigator.canShare) {
+    try {
+      const blob = await (await fetch(generatedImageUrl.value)).blob()
+      const file = new File([blob], `MBTI-PRO-${props.typeCode}.jpg`, { type: 'image/jpeg' })
+      const shareData: any = { files: [file], title: 'MBTI-PRO 人格画像' }
+      if (navigator.canShare(shareData)) {
+        await navigator.share(shareData)
+        return
+      }
+    } catch { /* fallback */ }
+  }
+  // 降级：显示长按提示
+  downloadPoster()
+}
+
+onMounted(async () => {
+  // 检测移动端
+  isMobile.value = /Android|iPhone|iPad|iPod|webOS/i.test(navigator.userAgent) || ('ontouchstart' in window && window.innerWidth < 768)
+  await generateQR()
+  try { await drawPoster() } catch { hasError.value = true }
+  finally { isGenerating.value = false; showModal.value = true }
+})
 </script>
 
 <template>
@@ -170,12 +212,28 @@ const showShare = computed(() => showModal.value && !isGenerating.value && !hasE
       <div class="absolute inset-0 bg-charcoal/50 backdrop-blur-sm" @click="emit('close')" />
       <div class="relative bg-cream rounded-3xl p-6 max-w-sm w-full shadow-2xl">
         <h3 class="text-lg font-bold text-charcoal mb-2 text-center">分享你的人格画像</h3>
-        <p class="text-sm text-text-muted text-center mb-5">长按保存图片，分享到朋友圈</p>
-        <div class="rounded-2xl overflow-hidden mb-5" style="box-shadow:0 8px 32px rgba(0,0,0,.1)"><img :src="generatedImageUrl" class="w-full" /></div>
+        <p v-if="isMobile" class="text-sm text-text-muted text-center mb-5">长按下方图片即可保存到相册</p>
+        <p v-else class="text-sm text-text-muted text-center mb-5">点击保存图片，分享到朋友圈</p>
+        <div class="rounded-2xl overflow-hidden mb-5 relative" style="box-shadow:0 8px 32px rgba(0,0,0,.1)">
+          <img :src="generatedImageUrl" class="w-full" />
+          <!-- 长按提示浮层 -->
+          <Transition name="fade">
+            <div v-if="showLongPressHint" class="absolute inset-0 bg-charcoal/80 flex items-center justify-center rounded-2xl">
+              <div class="text-center text-cream px-6">
+                <p class="text-5xl mb-3">👆</p>
+                <p class="text-lg font-bold mb-1">长按图片</p>
+                <p class="text-sm opacity-80">选择「保存图片」即可存到相册</p>
+              </div>
+            </div>
+          </Transition>
+        </div>
         <div class="flex gap-3">
           <button @click="emit('close')" class="flex-1 px-4 py-3 text-sm font-medium text-text-secondary border border-border rounded-xl">关闭</button>
-          <button @click="downloadPoster" class="flex-1 px-4 py-3 text-sm font-semibold bg-charcoal text-cream rounded-xl">保存图片</button>
-          <button @click="copyToClipboard" class="flex-1 px-4 py-3 text-sm font-semibold text-white rounded-xl" :style="{background:typeColor.hex}">复制图片</button>
+          <!-- 移动端：分享按钮（调用系统分享） -->
+          <button v-if="isMobile" @click="sharePoster" class="flex-1 px-4 py-3 text-sm font-semibold text-white rounded-xl" :style="{background:typeColor.hex}">📤 分享给朋友</button>
+          <!-- 桌面端：保存按钮 -->
+          <button v-else @click="downloadPoster" class="flex-1 px-4 py-3 text-sm font-semibold bg-charcoal text-cream rounded-xl">保存图片</button>
+          <button v-if="!isMobile" @click="sharePoster" class="flex-1 px-4 py-3 text-sm font-semibold text-white rounded-xl" :style="{background:typeColor.hex}">📤 分享</button>
         </div>
       </div>
     </div>
@@ -185,4 +243,6 @@ const showShare = computed(() => showModal.value && !isGenerating.value && !hasE
 <style scoped>
 .modal-enter-active,.modal-leave-active{transition:all .3s ease}
 .modal-enter-from,.modal-leave-to{opacity:0}
+.fade-enter-active,.fade-leave-active{transition:all .25s ease}
+.fade-enter-from,.fade-leave-to{opacity:0}
 </style>
