@@ -26,6 +26,7 @@ const ALLOWED_ORIGINS = [
 
 app.use(cors({ origin: ALLOWED_ORIGINS }))
 app.use(express.json())
+app.use(express.urlencoded({ extended: true })) // XorPay 回调使用 form-urlencoded
 
 app.use('/api/questions', questionRoutes)
 app.use('/api/results', resultRoutes)

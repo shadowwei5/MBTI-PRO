@@ -119,7 +119,7 @@ function stopPolling() {
 onUnmounted(() => stopPolling())
 
 
-// 将 weixin:// 链接转成可扫描的二维码图片
+// 将支付链接转成可扫描的二维码图片
 function getQRImageUrl(data: string): string {
   // 使用免费 QR 码生成 API
   return `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(data)}`
@@ -165,7 +165,7 @@ function getQRImageUrl(data: string): string {
 
       <!-- 二维码区域 -->
       <div v-if="showQR && qrUrl" class="qr-section">
-        <p class="qr-hint">请使用<strong>微信</strong>扫描二维码支付</p>
+        <p class="qr-hint">请使用<strong>支付宝</strong>扫描二维码支付</p>
         <div class="qr-code-wrap">
           <img
             :src="getQRImageUrl(qrUrl)"
