@@ -46,18 +46,6 @@ model PersonalityType {
   @@index([isTraditional])
 }
 
-model UserFeedback {
-  id            String   @id @default(uuid())
-  userType      String   // 用户自己的人格类型
-  likedType     String   // 相处愉快的类型
-  dislikedType  String   // 相处痛苦的类型
-  createdAt     DateTime @default(now())
-
-  @@index([userType])
-  @@index([likedType])
-  @@index([dislikedType])
-}
-
 model TestRecord {
   id              String   @id @default(cuid())
   typeCode        String   // resulting 4-char type code
@@ -65,6 +53,9 @@ model TestRecord {
   chars           String   // JSON: {"E_I":"E","S_N":"B","T_F":"T","P_J":"D"}
   answers         String   // JSON: {"1":"A","2":"B",...}
   duration        Int      // seconds spent on test
+  dimAnswered     String?  // JSON: {"E_I":23,"S_N":25,"T_F":20,"P_J":24} each dimension answered count
+  dimTotals       String?  // JSON: {"E_I":25,"S_N":25,"T_F":25,"P_J":25} each dimension total
+  confidence      Int?     // overall confidence 0-100 (min of 4 dimensions)
   deviceInfo      String?  // JSON: {os,browser,screen,language}
   utmSource       String?  // utm_source from URL
   utmMedium       String?  // utm_medium
@@ -75,6 +66,21 @@ model TestRecord {
 
   @@index([typeCode])
   @@index([createdAt])
+  @@index([confidence])
+}
+
+model UserFeedback {
+  id            String   @id @default(uuid())
+  recordId      String?  // 关联的测试记录ID
+  userType      String   // 用户自己的人格类型
+  likedType     String   // 相处愉快的类型
+  dislikedType  String   // 相处痛苦的类型
+  createdAt     DateTime @default(now())
+
+  @@index([userType])
+  @@index([likedType])
+  @@index([dislikedType])
+  @@index([recordId])
 }
 
 model PaymentRecord {

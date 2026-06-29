@@ -28,6 +28,8 @@ const answers = ref<Record<number, string>>({})
 const showSubmitConfirm = ref(false)
 const submitting = ref(false)
 const startTime = ref(Date.now())
+// 每道题的答题时间戳（用于计算耗时）
+const questionTimestamps = ref<Record<number, number>>({})
 
 // 反馈收集（答题完成后、展示结果前 — 必须完成反馈才能查看结果）
 const showFeedbackAfterTest = ref(false)
@@ -38,6 +40,7 @@ const pendingResult = ref<{
   confidence: number
   dimTotals: Record<string, number>
   dimAnswered: Record<string, number>
+  recordId?: string
 } | null>(null)
 
 function onFeedbackSubmitted() {
@@ -182,6 +185,10 @@ function onObjectiveTimeout() {
 
 function selectOption(key: string) {
   if (isObjectiveLocked.value) return
+  // 记录答题时间戳
+  if (!questionTimestamps.value[currentQuestion.value.id]) {
+    questionTimestamps.value[currentQuestion.value.id] = Date.now()
+  }
   answers.value[currentQuestion.value.id] = key
   if (currentQuestion.value.type === 'objective') {
     saveTimerRemaining()
@@ -282,15 +289,46 @@ async function submitTest() {
     const score = await api.submitScore({ ...answers.value }, presentedIds, timedOut)
     localStorage.removeItem('mbti-pro-test')
 
-    api.saveRecord({
+    // 计算每题耗时（秒）
+    const questionTimings: Record<number, number> = {}
+    const now = Date.now()
+    for (const q of questions.value) {
+      const ts = questionTimestamps.value[q.id]
+      if (ts) {
+        questionTimings[q.id] = Math.round((now - ts) / 100) / 10 // 秒，保留1位小数
+      }
+    }
+
+    // 收集设备信息
+    const deviceInfo = JSON.stringify({
+      os: navigator.platform || 'unknown',
+      screen: `${window.screen.width}x${window.screen.height}`,
+      language: navigator.language,
+    })
+
+    // 收集UTM参数
+    const urlParams = new URLSearchParams(window.location.search)
+    const utmSource = urlParams.get('utm_source') || undefined
+    const utmMedium = urlParams.get('utm_medium') || undefined
+    const utmCampaign = urlParams.get('utm_campaign') || undefined
+
+    const recordRes = await api.saveRecord({
       typeCode: score.typeCode,
       scores: score.scores,
       chars: score.chars,
       answers: { ...answers.value },
       duration: Math.round((Date.now() - startTime.value) / 1000),
-    }).catch(() => { /* non-critical */ })
+      dimAnswered,
+      dimTotals,
+      confidence: score.confidence,
+      questionTimings,
+      deviceInfo,
+      utmSource,
+      utmMedium,
+      utmCampaign,
+    }).catch(() => ({ id: undefined }))
 
-    // 保存评分结果，先展示反馈收集，完成后再跳转结果页
+    // 保存评分结果，携带 recordId 用于关联反馈
     pendingResult.value = {
       typeCode: score.typeCode,
       scores: score.scores,
@@ -298,6 +336,7 @@ async function submitTest() {
       confidence: score.confidence,
       dimTotals,
       dimAnswered,
+      recordId: recordRes?.id,
     }
     showFeedbackAfterTest.value = true
     submitting.value = false
@@ -570,6 +609,7 @@ onUnmounted(() => {
           </div>
           <FeedbackCollector
             :user-type="pendingResult?.typeCode || ''"
+            :record-id="pendingResult?.recordId"
             @submitted="onFeedbackSubmitted"
           />
         </div>

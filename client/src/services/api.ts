@@ -49,6 +49,14 @@ export interface TestRecordPayload {
   chars: Record<string, string>
   answers: Record<string, string>
   duration: number
+  dimAnswered?: Record<string, number>
+  dimTotals?: Record<string, number>
+  confidence?: number
+  questionTimings?: Record<number, number>
+  deviceInfo?: string
+  utmSource?: string
+  utmMedium?: string
+  utmCampaign?: string
 }
 
 export interface ScoreResponse {
@@ -95,9 +103,9 @@ export const api = {
       body: JSON.stringify(payload),
     }),
 
-  submitFeedback: (userType: string, likedType: string, dislikedType: string) =>
+  submitFeedback: (userType: string, likedType: string, dislikedType: string, recordId?: string) =>
     request<{ id: string }>('/feedback', {
       method: 'POST',
-      body: JSON.stringify({ userType, likedType, dislikedType }),
+      body: JSON.stringify({ userType, likedType, dislikedType, recordId }),
     }),
 }

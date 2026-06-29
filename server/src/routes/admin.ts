@@ -21,19 +21,19 @@ adminRoutes.get('/stats', async (_req, res, next) => {
       prisma.testRecord.count(),
       prisma.testRecord.count({ where: { createdAt: { gte: todayStart } } }),
       prisma.testRecord.count({ where: { createdAt: { gte: weekStart } } }),
-      prisma.testRecord.groupBy({ by: ['typeCode'], _count: true, orderBy: { _count: { typeCode: 'desc' } }, take: 15 }),
-      prisma.testRecord.groupBy({ by: ['typeCode'], _count: true, where: { createdAt: { gte: todayStart } }, orderBy: { _count: { typeCode: 'desc' } }, take: 10 }),
+      prisma.testRecord.groupBy({ by: ['typeCode'], _count: true, where: { confidence: { gte: 92 } }, orderBy: { _count: { typeCode: 'desc' } }, take: 15 }),
+      prisma.testRecord.groupBy({ by: ['typeCode'], _count: true, where: { AND: [{ createdAt: { gte: todayStart } }, { confidence: { gte: 92 } }] }, orderBy: { _count: { typeCode: 'desc' } }, take: 10 }),
       prisma.userFeedback.count(),
       prisma.userFeedback.groupBy({ by: ['likedType'], _count: true, orderBy: { _count: { likedType: 'desc' } }, take: 10 }),
       prisma.userFeedback.groupBy({ by: ['dislikedType'], _count: true, orderBy: { _count: { dislikedType: 'desc' } }, take: 10 }),
       prisma.userEmail.count(),
       prisma.userEmail.count({ where: { createdAt: { gte: todayStart } } }),
-      prisma.testRecord.count({ where: { abandonStep: { not: null } } }),
-      prisma.testRecord.count({ where: { abandonStep: null } }),
+      prisma.testRecord.count({ where: { confidence: { lt: 92 } } }),
+      prisma.testRecord.count({ where: { confidence: { gte: 92 } } }),
     ])
 
-    const totalWithAbandon = abandonCount + completedCount
-    const completionRate = totalWithAbandon > 0 ? Math.round((completedCount / totalWithAbandon) * 100) : 100
+    const totalWithConfidence = abandonCount + completedCount
+    const completionRate = totalWithConfidence > 0 ? Math.round((completedCount / totalWithConfidence) * 100) : 0
 
     // 类型分布格式化
     const typeDistribution = typeDist.map(d => ({ code: d.typeCode, count: d._count }))

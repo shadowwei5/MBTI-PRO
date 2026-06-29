@@ -6,12 +6,12 @@ const router = Router()
 // POST /api/feedback — 用户提交相处偏好
 router.post('/', async (req, res) => {
   try {
-    const { userType, likedType, dislikedType } = req.body
+    const { userType, likedType, dislikedType, recordId } = req.body
     if (!userType || !likedType || !dislikedType) {
       return res.status(400).json({ success: false, error: '缺少必填字段: userType, likedType, dislikedType' })
     }
     const fb = await prisma.userFeedback.create({
-      data: { userType, likedType, dislikedType },
+      data: { userType, likedType, dislikedType, recordId: recordId || null },
     })
     res.json({ success: true, data: { id: fb.id } })
   } catch (e: any) {
