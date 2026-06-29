@@ -9,9 +9,40 @@ const qrUrl = ref('')
 const qrLoading = ref(false)
 const qrError = ref('')
 const payStatus = ref<'idle' | 'loading' | 'paid' | 'error'>('idle')
+const userEmail = ref('')
+const emailSaved = ref(false)
+const emailError = ref('')
 let pollTimer: ReturnType<typeof setInterval> | null = null
 
+function isValidEmail(e: string) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e) }
+
+async function saveEmail() {
+  if (!userEmail.value || !isValidEmail(userEmail.value)) {
+    emailError.value = '请输入有效的邮箱地址'
+    return false
+  }
+  try {
+    const API_BASE = import.meta.env.VITE_API_BASE || '/api'
+    await fetch(`${API_BASE}/email`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: userEmail.value, typeCode: props.typeCode, source: 'paywall' }),
+    })
+    emailSaved.value = true
+    emailError.value = ''
+    return true
+  } catch {
+    emailError.value = '保存失败，请重试'
+    return false
+  }
+}
+
 async function payToUnlock() {
+  emailError.value = ''
+  // 先保存邮箱
+  if (userEmail.value && !emailSaved.value) {
+    await saveEmail()
+  }
   qrLoading.value = true
   qrError.value = ''
   payStatus.value = 'loading'
@@ -96,6 +127,24 @@ function getQRImageUrl(data: string): string {
       <h3 class="paywall-title">解锁深度人格报告</h3>
       <p class="paywall-desc">包含人格概览、四维日常画像、代表人物、核心优势、成长空间、四维深度解析</p>
 
+      <!-- 邮箱收集 -->
+      <div class="email-section">
+        <div class="email-input-wrap">
+          <input
+            v-model="userEmail"
+            type="email"
+            placeholder="输入邮箱，解锁后发送完整报告PDF"
+            class="email-input"
+            :class="{ 'email-saved': emailSaved }"
+            :disabled="emailSaved"
+            @keyup.enter="payToUnlock"
+          />
+          <span v-if="emailSaved" class="email-check">✅</span>
+        </div>
+        <p v-if="emailError" class="email-error">{{ emailError }}</p>
+        <p v-if="!emailSaved" class="email-hint">📧 付费解锁后会将完整深度报告发送到你的邮箱</p>
+      </div>
+
       <div class="paywall-actions">
         <button
           class="btn-unlock"
@@ -147,7 +196,18 @@ function getQRImageUrl(data: string): string {
 }
 .lock-icon { font-size: 40px; margin-bottom: 12px; }
 .paywall-title { font-size: 22px; font-weight: 700; color: #2D2A26; margin-bottom: 8px; }
-.paywall-desc { font-size: 15px; color: #6B6560; line-height: 1.5; margin-bottom: 24px; }
+.paywall-desc { font-size: 15px; color: #6B6560; line-height: 1.5; margin-bottom: 16px; }
+.email-section { margin-bottom: 18px; }
+.email-input-wrap { position: relative; display: flex; align-items: center; }
+.email-input {
+  width: 100%; padding: 14px 40px 14px 16px; border: 1.5px solid #E0D8CC; border-radius: 14px;
+  font-size: 15px; color: #2D2A26; background: #FAF8F5; outline: none; transition: border-color .2s;
+}
+.email-input:focus { border-color: #C8963E; }
+.email-input.email-saved { border-color: #2D8A4E; background: #F0FFF0; color: #2D8A4E; font-weight: 600; }
+.email-check { position: absolute; right: 12px; font-size: 18px; }
+.email-hint { font-size: 12px; color: #9C958E; margin-top: 6px; text-align: left; }
+.email-error { font-size: 12px; color: #E8816B; margin-top: 4px; text-align: left; }
 .paywall-actions { display: flex; flex-direction: column; gap: 12px; align-items: center; }
 .btn-unlock {
   color: #FFF; border: none; border-radius: 14px; padding: 14px 40px;

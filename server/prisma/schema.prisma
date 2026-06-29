@@ -59,14 +59,31 @@ model UserFeedback {
 }
 
 model TestRecord {
-  id        String   @id @default(cuid())
-  typeCode  String   // resulting 4-char type code
-  scores    String   // JSON: {"E_I":15,"S_N":-8,"T_F":32,"P_J":5}
-  chars     String   // JSON: {"E_I":"E","S_N":"B","T_F":"T","P_J":"D"}
-  answers   String   // JSON: {"1":"A","2":"B",...}
-  duration  Int      // seconds spent on test
-  createdAt DateTime @default(now())
+  id              String   @id @default(cuid())
+  typeCode        String   // resulting 4-char type code
+  scores          String   // JSON: {"E_I":15,"S_N":-8,"T_F":32,"P_J":5}
+  chars           String   // JSON: {"E_I":"E","S_N":"B","T_F":"T","P_J":"D"}
+  answers         String   // JSON: {"1":"A","2":"B",...}
+  duration        Int      // seconds spent on test
+  deviceInfo      String?  // JSON: {os,browser,screen,language}
+  utmSource       String?  // utm_source from URL
+  utmMedium       String?  // utm_medium
+  utmCampaign     String?  // utm_campaign
+  questionTimings String?  // JSON: {"1":5.2,"2":3.1,...} seconds per question
+  abandonStep     Int?     // 最后答到的题号(如未完成)
+  createdAt       DateTime @default(now())
 
   @@index([typeCode])
+  @@index([createdAt])
+}
+
+model UserEmail {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  typeCode  String?  // 关联的人格类型(如有)
+  source    String   @default("paywall") // paywall | footer | quiz
+  createdAt DateTime @default(now())
+
+  @@index([email])
   @@index([createdAt])
 }
