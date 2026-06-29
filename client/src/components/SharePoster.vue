@@ -57,7 +57,7 @@ async function drawPoster() {
 
   // 圆形人格图片 — 480px 更大更突出
   try {
-    const avatar = await loadImage(`/api/mediums/${props.typeCode}`)
+    const avatar = await loadImage(`/api/images/${props.typeCode}`)
     // 阴影更柔和
     ctx.save()
     ctx.shadowColor = 'rgba(0,0,0,0.10)'; ctx.shadowBlur = 30; ctx.shadowOffsetY = 6
