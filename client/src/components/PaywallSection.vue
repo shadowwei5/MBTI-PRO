@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, watch, nextTick } from 'vue'
 
 const props = defineProps<{ typeCode: string; typeName: string; typeColor: string }>()
+const emit = defineEmits<{ unlocked: [] }>()
 
 const STORAGE_KEY = 'mbti-pro-unlocked'
 
@@ -21,6 +22,16 @@ function persistUnlock() {
   unlockedTypes.value.add(props.typeCode)
   localStorage.setItem(STORAGE_KEY, JSON.stringify([...unlockedTypes.value]))
 }
+
+// 解锁后自动滚动到内容区
+watch(isUnlocked, async (val) => {
+  if (val) {
+    emit('unlocked')
+    await nextTick()
+    const el = document.querySelector('.paywall-unlocked')
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+})
 
 const showQR = ref(false)
 const qrUrl = ref('')
@@ -200,7 +211,7 @@ function getQRImageUrl(data: string): string {
 
   <div class="paywall-unlocked" v-else>
     <div class="unlocked-banner" :style="{ background: typeColor + '11', borderColor: typeColor + '33' }">
-      ✅ 已解锁 · 完整深度报告
+      🎉 解锁成功！向下滚动查看完整深度报告
     </div>
     <slot />
   </div>

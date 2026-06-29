@@ -22,12 +22,19 @@ const filteredTypes = computed(() =>
   TYPES.filter(t => t !== props.userType)
 )
 
+const submitError = ref(false)
+
 async function submit() {
   if (!likedType.value || !dislikedType.value || submitting.value) return
   submitting.value = true
+  submitError.value = false
   try {
     await api.submitFeedback(props.userType, likedType.value, dislikedType.value)
-  } catch { /* 非关键接口，失败也继续 */ }
+  } catch {
+    submitError.value = true
+    submitting.value = false
+    return
+  }
   submitted.value = true
   emit('submitted')
 }
@@ -57,6 +64,8 @@ async function submit() {
       <button class="fb-submit" :disabled="!likedType || !dislikedType || submitting" @click="submit">
         {{ submitting ? '提交中...' : '提交反馈' }}
       </button>
+      <p v-if="submitError" class="fb-error">⚠️ 网络异常，请重试或直接跳过</p>
+      <button v-if="submitError" class="fb-skip" @click="submitted = true; emit('submitted')">跳过反馈，直接查看结果 →</button>
     </div>
   </div>
   <div class="feedback-done" v-else>
@@ -84,6 +93,9 @@ async function submit() {
   font-size: 16px; font-weight: 600; cursor: pointer;
 }
 .fb-submit:disabled { opacity: 0.4; cursor: not-allowed; }
+.fb-error { color: #E8816B; font-size: 13px; margin-top: 8px; text-align: center; }
+.fb-skip { background: none; border: 1.5px solid #E0D8CC; border-radius: 12px; padding: 10px 20px; font-size: 14px; color: #6B6560; cursor: pointer; margin-top: 8px; width: 100%; }
+.fb-skip:hover { background: #F8F4EC; }
 .feedback-done {
   margin: 32px 0; padding: 16px; background: #2D8A4E11;
   border-radius: 12px; text-align: center; font-size: 14px; color: #2D8A4E;
