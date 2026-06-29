@@ -76,7 +76,7 @@ paymentRoutes.post('/create', async (req, res, next) => {
 
     const orderId = `mbtipro_${typeCode}_${Date.now()}`
     const price = '4.90'
-    const payType = 'native' // 微信扫码；alipay 为支付宝当面付
+    const payType = (process.env.XORPAY_PAY_TYPE as string) || 'alipay' // 微信扫码；alipay 为支付宝当面付
 
     const sign = signPay({
       name: `MBTI-PRO ${typeCode} 深度人格报告`,
