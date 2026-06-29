@@ -108,4 +108,35 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ userType, likedType, dislikedType, recordId }),
     }),
+
+  // ====== 支付相关 ======
+
+  /** 创建支付订单，返回二维码内容；已支付时返回 null */
+  createPayment: (typeCode: string, typeName: string): Promise<{ qrUrl: string; orderId: string; aoid: string; expiresIn: number } | null> => {
+    const API_BASE = import.meta.env.VITE_API_BASE || '/api'
+    return fetch(`${API_BASE}/payment/create`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ typeCode, typeName }),
+    }).then(async (res) => {
+      const json = await res.json()
+      if (!json.success) throw new Error(json.error || '支付服务暂不可用')
+      // 已支付过
+      if (json.paid) return null
+      // 返回二维码数据
+      if (json.data?.qrUrl) return json.data
+      throw new Error(json.error || '获取支付二维码失败')
+    })
+  },
+
+  /** 检查某个类型是否已支付 */
+  checkPayment: (typeCode: string) =>
+    request<{ paid: boolean }>(`/payment/check/${typeCode}`),
+
+  /** 保存邮箱 */
+  saveEmail: (email: string, typeCode: string, source: string = 'paywall') =>
+    request<{ id: string }>('/email', {
+      method: 'POST',
+      body: JSON.stringify({ email, typeCode, source }),
+    }),
 }

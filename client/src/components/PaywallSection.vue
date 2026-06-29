@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, watch, nextTick } from 'vue'
+import { api } from '../services/api'
 
 const props = defineProps<{ typeCode: string; typeName: string; typeColor: string }>()
 const emit = defineEmits<{ unlocked: [] }>()
@@ -51,12 +52,7 @@ async function saveEmail() {
     return false
   }
   try {
-    const API_BASE = import.meta.env.VITE_API_BASE || '/api'
-    await fetch(`${API_BASE}/email`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: userEmail.value, typeCode: props.typeCode, source: 'paywall' }),
-    })
+    await api.saveEmail(userEmail.value, props.typeCode, 'paywall')
     emailSaved.value = true
     emailError.value = ''
     return true
@@ -77,37 +73,20 @@ async function payToUnlock() {
   payStatus.value = 'loading'
 
   try {
-    const API_BASE = import.meta.env.VITE_API_BASE || '/api'
-    const res = await fetch(`${API_BASE}/payment/create`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ typeCode: props.typeCode, typeName: props.typeName }),
-    })
-    const json = await res.json()
+    const data = await api.createPayment(props.typeCode, props.typeName)
 
-    if (!json.success || json.error) {
-      qrError.value = json.error || '支付服务暂不可用'
-      payStatus.value = 'error'
-      return
-    }
-
-    if (json.paid) {
+    if (data === null) {
       // 已支付过
       isUnlocked.value = true; persistUnlock()
       return
     }
 
-    if (json.data?.qrUrl) {
-      qrUrl.value = json.data.qrUrl
-      showQR.value = true
-      payStatus.value = 'idle'
-      startPolling()
-    } else {
-      qrError.value = '获取支付二维码失败'
-      payStatus.value = 'error'
-    }
-  } catch {
-    qrError.value = '网络错误，请重试'
+    qrUrl.value = data.qrUrl
+    showQR.value = true
+    payStatus.value = 'idle'
+    startPolling()
+  } catch (err: any) {
+    qrError.value = err.message || '网络错误，请重试'
     payStatus.value = 'error'
   } finally {
     qrLoading.value = false
@@ -118,10 +97,8 @@ function startPolling() {
   stopPolling()
   pollTimer = setInterval(async () => {
     try {
-      const API_BASE = import.meta.env.VITE_API_BASE || '/api'
-      const res = await fetch(`${API_BASE}/payment/check/${props.typeCode}`)
-      const json = await res.json()
-      if (json.paid) {
+      const data = await api.checkPayment(props.typeCode)
+      if (data.paid) {
         payStatus.value = 'paid'
         stopPolling()
         setTimeout(() => {
