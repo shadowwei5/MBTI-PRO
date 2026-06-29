@@ -27,5 +27,5 @@ jobs:
             # 修复6个中文名(数据库层面)
             npx tsx scripts/fix-names.ts
             cd ../client && npm install && npm run build
-            cd /opt/MBTI-PRO && touch server/src/index.ts && pm2 restart mbti-pro 2>/dev/null || (cd /opt/MBTI-PRO/server && pm2 start src/index.ts --name mbti-pro) || (cd /opt/MBTI-PRO/server && npx tsx src/index.ts &)
+            cd /opt/MBTI-PRO && (npx pm2 kill 2>/dev/null || true) && sleep 1 && cd server && nohup npx tsx src/index.ts > /tmp/mbti-pro.log 2>&1 &
             echo "✅ Deploy done"
