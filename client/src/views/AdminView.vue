@@ -53,6 +53,21 @@ function formatSec(s: number) {
   const sec = s % 60
   return `${m}分${sec}秒`
 }
+
+async function copyEmails() {
+  const text = emails.value.map(e => e.email).join('\n')
+  try {
+    await navigator.clipboard.writeText(text)
+  } catch {
+    // fallback
+    const ta = document.createElement('textarea')
+    ta.value = text
+    document.body.appendChild(ta)
+    ta.select()
+    document.execCommand('copy')
+    document.body.removeChild(ta)
+  }
+}
 </script>
 
 <template>
@@ -184,7 +199,7 @@ function formatSec(s: number) {
         <div v-if="showEmails" class="bg-white rounded-2xl p-6 shadow-sm border border-border/30">
           <div class="flex items-center justify-between mb-4">
             <h2 class="text-sm font-semibold text-charcoal uppercase tracking-wider">📧 邮箱列表 ({{ emails.length }})</h2>
-            <button @click="(window.navigator as any).clipboard?.writeText(emails.map((e: any) => e.email).join('\n'))" class="text-xs text-coral hover:underline">复制全部</button>
+            <button @click="copyEmails" class="text-xs text-coral hover:underline">复制全部</button>
           </div>
           <div v-if="!emails.length" class="text-text-muted text-sm text-center py-8">暂无邮箱数据</div>
           <div v-else class="overflow-x-auto">
