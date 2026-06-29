@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import QRCode from 'qrcode'
 
 const props = defineProps<{
@@ -208,7 +208,7 @@ onMounted(async () => {
     </div>
   </Transition>
   <Transition name="modal">
-    <div v-if="showShare" class="fixed inset-0 z-50 flex items-center justify-center p-5">
+    <div v-if="showModal && !isGenerating && !hasError" class="fixed inset-0 z-50 flex items-center justify-center p-5">
       <div class="absolute inset-0 bg-charcoal/50 backdrop-blur-sm" @click="emit('close')" />
       <div class="relative bg-cream rounded-3xl p-6 max-w-sm w-full shadow-2xl">
         <h3 class="text-lg font-bold text-charcoal mb-2 text-center">分享你的人格画像</h3>
