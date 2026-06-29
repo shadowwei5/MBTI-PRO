@@ -88,7 +88,7 @@ resultRoutes.get('/', async (_req, res, next) => {
       data: types.map(t => ({
         ...t,
         celebrities: JSON.parse(t.celebrities || '[]'),
-        imageUrl: `/api/thumbs/${t.code}`,
+        imageUrl: `/api/images/${t.code}`,
       })),
     })
   } catch (err) {
