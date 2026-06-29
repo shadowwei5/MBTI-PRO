@@ -23,6 +23,10 @@ jobs:
             git fetch --unshallow origin 2>/dev/null || true
             git fetch origin master
             git reset --hard origin/master
+            # 注入 XorPay 支付环境变量（不覆盖已有配置）
+            grep -q "^XORPAY_AID=" server/.env 2>/dev/null || echo "XORPAY_AID=${{ secrets.XORPAY_AID }}" >> server/.env
+            grep -q "^XORPAY_SECRET=" server/.env 2>/dev/null || echo "XORPAY_SECRET=${{ secrets.XORPAY_SECRET }}" >> server/.env
+            grep -q "^XORPAY_NOTIFY_URL=" server/.env 2>/dev/null || echo "XORPAY_NOTIFY_URL=${{ secrets.XORPAY_NOTIFY_URL }}" >> server/.env
             cd server && npx prisma generate && npx prisma db push
             # 修复6个中文名(数据库层面)
             npx tsx scripts/fix-names.ts
