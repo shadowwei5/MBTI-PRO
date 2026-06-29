@@ -23,14 +23,19 @@ jobs:
             git fetch --unshallow origin 2>/dev/null || true
             git fetch origin master
             git reset --hard origin/master
-            # 注入 XorPay 支付环境变量（先删旧行再写入，确保值与 Secrets 同步）
+            # 注入 XorPay 支付 + SMTP 邮件环境变量
             sed -i '/^XORPAY_/d' server/.env
+            sed -i '/^SMTP_/d' server/.env
             cat >> server/.env << 'ENVEOF'
             XORPAY_AID=${{ secrets.XORPAY_AID }}
             XORPAY_SECRET=${{ secrets.XORPAY_SECRET }}
             XORPAY_NOTIFY_URL=${{ secrets.XORPAY_NOTIFY_URL }}
+            SMTP_HOST=${{ secrets.SMTP_HOST }}
+            SMTP_PORT=${{ secrets.SMTP_PORT }}
+            SMTP_USER=${{ secrets.SMTP_USER }}
+            SMTP_PASS=${{ secrets.SMTP_PASS }}
             ENVEOF
-            cd server && npx prisma generate && npx prisma db push
+            cd server && npm install --include=dev && npx prisma generate && npx prisma db push
             # 修复6个中文名(数据库层面)
             npx tsx scripts/fix-names.ts
             cd ../client && npm install && npm run build

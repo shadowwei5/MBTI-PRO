@@ -14,9 +14,9 @@ adminRoutes.get('/stats', async (_req, res, next) => {
     const [
       totalTests, todayTests, weekTests,
       typeDist, todayTypeDist,
-      feedbacks, likedStats, dislikedStats,
-      emails, todayEmails,
+      feedbacks, emails, todayEmails,
       abandonCount, completedCount,
+      completedRecords, // 置信度≥92%的记录(用于过滤反馈)
     ] = await Promise.all([
       prisma.testRecord.count(),
       prisma.testRecord.count({ where: { createdAt: { gte: todayStart } } }),
@@ -24,12 +24,27 @@ adminRoutes.get('/stats', async (_req, res, next) => {
       prisma.testRecord.groupBy({ by: ['typeCode'], _count: true, where: { confidence: { gte: 92 } }, orderBy: { _count: { typeCode: 'desc' } }, take: 15 }),
       prisma.testRecord.groupBy({ by: ['typeCode'], _count: true, where: { AND: [{ createdAt: { gte: todayStart } }, { confidence: { gte: 92 } }] }, orderBy: { _count: { typeCode: 'desc' } }, take: 10 }),
       prisma.userFeedback.count(),
-      prisma.userFeedback.groupBy({ by: ['likedType'], _count: true, orderBy: { _count: { likedType: 'desc' } }, take: 10 }),
-      prisma.userFeedback.groupBy({ by: ['dislikedType'], _count: true, orderBy: { _count: { dislikedType: 'desc' } }, take: 10 }),
       prisma.userEmail.count(),
       prisma.userEmail.count({ where: { createdAt: { gte: todayStart } } }),
       prisma.testRecord.count({ where: { confidence: { lt: 92 } } }),
       prisma.testRecord.count({ where: { confidence: { gte: 92 } } }),
+      prisma.testRecord.findMany({ where: { confidence: { gte: 92 } }, select: { id: true } }),
+    ])
+
+    const completedIds = completedRecords.map(r => r.id)
+
+    // 仅统计完成测试(置信度≥92%)的反馈
+    const [likedStats, dislikedStats] = await Promise.all([
+      prisma.userFeedback.groupBy({
+        by: ['likedType'], _count: true,
+        where: { recordId: { in: completedIds } },
+        orderBy: { _count: { likedType: 'desc' } }, take: 10,
+      }),
+      prisma.userFeedback.groupBy({
+        by: ['dislikedType'], _count: true,
+        where: { recordId: { in: completedIds } },
+        orderBy: { _count: { dislikedType: 'desc' } }, take: 10,
+      }),
     ])
 
     const totalWithConfidence = abandonCount + completedCount

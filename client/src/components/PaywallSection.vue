@@ -93,19 +93,27 @@ async function payToUnlock() {
   }
 }
 
+async function checkAndUnlock() {
+  try {
+    const data = await api.checkPayment(props.typeCode)
+    if (data.paid) {
+      payStatus.value = 'paid'
+      stopPolling()
+      setTimeout(() => {
+        isUnlocked.value = true; persistUnlock()
+      }, 800)
+      return true
+    }
+  } catch { /* retry next poll */ }
+  return false
+}
+
 function startPolling() {
   stopPolling()
-  pollTimer = setInterval(async () => {
-    try {
-      const data = await api.checkPayment(props.typeCode)
-      if (data.paid) {
-        payStatus.value = 'paid'
-        stopPolling()
-        setTimeout(() => {
-          isUnlocked.value = true; persistUnlock()
-        }, 800)
-      }
-    } catch { /* retry next poll */ }
+  // 立即检查一次（不等2秒）
+  checkAndUnlock()
+  pollTimer = setInterval(() => {
+    checkAndUnlock()
   }, 2000)
 }
 
@@ -116,7 +124,29 @@ function stopPolling() {
   }
 }
 
-onUnmounted(() => stopPolling())
+// 页面可见性变化时立即检查（用户从支付宝切回浏览器时触发）
+function onVisibilityChange() {
+  if (document.visibilityState === 'visible' && pollTimer) {
+    checkAndUnlock()
+  }
+}
+
+onMounted(() => {
+  document.addEventListener('visibilitychange', onVisibilityChange)
+  // 也检查服务端状态（localStorage 可能过期）
+  if (!isUnlocked.value) {
+    api.checkPayment(props.typeCode).then(data => {
+      if (data.paid) {
+        isUnlocked.value = true; persistUnlock()
+      }
+    }).catch(() => {})
+  }
+})
+
+onUnmounted(() => {
+  stopPolling()
+  document.removeEventListener('visibilitychange', onVisibilityChange)
+})
 
 
 // 将支付链接转成可扫描的二维码图片

@@ -145,8 +145,16 @@ paymentRoutes.post('/callback', async (req, res, next) => {
     // order_id 格式: mbtipro_{typeCode}_{timestamp}
     const match = order_id?.match(/^mbtipro_(\w+)_\d+$/)
     if (match) {
-      markPaid(match[1].toUpperCase())
-      console.log(`[payment] ${match[1]} 支付成功 ¥${pay_price}`)
+      const code = match[1].toUpperCase()
+      markPaid(code)
+      console.log(`[payment] ${code} 支付成功 ¥${pay_price}`)
+
+      // 异步发送邮件（不阻塞回调响应）
+      import("../services/email.js").then(({ sendPaymentEmail }) =>
+        sendPaymentEmail(code)
+      ).catch(err =>
+        console.error("[payment] email send error:", err)
+      )
     }
 
     res.send('ok')
