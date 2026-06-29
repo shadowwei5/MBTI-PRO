@@ -24,8 +24,35 @@ function verifyCallbackSign(params: { aoid: string; order_id: string; pay_price:
   return md5(raw)
 }
 
-// 已支付订单的内存缓存（生产环境应换 Redis/DB）
-const paidOrders = new Set<string>()
+// 已支付订单：先查内存（热缓存），回退数据库
+const paidOrdersCache = new Set<string>()
+
+async function isPaid(typeCode: string): Promise<boolean> {
+  const code = typeCode.toUpperCase()
+  if (paidOrdersCache.has(code)) return true
+  try {
+    const { prisma } = await import('../index.js')
+    const record = await prisma.paymentRecord.findUnique({ where: { typeCode: code } })
+    if (record?.paid) {
+      paidOrdersCache.add(code)
+      return true
+    }
+  } catch { /* DB不可用时降级到内存 */ }
+  return false
+}
+
+async function markPaid(typeCode: string): Promise<void> {
+  const code = typeCode.toUpperCase()
+  paidOrdersCache.add(code)
+  try {
+    const { prisma } = await import('../index.js')
+    await prisma.paymentRecord.upsert({
+      where: { typeCode: code },
+      update: { paid: true, paidAt: new Date() },
+      create: { typeCode: code, paid: true, paidAt: new Date() },
+    })
+  } catch { /* DB不可用时仅内存 */ }
+}
 
 // POST /api/payment/create — 创建支付订单，返回二维码
 paymentRoutes.post('/create', async (req, res, next) => {
@@ -42,7 +69,7 @@ paymentRoutes.post('/create', async (req, res, next) => {
     }
 
     // 检查是否已支付
-    if (paidOrders.has(typeCode.toUpperCase())) {
+    if (await isPaid(typeCode)) {
       res.json({ success: true, paid: true })
       return
     }
@@ -91,7 +118,7 @@ paymentRoutes.post('/create', async (req, res, next) => {
         },
       })
     } else if (data.status === 'order_payed') {
-      paidOrders.add(typeCode.toUpperCase())
+      await markPaid(typeCode)
       res.json({ success: true, paid: true })
     } else {
       res.status(500).json({ success: false, error: data.status || 'payment_failed' })
@@ -118,7 +145,7 @@ paymentRoutes.post('/callback', async (req, res, next) => {
     // order_id 格式: mbtipro_{typeCode}_{timestamp}
     const match = order_id?.match(/^mbtipro_(\w+)_\d+$/)
     if (match) {
-      paidOrders.add(match[1].toUpperCase())
+      markPaid(match[1].toUpperCase())
       console.log(`[payment] ${match[1]} 支付成功 ¥${pay_price}`)
     }
 
@@ -129,7 +156,8 @@ paymentRoutes.post('/callback', async (req, res, next) => {
 })
 
 // GET /api/payment/check/:typeCode — 检查是否已支付
-paymentRoutes.get('/check/:typeCode', (req, res) => {
+paymentRoutes.get('/check/:typeCode', async (req, res) => {
   const typeCode = req.params.typeCode.toUpperCase()
-  res.json({ success: true, paid: paidOrders.has(typeCode) })
+  const paid = await isPaid(typeCode)
+  res.json({ success: true, paid })
 })

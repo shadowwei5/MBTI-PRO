@@ -77,6 +77,13 @@ model TestRecord {
   @@index([createdAt])
 }
 
+model PaymentRecord {
+  typeCode String   @id
+  paid     Boolean  @default(false)
+  paidAt   DateTime?
+  createdAt DateTime @default(now())
+}
+
 model UserEmail {
   id        String   @id @default(uuid())
   email     String   @unique

@@ -1,9 +1,27 @@
 <script setup lang="ts">
-import { ref, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 
 const props = defineProps<{ typeCode: string; typeName: string; typeColor: string }>()
 
+const STORAGE_KEY = 'mbti-pro-unlocked'
+
+// 恢复解锁状态
 const isUnlocked = ref(false)
+const unlockedTypes = ref<Set<string>>(new Set(
+  JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]')
+))
+
+onMounted(() => {
+  if (unlockedTypes.value.has(props.typeCode)) {
+    isUnlocked.value = true; persistUnlock()
+  }
+})
+
+function persistUnlock() {
+  unlockedTypes.value.add(props.typeCode)
+  localStorage.setItem(STORAGE_KEY, JSON.stringify([...unlockedTypes.value]))
+}
+
 const showQR = ref(false)
 const qrUrl = ref('')
 const qrLoading = ref(false)
@@ -64,7 +82,7 @@ async function payToUnlock() {
 
     if (json.paid) {
       // 已支付过
-      isUnlocked.value = true
+      isUnlocked.value = true; persistUnlock()
       return
     }
 
@@ -96,7 +114,7 @@ function startPolling() {
         payStatus.value = 'paid'
         stopPolling()
         setTimeout(() => {
-          isUnlocked.value = true
+          isUnlocked.value = true; persistUnlock()
         }, 800)
       }
     } catch { /* retry next poll */ }

@@ -524,6 +524,8 @@ function goToType(code: string) {
       <span>测试结果仅供个人参考</span>
       <span>&middot;</span>
       <span>不用于临床诊断或招聘决策</span>
+      <span>&middot;</span>
+      <a href="/admin" class="hover:text-coral transition-colors duration-200">管理后台</a>
     </footer>
   </div>
 </template>
