@@ -27,9 +27,9 @@ async function submit() {
   submitting.value = true
   try {
     await api.submitFeedback(props.userType, likedType.value, dislikedType.value)
-    submitted.value = true
-    emit('submitted')
-  } catch { submitting.value = false }
+  } catch { /* 非关键接口，失败也继续 */ }
+  submitted.value = true
+  emit('submitted')
 }
 </script>
 

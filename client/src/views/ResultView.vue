@@ -207,7 +207,7 @@ const defaultItems = {
               <img
                 :src="`/api/images/${typeCode}`"
                 :alt="`${typeCode} 人格类型画像`"
-                class="w-full h-full object-cover object-center transition-opacity duration-700"
+                class="w-full h-full object-contain object-center transition-opacity duration-700"
                 :class="{ 'opacity-0': !imageLoaded }"
                 loading="eager"
                 @load="imageLoaded = true"

@@ -459,11 +459,11 @@ function goToType(code: string) {
                 :style="{ borderColor: NINE_GROUP_META[groupCode].hex + '20' }"
               >
                 <!-- Image thumbnail -->
-                <div class="relative w-full aspect-[4/3] overflow-hidden bg-surface-alt/30">
+                <div class="relative w-full aspect-[3/4] overflow-hidden bg-surface-alt/30">
                   <img
                     :src="`/api/images/${t.code}`"
                     :alt="`${t.code}`"
-                    class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    class="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
                     loading="lazy"
                     decoding="async"
                     fetchpriority="low"

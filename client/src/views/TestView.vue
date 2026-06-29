@@ -565,7 +565,7 @@ onUnmounted(() => {
             </div>
             <h3 class="text-xl font-display font-bold text-charcoal mb-2">最后一步！</h3>
             <p class="text-sm text-text-secondary leading-relaxed">
-              答题已完成 ✨ 请先帮助我们完成下面两项选择，<br />即可<strong class="text-charcoal">免费查看</strong>你的完整测试结果。
+              答题已完成 ✨ 请先帮助我们完成下面两项选择，<br />即可<strong class="text-charcoal">免费查看</strong>你的测试结果。
             </p>
           </div>
           <FeedbackCollector
