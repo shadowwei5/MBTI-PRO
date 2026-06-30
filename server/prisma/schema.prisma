@@ -94,11 +94,13 @@ model PaymentOrder {
   orderId     String   @id
   typeCode    String
   unlockToken String   @unique
+  email       String?
   paid        Boolean  @default(false)
   paidAt      DateTime?
   createdAt   DateTime @default(now())
 
   @@index([typeCode])
+  @@index([email])
   @@index([paid])
 }
 

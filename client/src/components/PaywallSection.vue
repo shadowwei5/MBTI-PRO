@@ -71,16 +71,22 @@ async function saveEmail() {
 
 async function payToUnlock() {
   emailError.value = ''
+  if (!userEmail.value || !isValidEmail(userEmail.value)) {
+    emailError.value = '请输入有效的邮箱地址，用于接收PDF报告'
+    return
+  }
+
   // 先保存邮箱
-  if (userEmail.value && !emailSaved.value) {
-    await saveEmail()
+  if (!emailSaved.value) {
+    const saved = await saveEmail()
+    if (!saved) return
   }
   qrLoading.value = true
   qrError.value = ''
   payStatus.value = 'loading'
 
   try {
-    const data = await api.createPayment(props.typeCode, props.typeName)
+    const data = await api.createPayment(props.typeCode, props.typeName, userEmail.value || undefined)
 
     if (data.paid) {
       persistUnlock(data.unlockToken)

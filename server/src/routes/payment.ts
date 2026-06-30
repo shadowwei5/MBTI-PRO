@@ -41,15 +41,15 @@ export async function isOrderPaid(typeCode: string, unlockToken: string): Promis
   return false
 }
 
-async function createPaymentOrder(orderId: string, typeCode: string, unlockToken: string): Promise<void> {
+async function createPaymentOrder(orderId: string, typeCode: string, unlockToken: string, email?: string): Promise<void> {
   const code = typeCode.toUpperCase()
   const { prisma } = await import('../index.js')
   await prisma.paymentOrder.create({
-    data: { orderId, typeCode: code, unlockToken },
+    data: { orderId, typeCode: code, unlockToken, email: email || null },
   })
 }
 
-async function markPaid(orderId: string): Promise<string | null> {
+async function markPaid(orderId: string): Promise<{ typeCode: string; email: string | null } | null> {
   try {
     const { prisma } = await import('../index.js')
     const order = await prisma.paymentOrder.update({
@@ -57,7 +57,7 @@ async function markPaid(orderId: string): Promise<string | null> {
       data: { paid: true, paidAt: new Date() },
     })
     paidOrdersCache.set(order.unlockToken, order.typeCode)
-    return order.typeCode
+    return { typeCode: order.typeCode, email: order.email }
   } catch {
     return null
   }
@@ -66,7 +66,7 @@ async function markPaid(orderId: string): Promise<string | null> {
 // POST /api/payment/create — 创建支付订单，返回二维码
 paymentRoutes.post('/create', async (req, res, next) => {
   try {
-    const { typeCode, typeName } = req.body as { typeCode?: string; typeName?: string }
+    const { typeCode, typeName, email } = req.body as { typeCode?: string; typeName?: string; email?: string }
     if (!typeCode || !typeName) {
       res.status(400).json({ success: false, error: 'typeCode and typeName required' })
       return
@@ -82,7 +82,7 @@ paymentRoutes.post('/create', async (req, res, next) => {
     const orderId = `mbtipro_${normalizedTypeCode}_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`
     const price = '4.90'
     const payType = (process.env.XORPAY_PAY_TYPE as string) || 'alipay' // 微信扫码；alipay 为支付宝当面付
-    await createPaymentOrder(orderId, normalizedTypeCode, unlockToken)
+    await createPaymentOrder(orderId, normalizedTypeCode, unlockToken, email)
 
     const sign = signPay({
       name: `MBTI-PRO ${normalizedTypeCode} 深度人格报告`,
@@ -148,13 +148,13 @@ paymentRoutes.post('/callback', async (req, res, next) => {
       return
     }
 
-    const code = await markPaid(order_id)
-    if (code) {
-      console.log(`[payment] ${code} 支付成功 ¥${pay_price}`)
+    const paidOrder = await markPaid(order_id)
+    if (paidOrder) {
+      console.log(`[payment] ${paidOrder.typeCode} 支付成功 ¥${pay_price}`)
 
       // 异步发送邮件（不阻塞回调响应）
       import("../services/email.js").then(({ sendPaymentEmail }) =>
-        sendPaymentEmail(code)
+        sendPaymentEmail(paidOrder.typeCode, paidOrder.email || undefined)
       ).catch(err =>
         console.error("[payment] email send error:", err)
       )

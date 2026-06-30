@@ -116,12 +116,12 @@ export const api = {
   // ====== 支付相关 ======
 
   /** 创建支付订单，返回二维码内容；已支付时返回 null */
-  createPayment: (typeCode: string, typeName: string): Promise<{ qrUrl?: string; orderId?: string; aoid?: string; unlockToken: string; expiresIn?: number; paid?: boolean }> => {
+  createPayment: (typeCode: string, typeName: string, email?: string): Promise<{ qrUrl?: string; orderId?: string; aoid?: string; unlockToken: string; expiresIn?: number; paid?: boolean }> => {
     const API_BASE = import.meta.env.VITE_API_BASE || '/api'
     return fetch(`${API_BASE}/payment/create`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ typeCode, typeName }),
+      body: JSON.stringify({ typeCode, typeName, email }),
     }).then(async (res) => {
       const json = await res.json()
       if (!json.success) throw new Error(json.error || '支付服务暂不可用')
