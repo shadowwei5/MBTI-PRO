@@ -90,6 +90,18 @@ model PaymentRecord {
   createdAt DateTime @default(now())
 }
 
+model PaymentOrder {
+  orderId     String   @id
+  typeCode    String
+  unlockToken String   @unique
+  paid        Boolean  @default(false)
+  paidAt      DateTime?
+  createdAt   DateTime @default(now())
+
+  @@index([typeCode])
+  @@index([paid])
+}
+
 model UserEmail {
   id        String   @id @default(uuid())
   email     String   @unique

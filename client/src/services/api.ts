@@ -41,6 +41,7 @@ export interface PersonalityType {
   tfModule?: string | null
   pjModule?: string | null
   imageUrl?: string
+  paid?: boolean
 }
 
 export interface TestRecordPayload {
@@ -83,7 +84,10 @@ export const api = {
 
   getQuestionCount: () => request<{ count: number }>('/questions/count'),
 
-  getResult: (typeCode: string) => request<PersonalityType>(`/results/${typeCode}`),
+  getResult: (typeCode: string, unlockToken?: string) => {
+    const query = unlockToken ? `?token=${encodeURIComponent(unlockToken)}` : ''
+    return request<PersonalityType>(`/results/${typeCode}${query}`)
+  },
 
   getResultSummary: (typeCode: string) =>
     request<Pick<PersonalityType, 'code' | 'name' | 'isTraditional' | 'overview'>>(`/results/${typeCode}/summary`),
@@ -112,7 +116,7 @@ export const api = {
   // ====== 支付相关 ======
 
   /** 创建支付订单，返回二维码内容；已支付时返回 null */
-  createPayment: (typeCode: string, typeName: string): Promise<{ qrUrl: string; orderId: string; aoid: string; expiresIn: number } | null> => {
+  createPayment: (typeCode: string, typeName: string): Promise<{ qrUrl?: string; orderId?: string; aoid?: string; unlockToken: string; expiresIn?: number; paid?: boolean }> => {
     const API_BASE = import.meta.env.VITE_API_BASE || '/api'
     return fetch(`${API_BASE}/payment/create`, {
       method: 'POST',
@@ -121,8 +125,7 @@ export const api = {
     }).then(async (res) => {
       const json = await res.json()
       if (!json.success) throw new Error(json.error || '支付服务暂不可用')
-      // 已支付过
-      if (json.paid) return null
+      if (json.data?.paid && json.data?.unlockToken) return json.data
       // 返回二维码数据
       if (json.data?.qrUrl) return json.data
       throw new Error(json.error || '获取支付二维码失败')
@@ -130,8 +133,8 @@ export const api = {
   },
 
   /** 检查某个类型是否已支付 */
-  checkPayment: (typeCode: string) =>
-    request<{ paid: boolean }>(`/payment/check/${typeCode}`),
+  checkPayment: (typeCode: string, unlockToken: string) =>
+    request<{ paid: boolean }>(`/payment/check/${typeCode}?token=${encodeURIComponent(unlockToken)}`),
 
   /** 保存邮箱 */
   saveEmail: (email: string, typeCode: string, source: string = 'paywall') =>

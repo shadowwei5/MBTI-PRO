@@ -3,31 +3,38 @@ import { ref, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import { api } from '../services/api'
 
 const props = defineProps<{ typeCode: string; typeName: string; typeColor: string }>()
-const emit = defineEmits<{ unlocked: [] }>()
+const emit = defineEmits<{ unlocked: [unlockToken: string] }>()
 
-const STORAGE_KEY = 'mbti-pro-unlocked'
+const STORAGE_KEY = 'mbti-pro-orders'
 
 // 恢复解锁状态
 const isUnlocked = ref(false)
-const unlockedTypes = ref<Set<string>>(new Set(
-  JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]')
-))
+const unlockToken = ref('')
+const unlockedOrders = ref<Record<string, string>>(JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'))
 
 onMounted(() => {
-  if (unlockedTypes.value.has(props.typeCode)) {
-    isUnlocked.value = true; persistUnlock()
+  const savedToken = unlockedOrders.value[props.typeCode]
+  if (savedToken) {
+    unlockToken.value = savedToken
+    verifySavedUnlock(savedToken)
   }
 })
 
-function persistUnlock() {
-  unlockedTypes.value.add(props.typeCode)
-  localStorage.setItem(STORAGE_KEY, JSON.stringify([...unlockedTypes.value]))
+function persistUnlock(token: string) {
+  unlockToken.value = token
+  unlockedOrders.value[props.typeCode] = token
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(unlockedOrders.value))
+}
+
+function clearSavedUnlock() {
+  delete unlockedOrders.value[props.typeCode]
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(unlockedOrders.value))
 }
 
 // 解锁后自动滚动到内容区
 watch(isUnlocked, async (val) => {
   if (val) {
-    emit('unlocked')
+    emit('unlocked', unlockToken.value)
     await nextTick()
     const el = document.querySelector('.paywall-unlocked')
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
@@ -75,13 +82,16 @@ async function payToUnlock() {
   try {
     const data = await api.createPayment(props.typeCode, props.typeName)
 
-    if (data === null) {
-      // 已支付过
-      isUnlocked.value = true; persistUnlock()
+    if (data.paid) {
+      persistUnlock(data.unlockToken)
+      isUnlocked.value = true
       return
     }
 
+    if (!data.qrUrl) throw new Error('获取支付二维码失败')
+
     qrUrl.value = data.qrUrl
+    unlockToken.value = data.unlockToken
     showQR.value = true
     payStatus.value = 'idle'
     startPolling()
@@ -94,13 +104,15 @@ async function payToUnlock() {
 }
 
 async function checkAndUnlock() {
+  if (!unlockToken.value) return false
   try {
-    const data = await api.checkPayment(props.typeCode)
+    const data = await api.checkPayment(props.typeCode, unlockToken.value)
     if (data.paid) {
       payStatus.value = 'paid'
       stopPolling()
       setTimeout(() => {
-        isUnlocked.value = true; persistUnlock()
+        persistUnlock(unlockToken.value)
+        isUnlocked.value = true
       }, 800)
       return true
     }
@@ -134,14 +146,29 @@ function onVisibilityChange() {
 onMounted(() => {
   document.addEventListener('visibilitychange', onVisibilityChange)
   // 也检查服务端状态（localStorage 可能过期）
-  if (!isUnlocked.value) {
-    api.checkPayment(props.typeCode).then(data => {
+  if (!isUnlocked.value && unlockToken.value) {
+    api.checkPayment(props.typeCode, unlockToken.value).then(data => {
       if (data.paid) {
-        isUnlocked.value = true; persistUnlock()
+        persistUnlock(unlockToken.value)
+        isUnlocked.value = true
+      } else {
+        clearSavedUnlock()
       }
     }).catch(() => {})
   }
 })
+
+async function verifySavedUnlock(token: string) {
+  try {
+    const data = await api.checkPayment(props.typeCode, token)
+    if (data.paid) {
+      persistUnlock(token)
+      isUnlocked.value = true
+    } else {
+      clearSavedUnlock()
+    }
+  } catch { /* ignore */ }
+}
 
 onUnmounted(() => {
   stopPolling()

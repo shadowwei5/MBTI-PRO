@@ -2,6 +2,7 @@ import { Router } from 'express'
 import { prisma } from '../index.js'
 import { calculateScore, type Answers, type QuestionMeta, type AnswerKey } from '../services/scoring.js'
 import { getTypeDimensionModules } from '../content/dimension-modules.js'
+import { isOrderPaid } from './payment.js'
 
 // 81型人格总结内联（避免types.ts导入链问题）
 const TYPE_SUMMARIES: Record<string, string> = {
@@ -203,6 +204,7 @@ resultRoutes.get('/:typeCode/summary', async (req, res, next) => {
 resultRoutes.get('/:typeCode', async (req, res, next) => {
   try {
     const { typeCode } = req.params
+    const unlockToken = typeof req.query.token === 'string' ? req.query.token : ''
     const type = await prisma.personalityType.findUnique({
       where: { code: typeCode.toUpperCase() },
     })
@@ -210,25 +212,30 @@ resultRoutes.get('/:typeCode', async (req, res, next) => {
       res.status(404).json({ success: false, error: 'Type not found' })
       return
     }
-    // 使用81型独立维度模块（覆盖DB中的旧值，确保81型全部有独立文案）
-    const dimModules = getTypeDimensionModules(type.code)
+    const paid = unlockToken ? await isOrderPaid(type.code, unlockToken) : false
+    const dimModules = paid ? getTypeDimensionModules(type.code) : null
 
     // Parse JSON fields
     res.json({
       success: true,
       data: {
-        ...type,
+        code: type.code,
+        name: type.name,
+        isTraditional: type.isTraditional,
         summary: TYPE_SUMMARIES[type.code] ?? null,
-        eiModule: dimModules.eiModule,
-        snModule: dimModules.snModule,
-        tfModule: dimModules.tfModule,
-        pjModule: dimModules.pjModule,
-        strengths: JSON.parse(type.strengths),
-        growthAreas: JSON.parse(type.growthAreas),
-        careers: JSON.parse(type.careers),
-        suitableFields: JSON.parse(type.suitableFields),
-        celebrities: JSON.parse(type.celebrities || '[]'),
+        overview: paid ? type.overview : '',
+        population: paid ? type.population : null,
+        eiModule: dimModules?.eiModule ?? null,
+        snModule: dimModules?.snModule ?? null,
+        tfModule: dimModules?.tfModule ?? null,
+        pjModule: dimModules?.pjModule ?? null,
+        strengths: paid ? JSON.parse(type.strengths) : [],
+        growthAreas: paid ? JSON.parse(type.growthAreas) : [],
+        careers: paid ? JSON.parse(type.careers) : [],
+        suitableFields: paid ? JSON.parse(type.suitableFields) : [],
+        celebrities: paid ? JSON.parse(type.celebrities || '[]') : [],
         imageUrl: `/api/images/${type.code}`,
+        paid,
       },
     })
   } catch (err) {

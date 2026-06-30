@@ -24,34 +24,43 @@ function verifyCallbackSign(params: { aoid: string; order_id: string; pay_price:
   return md5(raw)
 }
 
-// 已支付订单：先查内存（热缓存），回退数据库
-const paidOrdersCache = new Set<string>()
+// 已支付订单：按订单解锁，避免同一人格类型被全站共享解锁
+const paidOrdersCache = new Map<string, string>()
 
-async function isPaid(typeCode: string): Promise<boolean> {
+export async function isOrderPaid(typeCode: string, unlockToken: string): Promise<boolean> {
   const code = typeCode.toUpperCase()
-  if (paidOrdersCache.has(code)) return true
+  if (paidOrdersCache.get(unlockToken) === code) return true
   try {
     const { prisma } = await import('../index.js')
-    const record = await prisma.paymentRecord.findUnique({ where: { typeCode: code } })
-    if (record?.paid) {
-      paidOrdersCache.add(code)
+    const record = await prisma.paymentOrder.findUnique({ where: { unlockToken } })
+    if (record?.paid && record.typeCode === code) {
+      paidOrdersCache.set(unlockToken, code)
       return true
     }
   } catch { /* DB不可用时降级到内存 */ }
   return false
 }
 
-async function markPaid(typeCode: string): Promise<void> {
+async function createPaymentOrder(orderId: string, typeCode: string, unlockToken: string): Promise<void> {
   const code = typeCode.toUpperCase()
-  paidOrdersCache.add(code)
+  const { prisma } = await import('../index.js')
+  await prisma.paymentOrder.create({
+    data: { orderId, typeCode: code, unlockToken },
+  })
+}
+
+async function markPaid(orderId: string): Promise<string | null> {
   try {
     const { prisma } = await import('../index.js')
-    await prisma.paymentRecord.upsert({
-      where: { typeCode: code },
-      update: { paid: true, paidAt: new Date() },
-      create: { typeCode: code, paid: true, paidAt: new Date() },
+    const order = await prisma.paymentOrder.update({
+      where: { orderId },
+      data: { paid: true, paidAt: new Date() },
     })
-  } catch { /* DB不可用时仅内存 */ }
+    paidOrdersCache.set(order.unlockToken, order.typeCode)
+    return order.typeCode
+  } catch {
+    return null
+  }
 }
 
 // POST /api/payment/create — 创建支付订单，返回二维码
@@ -68,18 +77,15 @@ paymentRoutes.post('/create', async (req, res, next) => {
       return
     }
 
-    // 检查是否已支付
-    if (await isPaid(typeCode)) {
-      res.json({ success: true, paid: true })
-      return
-    }
-
-    const orderId = `mbtipro_${typeCode}_${Date.now()}`
+    const normalizedTypeCode = typeCode.toUpperCase()
+    const unlockToken = crypto.randomBytes(24).toString('hex')
+    const orderId = `mbtipro_${normalizedTypeCode}_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`
     const price = '4.90'
     const payType = (process.env.XORPAY_PAY_TYPE as string) || 'alipay' // 微信扫码；alipay 为支付宝当面付
+    await createPaymentOrder(orderId, normalizedTypeCode, unlockToken)
 
     const sign = signPay({
-      name: `MBTI-PRO ${typeCode} 深度人格报告`,
+      name: `MBTI-PRO ${normalizedTypeCode} 深度人格报告`,
       pay_type: payType,
       price,
       order_id: orderId,
@@ -87,7 +93,7 @@ paymentRoutes.post('/create', async (req, res, next) => {
     })
 
     const body = new URLSearchParams({
-      name: `MBTI-PRO ${typeCode} 深度人格报告`,
+      name: `MBTI-PRO ${normalizedTypeCode} 深度人格报告`,
       pay_type: payType,
       price,
       order_id: orderId,
@@ -114,12 +120,13 @@ paymentRoutes.post('/create', async (req, res, next) => {
           qrUrl: data.info.qr,
           orderId,
           aoid: data.aoid,
+          unlockToken,
           expiresIn: 7200,
         },
       })
     } else if (data.status === 'order_payed') {
-      await markPaid(typeCode)
-      res.json({ success: true, paid: true })
+      await markPaid(orderId)
+      res.json({ success: true, data: { paid: true, unlockToken } })
     } else {
       res.status(500).json({ success: false, error: data.status || 'payment_failed' })
     }
@@ -141,12 +148,8 @@ paymentRoutes.post('/callback', async (req, res, next) => {
       return
     }
 
-    // 从 order_id 提取 typeCode
-    // order_id 格式: mbtipro_{typeCode}_{timestamp}
-    const match = order_id?.match(/^mbtipro_(\w+)_\d+$/)
-    if (match) {
-      const code = match[1].toUpperCase()
-      markPaid(code)
+    const code = await markPaid(order_id)
+    if (code) {
       console.log(`[payment] ${code} 支付成功 ¥${pay_price}`)
 
       // 异步发送邮件（不阻塞回调响应）
@@ -163,9 +166,10 @@ paymentRoutes.post('/callback', async (req, res, next) => {
   }
 })
 
-// GET /api/payment/check/:typeCode — 检查是否已支付
+// GET /api/payment/check/:typeCode — 检查当前订单是否已支付
 paymentRoutes.get('/check/:typeCode', async (req, res) => {
   const typeCode = req.params.typeCode.toUpperCase()
-  const paid = await isPaid(typeCode)
-  res.json({ success: true, paid })
+  const unlockToken = typeof req.query.token === 'string' ? req.query.token : ''
+  const paid = unlockToken ? await isOrderPaid(typeCode, unlockToken) : false
+  res.json({ success: true, data: { paid } })
 })

@@ -21,6 +21,7 @@ const typeData = ref<PersonalityType | null>(null)
 const fetchError = ref('')
 const showSharePoster = ref(false)
 const imageLoaded = ref(false)
+const paidReport = ref(false)
 
 // 是否来自真实测试（有分数数据）
 const hasTestData = computed(() => !!route.query.scores)
@@ -44,6 +45,7 @@ onMounted(async () => {
 
   try {
     typeData.value = await api.getResult(typeCode.value)
+    paidReport.value = !!typeData.value.paid
   } catch {
     fetchError.value = 'typeData'
   }
@@ -103,6 +105,15 @@ const oneLiner = computed(() => {
   }
   return `${groupColor.value.name} · ${typeName.value}`
 })
+
+async function loadPaidReport(unlockToken: string) {
+  try {
+    typeData.value = await api.getResult(typeCode.value, unlockToken)
+    paidReport.value = !!typeData.value.paid
+  } catch {
+    fetchError.value = 'typeData'
+  }
+}
 
 // 动态更新分享元标签 + SEO
 useShareMeta(
@@ -272,12 +283,13 @@ const defaultItems = {
 
         <!-- ====== 🔒 付费解锁：所有文字内容 ====== -->
         <PaywallSection
-          v-if="typeData"
+          v-if="hasTestData && typeData"
           :type-code="typeData.code"
           :type-name="typeData.name"
           :type-color="typeColor.hex"
+          @unlocked="loadPaidReport"
         >
-          <div class="deep-content space-y-6 mt-2">
+          <div v-if="paidReport" class="deep-content space-y-6 mt-2">
 
             <!-- 人格概览 -->
             <div class="bg-white/70 backdrop-blur-sm rounded-3xl p-6 md:p-8 border border-border shadow-sm">
