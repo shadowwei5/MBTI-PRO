@@ -1,8 +1,11 @@
 import { Router } from 'express'
 import crypto from 'crypto'
 import { markReferralPaid } from './referrals.js'
+import { loadServerEnv } from '../config/env.js'
 
 export const paymentRoutes = Router()
+
+loadServerEnv()
 
 const XORPAY_BASE = 'https://xorpay.com/api'
 const AID = process.env.XORPAY_AID || ''
@@ -50,7 +53,17 @@ async function createPaymentOrder(orderId: string, typeCode: string, unlockToken
   })
 }
 
-async function markPaid(orderId: string): Promise<{ typeCode: string; email: string | null; referralCode: string | null; recordId: string | null } | null> {
+type PaidOrderInfo = {
+  orderId: string
+  typeCode: string
+  unlockToken: string
+  email: string | null
+  referralCode: string | null
+  recordId: string | null
+  emailSentAt: Date | null
+}
+
+async function markPaid(orderId: string): Promise<PaidOrderInfo | null> {
   try {
     const { prisma } = await import('../index.js')
     const order = await prisma.paymentOrder.update({
@@ -58,9 +71,42 @@ async function markPaid(orderId: string): Promise<{ typeCode: string; email: str
       data: { paid: true, paidAt: new Date() },
     })
     paidOrdersCache.set(order.unlockToken, order.typeCode)
-    return { typeCode: order.typeCode, email: order.email, referralCode: order.referralCode, recordId: order.recordId }
+    return {
+      orderId: order.orderId,
+      typeCode: order.typeCode,
+      unlockToken: order.unlockToken,
+      email: order.email,
+      referralCode: order.referralCode,
+      recordId: order.recordId,
+      emailSentAt: order.emailSentAt,
+    }
   } catch {
     return null
+  }
+}
+
+export async function sendPaidReportEmail(order: Pick<PaidOrderInfo, 'orderId' | 'typeCode' | 'email' | 'emailSentAt'>): Promise<boolean> {
+  if (order.emailSentAt) return true
+  try {
+    const { sendPaymentEmail } = await import('../services/email.js')
+    const sent = await sendPaymentEmail(order.typeCode, order.email || undefined)
+    const { prisma } = await import('../index.js')
+    await prisma.paymentOrder.update({
+      where: { orderId: order.orderId },
+      data: sent
+        ? { emailSentAt: new Date(), emailSendError: null }
+        : { emailSendError: 'email not sent: SMTP not configured, recipient email missing, or email service returned false' },
+    })
+    return sent
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err)
+    const { prisma } = await import('../index.js')
+    await prisma.paymentOrder.update({
+      where: { orderId: order.orderId },
+      data: { emailSendError: message.slice(0, 500) },
+    }).catch(() => {})
+    console.error('[payment] paid report email send failed:', err)
+    return false
   }
 }
 
@@ -153,12 +199,8 @@ paymentRoutes.post('/callback', async (req, res, next) => {
     if (paidOrder) {
       console.log(`[payment] ${paidOrder.typeCode} 支付成功 ¥${pay_price}`)
 
-      // 异步发送邮件（不阻塞回调响应）
-      import("../services/email.js").then(({ sendPaymentEmail }) =>
-        sendPaymentEmail(paidOrder.typeCode, paidOrder.email || undefined)
-      ).catch(err =>
-        console.error("[payment] email send error:", err)
-      )
+      // 异步发送邮件（不阻塞回调响应），结果写回订单，便于补发和排查
+      sendPaidReportEmail(paidOrder).catch(err => console.error('[payment] email send error:', err))
       if (paidOrder.referralCode && paidOrder.recordId) {
         markReferralPaid(paidOrder.referralCode, paidOrder.recordId).catch(err => console.error('[payment] referral paid count error:', err))
       }
@@ -175,5 +217,16 @@ paymentRoutes.get('/check/:typeCode', async (req, res) => {
   const typeCode = req.params.typeCode.toUpperCase()
   const unlockToken = typeof req.query.token === 'string' ? req.query.token : ''
   const paid = unlockToken ? await isOrderPaid(typeCode, unlockToken) : false
+  if (paid && unlockToken) {
+    import('../index.js').then(async ({ prisma }) => {
+      const order = await prisma.paymentOrder.findUnique({
+        where: { unlockToken },
+        select: { orderId: true, typeCode: true, email: true, emailSentAt: true },
+      })
+      if (order && order.typeCode === typeCode && !order.emailSentAt) {
+        sendPaidReportEmail(order).catch(err => console.error('[payment] email resend error:', err))
+      }
+    }).catch(() => {})
+  }
   res.json({ success: true, data: { paid } })
 })

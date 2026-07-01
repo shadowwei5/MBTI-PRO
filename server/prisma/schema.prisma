@@ -99,6 +99,8 @@ model PaymentOrder {
   recordId    String?
   paid        Boolean  @default(false)
   paidAt      DateTime?
+  emailSentAt DateTime?
+  emailSendError String?
   createdAt   DateTime @default(now())
 
   @@index([typeCode])

@@ -1,12 +1,16 @@
 import nodemailer from 'nodemailer'
 import { prisma } from '../index.js'
 import { generateReportPdf } from './reportPdf.js'
+import { getSmtpPort, getSmtpSecure, hasSmtpConfig } from './smtpConfig.js'
+import { loadServerEnv } from '../config/env.js'
+
+loadServerEnv()
 
 // SMTP 配置（使用 QQ 邮箱为例，也可用其他 SMTP 服务）
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST || 'smtp.qq.com',
-  port: Number(process.env.SMTP_PORT) || 465,
-  secure: true, // SSL
+  port: getSmtpPort(),
+  secure: getSmtpSecure(),
   auth: {
     user: process.env.SMTP_USER || '',
     pass: process.env.SMTP_PASS || '',
@@ -44,7 +48,7 @@ function getReportHTML(typeName: string, typeCode: string): string {
  */
 export async function sendPaymentEmail(typeCode: string, paidEmail?: string): Promise<boolean> {
   // SMTP 未配置时静默跳过
-  if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
+  if (!hasSmtpConfig()) {
     console.log('[email] SMTP not configured, skipping email send')
     return false
   }

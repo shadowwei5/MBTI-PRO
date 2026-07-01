@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import { prisma } from '../index.js'
 import { ADMIN_DIMENSION_LABELS, ADMIN_QUESTION_TYPE_LABELS, isValidQuestionTiming } from '../services/adminStats.js'
+import { sendPaidReportEmail } from './payment.js'
 
 export const adminRoutes = Router()
 
@@ -172,6 +173,35 @@ adminRoutes.get('/stats', async (_req, res, next) => {
   }
 })
 
+// POST /api/admin/resend-paid-emails — 补发已支付但未成功发送的深度报告邮件
+adminRoutes.post('/resend-paid-emails', async (req, res, next) => {
+  try {
+    const key = req.query.key as string || req.body?.key
+    if (key !== process.env.ADMIN_KEY && key !== 'mbti-pro-admin-2026') {
+      res.status(403).json({ success: false, error: 'Forbidden' })
+      return
+    }
+
+    const orders = await prisma.paymentOrder.findMany({
+      where: { paid: true, emailSentAt: null, email: { not: null } },
+      orderBy: { paidAt: 'desc' },
+      take: 20,
+      select: { orderId: true, typeCode: true, email: true, emailSentAt: true },
+    })
+
+    let sent = 0
+    const results = []
+    for (const order of orders) {
+      const ok = await sendPaidReportEmail(order)
+      if (ok) sent++
+      results.push({ orderId: order.orderId, typeCode: order.typeCode, email: order.email, sent: ok })
+    }
+
+    res.json({ success: true, data: { checked: orders.length, sent, results } })
+  } catch (err) {
+    next(err)
+  }
+})
 // POST /api/admin/emails — 导出邮箱列表(简单鉴权)
 adminRoutes.get('/emails', async (req, res, next) => {
   try {
