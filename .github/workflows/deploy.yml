@@ -35,7 +35,11 @@ jobs:
             SMTP_USER=${{ secrets.SMTP_USER }}
             SMTP_PASS=${{ secrets.SMTP_PASS }}
             ENVEOF
-            cd server && npm install --include=dev && npx playwright install chromium --with-deps && npx prisma generate && npx prisma db push
+            cd server
+            npm install --include=dev
+            npx prisma generate
+            npx prisma db push
+            npx playwright install chromium || true
             # 修复6个中文名(数据库层面)
             npx tsx scripts/fix-names.ts
             cd ../client && npm install && npm run build
