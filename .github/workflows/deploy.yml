@@ -39,7 +39,7 @@ jobs:
             npm install --include=dev
             npx prisma generate
             npx prisma db push
-            npx playwright install chromium || true
+            npx playwright install --with-deps chromium || npx playwright install chromium || true
             # 修复6个中文名(数据库层面)
             npx tsx scripts/fix-names.ts
             cd ../client && npm install && npm run build
