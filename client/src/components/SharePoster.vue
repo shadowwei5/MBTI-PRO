@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import QRCode from 'qrcode'
+import { api } from '../services/api'
 
 const props = defineProps<{
   typeCode: string; typeName: string
   typeColor: { hex: string; name: string }; groupColor: { hex: string; name: string }
   oneLiner: string; imageUrl: string
+  recordId?: string
   scores?: { E_I: number; S_N: number; T_F: number; P_J: number }
   chars?: { E_I: string; S_N: string; T_F: string; P_J: string }
 }>()
@@ -19,8 +21,19 @@ const DIM_COLORS: Record<string, string> = {
   F: '#0277BD', T: '#E65100', P: '#BF8C00', J: '#1565C0',
 }
 
+async function getShareUrl() {
+  const email = localStorage.getItem('mbti-pro-referral-email') || ''
+  if (props.recordId && email) {
+    try {
+      const reward = await api.createReferral(props.recordId, props.typeCode, email)
+      return `${location.origin}/test?ref=${reward.code}`
+    } catch { /* fallback below */ }
+  }
+  return `${location.origin}/test?utm_source=share_poster&utm_medium=poster&utm_campaign=${props.typeCode}`
+}
+
 async function generateQR() {
-  try { qrDataUrl.value = await QRCode.toDataURL(`${location.origin}/#/test?ref=share`, { width: 110, margin: 0, color: { dark: '#1A1A1A', light: '#FFFFFF' } }) } catch {}
+  try { qrDataUrl.value = await QRCode.toDataURL(await getShareUrl(), { width: 110, margin: 0, color: { dark: '#1A1A1A', light: '#FFFFFF' } }) } catch {}
 }
 function loadImage(s: string): Promise<HTMLImageElement> { return new Promise((rs, rj) => { const i = new Image(); i.crossOrigin = 'anonymous'; i.onload = () => rs(i); i.onerror = rj; i.src = s }) }
 function rRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {

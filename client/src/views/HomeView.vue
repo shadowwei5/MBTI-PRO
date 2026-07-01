@@ -38,6 +38,12 @@ const groupedTypes = computed(() => {
 
 onMounted(async () => {
   window.scrollTo({ top: 0, behavior: 'instant' })
+  const params = new URLSearchParams(window.location.search)
+  const referralCode = params.get('ref')
+  if (referralCode) {
+    localStorage.setItem('mbti-pro-referral-code', referralCode)
+    api.trackReferralClick(referralCode).catch(() => {})
+  }
   setTimeout(() => { loaded.value = true }, 100)
   try {
     allTypes.value = await api.getAllTypes()

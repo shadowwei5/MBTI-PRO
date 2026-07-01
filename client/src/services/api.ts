@@ -60,6 +60,16 @@ export interface TestRecordPayload {
   utmCampaign?: string
 }
 
+export interface ReferralReward {
+  code: string
+  referrerRecordId: string
+  referrerTypeCode: string
+  referrerEmail?: string | null
+  clickedCount: number
+  validCompletedCount: number
+  rewardUnlocked: boolean
+}
+
 export interface ScoreResponse {
   typeCode: string
   scores: {
@@ -116,12 +126,12 @@ export const api = {
   // ====== 支付相关 ======
 
   /** 创建支付订单，返回二维码内容；已支付时返回 null */
-  createPayment: (typeCode: string, typeName: string, email?: string): Promise<{ qrUrl?: string; orderId?: string; aoid?: string; unlockToken: string; expiresIn?: number; paid?: boolean }> => {
+  createPayment: (typeCode: string, typeName: string, email?: string, referralCode?: string, recordId?: string): Promise<{ qrUrl?: string; orderId?: string; aoid?: string; unlockToken: string; expiresIn?: number; paid?: boolean }> => {
     const API_BASE = import.meta.env.VITE_API_BASE || '/api'
     return fetch(`${API_BASE}/payment/create`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ typeCode, typeName, email }),
+      body: JSON.stringify({ typeCode, typeName, email, referralCode, recordId }),
     }).then(async (res) => {
       const json = await res.json()
       if (!json.success) throw new Error(json.error || '支付服务暂不可用')
@@ -141,5 +151,23 @@ export const api = {
     request<{ id: string }>('/email', {
       method: 'POST',
       body: JSON.stringify({ email, typeCode, source }),
+    }),
+
+  createReferral: (recordId: string, typeCode: string, email: string) =>
+    request<ReferralReward>('/referrals/create', {
+      method: 'POST',
+      body: JSON.stringify({ recordId, typeCode, email }),
+    }),
+
+  trackReferralClick: (code: string) =>
+    request<{ found: boolean }>('/referrals/click', {
+      method: 'POST',
+      body: JSON.stringify({ code }),
+    }),
+
+  completeReferral: (referralCode: string, referredRecordId: string) =>
+    request<{ counted: boolean; rewardUnlocked: boolean }>('/referrals/complete', {
+      method: 'POST',
+      body: JSON.stringify({ referralCode, referredRecordId }),
     }),
 }

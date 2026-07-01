@@ -148,7 +148,7 @@ resultRoutes.post('/score', async (req, res, next) => {
         typeCode: result.typeCode,
         scores: result.scores,
         chars: result.chars,
-        confidence: result.confidence,
+        confidence: Math.round(result.confidence * 100),
       },
     })
   } catch (err) {

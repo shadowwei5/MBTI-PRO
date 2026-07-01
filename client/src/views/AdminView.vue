@@ -11,6 +11,8 @@ interface DashboardData {
   todayTypeDistribution: { code: string; count: number }[]
   topLiked: { type: string; count: number }[]
   topDisliked: { type: string; count: number }[]
+  questionTimingStats: { questionId: number; dimension: string; type: string; sortOrder: number; label: string; samples: number; avgSec: number; medianSec: number }[]
+  referralFunnel: { shares: number; clicks: number; validCompletions: number; rewardUnlocks: number; referredPaid: number }
   dailyTrend: { date: string; count: number }[]
   utmSources: { source: string; count: number }[]
 }
@@ -52,6 +54,10 @@ function formatSec(s: number) {
   const m = Math.floor(s / 60)
   const sec = s % 60
   return `${m}分${sec}秒`
+}
+
+function formatShortSec(s: number) {
+  return `${Math.round(s * 10) / 10}s`
 }
 
 async function copyEmails() {
@@ -132,6 +138,64 @@ async function copyEmails() {
               <span class="text-[10px] text-text-muted whitespace-nowrap">{{ d.date }}</span>
               <span class="text-[10px] font-bold text-coral">{{ d.count }}</span>
             </div>
+          </div>
+        </div>
+
+        <!-- Referral Funnel -->
+        <div class="bg-white rounded-2xl p-6 shadow-sm border border-border/30 mb-6">
+          <h2 class="text-sm font-semibold text-charcoal uppercase tracking-wider mb-4">🎁 邀请免费解锁漏斗</h2>
+          <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+            <div class="bg-surface-alt rounded-xl p-4">
+              <p class="text-xs text-text-muted mb-1">分享人数</p>
+              <p class="text-2xl font-display font-bold text-charcoal">{{ data.referralFunnel.shares }}</p>
+            </div>
+            <div class="bg-surface-alt rounded-xl p-4">
+              <p class="text-xs text-text-muted mb-1">被点击次数</p>
+              <p class="text-2xl font-display font-bold text-coral">{{ data.referralFunnel.clicks }}</p>
+            </div>
+            <div class="bg-surface-alt rounded-xl p-4">
+              <p class="text-xs text-text-muted mb-1">有效完成数</p>
+              <p class="text-2xl font-display font-bold text-sage">{{ data.referralFunnel.validCompletions }}</p>
+            </div>
+            <div class="bg-surface-alt rounded-xl p-4">
+              <p class="text-xs text-text-muted mb-1">奖励解锁数</p>
+              <p class="text-2xl font-display font-bold text-gold">{{ data.referralFunnel.rewardUnlocks }}</p>
+            </div>
+            <div class="bg-surface-alt rounded-xl p-4">
+              <p class="text-xs text-text-muted mb-1">邀请带来付费</p>
+              <p class="text-2xl font-display font-bold text-charcoal">{{ data.referralFunnel.referredPaid }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Question Timing Stats -->
+        <div v-if="data.questionTimingStats.length" class="bg-white rounded-2xl p-6 shadow-sm border border-border/30 mb-6">
+          <h2 class="text-sm font-semibold text-charcoal uppercase tracking-wider mb-4">⏱️ 每题平均答题耗时 Top15</h2>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="border-b border-border text-left text-xs text-text-muted uppercase">
+                  <th class="py-2 pr-3">题号</th>
+                  <th class="py-2 pr-3">维度</th>
+                  <th class="py-2 pr-3">类型</th>
+                  <th class="py-2 pr-3">平均</th>
+                  <th class="py-2 pr-3">中位</th>
+                  <th class="py-2 pr-3">样本</th>
+                  <th class="py-2">题目摘要</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-border/30">
+                <tr v-for="q in data.questionTimingStats" :key="q.questionId">
+                  <td class="py-2 pr-3 font-bold text-charcoal">#{{ q.sortOrder || q.questionId }}</td>
+                  <td class="py-2 pr-3 text-text-muted">{{ q.dimension }}</td>
+                  <td class="py-2 pr-3 text-text-muted">{{ q.type }}</td>
+                  <td class="py-2 pr-3 font-semibold text-coral">{{ formatShortSec(q.avgSec) }}</td>
+                  <td class="py-2 pr-3 text-text-muted">{{ formatShortSec(q.medianSec) }}</td>
+                  <td class="py-2 pr-3 text-text-muted">{{ q.samples }}</td>
+                  <td class="py-2 text-text-muted max-w-md truncate">{{ q.label }}</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
 

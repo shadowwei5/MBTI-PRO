@@ -17,6 +17,7 @@ adminRoutes.get('/stats', async (_req, res, next) => {
       feedbacks, emails, todayEmails,
       abandonCount, completedCount,
       completedRecords, // 置信度≥92%的记录(用于过滤反馈)
+      referralCount, referralClicks, referralValidCompletions, referralRewards, referralPaid,
     ] = await Promise.all([
       prisma.testRecord.count(),
       prisma.testRecord.count({ where: { createdAt: { gte: todayStart } } }),
@@ -29,9 +30,24 @@ adminRoutes.get('/stats', async (_req, res, next) => {
       prisma.testRecord.count({ where: { confidence: { lt: 92 } } }),
       prisma.testRecord.count({ where: { confidence: { gte: 92 } } }),
       prisma.testRecord.findMany({ where: { confidence: { gte: 92 } }, select: { id: true } }),
+      prisma.referralReward.count(),
+      prisma.referralReward.aggregate({ _sum: { clickedCount: true } }),
+      prisma.referralReward.aggregate({ _sum: { validCompletedCount: true } }),
+      prisma.referralReward.count({ where: { rewardUnlocked: true } }),
+      prisma.referralReward.aggregate({ _sum: { referredPaidCount: true } }),
     ])
 
     const completedIds = completedRecords.map(r => r.id)
+    const timingRecords = await prisma.testRecord.findMany({
+      where: { questionTimings: { not: null } },
+      select: { questionTimings: true },
+      orderBy: { createdAt: 'desc' },
+      take: 1000,
+    })
+    const questions = await prisma.question.findMany({
+      select: { id: true, dimension: true, type: true, sortOrder: true, text: true, textLeft: true, textRight: true },
+    })
+    const questionMeta = new Map(questions.map(q => [q.id, q]))
 
     // 仅统计完成测试(置信度≥92%)的反馈
     const [likedStats, dislikedStats] = await Promise.all([
@@ -57,6 +73,38 @@ adminRoutes.get('/stats', async (_req, res, next) => {
     // 反馈格式化
     const topLiked = likedStats.map(d => ({ type: d.likedType, count: d._count }))
     const topDisliked = dislikedStats.map(d => ({ type: d.dislikedType, count: d._count }))
+
+    const timingMap = new Map<number, number[]>()
+    for (const record of timingRecords) {
+      if (!record.questionTimings) continue
+      try {
+        const parsed = JSON.parse(record.questionTimings) as Record<string, number>
+        for (const [idText, seconds] of Object.entries(parsed)) {
+          const id = Number(idText)
+          if (!Number.isInteger(id) || typeof seconds !== 'number' || seconds <= 0 || seconds > 600) continue
+          const list = timingMap.get(id) || []
+          list.push(seconds)
+          timingMap.set(id, list)
+        }
+      } catch { /* ignore malformed timing json */ }
+    }
+    const questionTimingStats = [...timingMap.entries()].map(([questionId, values]) => {
+      const sorted = [...values].sort((a, b) => a - b)
+      const meta = questionMeta.get(questionId)
+      const label = meta?.type === 'likert'
+        ? `${meta.textLeft || ''} / ${meta.textRight || ''}`.trim()
+        : meta?.text || ''
+      return {
+        questionId,
+        dimension: meta?.dimension || '-',
+        type: meta?.type || '-',
+        sortOrder: meta?.sortOrder ?? questionId,
+        label: label.length > 42 ? `${label.slice(0, 42)}...` : label,
+        samples: values.length,
+        avgSec: Math.round((values.reduce((sum, value) => sum + value, 0) / values.length) * 10) / 10,
+        medianSec: sorted[Math.floor(sorted.length / 2)],
+      }
+    }).sort((a, b) => b.avgSec - a.avgSec).slice(0, 15)
 
     // 近7天趋势（每天测试数）
     const dailyTrend: { date: string; count: number }[] = []
@@ -104,6 +152,14 @@ adminRoutes.get('/stats', async (_req, res, next) => {
         todayTypeDistribution,
         topLiked,
         topDisliked,
+        questionTimingStats,
+        referralFunnel: {
+          shares: referralCount,
+          clicks: referralClicks._sum.clickedCount ?? 0,
+          validCompletions: referralValidCompletions._sum.validCompletedCount ?? 0,
+          rewardUnlocks: referralRewards,
+          referredPaid: referralPaid._sum.referredPaidCount ?? 0,
+        },
         dailyTrend,
         utmSources: utmSources.map(u => ({ source: u.utmSource || 'direct', count: u._count })),
       },

@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import crypto from 'crypto'
+import { markReferralPaid } from './referrals.js'
 
 export const paymentRoutes = Router()
 
@@ -41,15 +42,15 @@ export async function isOrderPaid(typeCode: string, unlockToken: string): Promis
   return false
 }
 
-async function createPaymentOrder(orderId: string, typeCode: string, unlockToken: string, email?: string): Promise<void> {
+async function createPaymentOrder(orderId: string, typeCode: string, unlockToken: string, email?: string, referralCode?: string, recordId?: string): Promise<void> {
   const code = typeCode.toUpperCase()
   const { prisma } = await import('../index.js')
   await prisma.paymentOrder.create({
-    data: { orderId, typeCode: code, unlockToken, email: email || null },
+    data: { orderId, typeCode: code, unlockToken, email: email || null, referralCode: referralCode || null, recordId: recordId || null },
   })
 }
 
-async function markPaid(orderId: string): Promise<{ typeCode: string; email: string | null } | null> {
+async function markPaid(orderId: string): Promise<{ typeCode: string; email: string | null; referralCode: string | null; recordId: string | null } | null> {
   try {
     const { prisma } = await import('../index.js')
     const order = await prisma.paymentOrder.update({
@@ -57,7 +58,7 @@ async function markPaid(orderId: string): Promise<{ typeCode: string; email: str
       data: { paid: true, paidAt: new Date() },
     })
     paidOrdersCache.set(order.unlockToken, order.typeCode)
-    return { typeCode: order.typeCode, email: order.email }
+    return { typeCode: order.typeCode, email: order.email, referralCode: order.referralCode, recordId: order.recordId }
   } catch {
     return null
   }
@@ -66,7 +67,7 @@ async function markPaid(orderId: string): Promise<{ typeCode: string; email: str
 // POST /api/payment/create — 创建支付订单，返回二维码
 paymentRoutes.post('/create', async (req, res, next) => {
   try {
-    const { typeCode, typeName, email } = req.body as { typeCode?: string; typeName?: string; email?: string }
+    const { typeCode, typeName, email, referralCode, recordId } = req.body as { typeCode?: string; typeName?: string; email?: string; referralCode?: string; recordId?: string }
     if (!typeCode || !typeName) {
       res.status(400).json({ success: false, error: 'typeCode and typeName required' })
       return
@@ -82,7 +83,7 @@ paymentRoutes.post('/create', async (req, res, next) => {
     const orderId = `mbtipro_${normalizedTypeCode}_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`
     const price = '4.90'
     const payType = (process.env.XORPAY_PAY_TYPE as string) || 'alipay' // 微信扫码；alipay 为支付宝当面付
-    await createPaymentOrder(orderId, normalizedTypeCode, unlockToken, email)
+    await createPaymentOrder(orderId, normalizedTypeCode, unlockToken, email, referralCode, recordId)
 
     const sign = signPay({
       name: `MBTI-PRO ${normalizedTypeCode} 深度人格报告`,
@@ -158,6 +159,9 @@ paymentRoutes.post('/callback', async (req, res, next) => {
       ).catch(err =>
         console.error("[payment] email send error:", err)
       )
+      if (paidOrder.referralCode && paidOrder.recordId) {
+        markReferralPaid(paidOrder.referralCode, paidOrder.recordId).catch(err => console.error('[payment] referral paid count error:', err))
+      }
     }
 
     res.send('ok')

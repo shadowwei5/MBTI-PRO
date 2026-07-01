@@ -2,7 +2,7 @@
 import { ref, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import { api } from '../services/api'
 
-const props = defineProps<{ typeCode: string; typeName: string; typeColor: string }>()
+const props = defineProps<{ typeCode: string; typeName: string; typeColor: string; recordId?: string }>()
 const emit = defineEmits<{ unlocked: [unlockToken: string] }>()
 
 const STORAGE_KEY = 'mbti-pro-orders'
@@ -49,6 +49,10 @@ const payStatus = ref<'idle' | 'loading' | 'paid' | 'error'>('idle')
 const userEmail = ref('')
 const emailSaved = ref(false)
 const emailError = ref('')
+const inviteLoading = ref(false)
+const inviteError = ref('')
+const inviteLink = ref('')
+const inviteCopied = ref(false)
 let pollTimer: ReturnType<typeof setInterval> | null = null
 
 function isValidEmail(e: string) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e) }
@@ -86,7 +90,13 @@ async function payToUnlock() {
   payStatus.value = 'loading'
 
   try {
-    const data = await api.createPayment(props.typeCode, props.typeName, userEmail.value || undefined)
+    const data = await api.createPayment(
+      props.typeCode,
+      props.typeName,
+      userEmail.value || undefined,
+      localStorage.getItem('mbti-pro-referral-code') || undefined,
+      props.recordId || undefined,
+    )
 
     if (data.paid) {
       persistUnlock(data.unlockToken)
@@ -106,6 +116,43 @@ async function payToUnlock() {
     payStatus.value = 'error'
   } finally {
     qrLoading.value = false
+  }
+}
+
+async function createInviteUnlock() {
+  inviteError.value = ''
+  inviteCopied.value = false
+  if (!props.recordId) {
+    inviteError.value = '请从完整测试结果页生成邀请链接'
+    return
+  }
+  if (!userEmail.value || !isValidEmail(userEmail.value)) {
+    emailError.value = '请输入有效的邮箱地址，用于接收免费解锁PDF报告'
+    return
+  }
+  if (!emailSaved.value) {
+    const saved = await saveEmail()
+    if (!saved) return
+  }
+  inviteLoading.value = true
+  try {
+    const reward = await api.createReferral(props.recordId, props.typeCode, userEmail.value)
+    localStorage.setItem('mbti-pro-referral-email', userEmail.value)
+    inviteLink.value = `${window.location.origin}/test?ref=${reward.code}`
+  } catch (err: any) {
+    inviteError.value = err.message || '生成邀请链接失败，请稍后重试'
+  } finally {
+    inviteLoading.value = false
+  }
+}
+
+async function copyInviteLink() {
+  if (!inviteLink.value) return
+  try {
+    await navigator.clipboard.writeText(inviteLink.value)
+    inviteCopied.value = true
+  } catch {
+    inviteCopied.value = false
   }
 }
 
@@ -214,6 +261,21 @@ function getQRImageUrl(data: string): string {
         <p v-if="!emailSaved" class="email-hint">📧 付费解锁后会将完整深度报告发送到你的邮箱</p>
       </div>
 
+      <div class="invite-card">
+        <div>
+          <h4 class="invite-title">邀请 1 位好友免费解锁</h4>
+          <p class="invite-desc">好友通过你的链接认真完成所有测试（置信度≥92%）后，系统会自动把你的深度报告 PDF 发送到上方邮箱。</p>
+        </div>
+        <button class="btn-invite" :disabled="inviteLoading" @click="createInviteUnlock">
+          {{ inviteLoading ? '生成中...' : '生成邀请链接' }}
+        </button>
+        <div v-if="inviteLink" class="invite-link-wrap">
+          <input class="invite-link" :value="inviteLink" readonly />
+          <button class="btn-copy" @click="copyInviteLink">{{ inviteCopied ? '已复制' : '复制' }}</button>
+        </div>
+        <p v-if="inviteError" class="qr-error">{{ inviteError }}</p>
+      </div>
+
       <div class="paywall-actions">
         <button
           class="btn-unlock"
@@ -277,6 +339,14 @@ function getQRImageUrl(data: string): string {
 .email-check { position: absolute; right: 12px; font-size: 18px; }
 .email-hint { font-size: 12px; color: #9C958E; margin-top: 6px; text-align: left; }
 .email-error { font-size: 12px; color: #E8816B; margin-top: 4px; text-align: left; }
+.invite-card { margin: 18px 0; padding: 16px; border: 1.5px dashed #C8963E66; border-radius: 16px; background: #FAF8F5; text-align: left; }
+.invite-title { font-size: 15px; font-weight: 700; color: #2D2A26; margin-bottom: 6px; }
+.invite-desc { font-size: 12px; color: #6B6560; line-height: 1.5; margin-bottom: 12px; }
+.btn-invite { width: 100%; padding: 12px 16px; border: none; border-radius: 12px; background: #2D2A26; color: #FFF; font-size: 14px; font-weight: 700; cursor: pointer; }
+.btn-invite:disabled { opacity: 0.65; cursor: not-allowed; }
+.invite-link-wrap { display: flex; gap: 8px; margin-top: 10px; }
+.invite-link { flex: 1; min-width: 0; padding: 10px; border: 1.5px solid #E0D8CC; border-radius: 10px; font-size: 12px; color: #6B6560; background: #FFF; }
+.btn-copy { padding: 10px 14px; border: none; border-radius: 10px; background: #C8963E; color: #FFF; font-size: 12px; font-weight: 700; cursor: pointer; }
 .paywall-actions { display: flex; flex-direction: column; gap: 12px; align-items: center; }
 .btn-unlock {
   color: #FFF; border: none; border-radius: 14px; padding: 14px 40px;

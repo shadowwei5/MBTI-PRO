@@ -2,7 +2,7 @@
 import { ref, computed } from 'vue'
 import { api } from '../services/api'
 
-const props = defineProps<{ userType: string; recordId?: string }>()
+const props = defineProps<{ userType: string; recordId?: string; lowConfidence?: boolean }>()
 const emit = defineEmits<{ submitted: [] }>()
 
 const TYPES = ['INTJ','INTP','ENTJ','ENTP','INFJ','INFP','ENFJ','ENFP','ISTJ','ISFJ','ESTJ','ESFJ','ISTP','ISFP','ESTP','ESFP']
@@ -45,6 +45,9 @@ async function submit() {
     <div class="fb-card">
       <h3 class="fb-title">💡 帮助我们提供更精准的分析</h3>
       <p class="fb-desc">你的数据将用于生成真实用户相处偏好报告</p>
+      <div v-if="lowConfidence" class="fb-warning">
+        ⚠️ 请认真完成所有题目再提交，不然结果页面仅展示默认结果（非真实测试结果）。
+      </div>
       <div class="fb-rows">
         <div class="fb-row">
           <label>与你相处最愉快的 MBTI 类型：</label>
@@ -80,6 +83,7 @@ async function submit() {
 }
 .fb-title { font-size: 18px; font-weight: 700; color: #2D2A26; margin-bottom: 6px; }
 .fb-desc { font-size: 14px; color: #8A827C; margin-bottom: 20px; }
+.fb-warning { background: #FFF4E5; border: 1.5px solid #F0C36A; color: #8A5A12; border-radius: 12px; padding: 10px 12px; font-size: 13px; line-height: 1.5; margin-bottom: 16px; }
 .fb-rows { display: flex; flex-direction: column; gap: 14px; }
 .fb-row { display: flex; flex-direction: column; gap: 6px; }
 .fb-row label { font-size: 14px; font-weight: 600; color: #6B6560; }

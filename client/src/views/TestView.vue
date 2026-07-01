@@ -8,6 +8,7 @@ import FeedbackCollector from '../components/FeedbackCollector.vue'
 import { api } from '../services/api'
 
 const router = useRouter()
+const REFERRAL_KEY = 'mbti-pro-referral-code'
 
 interface Question {
   id: number
@@ -28,8 +29,9 @@ const answers = ref<Record<number, string>>({})
 const showSubmitConfirm = ref(false)
 const submitting = ref(false)
 const startTime = ref(Date.now())
-// 每道题的答题时间戳（用于计算耗时）
-const questionTimestamps = ref<Record<number, number>>({})
+// 每道题的进入时间与答题耗时（用于后台分析题目卡点）
+const questionEnterAt = ref<Record<number, number>>({})
+const questionTimings = ref<Record<number, number>>({})
 
 // 反馈收集（答题完成后、展示结果前 — 必须完成反馈才能查看结果）
 const showFeedbackAfterTest = ref(false)
@@ -56,6 +58,7 @@ function onFeedbackSubmitted() {
       confidence: String(r.confidence),
       dimTotals: JSON.stringify(r.dimTotals),
       dimAnswered: JSON.stringify(r.dimAnswered),
+      recordId: r.recordId,
     },
   })
 }
@@ -100,6 +103,7 @@ async function fetchQuestions() {
         currentIndex.value = parsed.currentIndex || 0
         objectiveIntroShown.value = parsed.objectiveIntroShown || false
         timerRemaining.value = parsed.timerRemaining || {}
+        questionTimings.value = parsed.questionTimings || {}
         loading.value = false
         return
       }
@@ -123,8 +127,20 @@ async function fetchQuestions() {
 }
 
 onMounted(() => {
+  const params = new URLSearchParams(window.location.search)
+  const referralCode = params.get('ref')
+  if (referralCode) {
+    localStorage.setItem(REFERRAL_KEY, referralCode)
+    api.trackReferralClick(referralCode).catch(() => {})
+  }
   fetchQuestions()
 })
+
+function markQuestionEntered() {
+  const q = currentQuestion.value
+  if (!q || questionEnterAt.value[q.id]) return
+  questionEnterAt.value[q.id] = Date.now()
+}
 
 // Save progress
 watch([answers, currentIndex, objectiveIntroShown, timerRemaining], () => {
@@ -134,6 +150,7 @@ watch([answers, currentIndex, objectiveIntroShown, timerRemaining], () => {
     currentIndex: currentIndex.value,
     objectiveIntroShown: objectiveIntroShown.value,
     timerRemaining: timerRemaining.value,
+    questionTimings: questionTimings.value,
   }))
 }, { deep: true })
 
@@ -185,12 +202,14 @@ function onObjectiveTimeout() {
 
 function selectOption(key: string) {
   if (isObjectiveLocked.value) return
-  // 记录答题时间戳
-  if (!questionTimestamps.value[currentQuestion.value.id]) {
-    questionTimestamps.value[currentQuestion.value.id] = Date.now()
+  const q = currentQuestion.value
+  if (!q) return
+  if (!questionEnterAt.value[q.id]) markQuestionEntered()
+  if (!questionTimings.value[q.id] && questionEnterAt.value[q.id]) {
+    questionTimings.value[q.id] = Math.round((Date.now() - questionEnterAt.value[q.id]) / 100) / 10
   }
-  answers.value[currentQuestion.value.id] = key
-  if (currentQuestion.value.type === 'objective') {
+  answers.value[q.id] = key
+  if (q.type === 'objective') {
     saveTimerRemaining()
     stopObjectiveTimer()
   }
@@ -289,16 +308,6 @@ async function submitTest() {
     const score = await api.submitScore({ ...answers.value }, presentedIds, timedOut)
     localStorage.removeItem('mbti-pro-test')
 
-    // 计算每题耗时（秒）
-    const questionTimings: Record<number, number> = {}
-    const now = Date.now()
-    for (const q of questions.value) {
-      const ts = questionTimestamps.value[q.id]
-      if (ts) {
-        questionTimings[q.id] = Math.round((now - ts) / 100) / 10 // 秒，保留1位小数
-      }
-    }
-
     // 收集设备信息
     const deviceInfo = JSON.stringify({
       os: navigator.platform || 'unknown',
@@ -321,12 +330,19 @@ async function submitTest() {
       dimAnswered,
       dimTotals,
       confidence: score.confidence,
-      questionTimings,
+      questionTimings: { ...questionTimings.value },
       deviceInfo,
       utmSource,
       utmMedium,
       utmCampaign,
     }).catch(() => ({ id: undefined }))
+
+    const referralCode = localStorage.getItem(REFERRAL_KEY) || ''
+    if (referralCode && recordRes?.id && score.confidence >= 92) {
+      api.completeReferral(referralCode, recordRes.id)
+        .then(() => localStorage.removeItem(REFERRAL_KEY))
+        .catch(() => {})
+    }
 
     // 保存评分结果，携带 recordId 用于关联反馈
     pendingResult.value = {
@@ -358,6 +374,7 @@ function jumpTo(index: number) {
 
 // 监听进入客观题自动启动计时（有剩余秒数则恢复，已归零则不再启动）
 watch(currentIndex, () => {
+  markQuestionEntered()
   const q = currentQuestion.value
   if (q?.type === 'objective' && objectiveIntroShown.value && !showObjectiveIntro.value) {
     const saved = timerRemaining.value[q.id]
@@ -388,6 +405,7 @@ function onKeydown(e: KeyboardEvent) {
 
 onMounted(() => {
   window.addEventListener('keydown', onKeydown)
+  markQuestionEntered()
 })
 
 onUnmounted(() => {
@@ -610,6 +628,7 @@ onUnmounted(() => {
           <FeedbackCollector
             :user-type="pendingResult?.typeCode || ''"
             :record-id="pendingResult?.recordId"
+            :low-confidence="(pendingResult?.confidence ?? 100) < 92"
             @submitted="onFeedbackSubmitted"
           />
         </div>

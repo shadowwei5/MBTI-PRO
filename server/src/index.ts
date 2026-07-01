@@ -9,6 +9,7 @@ import { resultRoutes } from './routes/results.js'
 import { recordRoutes } from './routes/records.js'
 import feedbackRoutes from './routes/feedback.js'
 import { paymentRoutes } from './routes/payment.js'
+import { referralRoutes } from './routes/referrals.js'
 import { adminRoutes } from './routes/admin.js'
 import emailRoutes from './routes/email.js'
 
@@ -33,6 +34,7 @@ app.use('/api/results', resultRoutes)
 app.use('/api/records', recordRoutes)
 app.use('/api/feedback', feedbackRoutes)
 app.use('/api/payment', paymentRoutes)
+app.use('/api/referrals', referralRoutes)
 app.use('/api/admin', adminRoutes)
 app.use('/api/email', emailRoutes)
 

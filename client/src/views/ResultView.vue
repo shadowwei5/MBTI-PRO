@@ -22,6 +22,7 @@ const fetchError = ref('')
 const showSharePoster = ref(false)
 const imageLoaded = ref(false)
 const paidReport = ref(false)
+const recordId = computed(() => typeof route.query.recordId === 'string' ? route.query.recordId : '')
 
 // 是否来自真实测试（有分数数据）
 const hasTestData = computed(() => !!route.query.scores)
@@ -287,6 +288,7 @@ const defaultItems = {
           :type-code="typeData.code"
           :type-name="typeData.name"
           :type-color="typeColor.hex"
+          :record-id="recordId"
           @unlocked="loadPaidReport"
         >
           <div v-if="paidReport" class="deep-content space-y-6 mt-2">
@@ -454,6 +456,7 @@ const defaultItems = {
       :groupColor="groupColor"
       :oneLiner="oneLiner"
       :imageUrl="typeData?.imageUrl || `/api/images/${typeCode}`"
+      :recordId="recordId"
       :scores="hasTestData ? scores : undefined"
       :chars="hasTestData ? chars : undefined"
       @close="showSharePoster = false"

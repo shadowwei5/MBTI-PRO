@@ -95,12 +95,47 @@ model PaymentOrder {
   typeCode    String
   unlockToken String   @unique
   email       String?
+  referralCode String?
+  recordId    String?
   paid        Boolean  @default(false)
   paidAt      DateTime?
   createdAt   DateTime @default(now())
 
   @@index([typeCode])
   @@index([email])
+  @@index([referralCode])
+  @@index([recordId])
+  @@index([paid])
+}
+
+model ReferralReward {
+  code               String   @id
+  referrerRecordId   String
+  referrerTypeCode   String
+  referrerEmail      String?
+  clickedCount       Int      @default(0)
+  validCompletedCount Int     @default(0)
+  rewardUnlocked     Boolean  @default(false)
+  rewardSentAt       DateTime?
+  referredPaidCount  Int      @default(0)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@index([referrerRecordId])
+  @@index([referrerEmail])
+  @@index([rewardUnlocked])
+}
+
+model ReferralCompletion {
+  id               String   @id @default(uuid())
+  referralCode     String
+  referredRecordId String   @unique
+  referredTypeCode String
+  confidence       Int
+  paid             Boolean  @default(false)
+  createdAt        DateTime @default(now())
+
+  @@index([referralCode])
   @@index([paid])
 }
 
