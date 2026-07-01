@@ -106,6 +106,6 @@ export async function sendPaymentEmail(typeCode: string, paidEmail?: string): Pr
     return true
   } catch (err) {
     console.error('[email] send error:', err)
-    return false
+    throw err
   }
 }
