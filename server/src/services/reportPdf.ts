@@ -10,6 +10,9 @@ import { getTypeDimensionModules } from '../content/dimension-modules.js'
 const prisma = new PrismaClient()
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const imagesDir = path.resolve(__dirname, '..', '..', 'generated_images')
+const reportFontPath = path.resolve(__dirname, '..', '..', 'assets', 'fonts', 'SourceHanSansCN-Regular.ttf')
+
+let reportFontFaceCache: string | null = null
 
 type ReportData = {
   code: string
@@ -132,6 +135,19 @@ function portraitDataUri(typeCode: string): string {
   const base64 = fs.readFileSync(imagePath).toString('base64')
   return `data:image/jpeg;base64,${base64}`
 }
+
+function reportFontFace(): string {
+  if (reportFontFaceCache !== null) return reportFontFaceCache
+  if (!fs.existsSync(reportFontPath)) {
+    reportFontFaceCache = ''
+    return reportFontFaceCache
+  }
+
+  const base64 = fs.readFileSync(reportFontPath).toString('base64')
+  reportFontFaceCache = `@font-face{font-family:'MBTIProReportCJK';src:url(data:font/ttf;base64,${base64}) format('truetype');font-weight:400 700;font-style:normal;font-display:block}`
+  return reportFontFaceCache
+}
+
 function dimModule(typeCode: string, dimKey: string, title: string, moduleText: string | null): string {
   const raw = charScore(typeCode, dimKey)
   const letter = resultLetter(dimKey, raw)
@@ -171,8 +187,9 @@ export function buildReportHtml(t: ReportData): string {
 <html lang="zh-CN">
 <head><meta charset="utf-8"><title>MBTI-PRO 深度人格报告 - ${escapeHtml(t.name)}</title>
 <style>
+${reportFontFace()}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Noto Sans CJK SC','Noto Sans SC','WenQuanYi Zen Hei','Microsoft YaHei','PingFang SC',sans-serif;color:#2D2A26;background:#FFF;max-width:800px;margin:0 auto;padding:50px 56px}
+body{font-family:'MBTIProReportCJK','Noto Sans CJK SC','Noto Sans SC','WenQuanYi Zen Hei','Microsoft YaHei','PingFang SC',sans-serif;color:#2D2A26;background:#FFF;max-width:800px;margin:0 auto;padding:50px 56px}
 .cover{text-align:center;padding:50px 0 40px;border-bottom:2px solid #E0D8CC;margin-bottom:36px}
 .cover .type-code{font-size:44px;font-weight:300;letter-spacing:8px;color:#9C958E;margin-bottom:4px}
 .cover h1{font-size:44px;font-weight:700;margin-bottom:4px;color:#C8963E}
