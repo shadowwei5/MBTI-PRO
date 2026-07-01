@@ -15,6 +15,7 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT || 22 }}
+          command_timeout: 30m
           script: |
             export PATH=$PATH:/root/.nvm/versions/node/*/bin:$(dirname $(which node 2>/dev/null) 2>/dev/null)
             export NVM_DIR="$HOME/.nvm"
