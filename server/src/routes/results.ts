@@ -3,6 +3,7 @@ import { prisma } from '../index.js'
 import { calculateScore, type Answers, type QuestionMeta, type AnswerKey } from '../services/scoring.js'
 import { getTypeDimensionModules } from '../content/dimension-modules.js'
 import { isOrderPaid } from './payment.js'
+import { scalePopulationFor81 } from '../services/population.js'
 
 // 81型人格总结内联（避免types.ts导入链问题）
 const TYPE_SUMMARIES: Record<string, string> = {
@@ -224,7 +225,7 @@ resultRoutes.get('/:typeCode', async (req, res, next) => {
         isTraditional: type.isTraditional,
         summary: TYPE_SUMMARIES[type.code] ?? null,
         overview: paid ? type.overview : '',
-        population: paid ? type.population : null,
+        population: paid ? scalePopulationFor81(type.population) : null,
         eiModule: dimModules?.eiModule ?? null,
         snModule: dimModules?.snModule ?? null,
         tfModule: dimModules?.tfModule ?? null,

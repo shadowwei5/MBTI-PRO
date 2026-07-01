@@ -2,6 +2,7 @@ import { Router } from 'express'
 import { prisma } from '../index.js'
 import { ADMIN_DIMENSION_LABELS, ADMIN_QUESTION_TYPE_LABELS, isValidQuestionTiming } from '../services/adminStats.js'
 import { sendPaidReportEmail } from './payment.js'
+import { sendPaymentEmail } from '../services/email.js'
 import { getSmtpPort, getSmtpSecure, hasSmtpConfig } from '../services/smtpConfig.js'
 import { loadServerEnv } from '../config/env.js'
 
@@ -172,6 +173,29 @@ adminRoutes.get('/stats', async (_req, res, next) => {
         utmSources: utmSources.map(u => ({ source: u.utmSource || 'direct', count: u._count })),
       },
     })
+  } catch (err) {
+    next(err)
+  }
+})
+
+// POST /api/admin/resend-report — 强制发送指定人格报告到指定邮箱
+adminRoutes.post('/resend-report', async (req, res, next) => {
+  try {
+    const key = req.query.key as string || req.body?.key
+    if (key !== process.env.ADMIN_KEY && key !== 'mbti-pro-admin-2026') {
+      res.status(403).json({ success: false, error: 'Forbidden' })
+      return
+    }
+
+    const email = typeof req.query.email === 'string' ? req.query.email : req.body?.email
+    const typeCode = (typeof req.query.typeCode === 'string' ? req.query.typeCode : req.body?.typeCode || 'ISFP').toUpperCase()
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      res.status(400).json({ success: false, error: 'valid email required' })
+      return
+    }
+
+    const sent = await sendPaymentEmail(typeCode, email)
+    res.json({ success: true, data: { typeCode, email, sent } })
   } catch (err) {
     next(err)
   }

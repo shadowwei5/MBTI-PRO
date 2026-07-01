@@ -1,9 +1,15 @@
-﻿import { chromium } from 'playwright'
+import { chromium } from 'playwright'
 import { PrismaClient } from '@prisma/client'
+import fs from 'fs'
+import path from 'path'
+import { fileURLToPath } from 'url'
+import { scalePopulationFor81 } from './population.js'
 import { TYPE_SUMMARIES } from '../content/types.js'
 import { getTypeDimensionModules } from '../content/dimension-modules.js'
 
 const prisma = new PrismaClient()
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+const imagesDir = path.resolve(__dirname, '..', '..', 'generated_images')
 
 type ReportData = {
   code: string
@@ -120,6 +126,12 @@ function tags(items: string[]): string {
   return items.map(item => `<span class="tag">${escapeHtml(item)}</span>`).join('')
 }
 
+function portraitDataUri(typeCode: string): string {
+  const imagePath = path.join(imagesDir, `${typeCode}.jpg`)
+  if (!fs.existsSync(imagePath)) return ''
+  const base64 = fs.readFileSync(imagePath).toString('base64')
+  return `data:image/jpeg;base64,${base64}`
+}
 function dimModule(typeCode: string, dimKey: string, title: string, moduleText: string | null): string {
   const raw = charScore(typeCode, dimKey)
   const letter = resultLetter(dimKey, raw)
@@ -144,7 +156,7 @@ export async function getReportData(typeCode: string): Promise<ReportData | null
     growthAreas: JSON.parse(type.growthAreas),
     careers: JSON.parse(type.careers),
     suitableFields: JSON.parse(type.suitableFields),
-    population: type.population,
+    population: scalePopulationFor81(type.population),
     celebrities: JSON.parse(type.celebrities || '[]'),
     eiModule: dimModules.eiModule,
     snModule: dimModules.snModule,
@@ -154,6 +166,7 @@ export async function getReportData(typeCode: string): Promise<ReportData | null
 }
 
 export function buildReportHtml(t: ReportData): string {
+  const portraitSrc = portraitDataUri(t.code) || `https://mbti-pro.com/api/images/${encodeURIComponent(t.code)}`
   return `<!DOCTYPE html>
 <html lang="zh-CN">
 <head><meta charset="utf-8"><title>MBTI-PRO 深度人格报告 - ${escapeHtml(t.name)}</title>
@@ -189,7 +202,7 @@ ul{padding-left:20px;margin:8px 0 16px}.tags{display:flex;gap:8px;flex-wrap:wrap
 </style></head>
 <body>
 <div class="cover"><div class="type-code">${escapeHtml(t.code)}</div><h1>${escapeHtml(t.name)}</h1><p class="subtitle">MBTI-PRO 81型人格深度报告</p></div>
-<div class="portrait-full"><img class="portrait-img" src="https://mbti-pro.com/api/images/${encodeURIComponent(t.code)}" alt="${escapeHtml(t.name)}" /></div>
+<div class="portrait-full"><img class="portrait-img" src="${portraitSrc}" alt="${escapeHtml(t.name)}" /></div>
 <div class="dims-section">${dimBars(t.code)}</div>
 <div class="summary-box"><p>${escapeHtml(t.summary)}</p></div>
 ${t.population ? `<p class="population">占总人口比例：<strong>${escapeHtml(t.population)}</strong></p>` : ''}
@@ -227,4 +240,3 @@ export async function generateReportPdf(typeCode: string): Promise<Buffer> {
     await browser.close()
   }
 }
-
