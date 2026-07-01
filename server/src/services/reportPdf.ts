@@ -172,7 +172,7 @@ export function buildReportHtml(t: ReportData): string {
 <head><meta charset="utf-8"><title>MBTI-PRO 深度人格报告 - ${escapeHtml(t.name)}</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'PingFang SC','Microsoft YaHei','Noto Sans SC',sans-serif;color:#2D2A26;background:#FFF;max-width:800px;margin:0 auto;padding:50px 56px}
+body{font-family:'Noto Sans CJK SC','Noto Sans SC','WenQuanYi Zen Hei','Microsoft YaHei','PingFang SC',sans-serif;color:#2D2A26;background:#FFF;max-width:800px;margin:0 auto;padding:50px 56px}
 .cover{text-align:center;padding:50px 0 40px;border-bottom:2px solid #E0D8CC;margin-bottom:36px}
 .cover .type-code{font-size:44px;font-weight:300;letter-spacing:8px;color:#9C958E;margin-bottom:4px}
 .cover h1{font-size:44px;font-weight:700;margin-bottom:4px;color:#C8963E}

@@ -23,12 +23,17 @@ jobs:
             export DEBIAN_FRONTEND=noninteractive
             if command -v apt-get >/dev/null 2>&1; then
               apt-get update || true
-              apt-get install -y libgbm1 libnss3 libatk-bridge2.0-0 libxkbcommon0 libxss1 libgtk-3-0 || true
+              apt-get install -y libgbm1 libnss3 libatk-bridge2.0-0 libxkbcommon0 libxss1 libgtk-3-0 fontconfig fonts-noto-cjk fonts-wqy-zenhei || true
               apt-get install -y libasound2 || apt-get install -y libasound2t64 || true
+              fc-cache -fv || true
             elif command -v yum >/dev/null 2>&1; then
-              yum install -y mesa-libgbm nss atk at-spi2-atk libxkbcommon libXScrnSaver gtk3 alsa-lib || true
+              yum install -y mesa-libgbm nss atk at-spi2-atk libxkbcommon libXScrnSaver gtk3 alsa-lib fontconfig freetype || true
+              yum install -y wqy-zenhei-fonts || yum install -y google-noto-sans-cjk-fonts || yum install -y google-noto-sans-cjk-ttc-fonts || true
+              fc-cache -fv || true
             elif command -v dnf >/dev/null 2>&1; then
-              dnf install -y mesa-libgbm nss atk at-spi2-atk libxkbcommon libXScrnSaver gtk3 alsa-lib || true
+              dnf install -y mesa-libgbm nss atk at-spi2-atk libxkbcommon libXScrnSaver gtk3 alsa-lib fontconfig freetype || true
+              dnf install -y wqy-zenhei-fonts || dnf install -y google-noto-sans-cjk-fonts || dnf install -y google-noto-sans-cjk-ttc-fonts || true
+              fc-cache -fv || true
             fi
             git fetch --unshallow origin 2>/dev/null || true
             git fetch origin master
