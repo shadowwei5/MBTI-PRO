@@ -47,12 +47,13 @@ jobs:
             SMTP_PASS=${{ secrets.SMTP_PASS }}
             ENVEOF
             cd server
-            npm install --include=dev
+            if [ ! -d node_modules ]; then npm install --include=dev; fi
             npx prisma generate
             npx prisma db push
-            npx playwright install --with-deps chromium || npx playwright install chromium || true
-            # 修复6个中文名(数据库层面)
+            if [ ! -d ~/.cache/ms-playwright ]; then npx playwright install --with-deps chromium || npx playwright install chromium || true; fi
             npx tsx scripts/fix-names.ts
-            cd ../client && npm install && npm run build
+            cd ../client
+            if [ ! -d node_modules ]; then npm install; fi
+            if [ ! -d dist ]; then npm run build; fi
             cd /opt/MBTI-PRO && fuser -k 3001/tcp 2>/dev/null || true && sleep 1 && npx pm2 kill 2>/dev/null || true && cd server && setsid nohup npx tsx src/index.ts > /tmp/mbti-pro.log 2>&1 < /dev/null &
             echo "✅ Deploy done"

@@ -144,7 +144,8 @@ function reportFontFace(): string {
   }
 
   const base64 = fs.readFileSync(reportFontPath).toString('base64')
-  reportFontFaceCache = `@font-face{font-family:'MBTIProReportCJK';src:url(data:font/ttf;base64,${base64}) format('truetype');font-weight:400 700;font-style:normal;font-display:block}`
+  const src = `url(data:font/ttf;base64,${base64}) format('truetype')`
+  reportFontFaceCache = `@font-face{font-family:'MBTIProReportCJK';src:${src};font-weight:400;font-style:normal;font-display:block}@font-face{font-family:'MBTIProReportCJK';src:${src};font-weight:700;font-style:normal;font-display:block}`
   return reportFontFaceCache
 }
 
