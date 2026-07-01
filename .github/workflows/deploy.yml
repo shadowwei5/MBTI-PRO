@@ -21,7 +21,9 @@ jobs:
             [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
             cd /opt/MBTI-PRO
             export DEBIAN_FRONTEND=noninteractive
-            apt-get update && apt-get install -y libgbm1 libnss3 libatk-bridge2.0-0 libxkbcommon0 libxss1 libgtk-3-0 libasound2 || apt-get install -y libasound2t64 || true
+            apt-get update || true
+            apt-get install -y libgbm1 libnss3 libatk-bridge2.0-0 libxkbcommon0 libxss1 libgtk-3-0 || true
+            apt-get install -y libasound2 || apt-get install -y libasound2t64 || true
             git fetch --unshallow origin 2>/dev/null || true
             git fetch origin master
             git reset --hard origin/master
