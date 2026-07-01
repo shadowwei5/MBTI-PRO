@@ -211,7 +211,10 @@ export async function generateReportPdf(typeCode: string): Promise<Buffer> {
   const report = await getReportData(typeCode)
   if (!report) throw new Error(`Personality type not found: ${typeCode}`)
 
-  const browser = await chromium.launch({ headless: true })
+  const browser = await chromium.launch({
+    headless: true,
+    args: ['--no-sandbox', '--disable-setuid-sandbox'],
+  })
   try {
     const page = await browser.newPage()
     await page.setContent(buildReportHtml(report), { waitUntil: 'networkidle' })
