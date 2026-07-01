@@ -7,6 +7,10 @@ describe('server env loader', () => {
     expect(__private__.parseEnvLine('SMTP_PASS="abc123"')).toEqual(['SMTP_PASS', 'abc123'])
   })
 
+  it('trims indented deployment env lines', () => {
+    expect(__private__.parseEnvLine('            SMTP_HOST=smtp.example.com')).toEqual(['SMTP_HOST', 'smtp.example.com'])
+  })
+
   it('ignores comments and invalid lines', () => {
     expect(__private__.parseEnvLine('# comment')).toBeNull()
     expect(__private__.parseEnvLine('')).toBeNull()

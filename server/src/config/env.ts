@@ -26,6 +26,7 @@ export function loadServerEnv(): void {
     path.resolve(process.cwd(), '.env'),
     path.resolve(currentDir, '..', '..', '.env'),
   ]
+  const loadedValues: Record<string, string> = {}
 
   for (const envPath of candidates) {
     if (!fs.existsSync(envPath)) continue
@@ -34,8 +35,12 @@ export function loadServerEnv(): void {
       const parsed = parseEnvLine(line)
       if (!parsed) continue
       const [key, value] = parsed
-      if (process.env[key] === undefined) process.env[key] = value
+      loadedValues[key] = value
     }
+  }
+
+  for (const [key, value] of Object.entries(loadedValues)) {
+    if (process.env[key] === undefined || process.env[key] === '') process.env[key] = value
   }
 }
 
