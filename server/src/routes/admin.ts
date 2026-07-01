@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import { prisma } from '../index.js'
+import { ADMIN_DIMENSION_LABELS, ADMIN_QUESTION_TYPE_LABELS, isValidQuestionTiming } from '../services/adminStats.js'
 
 export const adminRoutes = Router()
 
@@ -81,7 +82,7 @@ adminRoutes.get('/stats', async (_req, res, next) => {
         const parsed = JSON.parse(record.questionTimings) as Record<string, number>
         for (const [idText, seconds] of Object.entries(parsed)) {
           const id = Number(idText)
-          if (!Number.isInteger(id) || typeof seconds !== 'number' || seconds <= 0 || seconds > 600) continue
+          if (!Number.isInteger(id) || !isValidQuestionTiming(seconds)) continue
           const list = timingMap.get(id) || []
           list.push(seconds)
           timingMap.set(id, list)
@@ -97,7 +98,9 @@ adminRoutes.get('/stats', async (_req, res, next) => {
       return {
         questionId,
         dimension: meta?.dimension || '-',
+        dimensionLabel: ADMIN_DIMENSION_LABELS[meta?.dimension || ''] || meta?.dimension || '-',
         type: meta?.type || '-',
+        typeLabel: ADMIN_QUESTION_TYPE_LABELS[meta?.type || ''] || meta?.type || '-',
         sortOrder: meta?.sortOrder ?? questionId,
         label: label.length > 42 ? `${label.slice(0, 42)}...` : label,
         samples: values.length,

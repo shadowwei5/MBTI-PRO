@@ -32,6 +32,7 @@ const startTime = ref(Date.now())
 // 每道题的进入时间与答题耗时（用于后台分析题目卡点）
 const questionEnterAt = ref<Record<number, number>>({})
 const questionTimings = ref<Record<number, number>>({})
+const questionActiveMs = ref<Record<number, number>>({})
 
 // 反馈收集（答题完成后、展示结果前 — 必须完成反馈才能查看结果）
 const showFeedbackAfterTest = ref(false)
@@ -104,6 +105,7 @@ async function fetchQuestions() {
         objectiveIntroShown.value = parsed.objectiveIntroShown || false
         timerRemaining.value = parsed.timerRemaining || {}
         questionTimings.value = parsed.questionTimings || {}
+        questionActiveMs.value = parsed.questionActiveMs || {}
         loading.value = false
         return
       }
@@ -142,6 +144,24 @@ function markQuestionEntered() {
   questionEnterAt.value[q.id] = Date.now()
 }
 
+function flushCurrentQuestionTiming() {
+  const q = currentQuestion.value
+  if (!q) return
+  const enterAt = questionEnterAt.value[q.id]
+  if (!enterAt) return
+  const elapsed = Date.now() - enterAt
+  if (document.visibilityState === 'visible' && elapsed > 0) {
+    questionActiveMs.value[q.id] = (questionActiveMs.value[q.id] || 0) + Math.min(elapsed, 120000)
+  }
+  questionEnterAt.value[q.id] = Date.now()
+}
+
+function finalizeQuestionTiming(questionId: number) {
+  const activeMs = questionActiveMs.value[questionId]
+  if (!activeMs || activeMs <= 0) return
+  questionTimings.value[questionId] = Math.round(Math.min(activeMs / 1000, 120) * 10) / 10
+}
+
 // Save progress
 watch([answers, currentIndex, objectiveIntroShown, timerRemaining], () => {
   localStorage.setItem('mbti-pro-test', JSON.stringify({
@@ -151,6 +171,7 @@ watch([answers, currentIndex, objectiveIntroShown, timerRemaining], () => {
     objectiveIntroShown: objectiveIntroShown.value,
     timerRemaining: timerRemaining.value,
     questionTimings: questionTimings.value,
+    questionActiveMs: questionActiveMs.value,
   }))
 }, { deep: true })
 
@@ -189,6 +210,11 @@ function saveTimerRemaining() {
 }
 
 function onObjectiveTimeout() {
+  const q = currentQuestion.value
+  if (q) {
+    questionActiveMs.value[q.id] = Math.max(questionActiveMs.value[q.id] || 0, 20000)
+    finalizeQuestionTiming(q.id)
+  }
   stopObjectiveTimer()
   timerRemaining.value[currentQuestion.value.id] = 0
   // 已作答的不再自动跳转
@@ -205,9 +231,8 @@ function selectOption(key: string) {
   const q = currentQuestion.value
   if (!q) return
   if (!questionEnterAt.value[q.id]) markQuestionEntered()
-  if (!questionTimings.value[q.id] && questionEnterAt.value[q.id]) {
-    questionTimings.value[q.id] = Math.round((Date.now() - questionEnterAt.value[q.id]) / 100) / 10
-  }
+  flushCurrentQuestionTiming()
+  finalizeQuestionTiming(q.id)
   answers.value[q.id] = key
   if (q.type === 'objective') {
     saveTimerRemaining()
@@ -285,6 +310,7 @@ function goPrev() {
 async function submitTest() {
   submitting.value = true
   showSubmitConfirm.value = false
+  flushCurrentQuestionTiming()
   stopObjectiveTimer()
 
   // Count answered questions per dimension (for display in result)
@@ -365,6 +391,7 @@ async function submitTest() {
 function jumpTo(index: number) {
   if (isInObjectiveMode.value) return
   if (autoAdvanceTimer) { clearTimeout(autoAdvanceTimer); autoAdvanceTimer = null }
+  flushCurrentQuestionTiming()
   saveTimerRemaining()
   stopObjectiveTimer()
   if (index >= 0 && index <= questions.value.length - 1) {
@@ -374,6 +401,7 @@ function jumpTo(index: number) {
 
 // 监听进入客观题自动启动计时（有剩余秒数则恢复，已归零则不再启动）
 watch(currentIndex, () => {
+  flushCurrentQuestionTiming()
   markQuestionEntered()
   const q = currentQuestion.value
   if (q?.type === 'objective' && objectiveIntroShown.value && !showObjectiveIntro.value) {
@@ -405,11 +433,23 @@ function onKeydown(e: KeyboardEvent) {
 
 onMounted(() => {
   window.addEventListener('keydown', onKeydown)
+  document.addEventListener('visibilitychange', onVisibilityChange)
   markQuestionEntered()
 })
 
+function onVisibilityChange() {
+  if (document.visibilityState === 'hidden') {
+    flushCurrentQuestionTiming()
+  } else {
+    questionEnterAt.value = {}
+    markQuestionEntered()
+  }
+}
+
 onUnmounted(() => {
+  flushCurrentQuestionTiming()
   window.removeEventListener('keydown', onKeydown)
+  document.removeEventListener('visibilitychange', onVisibilityChange)
   stopObjectiveTimer()
 })
 </script>

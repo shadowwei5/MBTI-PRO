@@ -11,7 +11,7 @@ interface DashboardData {
   todayTypeDistribution: { code: string; count: number }[]
   topLiked: { type: string; count: number }[]
   topDisliked: { type: string; count: number }[]
-  questionTimingStats: { questionId: number; dimension: string; type: string; sortOrder: number; label: string; samples: number; avgSec: number; medianSec: number }[]
+  questionTimingStats: { questionId: number; dimension: string; dimensionLabel?: string; type: string; typeLabel?: string; sortOrder: number; label: string; samples: number; avgSec: number; medianSec: number }[]
   referralFunnel: { shares: number; clicks: number; validCompletions: number; rewardUnlocks: number; referredPaid: number }
   dailyTrend: { date: string; count: number }[]
   utmSources: { source: string; count: number }[]
@@ -58,6 +58,26 @@ function formatSec(s: number) {
 
 function formatShortSec(s: number) {
   return `${Math.round(s * 10) / 10}s`
+}
+
+function sourceLabel(source: string) {
+  const labels: Record<string, string> = {
+    direct: '直接访问',
+    share_poster: '分享海报',
+    referral: '邀请链接',
+    codex_deploy_check: '部署测试',
+    codex_referral_check: '邀请链路测试',
+  }
+  return labels[source] || source || '直接访问'
+}
+
+function emailSourceLabel(source: string) {
+  const labels: Record<string, string> = {
+    paywall: '解锁弹窗',
+    footer: '页脚订阅',
+    quiz: '测试流程',
+  }
+  return labels[source] || source
 }
 
 async function copyEmails() {
@@ -170,7 +190,8 @@ async function copyEmails() {
 
         <!-- Question Timing Stats -->
         <div v-if="data.questionTimingStats.length" class="bg-white rounded-2xl p-6 shadow-sm border border-border/30 mb-6">
-          <h2 class="text-sm font-semibold text-charcoal uppercase tracking-wider mb-4">⏱️ 每题平均答题耗时 Top15</h2>
+          <h2 class="text-sm font-semibold text-charcoal uppercase tracking-wider mb-2">⏱️ 每题平均答题耗时 Top15</h2>
+          <p class="text-xs text-text-muted mb-4">已过滤离开页面、切后台或单题超过 120 秒的异常值，用于判断题目是否卡住用户。</p>
           <div class="overflow-x-auto">
             <table class="w-full text-sm">
               <thead>
@@ -187,8 +208,8 @@ async function copyEmails() {
               <tbody class="divide-y divide-border/30">
                 <tr v-for="q in data.questionTimingStats" :key="q.questionId">
                   <td class="py-2 pr-3 font-bold text-charcoal">#{{ q.sortOrder || q.questionId }}</td>
-                  <td class="py-2 pr-3 text-text-muted">{{ q.dimension }}</td>
-                  <td class="py-2 pr-3 text-text-muted">{{ q.type }}</td>
+                  <td class="py-2 pr-3 text-text-muted">{{ q.dimensionLabel || q.dimension }}</td>
+                  <td class="py-2 pr-3 text-text-muted">{{ q.typeLabel || q.type }}</td>
                   <td class="py-2 pr-3 font-semibold text-coral">{{ formatShortSec(q.avgSec) }}</td>
                   <td class="py-2 pr-3 text-text-muted">{{ formatShortSec(q.medianSec) }}</td>
                   <td class="py-2 pr-3 text-text-muted">{{ q.samples }}</td>
@@ -253,7 +274,7 @@ async function copyEmails() {
           <h2 class="text-sm font-semibold text-charcoal uppercase tracking-wider mb-4">🔗 流量来源</h2>
           <div class="flex flex-wrap gap-3">
             <div v-for="u in data.utmSources" :key="u.source" class="px-4 py-2 bg-surface-alt rounded-xl text-sm">
-              <span class="font-semibold text-charcoal">{{ u.source || '直接访问' }}</span>
+              <span class="font-semibold text-charcoal">{{ sourceLabel(u.source) }}</span>
               <span class="text-text-muted ml-2">{{ u.count }} 次</span>
             </div>
           </div>
@@ -281,7 +302,7 @@ async function copyEmails() {
                   <td class="py-2 pr-4 font-medium text-charcoal">{{ e.email }}</td>
                   <td class="py-2 pr-4 text-text-muted">{{ e.typeCode || '-' }}</td>
                   <td class="py-2 pr-4">
-                    <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold" :class="e.source === 'paywall' ? 'bg-gold/10 text-gold' : 'bg-sage/10 text-sage'">{{ e.source }}</span>
+                    <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold" :class="e.source === 'paywall' ? 'bg-gold/10 text-gold' : 'bg-sage/10 text-sage'">{{ emailSourceLabel(e.source) }}</span>
                   </td>
                   <td class="py-2 text-text-muted text-xs">{{ new Date(e.createdAt).toLocaleDateString('zh-CN') }}</td>
                 </tr>

@@ -1,6 +1,7 @@
 ﻿import { Router } from 'express'
 import crypto from 'crypto'
 import { prisma } from '../index.js'
+import { getCreateReferralEligibilityError } from '../services/referralEligibility.js'
 
 export const referralRoutes = Router()
 
@@ -43,8 +44,12 @@ export async function markReferralPaid(referralCode: string, referredRecordId: s
 referralRoutes.post('/create', async (req, res, next) => {
   try {
     const { recordId, typeCode, email } = req.body as { recordId?: string; typeCode?: string; email?: string }
-    if (!recordId || !typeCode || !email || !isValidEmail(email)) {
-      res.status(400).json({ success: false, error: 'recordId, typeCode and valid email required' })
+    if (!recordId) {
+      res.status(400).json({ success: false, error: '未找到本次测试记录，请从完整测试结果页生成邀请链接。' })
+      return
+    }
+    if (!email || !isValidEmail(email)) {
+      res.status(400).json({ success: false, error: '请输入有效邮箱，用于接收免费解锁后的深度报告 PDF。' })
       return
     }
 
@@ -52,11 +57,15 @@ referralRoutes.post('/create', async (req, res, next) => {
       where: { id: recordId },
       select: { id: true, typeCode: true, confidence: true },
     })
-    if (!record || record.typeCode !== typeCode.toUpperCase() || (record.confidence ?? 0) < 92) {
-      res.status(400).json({ success: false, error: 'only high-confidence completed test can invite' })
+    const eligibilityError = getCreateReferralEligibilityError(record)
+    if (eligibilityError) {
+      res.status(400).json({ success: false, error: eligibilityError })
       return
     }
-
+    const eligibleRecord = record!
+    if (typeCode && eligibleRecord.typeCode !== typeCode.toUpperCase()) {
+      console.warn('[referral] result type mismatch, using saved record type', { recordId, requestedTypeCode: typeCode, recordTypeCode: eligibleRecord.typeCode })
+    }
     const existing = await prisma.referralReward.findFirst({ where: { referrerRecordId: recordId } })
     if (existing) {
       const updated = await prisma.referralReward.update({
@@ -74,7 +83,7 @@ referralRoutes.post('/create', async (req, res, next) => {
       data: {
         code,
         referrerRecordId: recordId,
-        referrerTypeCode: record.typeCode,
+        referrerTypeCode: eligibleRecord.typeCode,
         referrerEmail: email,
       },
     })
