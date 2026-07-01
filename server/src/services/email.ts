@@ -1,6 +1,6 @@
 import nodemailer from 'nodemailer'
 import { prisma } from '../index.js'
-import { generateReportPdf } from './reportPdf.js'
+import { generateReportPdf, getReportData, buildReportHtml } from './reportPdf.js'
 import { getSmtpPort, getSmtpSecure, hasSmtpConfig } from './smtpConfig.js'
 import { loadServerEnv } from '../config/env.js'
 
@@ -43,6 +43,31 @@ function getReportHTML(typeName: string, typeCode: string): string {
 </html>`
 }
 
+type ReportAttachment = {
+  filename: string
+  content: Buffer
+  contentType: string
+}
+
+async function buildReportAttachment(typeCode: string, typeName: string): Promise<ReportAttachment> {
+  try {
+    return {
+      filename: `MBTI-PRO-${typeCode}-${typeName}-深度人格报告.pdf`,
+      content: await generateReportPdf(typeCode),
+      contentType: 'application/pdf',
+    }
+  } catch (err) {
+    console.error('[email] PDF generation failed, sending HTML report fallback:', err)
+    const data = await getReportData(typeCode)
+    if (!data) throw err
+    return {
+      filename: `MBTI-PRO-${typeCode}-${typeName}-深度人格报告.html`,
+      content: Buffer.from(buildReportHtml(data), 'utf8'),
+      contentType: 'text/html; charset=utf-8',
+    }
+  }
+}
+
 /**
  * 支付成功后发送深度报告邮件
  */
@@ -74,7 +99,7 @@ export async function sendPaymentEmail(typeCode: string, paidEmail?: string): Pr
       select: { name: true },
     })
     const typeName = type?.name || typeCode
-    const pdf = await generateReportPdf(normalizedTypeCode)
+    const attachment = await buildReportAttachment(normalizedTypeCode, typeName)
 
     const results = await Promise.allSettled(
       emails.map(e =>
@@ -83,13 +108,7 @@ export async function sendPaymentEmail(typeCode: string, paidEmail?: string): Pr
           to: e.email,
           subject: `🎉 你的 ${typeName}（${normalizedTypeCode}）深度人格报告 PDF`,
           html: getReportHTML(typeName, normalizedTypeCode),
-          attachments: [
-            {
-              filename: `MBTI-PRO-${normalizedTypeCode}-${typeName}-深度人格报告.pdf`,
-              content: pdf,
-              contentType: 'application/pdf',
-            },
-          ],
+          attachments: [attachment],
         })
       )
     )
