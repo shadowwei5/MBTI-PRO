@@ -96,7 +96,14 @@ export async function sendPaymentEmail(typeCode: string, paidEmail?: string): Pr
 
     const sent = results.filter(r => r.status === 'fulfilled').length
     console.log(`[email] ${typeCode}: sent ${sent}/${emails.length} emails`)
-    return sent > 0
+    if (sent === 0) {
+      const reasons = results
+        .filter((r): r is PromiseRejectedResult => r.status === 'rejected')
+        .map(r => r.reason instanceof Error ? r.reason.message : String(r.reason))
+        .filter(Boolean)
+      throw new Error(reasons.length ? reasons.join(' | ').slice(0, 500) : 'email service returned false')
+    }
+    return true
   } catch (err) {
     console.error('[email] send error:', err)
     return false

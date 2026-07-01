@@ -2,8 +2,12 @@ import { Router } from 'express'
 import { prisma } from '../index.js'
 import { ADMIN_DIMENSION_LABELS, ADMIN_QUESTION_TYPE_LABELS, isValidQuestionTiming } from '../services/adminStats.js'
 import { sendPaidReportEmail } from './payment.js'
+import { getSmtpPort, getSmtpSecure, hasSmtpConfig } from '../services/smtpConfig.js'
+import { loadServerEnv } from '../config/env.js'
 
 export const adminRoutes = Router()
+
+loadServerEnv()
 
 // GET /api/admin/stats — 仪表盘全部统计数据
 adminRoutes.get('/stats', async (_req, res, next) => {
@@ -186,7 +190,7 @@ adminRoutes.post('/resend-paid-emails', async (req, res, next) => {
       where: { paid: true, emailSentAt: null, email: { not: null } },
       orderBy: { paidAt: 'desc' },
       take: 20,
-      select: { orderId: true, typeCode: true, email: true, emailSentAt: true },
+      select: { orderId: true, typeCode: true, email: true, emailSentAt: true, emailSendError: true },
     })
 
     let sent = 0
@@ -194,10 +198,35 @@ adminRoutes.post('/resend-paid-emails', async (req, res, next) => {
     for (const order of orders) {
       const ok = await sendPaidReportEmail(order)
       if (ok) sent++
-      results.push({ orderId: order.orderId, typeCode: order.typeCode, email: order.email, sent: ok })
+      const updated = await prisma.paymentOrder.findUnique({
+        where: { orderId: order.orderId },
+        select: { emailSentAt: true, emailSendError: true },
+      })
+      results.push({
+        orderId: order.orderId,
+        typeCode: order.typeCode,
+        email: order.email,
+        sent: ok,
+        error: updated?.emailSendError || null,
+      })
     }
 
-    res.json({ success: true, data: { checked: orders.length, sent, results } })
+    res.json({
+      success: true,
+      data: {
+        checked: orders.length,
+        sent,
+        smtp: {
+          configured: hasSmtpConfig(),
+          hostConfigured: Boolean(process.env.SMTP_HOST),
+          userConfigured: Boolean(process.env.SMTP_USER),
+          passConfigured: Boolean(process.env.SMTP_PASS),
+          port: getSmtpPort(),
+          secure: getSmtpSecure(),
+        },
+        results,
+      },
+    })
   } catch (err) {
     next(err)
   }
