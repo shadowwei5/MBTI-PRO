@@ -3,6 +3,11 @@ name: Deploy to Tencent Cloud
 on:
   push:
     branches: [master]
+  workflow_dispatch:
+
+concurrency:
+  group: tencent-cloud-deploy
+  cancel-in-progress: true
 
 jobs:
   deploy:
@@ -15,26 +20,35 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT || 22 }}
-          command_timeout: 30m
+          command_timeout: 20m
+          script_stop: true
           script: |
-            export PATH=$PATH:/root/.nvm/versions/node/*/bin:$(dirname $(which node 2>/dev/null) 2>/dev/null)
+            set -e
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+            export PATH="$PATH:/root/.nvm/versions/node/$(ls /root/.nvm/versions/node 2>/dev/null | tail -1)/bin"
+
             cd /opt/MBTI-PRO
-            export DEBIAN_FRONTEND=noninteractive
-            if command -v apt-get >/dev/null 2>&1; then
-              apt-get update || true
-              apt-get install -y libgbm1 libnss3 libatk-bridge2.0-0 libxkbcommon0 libxss1 libgtk-3-0 fontconfig || true
-              apt-get install -y libasound2 || apt-get install -y libasound2t64 || true
-            elif command -v yum >/dev/null 2>&1; then
-              yum install -y mesa-libgbm nss atk at-spi2-atk libxkbcommon libXScrnSaver gtk3 alsa-lib fontconfig freetype || true
-            elif command -v dnf >/dev/null 2>&1; then
-              dnf install -y mesa-libgbm nss atk at-spi2-atk libxkbcommon libXScrnSaver gtk3 alsa-lib fontconfig freetype || true
+
+            if [ ! -f .deploy_deps_ready ]; then
+              export DEBIAN_FRONTEND=noninteractive
+              if command -v apt-get >/dev/null 2>&1; then
+                apt-get update || true
+                apt-get install -y libgbm1 libnss3 libatk-bridge2.0-0 libxkbcommon0 libxss1 libgtk-3-0 fontconfig || true
+                apt-get install -y libasound2 || apt-get install -y libasound2t64 || true
+              elif command -v yum >/dev/null 2>&1; then
+                yum install -y mesa-libgbm nss atk at-spi2-atk libxkbcommon libXScrnSaver gtk3 alsa-lib fontconfig freetype || true
+              elif command -v dnf >/dev/null 2>&1; then
+                dnf install -y mesa-libgbm nss atk at-spi2-atk libxkbcommon libXScrnSaver gtk3 alsa-lib fontconfig freetype || true
+              fi
+              touch .deploy_deps_ready
             fi
+
             git fetch --unshallow origin 2>/dev/null || true
             git fetch origin master
             git reset --hard origin/master
-            # 注入 XorPay 支付 + SMTP 邮件环境变量
+
+            touch server/.env
             sed -i '/^XORPAY_/d' server/.env
             sed -i '/^SMTP_/d' server/.env
             cat >> server/.env << 'ENVEOF'
@@ -46,14 +60,40 @@ jobs:
             SMTP_USER=${{ secrets.SMTP_USER }}
             SMTP_PASS=${{ secrets.SMTP_PASS }}
             ENVEOF
+
             cd server
-            if [ ! -d node_modules ]; then npm install --include=dev; fi
+            server_hash="$(sha256sum package.json package-lock.json | sha256sum | awk '{print $1}')"
+            if [ ! -d node_modules ] || [ ! -f .deploy_lock_hash ] || [ "$(cat .deploy_lock_hash)" != "$server_hash" ]; then
+              npm install --include=dev --prefer-offline --no-audit
+              echo "$server_hash" > .deploy_lock_hash
+            fi
             npx prisma generate
             npx prisma db push
-            if [ ! -d ~/.cache/ms-playwright ]; then npx playwright install --with-deps chromium || npx playwright install chromium || true; fi
+            if [ ! -d "$HOME/.cache/ms-playwright" ]; then
+              npx playwright install chromium || true
+            fi
             npx tsx scripts/fix-names.ts
+
             cd ../client
-            if [ ! -d node_modules ]; then npm install; fi
-            if [ ! -d dist ]; then npm run build; fi
-            cd /opt/MBTI-PRO && fuser -k 3001/tcp 2>/dev/null || true && sleep 1 && npx pm2 kill 2>/dev/null || true && cd server && setsid nohup npx tsx src/index.ts > /tmp/mbti-pro.log 2>&1 < /dev/null &
-            echo "✅ Deploy done"
+            client_hash="$(sha256sum package.json package-lock.json | sha256sum | awk '{print $1}')"
+            if [ ! -d node_modules ] || [ ! -f .deploy_lock_hash ] || [ "$(cat .deploy_lock_hash)" != "$client_hash" ]; then
+              npm install --prefer-offline --no-audit
+              echo "$client_hash" > .deploy_lock_hash
+            fi
+            npm run build
+
+            cd /opt/MBTI-PRO
+            fuser -k 3001/tcp 2>/dev/null || true
+            sleep 1
+            npx pm2 kill 2>/dev/null || true
+            cd server
+            setsid nohup npx tsx src/index.ts > /tmp/mbti-pro.log 2>&1 < /dev/null &
+            for i in $(seq 1 30); do
+              curl -fsS http://127.0.0.1:3001/api/health >/dev/null && break
+              sleep 1
+              if [ "$i" = "30" ]; then
+                tail -n 80 /tmp/mbti-pro.log || true
+                exit 1
+              fi
+            done
+            echo "Deploy done"
