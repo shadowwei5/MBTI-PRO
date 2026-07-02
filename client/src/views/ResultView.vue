@@ -109,7 +109,7 @@ const oneLiner = computed(() => {
 
 async function loadPaidReport(unlockToken: string) {
   try {
-    typeData.value = await api.getResult(typeCode.value, unlockToken)
+    typeData.value = await api.getResult(typeCode.value, unlockToken, recordId.value || undefined)
     paidReport.value = !!typeData.value.paid
   } catch {
     fetchError.value = 'typeData'

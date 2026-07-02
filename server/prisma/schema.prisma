@@ -151,3 +151,28 @@ model UserEmail {
   @@index([email])
   @@index([createdAt])
 }
+
+model SocialUnlockRequest {
+  id             String   @id @default(uuid())
+  recordId       String
+  typeCode       String
+  email          String
+  platform       String
+  socialHandle   String?
+  commentText    String?
+  screenshotData String
+  status         String   @default("pending")
+  reviewerNote   String?
+  approvedAt     DateTime?
+  rejectedAt     DateTime?
+  reportSentAt   DateTime?
+  sendError      String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([recordId])
+  @@index([email])
+  @@index([status])
+  @@index([platform])
+  @@index([createdAt])
+}

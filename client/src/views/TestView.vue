@@ -308,9 +308,16 @@ function goPrev() {
 }
 
 async function submitTest() {
+  flushCurrentQuestionTiming()
+  const answeredCount = Object.keys(answers.value).length
+  if (answeredCount < questions.value.length) {
+    loadError.value = '请认真完成所有题目后再提交，未完成测试不会生成真实结果，也不能解锁深度报告。'
+    showSubmitConfirm.value = false
+    return
+  }
+
   submitting.value = true
   showSubmitConfirm.value = false
-  flushCurrentQuestionTiming()
   stopObjectiveTimer()
 
   // Count answered questions per dimension (for display in result)
@@ -361,7 +368,7 @@ async function submitTest() {
       utmSource,
       utmMedium,
       utmCampaign,
-    }).catch(() => ({ id: undefined }))
+    })
 
     const referralCode = localStorage.getItem(REFERRAL_KEY) || ''
     if (referralCode && recordRes?.id && score.confidence >= 92) {

@@ -249,6 +249,7 @@ export async function generateReportPdf(typeCode: string): Promise<Buffer> {
   try {
     const page = await browser.newPage()
     await page.setContent(buildReportHtml(report), { waitUntil: 'networkidle' })
+    await page.evaluate(() => document.fonts.ready)
     return await page.pdf({
       format: 'A4',
       printBackground: true,

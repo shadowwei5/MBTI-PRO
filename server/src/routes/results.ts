@@ -206,6 +206,7 @@ resultRoutes.get('/:typeCode', async (req, res, next) => {
   try {
     const { typeCode } = req.params
     const unlockToken = typeof req.query.token === 'string' ? req.query.token : ''
+    const recordId = typeof req.query.recordId === 'string' ? req.query.recordId : ''
     const type = await prisma.personalityType.findUnique({
       where: { code: typeCode.toUpperCase() },
     })
@@ -213,7 +214,7 @@ resultRoutes.get('/:typeCode', async (req, res, next) => {
       res.status(404).json({ success: false, error: 'Type not found' })
       return
     }
-    const paid = unlockToken ? await isOrderPaid(type.code, unlockToken) : false
+    const paid = unlockToken && recordId ? await isOrderPaid(type.code, unlockToken, recordId) : false
     const dimModules = paid ? getTypeDimensionModules(type.code) : null
 
     // Parse JSON fields

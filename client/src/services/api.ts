@@ -1,4 +1,4 @@
-// 开发环境通过 Vite proxy 访问 /api，生产环境使用完整 URL
+﻿// 开发环境通过 Vite proxy 访问 /api，生产环境使用同源 /api
 const API_BASE = import.meta.env.VITE_API_BASE || '/api'
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
@@ -70,6 +70,22 @@ export interface ReferralReward {
   rewardUnlocked: boolean
 }
 
+export interface SocialUnlockRequest {
+  id: string
+  recordId: string
+  typeCode: string
+  email: string
+  platform: 'douyin' | 'xiaohongshu'
+  socialHandle?: string | null
+  commentText?: string | null
+  screenshotData: string
+  status: 'pending' | 'approved' | 'rejected'
+  reviewerNote?: string | null
+  reportSentAt?: string | null
+  sendError?: string | null
+  createdAt: string
+}
+
 export interface ScoreResponse {
   typeCode: string
   scores: {
@@ -94,8 +110,11 @@ export const api = {
 
   getQuestionCount: () => request<{ count: number }>('/questions/count'),
 
-  getResult: (typeCode: string, unlockToken?: string) => {
-    const query = unlockToken ? `?token=${encodeURIComponent(unlockToken)}` : ''
+  getResult: (typeCode: string, unlockToken?: string, recordId?: string) => {
+    const params = new URLSearchParams()
+    if (unlockToken) params.set('token', unlockToken)
+    if (recordId) params.set('recordId', recordId)
+    const query = params.toString() ? `?${params.toString()}` : ''
     return request<PersonalityType>(`/results/${typeCode}${query}`)
   },
 
@@ -112,7 +131,7 @@ export const api = {
     }),
 
   saveRecord: (payload: TestRecordPayload) =>
-    request<{ id: string }>('/records', {
+    request<{ id: string; typeCode: string; confidence: number | null }>('/records', {
       method: 'POST',
       body: JSON.stringify(payload),
     }),
@@ -123,11 +142,7 @@ export const api = {
       body: JSON.stringify({ userType, likedType, dislikedType, recordId }),
     }),
 
-  // ====== 支付相关 ======
-
-  /** 创建支付订单，返回二维码内容；已支付时返回 null */
   createPayment: (typeCode: string, typeName: string, email?: string, referralCode?: string, recordId?: string): Promise<{ qrUrl?: string; orderId?: string; aoid?: string; unlockToken: string; expiresIn?: number; paid?: boolean }> => {
-    const API_BASE = import.meta.env.VITE_API_BASE || '/api'
     return fetch(`${API_BASE}/payment/create`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -136,17 +151,17 @@ export const api = {
       const json = await res.json()
       if (!json.success) throw new Error(json.error || '支付服务暂不可用')
       if (json.data?.paid && json.data?.unlockToken) return json.data
-      // 返回二维码数据
       if (json.data?.qrUrl) return json.data
       throw new Error(json.error || '获取支付二维码失败')
     })
   },
 
-  /** 检查某个类型是否已支付 */
-  checkPayment: (typeCode: string, unlockToken: string) =>
-    request<{ paid: boolean }>(`/payment/check/${typeCode}?token=${encodeURIComponent(unlockToken)}`),
+  checkPayment: (typeCode: string, unlockToken: string, recordId?: string) => {
+    const params = new URLSearchParams({ token: unlockToken })
+    if (recordId) params.set('recordId', recordId)
+    return request<{ paid: boolean }>(`/payment/check/${typeCode}?${params.toString()}`)
+  },
 
-  /** 保存邮箱 */
   saveEmail: (email: string, typeCode: string, source: string = 'paywall') =>
     request<{ id: string }>('/email', {
       method: 'POST',
@@ -169,5 +184,23 @@ export const api = {
     request<{ counted: boolean; rewardUnlocked: boolean }>('/referrals/complete', {
       method: 'POST',
       body: JSON.stringify({ referralCode, referredRecordId }),
+    }),
+
+  submitSocialUnlock: (payload: { recordId: string; typeCode: string; email: string; platform: 'douyin' | 'xiaohongshu'; socialHandle?: string; commentText?: string; screenshotData: string }) =>
+    request<{ id: string; status: string; message: string }>('/social-unlocks', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+
+  getSocialUnlocks: (status = 'pending') =>
+    request<SocialUnlockRequest[]>(`/social-unlocks/admin?key=mbti-pro-admin-2026&status=${encodeURIComponent(status)}`),
+
+  approveSocialUnlock: (id: string) =>
+    request<{ id: string; sent: boolean; email: string; typeCode: string }>(`/social-unlocks/admin/${id}/approve?key=mbti-pro-admin-2026`, { method: 'POST' }),
+
+  rejectSocialUnlock: (id: string, note?: string) =>
+    request<{ id: string; status: string }>(`/social-unlocks/admin/${id}/reject?key=mbti-pro-admin-2026`, {
+      method: 'POST',
+      body: JSON.stringify({ note }),
     }),
 }

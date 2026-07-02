@@ -1,7 +1,7 @@
 ﻿import { Router } from 'express'
 import crypto from 'crypto'
 import { prisma } from '../index.js'
-import { getCreateReferralEligibilityError } from '../services/referralEligibility.js'
+import { getCompleteHighConfidenceError } from '../services/testRecordEligibility.js'
 
 export const referralRoutes = Router()
 
@@ -55,9 +55,9 @@ referralRoutes.post('/create', async (req, res, next) => {
 
     const record = await prisma.testRecord.findUnique({
       where: { id: recordId },
-      select: { id: true, typeCode: true, confidence: true },
+      select: { id: true, typeCode: true, confidence: true, dimAnswered: true, dimTotals: true },
     })
-    const eligibilityError = getCreateReferralEligibilityError(record)
+    const eligibilityError = getCompleteHighConfidenceError(record, typeCode)
     if (eligibilityError) {
       res.status(400).json({ success: false, error: eligibilityError })
       return
@@ -124,9 +124,9 @@ referralRoutes.post('/complete', async (req, res, next) => {
 
     const [reward, record] = await Promise.all([
       prisma.referralReward.findUnique({ where: { code: referralCode } }),
-      prisma.testRecord.findUnique({ where: { id: referredRecordId }, select: { id: true, typeCode: true, confidence: true } }),
+      prisma.testRecord.findUnique({ where: { id: referredRecordId }, select: { id: true, typeCode: true, confidence: true, dimAnswered: true, dimTotals: true } }),
     ])
-    if (!reward || !record || record.id === reward.referrerRecordId || (record.confidence ?? 0) < 92) {
+    if (!reward || !record || record.id === reward.referrerRecordId || getCompleteHighConfidenceError(record)) {
       res.json({ success: true, data: { counted: false, rewardUnlocked: reward?.rewardUnlocked ?? false } })
       return
     }
