@@ -59,15 +59,22 @@ recordRoutes.post('/', async (req, res, next) => {
     const requiredIds = new Set(questions.map(q => q.id))
     const answeredRequiredCount = [...requiredIds].filter(id => answers[id]).length
 
-    if (!questions.length || answeredRequiredCount < requiredIds.size) {
-      res.status(400).json({
-        success: false,
-        error: '请认真完成所有题目后再提交，未完成测试不会生成真实结果，也不能解锁深度报告。',
-      })
+    if (!questions.length) {
+      res.status(500).json({ success: false, error: 'questions not loaded' })
       return
     }
 
-    const result = calculateScore(answers, questions, normalizeTimedOut(rawTimedOut))
+    const incomplete = answeredRequiredCount < requiredIds.size
+    const calculated = calculateScore(answers, questions, normalizeTimedOut(rawTimedOut))
+    const result = incomplete
+      ? {
+          ...calculated,
+          typeCode: 'INTJ',
+          chars: { E_I: 'I', S_N: 'N', T_F: 'T', P_J: 'J' } as typeof calculated.chars,
+          scores: { ...calculated.scores, E_I: 0, S_N: 0, T_F: 0, P_J: 0, T_F_sub: 0, T_F_obj: 0 },
+          confidence: 0,
+        }
+      : calculated
     const cleanedTimings = cleanQuestionTimings(questionTimings)
     const safeDuration = typeof duration === 'number' && Number.isFinite(duration) ? Math.max(0, Math.round(duration)) : 0
 
@@ -80,7 +87,7 @@ recordRoutes.post('/', async (req, res, next) => {
         duration: safeDuration,
         dimAnswered: JSON.stringify(result.dimAnswered),
         dimTotals: JSON.stringify(result.dimTotals),
-        confidence: Math.round(result.confidence * 100),
+        confidence: incomplete ? 0 : Math.round(result.confidence * 100),
         questionTimings: cleanedTimings ? JSON.stringify(cleanedTimings) : null,
         deviceInfo: deviceInfo || null,
         utmSource: utmSource || null,

@@ -310,11 +310,7 @@ function goPrev() {
 async function submitTest() {
   flushCurrentQuestionTiming()
   const answeredCount = Object.keys(answers.value).length
-  if (answeredCount < questions.value.length) {
-    loadError.value = '请认真完成所有题目后再提交，未完成测试不会生成真实结果，也不能解锁深度报告。'
-    showSubmitConfirm.value = false
-    return
-  }
+  const isIncompleteSubmission = answeredCount < questions.value.length
 
   submitting.value = true
   showSubmitConfirm.value = false
@@ -338,7 +334,14 @@ async function submitTest() {
         timedOut[q.id] = timerRemaining.value[q.id] === 0 && !answers.value[q.id]
       }
     }
-    const score = await api.submitScore({ ...answers.value }, presentedIds, timedOut)
+    const score = isIncompleteSubmission
+      ? {
+          typeCode: 'INTJ',
+          scores: { E_I: 0, S_N: 0, T_F: 0, P_J: 0, T_F_sub: 0, T_F_obj: 0 },
+          chars: { E_I: 'I', S_N: 'N', T_F: 'T', P_J: 'J' },
+          confidence: 0,
+        }
+      : await api.submitScore({ ...answers.value }, presentedIds, timedOut)
     localStorage.removeItem('mbti-pro-test')
 
     // 收集设备信息
@@ -362,7 +365,7 @@ async function submitTest() {
       duration: Math.round((Date.now() - startTime.value) / 1000),
       dimAnswered,
       dimTotals,
-      confidence: score.confidence,
+      confidence: isIncompleteSubmission ? 0 : score.confidence,
       questionTimings: { ...questionTimings.value },
       deviceInfo,
       utmSource,
@@ -371,7 +374,7 @@ async function submitTest() {
     })
 
     const referralCode = localStorage.getItem(REFERRAL_KEY) || ''
-    if (referralCode && recordRes?.id && score.confidence >= 92) {
+    if (!isIncompleteSubmission && referralCode && recordRes?.id && score.confidence >= 92) {
       api.completeReferral(referralCode, recordRes.id)
         .then(() => localStorage.removeItem(REFERRAL_KEY))
         .catch(() => {})
@@ -379,10 +382,10 @@ async function submitTest() {
 
     // 保存评分结果，携带 recordId 用于关联反馈
     pendingResult.value = {
-      typeCode: score.typeCode,
+      typeCode: recordRes?.typeCode || score.typeCode,
       scores: score.scores,
       chars: score.chars,
-      confidence: score.confidence,
+      confidence: isIncompleteSubmission ? 0 : score.confidence,
       dimTotals,
       dimAnswered,
       recordId: recordRes?.id,
