@@ -36,10 +36,6 @@ async function submit() {
   }
 }
 
-function skip() {
-  submitted.value = true
-  emit('submitted')
-}
 </script>
 
 <template>
@@ -73,8 +69,7 @@ function skip() {
       <button class="fb-submit" :disabled="!likedType || !dislikedType || submitting" @click="submit">
         {{ submitting ? '提交中...' : '提交并查看结果' }}
       </button>
-      <p v-if="submitError" class="fb-error">网络异常，反馈未保存。你可以重试或跳过。</p>
-      <button class="fb-skip" @click="skip">跳过，直接查看结果</button>
+      <p v-if="submitError" class="fb-error">网络异常，反馈未保存，请重试。</p>
     </div>
   </div>
   <div class="feedback-done" v-else>
@@ -97,7 +92,5 @@ function skip() {
 .fb-submit { margin-top: 20px; width: 100%; padding: 13px; background: #2D2A26; color: #FFF; border: none; border-radius: 14px; font-size: 16px; font-weight: 700; cursor: pointer; }
 .fb-submit:disabled { opacity: 0.4; cursor: not-allowed; }
 .fb-error { color: #E8816B; font-size: 13px; margin-top: 10px; text-align: center; }
-.fb-skip { background: none; border: none; padding: 12px 20px 0; font-size: 14px; color: #9C958E; cursor: pointer; width: 100%; }
-.fb-skip:hover { color: #6B6560; text-decoration: underline; }
 .feedback-done { margin: 32px 0; padding: 16px; background: #2D8A4E11; border-radius: 12px; text-align: center; font-size: 14px; color: #2D8A4E; }
 </style>

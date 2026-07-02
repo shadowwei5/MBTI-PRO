@@ -17,7 +17,6 @@ const emailError = ref('')
 const unlockLoading = ref(false)
 const unlockError = ref('')
 const unlockMessage = ref('')
-const shareChannel = ref('anywhere')
 
 const orderKey = () => props.recordId ? `${props.typeCode}:${props.recordId}` : ''
 
@@ -74,7 +73,7 @@ async function unlockByShare() {
       recordId: props.recordId,
       typeCode: props.typeCode,
       email: userEmail.value,
-      channel: shareChannel.value,
+      channel: 'share_poster',
     })
     persistUnlock(data.unlockToken)
     unlockMessage.value = '深度报告已解锁，PDF 正在自动发送到你的邮箱。请保存海报并分享给好友或发布到评论区支持 MBTI-PRO。'
@@ -126,7 +125,7 @@ watch(isUnlocked, async (val) => {
     <div class="paywall-card" :style="{ borderColor: typeColor + '33' }">
       <div class="lock-icon">🎁</div>
       <h3 class="paywall-title">免费解锁深度人格报告</h3>
-      <p class="paywall-desc">冷启动阶段限时开放：填写邮箱并生成分享海报，即可解锁网页深度内容，系统会自动发送完整 PDF 到你的邮箱。</p>
+      <p class="paywall-desc">填写邮箱并生成分享海报，即可解锁网页深度内容，系统会自动发送完整 PDF 到你的邮箱。</p>
 
       <div class="email-section">
         <div class="email-input-wrap">
@@ -145,15 +144,7 @@ watch(isUnlocked, async (val) => {
 
       <div class="share-card">
         <h4 class="share-title">生成海报并分享给任何人</h4>
-        <p class="share-desc">你可以分享到抖音/小红书/公众号评论区，也可以发给微信好友、朋友圈或其他社群。当前阶段不需要上传截图审核。</p>
-        <select v-model="shareChannel" class="channel-select">
-          <option value="anywhere">任意渠道</option>
-          <option value="wechat_friend">微信好友/群</option>
-          <option value="moments">朋友圈</option>
-          <option value="douyin">抖音评论区</option>
-          <option value="xiaohongshu">小红书评论区</option>
-          <option value="wechat_official">公众号评论区</option>
-        </select>
+        <p class="share-desc">你可以把海报分享到抖音、小红书、公众号评论区，也可以发给微信好友、朋友圈或其他社群。</p>
         <button class="btn-unlock" :style="{ background: typeColor }" :disabled="unlockLoading" @click="unlockByShare">
           <span v-if="unlockLoading" class="spinner" />
           {{ unlockLoading ? '生成并解锁中...' : '生成分享海报，免费解锁' }}
@@ -189,7 +180,6 @@ watch(isUnlocked, async (val) => {
 .share-card { padding: 18px; border: 1.5px dashed #C8963E66; border-radius: 16px; background: #FAF8F5; text-align: left; }
 .share-title { font-size: 16px; font-weight: 700; color: #2D2A26; margin-bottom: 6px; }
 .share-desc { font-size: 13px; color: #6B6560; line-height: 1.6; margin-bottom: 12px; }
-.channel-select { width: 100%; padding: 11px 12px; border: 1.5px solid #E0D8CC; border-radius: 12px; background: #FFF; color: #2D2A26; font-size: 14px; margin-bottom: 12px; }
 .btn-unlock { width: 100%; padding: 14px 18px; border: none; border-radius: 14px; color: #FFF; font-size: 16px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
 .btn-unlock:hover:not(:disabled) { transform: translateY(-1px); }
 .btn-unlock:disabled { opacity: 0.65; cursor: not-allowed; }

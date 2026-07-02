@@ -2,18 +2,11 @@
 import crypto from 'crypto'
 import { prisma } from '../index.js'
 import { sendPaymentEmail } from '../services/email.js'
-import { validateCompleteHighConfidenceRecord } from '../services/testRecordEligibility.js'
 
 export const shareUnlockRoutes = Router()
 
 function isValidEmail(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
-}
-
-function normalizeChannel(value: unknown): string | null {
-  if (typeof value !== 'string') return null
-  const normalized = value.trim().slice(0, 40)
-  return normalized || null
 }
 
 export async function isShareUnlockValid(typeCode: string, unlockToken: string, recordId?: string): Promise<boolean> {
@@ -47,7 +40,7 @@ shareUnlockRoutes.post('/create', async (req, res, next) => {
     const recordId = typeof req.body?.recordId === 'string' ? req.body.recordId : ''
     const typeCode = typeof req.body?.typeCode === 'string' ? req.body.typeCode.toUpperCase() : ''
     const email = typeof req.body?.email === 'string' ? req.body.email.trim() : ''
-    const channel = normalizeChannel(req.body?.channel)
+    const channel = typeof req.body?.channel === 'string' ? req.body.channel.trim().slice(0, 40) || null : null
 
     if (!recordId || !typeCode) {
       res.status(400).json({ success: false, error: '请从完整测试结果页生成分享海报。' })
@@ -58,9 +51,12 @@ shareUnlockRoutes.post('/create', async (req, res, next) => {
       return
     }
 
-    const eligibilityError = await validateCompleteHighConfidenceRecord(recordId, typeCode)
-    if (eligibilityError) {
-      res.status(400).json({ success: false, error: eligibilityError })
+    const record = await prisma.testRecord.findUnique({
+      where: { id: recordId },
+      select: { typeCode: true },
+    })
+    if (!record || record.typeCode !== typeCode) {
+      res.status(400).json({ success: false, error: '测试记录无效，请回到本次测试结果页重新生成分享海报。' })
       return
     }
 
