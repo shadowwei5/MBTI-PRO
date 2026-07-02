@@ -3,6 +3,7 @@ import { prisma } from '../index.js'
 import { calculateScore, type Answers, type QuestionMeta, type AnswerKey } from '../services/scoring.js'
 import { getTypeDimensionModules } from '../content/dimension-modules.js'
 import { isOrderPaid } from './payment.js'
+import { isShareUnlockValid } from './shareUnlocks.js'
 import { scalePopulationFor81 } from '../services/population.js'
 
 // 81型人格总结内联（避免types.ts导入链问题）
@@ -214,7 +215,9 @@ resultRoutes.get('/:typeCode', async (req, res, next) => {
       res.status(404).json({ success: false, error: 'Type not found' })
       return
     }
-    const paid = unlockToken && recordId ? await isOrderPaid(type.code, unlockToken, recordId) : false
+    const paid = unlockToken && recordId
+      ? await isOrderPaid(type.code, unlockToken, recordId) || await isShareUnlockValid(type.code, unlockToken, recordId)
+      : false
     const dimModules = paid ? getTypeDimensionModules(type.code) : null
 
     // Parse JSON fields

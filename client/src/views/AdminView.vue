@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { api, type SocialUnlockRequest } from '../services/api'
+
 
 interface DashboardData {
   overview: {
@@ -14,6 +14,7 @@ interface DashboardData {
   topDisliked: { type: string; count: number }[]
   questionTimingStats: { questionId: number; dimension: string; dimensionLabel?: string; type: string; typeLabel?: string; sortOrder: number; label: string; samples: number; avgSec: number; medianSec: number }[]
   referralFunnel: { shares: number; clicks: number; validCompletions: number; rewardUnlocks: number; referredPaid: number }
+  shareUnlockFunnel?: { unlocks: number; sentReports: number; todayUnlocks: number; channels: { channel: string; count: number }[] }
   dailyTrend: { date: string; count: number }[]
   utmSources: { source: string; count: number }[]
 }
@@ -23,42 +24,6 @@ const loading = ref(true)
 const error = ref('')
 const emails = ref<{ email: string; typeCode: string; source: string; createdAt: string }[]>([])
 const showEmails = ref(false)
-const socialUnlocks = ref<SocialUnlockRequest[]>([])
-const socialActionLoading = ref('')
-const socialActionMessage = ref('')
-
-async function loadSocialUnlocks() {
-  socialUnlocks.value = await api.getSocialUnlocks('pending')
-}
-
-async function approveSocialUnlock(id: string) {
-  socialActionLoading.value = id
-  socialActionMessage.value = ''
-  try {
-    const result = await api.approveSocialUnlock(id)
-    socialActionMessage.value = `已通过：${result.typeCode} 报告已发送到 ${result.email}`
-    await loadSocialUnlocks()
-  } catch (e: any) {
-    socialActionMessage.value = e.message || '审核通过失败'
-  } finally {
-    socialActionLoading.value = ''
-  }
-}
-
-async function rejectSocialUnlock(id: string) {
-  socialActionLoading.value = id
-  socialActionMessage.value = ''
-  try {
-    await api.rejectSocialUnlock(id, '截图不符合要求')
-    socialActionMessage.value = '已拒绝该申请'
-    await loadSocialUnlocks()
-  } catch (e: any) {
-    socialActionMessage.value = e.message || '拒绝失败'
-  } finally {
-    socialActionLoading.value = ''
-  }
-}
-
 onMounted(async () => {
   try {
     const API_BASE = import.meta.env.VITE_API_BASE || '/api'
@@ -75,7 +40,6 @@ onMounted(async () => {
       const emailsJson = await emailsRes.json()
       if (emailsJson.success) emails.value = emailsJson.data
     }
-    await loadSocialUnlocks().catch(() => {})
   } catch (e: any) {
     error.value = e.message
   } finally {
@@ -162,29 +126,31 @@ async function copyEmails() {
       <template v-else-if="data">
         <div class="bg-white rounded-2xl p-6 shadow-sm border border-border/30 mb-6">
           <div class="flex items-center justify-between mb-4">
-            <h2 class="text-sm font-semibold text-charcoal uppercase tracking-wider">社媒截图审核（{{ socialUnlocks.length }}）</h2>
-            <button @click="loadSocialUnlocks" class="text-xs text-coral hover:underline">刷新</button>
+            <h2 class="text-sm font-semibold text-charcoal uppercase tracking-wider">免费分享解锁漏斗</h2>
+            <span class="text-xs text-text-muted">冷启动阶段：邮箱 + 海报生成即解锁</span>
           </div>
-          <p class="text-xs text-text-muted mb-4">确认用户在抖音/小红书评论区文字评论并附上分享海报后，点击“通过并发送PDF”，系统会立刻把对应深度报告发送到用户邮箱。</p>
-          <p v-if="socialActionMessage" class="text-sm text-sage mb-3">{{ socialActionMessage }}</p>
-          <div v-if="!socialUnlocks.length" class="text-text-muted text-sm text-center py-6">暂无待审核截图</div>
-          <div v-else class="grid md:grid-cols-2 gap-4">
-            <div v-for="item in socialUnlocks" :key="item.id" class="border border-border/50 rounded-2xl p-4 bg-surface-alt/40">
-              <div class="flex items-center justify-between mb-2">
-                <div class="font-bold text-charcoal">{{ item.typeCode }} · {{ item.platform === 'douyin' ? '抖音' : '小红书' }}</div>
-                <div class="text-xs text-text-muted">{{ new Date(item.createdAt).toLocaleString('zh-CN') }}</div>
-              </div>
-              <div class="text-xs text-text-muted space-y-1 mb-3">
-                <p>邮箱：{{ item.email }}</p>
-                <p>昵称：{{ item.socialHandle || '-' }}</p>
-                <p>备注：{{ item.commentText || '-' }}</p>
-              </div>
-              <img :src="item.screenshotData" alt="评论截图" class="w-full max-h-80 object-contain rounded-xl border border-border bg-white mb-3" />
-              <div class="flex gap-2">
-                <button @click="approveSocialUnlock(item.id)" :disabled="socialActionLoading === item.id" class="flex-1 px-3 py-2 bg-sage text-white rounded-xl text-sm font-semibold disabled:opacity-60">通过并发送PDF</button>
-                <button @click="rejectSocialUnlock(item.id)" :disabled="socialActionLoading === item.id" class="px-3 py-2 bg-coral text-white rounded-xl text-sm font-semibold disabled:opacity-60">拒绝</button>
-              </div>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+            <div class="bg-surface-alt rounded-xl p-4">
+              <p class="text-xs text-text-muted mb-1">累计解锁</p>
+              <p class="text-2xl font-bold text-coral">{{ data.shareUnlockFunnel?.unlocks || 0 }}</p>
             </div>
+            <div class="bg-surface-alt rounded-xl p-4">
+              <p class="text-xs text-text-muted mb-1">今日解锁</p>
+              <p class="text-2xl font-bold text-gold">{{ data.shareUnlockFunnel?.todayUnlocks || 0 }}</p>
+            </div>
+            <div class="bg-surface-alt rounded-xl p-4">
+              <p class="text-xs text-text-muted mb-1">PDF 发送成功</p>
+              <p class="text-2xl font-bold text-sage">{{ data.shareUnlockFunnel?.sentReports || 0 }}</p>
+            </div>
+            <div class="bg-surface-alt rounded-xl p-4">
+              <p class="text-xs text-text-muted mb-1">发送成功率</p>
+              <p class="text-2xl font-bold text-indigo">{{ data.shareUnlockFunnel?.unlocks ? Math.round((data.shareUnlockFunnel.sentReports / data.shareUnlockFunnel.unlocks) * 100) : 0 }}%</p>
+            </div>
+          </div>
+          <div v-if="data.shareUnlockFunnel?.channels?.length" class="flex flex-wrap gap-2">
+            <span v-for="item in data.shareUnlockFunnel.channels" :key="item.channel" class="px-3 py-1 bg-surface-alt rounded-full text-xs text-text-muted">
+              {{ item.channel }}：{{ item.count }}
+            </span>
           </div>
         </div>
 

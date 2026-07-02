@@ -162,6 +162,12 @@ export const api = {
     return request<{ paid: boolean }>(`/payment/check/${typeCode}?${params.toString()}`)
   },
 
+  createShareUnlock: (payload: { recordId: string; typeCode: string; email: string; channel?: string }) =>
+    request<{ unlockToken: string; sent: boolean; id: string }>('/share-unlocks/create', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+
   saveEmail: (email: string, typeCode: string, source: string = 'paywall') =>
     request<{ id: string }>('/email', {
       method: 'POST',

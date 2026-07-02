@@ -13,6 +13,7 @@ const XORPAY_BASE = 'https://xorpay.com/api'
 const AID = process.env.XORPAY_AID || ''
 const SECRET = process.env.XORPAY_SECRET || ''
 const NOTIFY_URL = process.env.XORPAY_NOTIFY_URL || ''
+const ENABLE_PAID_UNLOCK = process.env.ENABLE_PAID_UNLOCK === 'true'
 const paidOrdersCache = new Map<string, string>()
 
 function md5(s: string): string {
@@ -122,6 +123,11 @@ paymentRoutes.post('/create', async (req, res, next) => {
       res.status(400).json({ success: false, error: 'typeCode and typeName required' })
       return
     }
+    if (!ENABLE_PAID_UNLOCK) {
+      res.status(403).json({ success: false, error: '冷启动阶段已开放免费分享解锁，请填写邮箱并生成分享海报解锁深度报告。' })
+      return
+    }
+
     if (!AID || !SECRET) {
       res.status(500).json({ success: false, error: 'XORPAY not configured' })
       return

@@ -1,4 +1,4 @@
-import express from 'express'
+﻿import express from 'express'
 import cors from 'cors'
 import path from 'path'
 import { fileURLToPath } from 'url'
@@ -13,6 +13,7 @@ import { paymentRoutes } from './routes/payment.js'
 import { referralRoutes } from './routes/referrals.js'
 import { adminRoutes } from './routes/admin.js'
 import { socialUnlockRoutes } from './routes/socialUnlocks.js'
+import { shareUnlockRoutes } from './routes/shareUnlocks.js'
 import emailRoutes from './routes/email.js'
 
 loadServerEnv()
@@ -23,7 +24,7 @@ const app = express()
 const PORT = process.env.PORT || 3001
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
-// CORS：开发环境 + 生产域名
+// CORS锛氬紑鍙戠幆澧?+ 鐢熶骇鍩熷悕
 const ALLOWED_ORIGINS = [
   'http://localhost:5173', 'http://localhost:5174', 'http://localhost:4173',
   process.env.CLIENT_ORIGIN,
@@ -31,7 +32,7 @@ const ALLOWED_ORIGINS = [
 
 app.use(cors({ origin: ALLOWED_ORIGINS }))
 app.use(express.json({ limit: '8mb' }))
-app.use(express.urlencoded({ extended: true, limit: '8mb' })) // XorPay 回调使用 form-urlencoded
+app.use(express.urlencoded({ extended: true, limit: '8mb' })) // XorPay 鍥炶皟浣跨敤 form-urlencoded
 
 app.use('/api/questions', questionRoutes)
 app.use('/api/results', resultRoutes)
@@ -40,6 +41,7 @@ app.use('/api/feedback', feedbackRoutes)
 app.use('/api/payment', paymentRoutes)
 app.use('/api/referrals', referralRoutes)
 app.use('/api/social-unlocks', socialUnlockRoutes)
+app.use('/api/share-unlocks', shareUnlockRoutes)
 app.use('/api/admin', adminRoutes)
 app.use('/api/email', emailRoutes)
 
@@ -104,8 +106,8 @@ app.get('/api/images/:typeCode', (req, res) => {
   }
 })
 
-// 缩略图端点: 首页网格用 320px WebP (~4KB)
-// 中图端点: 详情页+海报用 640px WebP (~15KB)
+// 缂╃暐鍥剧鐐? 棣栭〉缃戞牸鐢?320px WebP (~4KB)
+// 涓浘绔偣: 璇︽儏椤?娴锋姤鐢?640px WebP (~15KB)
 const mediumsDir = path.join(imagesDir, 'mediums')
 
 app.get('/api/mediums/:typeCode', (req, res) => {
@@ -129,7 +131,7 @@ app.get('/api/mediums/:typeCode', (req, res) => {
   }
 })
 
-// 缩略图端点: 首页网格用 320px WebP (~4KB)
+// 缂╃暐鍥剧鐐? 棣栭〉缃戞牸鐢?320px WebP (~4KB)
 app.get('/api/thumbs/:typeCode', (req, res) => {
   const typeCode = req.params.typeCode.toUpperCase()
   const thumbPath = path.join(thumbsDir, `${typeCode}.webp`)
@@ -138,7 +140,7 @@ app.get('/api/thumbs/:typeCode', (req, res) => {
     res.setHeader('Content-Type', 'image/webp')
     res.sendFile(thumbPath)
   } else {
-    // 降级: 缩略图不存在时回退到原图
+    // 缩略图不存在时回退到原图
     const imagePath = path.join(imagesDir, `${typeCode}.jpg`)
     if (fs.existsSync(imagePath)) {
       setImageCacheHeaders(res, 86400)

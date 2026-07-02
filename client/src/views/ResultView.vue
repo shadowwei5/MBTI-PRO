@@ -290,6 +290,7 @@ const defaultItems = {
           :type-color="typeColor.hex"
           :record-id="recordId"
           @unlocked="loadPaidReport"
+          @request-share-poster="showSharePoster = true"
         >
           <div v-if="paidReport" class="deep-content space-y-6 mt-2">
 

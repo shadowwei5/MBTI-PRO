@@ -176,3 +176,21 @@ model SocialUnlockRequest {
   @@index([platform])
   @@index([createdAt])
 }
+
+model ShareUnlock {
+  id          String   @id @default(uuid())
+  recordId    String
+  typeCode     String
+  email       String
+  channel     String?
+  unlockToken String   @unique
+  reportSentAt DateTime?
+  sendError   String?
+  createdAt   DateTime @default(now())
+
+  @@index([recordId])
+  @@index([typeCode])
+  @@index([email])
+  @@index([channel])
+  @@index([createdAt])
+}

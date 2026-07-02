@@ -25,6 +25,7 @@ adminRoutes.get('/stats', async (_req, res, next) => {
       abandonCount, completedCount,
       completedRecords, // 置信度≥92%的记录(用于过滤反馈)
       referralCount, referralClicks, referralValidCompletions, referralRewards, referralPaid,
+      shareUnlockCount, shareUnlockSent, shareUnlockToday, shareUnlockChannels,
     ] = await Promise.all([
       prisma.testRecord.count(),
       prisma.testRecord.count({ where: { createdAt: { gte: todayStart } } }),
@@ -42,6 +43,10 @@ adminRoutes.get('/stats', async (_req, res, next) => {
       prisma.referralReward.aggregate({ _sum: { validCompletedCount: true } }),
       prisma.referralReward.count({ where: { rewardUnlocked: true } }),
       prisma.referralReward.aggregate({ _sum: { referredPaidCount: true } }),
+      prisma.shareUnlock.count(),
+      prisma.shareUnlock.count({ where: { reportSentAt: { not: null } } }),
+      prisma.shareUnlock.count({ where: { createdAt: { gte: todayStart } } }),
+      prisma.shareUnlock.groupBy({ by: ['channel'], _count: true, orderBy: { _count: { channel: 'desc' } }, take: 10 }),
     ])
 
     const completedIds = completedRecords.map(r => r.id)
@@ -168,6 +173,12 @@ adminRoutes.get('/stats', async (_req, res, next) => {
           validCompletions: referralValidCompletions._sum.validCompletedCount ?? 0,
           rewardUnlocks: referralRewards,
           referredPaid: referralPaid._sum.referredPaidCount ?? 0,
+        },
+        shareUnlockFunnel: {
+          unlocks: shareUnlockCount,
+          sentReports: shareUnlockSent,
+          todayUnlocks: shareUnlockToday,
+          channels: shareUnlockChannels.map(item => ({ channel: item.channel || 'unknown', count: item._count })),
         },
         dailyTrend,
         utmSources: utmSources.map(u => ({ source: u.utmSource || 'direct', count: u._count })),
