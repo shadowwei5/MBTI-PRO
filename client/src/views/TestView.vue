@@ -540,7 +540,7 @@ onUnmounted(() => {
 
           <!-- Options (objective) -->
           <OptionGroup
-            v-if="currentQuestion.type === 'objective'"
+            v-if="currentQuestion.type === 'objective' || (currentQuestion.type === 'likert' && (!currentQuestion.textLeft || !currentQuestion.textRight))"
             :options="currentQuestion.options"
             :modelValue="answers[currentQuestion.id] ?? null"
             :disabled="isObjectiveLocked"
