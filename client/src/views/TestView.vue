@@ -309,8 +309,6 @@ function goPrev() {
 
 async function submitTest() {
   flushCurrentQuestionTiming()
-  const answeredCount = Object.keys(answers.value).length
-  const isIncompleteSubmission = answeredCount < questions.value.length
 
   submitting.value = true
   showSubmitConfirm.value = false
@@ -334,14 +332,7 @@ async function submitTest() {
         timedOut[q.id] = timerRemaining.value[q.id] === 0 && !answers.value[q.id]
       }
     }
-    const score = isIncompleteSubmission
-      ? {
-          typeCode: 'INTJ',
-          scores: { E_I: 0, S_N: 0, T_F: 0, P_J: 0, T_F_sub: 0, T_F_obj: 0 },
-          chars: { E_I: 'I', S_N: 'N', T_F: 'T', P_J: 'J' },
-          confidence: 0,
-        }
-      : await api.submitScore({ ...answers.value }, presentedIds, timedOut)
+    const score = await api.submitScore({ ...answers.value }, presentedIds, timedOut)
     localStorage.removeItem('mbti-pro-test')
 
     // 收集设备信息
@@ -365,7 +356,7 @@ async function submitTest() {
       duration: Math.round((Date.now() - startTime.value) / 1000),
       dimAnswered,
       dimTotals,
-      confidence: isIncompleteSubmission ? 0 : score.confidence,
+      confidence: score.confidence,
       questionTimings: { ...questionTimings.value },
       deviceInfo,
       utmSource,
@@ -374,7 +365,7 @@ async function submitTest() {
     })
 
     const referralCode = localStorage.getItem(REFERRAL_KEY) || ''
-    if (!isIncompleteSubmission && referralCode && recordRes?.id && score.confidence >= 92) {
+    if (referralCode && recordRes?.id && score.confidence >= 92) {
       api.completeReferral(referralCode, recordRes.id)
         .then(() => localStorage.removeItem(REFERRAL_KEY))
         .catch(() => {})
@@ -385,7 +376,7 @@ async function submitTest() {
       typeCode: recordRes?.typeCode || score.typeCode,
       scores: score.scores,
       chars: score.chars,
-      confidence: isIncompleteSubmission ? 0 : score.confidence,
+      confidence: score.confidence,
       dimTotals,
       dimAnswered,
       recordId: recordRes?.id,
