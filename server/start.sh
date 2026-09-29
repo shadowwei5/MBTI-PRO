@@ -1,37 +1,37 @@
 #!/bin/bash
-# Render 启动脚本 — 处理持久化磁盘 + 数据库初始化
+# Render 启动脚本 - 兼容免费层（无持久盘）与付费层（有持久盘）
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-PERSIST_DIR="/opt/render/project/persist"
 IMAGES_DIR="$SCRIPT_DIR/generated_images"
 PRISMA_DIR="$SCRIPT_DIR/prisma"
+PERSIST_DIR="/opt/render/project/persist"
 
-# 初始化持久化目录
-mkdir -p "$PERSIST_DIR/images"
-
-# 每次启动都同步新图片到持久化磁盘（覆盖同名，保留旧图）
-if [ -d "$IMAGES_DIR" ]; then
-    echo "[init] syncing images to persistent disk..."
+# 持久盘可用（付费层）：把图片同步到持久盘并软链；否则直接用 git 内置图片（免费层）
+if [ -d "$PERSIST_DIR" ] && [ -w "$PERSIST_DIR" ]; then
+  echo "[init] persistent disk detected, syncing images..."
+  mkdir -p "$PERSIST_DIR/images"
+  if [ -d "$IMAGES_DIR" ]; then
     cp -r "$IMAGES_DIR"/* "$PERSIST_DIR/images/" 2>/dev/null || true
+  fi
+  rm -rf "$IMAGES_DIR"
+  ln -sf "$PERSIST_DIR/images" "$IMAGES_DIR"
+else
+  echo "[init] no persistent disk, using in-place images (free tier)"
 fi
 
-# 链接持久化目录
-rm -rf "$IMAGES_DIR"
-ln -sf "$PERSIST_DIR/images" "$IMAGES_DIR"
-
-# 数据库初始化
 cd "$SCRIPT_DIR"
 npx prisma generate
 npx prisma db push --accept-data-loss 2>/dev/null || npx prisma db push
 
-# 检查是否需要 seed
-TABLE_COUNT=$(sqlite3 "$PRISMA_DIR/dev.db" "SELECT COUNT(*) FROM sqlite_master WHERE type='table';" 2>/dev/null || echo "0")
-QUESTION_COUNT=$(sqlite3 "$PRISMA_DIR/dev.db" "SELECT COUNT(*) FROM Question;" 2>/dev/null || echo "0")
-
+# 数据库为空时播种（题目 + 81 型内容）
+QUESTION_COUNT=0
+if command -v sqlite3 >/dev/null 2>&1; then
+  QUESTION_COUNT=$(sqlite3 "$PRISMA_DIR/dev.db" "SELECT COUNT(*) FROM Question;" 2>/dev/null || echo "0")
+fi
 if [ "$QUESTION_COUNT" -lt 90 ]; then
-    echo "[seed] populating database..."
-    npx tsx src/seed.ts
+  echo "[seed] populating database..."
+  npx tsx src/seed.ts
 fi
 
 echo "[start] launching MBTI-PRO API..."

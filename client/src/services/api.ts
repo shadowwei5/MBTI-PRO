@@ -162,6 +162,15 @@ export const api = {
     return request<{ paid: boolean }>(`/payment/check/${typeCode}?${params.toString()}`)
   },
 
+  createDonation: (amount: number, payType: 'alipay' | 'native') =>
+    request<{ qrUrl?: string; aoid?: string; orderId?: string; expiresIn?: number; paid?: boolean }>('/donation/create', {
+      method: 'POST',
+      body: JSON.stringify({ amount, payType }),
+    }),
+
+  checkDonation: (aoid: string) =>
+    request<{ paid: boolean; status: string }>(`/donation/check/${aoid}`),
+
   createShareUnlock: (payload: { recordId: string; typeCode: string; email: string; channel?: string }) =>
     request<{ unlockToken: string; sent: boolean; id: string }>('/share-unlocks/create', {
       method: 'POST',

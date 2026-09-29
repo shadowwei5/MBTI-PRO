@@ -1,4 +1,4 @@
-﻿import express from 'express'
+import express from 'express'
 import cors from 'cors'
 import path from 'path'
 import { fileURLToPath } from 'url'
@@ -10,6 +10,7 @@ import { resultRoutes } from './routes/results.js'
 import { recordRoutes } from './routes/records.js'
 import feedbackRoutes from './routes/feedback.js'
 import { paymentRoutes } from './routes/payment.js'
+import { donationRoutes } from './routes/donation.js'
 import { referralRoutes } from './routes/referrals.js'
 import { adminRoutes } from './routes/admin.js'
 import { socialUnlockRoutes } from './routes/socialUnlocks.js'
@@ -39,6 +40,7 @@ app.use('/api/results', resultRoutes)
 app.use('/api/records', recordRoutes)
 app.use('/api/feedback', feedbackRoutes)
 app.use('/api/payment', paymentRoutes)
+app.use('/api/donation', donationRoutes)
 app.use('/api/referrals', referralRoutes)
 app.use('/api/social-unlocks', socialUnlockRoutes)
 app.use('/api/share-unlocks', shareUnlockRoutes)

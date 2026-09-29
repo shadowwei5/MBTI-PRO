@@ -1,26 +1,26 @@
-# MBTI-PRO 后端 — Render 免费部署配置
-
+# MBTI-PRO - Render 免费层单服务部署（同源托管 前端 + API + 图片）
+# 免费层说明：15 分钟无访问会休眠，冷启动较慢（~30-60s）；无持久盘，
+# 每次 冷启动由 start.sh 重建 SQLite 并 seed 全部题目 + 81 型内容（仅统计类数据不保留）。
 services:
   - type: web
-    name: mbti-pro-api
+    name: mbti-pro
     env: node
     region: singapore
     plan: free
-    buildCommand: cd server && npm install --include=dev && npx prisma generate
+    buildCommand: cd client && npm install && npm run build && cd ../server && npm install --include=dev && npx prisma generate
     startCommand: cd server && bash start.sh
     healthCheckPath: /api/health
+    autoDeploy: true
     envVars:
+      - key: NODE_VERSION
+        value: "22"
       - key: PORT
-        value: 3001
+        value: "3001"
       - key: CLIENT_ORIGIN
-        value: https://mbti-pro.vercel.app
-      - key: VOLCENGINE_API_KEY
-        sync: false
+        value: https://mbti-pro.com
       - key: VOLCENGINE_BASE_URL
         value: https://ark.cn-beijing.volces.com
       - key: VOLCENGINE_IMAGE_MODEL
         value: doubao-seedream-5-0-lite-260128
-    disk:
-      name: persist
-      mountPath: /opt/render/project/persist
-      sizeGB: 1
+      - key: VOLCENGINE_API_KEY
+        sync: false

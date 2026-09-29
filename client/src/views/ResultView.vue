@@ -5,6 +5,7 @@ import DimensionSpectrum from '../components/DimensionSpectrum.vue'
 import TypeAvatar from '../components/TypeAvatar.vue'
 import SharePoster from '../components/SharePoster.vue'
 import PaywallSection from '../components/PaywallSection.vue'
+import DonationSection from '../components/DonationSection.vue'
 import { api, type PersonalityType } from '../services/api'
 import { getTypeColor, getTemperament, TEMPERAMENT_COLORS, getNineGroupCode, getNineGroupColor } from '../utils/colors'
 import { useShareMeta } from '../composables/useShareMeta'
@@ -439,6 +440,9 @@ const defaultItems = {
             返回首页
           </button>
         </div>
+
+        <!-- 打赏作者（始终显示） -->
+        <DonationSection :typeColor="typeColor.hex" />
 
         <!-- Disclaimer -->
         <p class="text-center text-xs text-text-muted mt-8">

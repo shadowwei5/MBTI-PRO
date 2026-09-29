@@ -21,3 +21,48 @@ video/6月26日/
 video/6月26日(1)/
 video/6月27日*/
 video/output/*.mp4
+
+.env.local
+.env.*.local
+
+# ── 个人证件与身份文件（绝不公开）─────────────────────────
+id-front.png
+id-back.png
+office.jpg
+
+# ── 本地预览 / 审核产物（构建副产物，无展示价值）───────────
+deploy_*.png
+review_*.png
+review_*.html
+prompts_review*.png
+prompts_review*.html
+ux_check_*.png
+xorpay_recharge.png
+web_dim_bars.png
+report_INTJ*
+color_comparison.html
+color_comparison.png
+
+# ── 日志与临时文件 ────────────────────────────────────────
+*.log
+*.err
+server/server_err.txt
+server/server_log.txt
+server-test.log
+server-test.err
+_openpage.tmp.txt
+
+# ── 图像生成过程快照 ──────────────────────────────────────
+server/generated_images/_backup_*/
+server/generated_images/_before_*/
+
+# ── 内容营销工作区（不随产品代码发布）──────────────────────
+content-marketing/
+
+# ── 外部参考与本地一次性脚本 ──────────────────────────────
+g2pW/
+external-projects/
+scripts/gen_report.js
+personality_data.json
+patch_v9*.mjs
+.codex*
