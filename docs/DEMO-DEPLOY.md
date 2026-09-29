@@ -76,12 +76,16 @@ DEMO_SHOT_DIR=/tmp ./node_modules/.bin/tsx scripts/verify-demo-build.ts http://1
 https://shadowwei5.github.io/MBTI-PRO/
 ```
 
-**更新演示站**（改了数据或代码后）：
+**以后更新演示站，一条命令：**
 
 ```bash
-cd client && node scripts/build-demo.mjs
-# 然后把 dist 内容重新推送到 gh-pages 分支
+cd client
+npm run deploy:ghpages -- --build     # 先构建再推送
+# 或已有 dist 时： npm run deploy:ghpages
 ```
+
+> 该脚本在系统临时目录里组装 gh-pages 分支再推送，不会污染主仓库工作区，
+> 并会自动补上 `.nojekyll`、把 `robots.txt` 设为禁止收录、移除 `sitemap.xml`。
 
 ---
 
@@ -139,7 +143,7 @@ cd client && node scripts/build-demo.mjs
 | 文件 | 作用 |
 |---|---|
 | `server/scripts/export-demo-data.ts` | 导出题库 + 81 型内容 + 81 张插画到 `client/public/demo/` |
-| `client/scripts/build-demo.mjs` | 以 `VITE_DEMO_MODE=1` 构建，并生成 `404.html` |
+|  `client/scripts/build-demo.mjs` | 以 `VITE_DEMO_MODE=1` 构建，并生成 `404.html` |
 | `server/scripts/verify-demo-build.ts` | 真实浏览器冒烟测试 |
 | `client/src/services/demoMode.ts` | 演示模式开关（读 `VITE_DEMO_MODE`） |
 | `client/src/services/demoApi.ts` | 静态数据实现，接口与 `api.ts` 完全一致 |

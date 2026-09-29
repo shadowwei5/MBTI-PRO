@@ -7,6 +7,7 @@
     "dev": "vite",
     "build": "vue-tsc -b && vite build",
     "build:demo": "node scripts/build-demo.mjs",
+    "deploy:ghpages": "node scripts/deploy-ghpages.mjs",
     "preview": "vite preview"
   },
   "dependencies": {
