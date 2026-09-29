@@ -1,0 +1,15 @@
+{
+  "demo": true,
+  "questionCount": 100,
+  "typeCount": 81,
+  "dimensionCounts": {
+    "E_I": 25,
+    "S_N": 25,
+    "P_J": 25,
+    "T_F": 25
+  },
+  "questionTypeCounts": {
+    "likert": 90,
+    "objective": 10
+  }
+}

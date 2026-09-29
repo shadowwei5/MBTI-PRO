@@ -11,6 +11,8 @@
     "db:push": "prisma db push",
     "db:seed": "tsx src/seed.ts",
     "db:studio": "prisma studio",
+    "demo:export": "tsx scripts/export-demo-data.ts",
+    "demo:verify": "tsx scripts/verify-demo-build.ts",
     "test": "vitest run",
     "test:watch": "vitest"
   },

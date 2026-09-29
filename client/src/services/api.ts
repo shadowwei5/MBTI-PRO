@@ -1,4 +1,8 @@
 ﻿// 开发环境通过 Vite proxy 访问 /api，生产环境使用同源 /api
+// 静态演示版（VITE_DEMO_MODE=1）走本地静态数据，见文件末尾的导出。
+import { demoApi } from './demoApi'
+import { IS_DEMO } from './demoMode'
+
 const API_BASE = import.meta.env.VITE_API_BASE || '/api'
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
@@ -105,7 +109,7 @@ export interface ScoreResponse {
   confidence: number
 }
 
-export const api = {
+export const realApi = {
   getQuestions: () => request<ApiQuestion[]>('/questions'),
 
   getQuestionCount: () => request<{ count: number }>('/questions/count'),
@@ -219,3 +223,13 @@ export const api = {
       body: JSON.stringify({ note }),
     }),
 }
+
+/**
+ * 对外统一入口。
+ *
+ * 构建时设置 `VITE_DEMO_MODE=1` 即切换到静态演示实现：
+ * 数据来自 /demo/*.json，评分在本地完成，所有写入类接口停用。
+ * 正式环境（默认）走 realApi，即上面的 HTTP 实现。
+ */
+export const api = (IS_DEMO ? demoApi : realApi) as typeof realApi
+

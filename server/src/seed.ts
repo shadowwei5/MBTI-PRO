@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client'
+import { pathToFileURL } from 'node:url'
 import { buildTypeContent, handCraftedTypes, generateAllTypeCodes } from './content/types.js'
 
 const prisma = new PrismaClient()
@@ -23,7 +24,7 @@ interface SeedQuestion {
   sortOrder: number
 }
 
-const questions: SeedQuestion[] = [
+export const questions: SeedQuestion[] = [
   // ═══════════════════════════════════════════════════════════
   // E_I 维度 - 双极量表 (25题, id 1-25)
   // 左侧=E外向倾向, 右侧=I内向倾向
@@ -231,6 +232,15 @@ async function main() {
   console.log('Seed complete!')
 }
 
-main()
-  .catch((e) => { console.error(e); process.exit(1) })
-  .finally(() => prisma.$disconnect())
+// 仅在被直接执行时跑 seeding。
+// 否则 import 本模块（例如 scripts/export-demo-data.ts 复用 questions 数组）
+// 会连带清库并重写 —— 这个副作用曾经真实发生过。
+const isDirectRun =
+  process.argv[1] !== undefined &&
+  import.meta.url === pathToFileURL(process.argv[1]).href
+
+if (isDirectRun) {
+  main()
+    .catch((e) => { console.error(e); process.exit(1) })
+    .finally(() => prisma.$disconnect())
+}

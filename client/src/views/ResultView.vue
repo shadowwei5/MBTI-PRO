@@ -7,7 +7,9 @@ import SharePoster from '../components/SharePoster.vue'
 import PaywallSection from '../components/PaywallSection.vue'
 import DonationSection from '../components/DonationSection.vue'
 import { api, type PersonalityType } from '../services/api'
+import { IS_DEMO } from '../services/demoMode'
 import { getTypeColor, getTemperament, TEMPERAMENT_COLORS, getNineGroupCode, getNineGroupColor } from '../utils/colors'
+import { typeImageUrl } from '../utils/typeImage'
 import { useShareMeta } from '../composables/useShareMeta'
 
 const route = useRoute()
@@ -121,7 +123,7 @@ async function loadPaidReport(unlockToken: string) {
 useShareMeta(
   () => `${typeCode.value} ${typeData.value?.name || typeName.value}`,
   () => oneLiner.value,
-  () => typeData.value?.imageUrl || `/api/images/${typeCode.value}`,
+  () => typeData.value?.imageUrl || typeImageUrl(typeCode.value),
   () => typeCode.value,
 )
 
@@ -131,7 +133,7 @@ function injectJsonLd() {
   const code = typeCode.value
   const name = typeData.value?.name || typeName.value
   const desc = oneLiner.value
-  const img = typeData.value?.imageUrl || `/api/images/${code}`
+  const img = typeData.value?.imageUrl || typeImageUrl(code)
   const ld = {
     '@context': 'https://schema.org',
     '@type': 'WebPage',
@@ -218,7 +220,7 @@ const defaultItems = {
           <div class="mb-8 flex justify-center">
             <div class="relative w-56 h-56 sm:w-72 sm:h-72 md:w-96 md:h-96 rounded-3xl overflow-hidden shadow-xl border-2 border-border/20 bg-surface-alt/30">
               <img
-                :src="`/api/images/${typeCode}`"
+                :src="typeImageUrl(typeCode)"
                 :alt="`${typeCode} 人格类型画像`"
                 class="w-full h-full object-contain object-center transition-opacity duration-700"
                 :class="{ 'opacity-0': !imageLoaded }"
@@ -442,7 +444,7 @@ const defaultItems = {
         </div>
 
         <!-- 打赏作者（始终显示） -->
-        <DonationSection :typeColor="typeColor.hex" />
+        <DonationSection v-if="!IS_DEMO" :typeColor="typeColor.hex" />
 
         <!-- Disclaimer -->
         <p class="text-center text-xs text-text-muted mt-8">

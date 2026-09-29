@@ -3,6 +3,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { api } from '../services/api'
 import { getTypeHex, getNineGroupCode } from '../utils/colors'
+import { typeImageUrl } from '../utils/typeImage'
 import TypeAvatar from '../components/TypeAvatar.vue'
 
 const router = useRouter()
@@ -467,7 +468,7 @@ function goToType(code: string) {
                 <!-- Image thumbnail -->
                 <div class="relative w-full aspect-[3/4] overflow-hidden bg-surface-alt/30">
                   <img
-                    :src="`/api/images/${t.code}`"
+                    :src="typeImageUrl(t.code)"
                     :alt="`${t.code}`"
                     class="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
                     loading="lazy"

@@ -1,6 +1,7 @@
 ﻿<script setup lang="ts">
 import { ref, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import { api } from '../services/api'
+import { IS_DEMO } from '../services/demoMode'
 
 const props = defineProps<{ typeCode: string; typeName: string; typeColor: string; recordId?: string }>()
 const emit = defineEmits<{ unlocked: [unlockToken: string]; requestSharePoster: [] }>()
@@ -99,6 +100,32 @@ async function verifySavedUnlock(token: string) {
   }
 }
 
+/**
+ * 演示模式专用解锁。
+ *
+ * 静态演示版没有后端，无法发邮件、也无法收付款。
+ * 所以这里不要求邮箱、也不声称"PDF 已发送"，直接解锁完整深度报告
+ * —— 让访客能看到产品全貌，同时不产生任何虚假承诺。
+ */
+async function unlockDemo() {
+  unlockError.value = ''
+  unlockLoading.value = true
+  try {
+    const data = await api.createShareUnlock({
+      recordId: props.recordId ?? 'demo',
+      typeCode: props.typeCode,
+      email: '',
+      channel: 'demo',
+    })
+    persistUnlock(data.unlockToken)
+    isUnlocked.value = true
+  } catch (err: any) {
+    unlockError.value = err.message || '解锁失败，请稍后重试。'
+  } finally {
+    unlockLoading.value = false
+  }
+}
+
 onMounted(() => {
   localStorage.removeItem(LEGACY_PAYMENT_KEY)
   const key = orderKey()
@@ -121,7 +148,27 @@ watch(isUnlocked, async (val) => {
 </script>
 
 <template>
-  <div class="paywall-section" v-if="!isUnlocked">
+  <div class="paywall-section" v-if="!isUnlocked && IS_DEMO">
+    <div class="paywall-card" :style="{ borderColor: typeColor + '33' }">
+      <div class="lock-icon">🔒</div>
+      <h3 class="paywall-title">深度人格报告</h3>
+      <p class="paywall-desc">正式版本中这部分为付费内容，完整 PDF 会通过邮件发送给用户。</p>
+
+      <div class="demo-switch">
+        <p class="demo-switch-title">演示环境</p>
+        <p class="demo-switch-desc">
+          本站是静态演示版，支付与邮件服务均已停用。点击下方按钮可直接查看完整报告内容，不会产生任何收费，也不会要求你留下邮箱。
+        </p>
+        <button class="btn-unlock" :style="{ background: typeColor }" :disabled="unlockLoading" @click="unlockDemo">
+          <span v-if="unlockLoading" class="spinner" />
+          {{ unlockLoading ? '加载中...' : '演示环境 · 查看完整报告' }}
+        </button>
+      </div>
+      <p v-if="unlockError" class="qr-error">{{ unlockError }}</p>
+    </div>
+  </div>
+
+  <div class="paywall-section" v-else-if="!isUnlocked">
     <div class="paywall-card" :style="{ borderColor: typeColor + '33' }">
       <div class="lock-icon">🎁</div>
       <h3 class="paywall-title">免费解锁深度人格报告</h3>
@@ -158,7 +205,8 @@ watch(isUnlocked, async (val) => {
 
   <div class="paywall-unlocked" v-else>
     <div class="unlocked-banner" :style="{ background: typeColor + '11', borderColor: typeColor + '33' }">
-      🎉 已免费解锁！完整 PDF 会自动发送到你的邮箱，请继续向下查看深度报告。
+      🎉 已解锁！请继续向下查看深度报告。
+      <template v-if="!IS_DEMO">完整 PDF 会自动发送到你的邮箱。</template>
     </div>
     <slot />
   </div>
@@ -178,6 +226,9 @@ watch(isUnlocked, async (val) => {
 .email-check { position: absolute; right: 12px; font-size: 18px; }
 .email-error { font-size: 12px; color: #E8816B; margin-top: 4px; text-align: left; }
 .share-card { padding: 18px; border: 1.5px dashed #C8963E66; border-radius: 16px; background: #FAF8F5; text-align: left; }
+.demo-switch { padding: 18px; border: 1.5px dashed #8A857E66; border-radius: 16px; background: #F7F6F4; text-align: left; }
+.demo-switch-title { font-size: 13px; font-weight: 700; color: #8A857E; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 6px; }
+.demo-switch-desc { font-size: 13px; color: #6B6560; line-height: 1.6; margin-bottom: 12px; }
 .share-title { font-size: 16px; font-weight: 700; color: #2D2A26; margin-bottom: 6px; }
 .share-desc { font-size: 13px; color: #6B6560; line-height: 1.6; margin-bottom: 12px; }
 .btn-unlock { width: 100%; padding: 14px 18px; border: none; border-radius: 14px; color: #FFF; font-size: 16px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
