@@ -66,3 +66,21 @@ scripts/gen_report.js
 personality_data.json
 patch_v9*.mjs
 .codex*
+
+# 小红书兑换码（含未售出码，绝不进仓库）
+server/access-codes/
+
+# ── 本地审核产物 / Agent 工作区（体积大或属本地状态，不入库）──
+.workbuddy/
+docs/ui-audit/
+docs/restart-analysis-assets/
+
+# ── 视频管线：构建产物、本地素材、历史备份 ─────────────────
+video/output/
+video/*.mp4
+video/81_image/
+scripts/video-pipeline/**/*.bak
+scripts/video-pipeline/**/*.bak.*
+scripts/video-pipeline/**/*.old
+scripts/video-pipeline/.tmp-*
+scripts/video-pipeline/_patch*
