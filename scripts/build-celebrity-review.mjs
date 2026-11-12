@@ -293,9 +293,9 @@ button.on{background:var(--accent);border-color:var(--accent);color:#fff}
 .hero p{font-size:13px;color:#3A3833;margin-top:6px;line-height:1.8}
 .hero p b{color:var(--accent)}
 .hero .meta{font-size:11.5px;color:var(--muted);margin-top:8px;letter-spacing:.03em}
-.summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:10px;margin-bottom:18px}
+.summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(128px,1fr));gap:10px;margin-bottom:18px}
 .kpi{background:#fff;border:1px solid var(--rule);border-radius:6px;padding:12px 14px}
-.kpi b{display:block;font-size:24px;font-family:'DM Mono',monospace}
+.kpi b{display:block;font-size:22px;font-family:'DM Mono',monospace}
 .kpi span{font-size:12px;color:var(--muted)}
 .kpi.good b{color:var(--ok)}
 .kpi.acc b{color:var(--accent)}
