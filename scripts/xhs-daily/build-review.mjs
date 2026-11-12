@@ -16,7 +16,7 @@ const inline = s => esc(s)
   .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
   .replace(/`(.+?)`/g, '<code>$1</code>');
 
-const PAGE_NAMES = ['封面', '场景', '迹象一', '迹象二', '迹象三', '观点', '题目', '人物', '互动'];
+const PAGE_NAMES = ['封面', '争议', '一边', '另一边', '另外三维', '结论', '题目', '人物', '互动'];
 
 const days = [];
 for (let i = 1; i <= 7; i++) {

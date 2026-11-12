@@ -5,7 +5,7 @@
 //   node scripts/xhs-daily/render-cards.mjs --note day3 --out <目录>
 //       → 单日 9 张
 //   node scripts/xhs-daily/render-cards.mjs --note elon --out <目录>
-//       → 名人坐标篇备用稿
+//       → 单篇备用稿（需先在 notes-data.mjs 里补该 key，否则脚本会直接报错，不会静默渲染成 day1）
 // 只做本地 HTML 截图，不调用任何付费 AI 生图接口，不执行发布动作。
 import { chromium } from 'playwright';
 import { mkdirSync, writeFileSync, renameSync } from 'node:fs';
@@ -41,7 +41,11 @@ for (const t of targets) {
   await page.evaluate(() => document.fonts.ready);
 
   const count = await page.locator('.page').count();
-  if (count !== 9) throw new Error(`[${t.note}] 期望 9 页，实际 ${count} 页，请检查 NOTE.signs 是否为 3 条`);
+  const keys = await page.evaluate(() => Object.keys(window.NOTE_LIBRARY || {}));
+  if (keys.length && !keys.includes(t.note)) {
+    throw new Error(`[${t.note}] 不在 NOTE_LIBRARY（${keys.join('/')}）里，请先在 notes-data.mjs 补该篇`);
+  }
+  if (count !== 9) throw new Error(`[${t.note}] 期望 9 页，实际 ${count} 页，请检查 NOTE.dispute 三张证据卡`);
 
   for (let i = 0; i < count; i++) {
     const name = `${String(i + 1).padStart(2, '0')}.png`;
