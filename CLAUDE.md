@@ -13,7 +13,8 @@ scripts/         视频管线、图片生成、数据脚本
 ## 线上地址
 
 - 网站：https://mbti-pro.com/
-- 自动部署：push 到 `master` 分支 → GitHub Actions → SSH 到腾讯云 → git pull + build + pm2 restart
+- 自动部署：push 到 `master` 分支 → GitHub Actions → SSH 到腾讯云 → git reset + build + `systemctl restart mbti-pro`
+- 线上服务器（2026-11-12 重建）：腾讯云香港轻量 `43.132.217.70`，nginx + systemd + certbot，运维细节见 `docs/MBTI-PRO-上线完成与运维交接-2026-11-12.md`
 
 ## 服务器关键路径
 
@@ -72,5 +73,5 @@ curl -s "https://mbti-pro.com/api/results/ABCD" | grep -o '"name":"[^"]*"'
 
 - **前端**: Vue 3 (Composition API + `<script setup>`) + Vite + TypeScript + Tailwind CSS
 - **后端**: Express.js + TypeScript + Prisma ORM + SQLite
-- **部署**: Tencent Cloud + nginx + pm2 + GitHub Actions
+- **部署**: Tencent Cloud（香港轻量）+ nginx + systemd + certbot + GitHub Actions
 - **视频**: Playwright headless + Python edge-tts + FFmpeg
