@@ -64,4 +64,4 @@ jobs:
                 exit 1
               fi
             done
-            curl -fsS -o /dev/null http://127.0.0.1/ && echo "Deploy done"
+            curl -fsS -H 'Host: mbti-pro.com' -o /dev/null http://127.0.0.1/ && echo "Deploy done"
