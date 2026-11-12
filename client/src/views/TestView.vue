@@ -3,6 +3,8 @@ import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import OptionGroup from '../components/OptionGroup.vue'
 import OptionGroupBipolar from '../components/OptionGroupBipolar.vue'
+import ConsentGate from '../components/ConsentGate.vue'
+import { hasPrivacyConsent } from '../services/consent'
 import { api } from '../services/api'
 import { getAccessToken } from '../services/access'
 import { IS_DEMO } from '../services/demoMode'
@@ -29,6 +31,8 @@ const currentIndex = ref(0)
 const isReviewingHistory = ref(false)
 const answers = ref<Record<number, string>>({})
 const showSubmitConfirm = ref(false)
+// 隐私"显式单独同意"：未同意前不允许作答（PIPL 对敏感个人信息的要求）
+const showConsent = ref(false)
 const submitError = ref('')
 const submitting = ref(false)
 const startTime = ref(Date.now())
@@ -122,6 +126,7 @@ onMounted(() => {
     router.replace('/')
     return
   }
+  showConsent.value = !hasPrivacyConsent()
   const params = new URLSearchParams(window.location.search)
   const referralCode = params.get('ref')
   if (referralCode) {
@@ -232,6 +237,7 @@ function onObjectiveTimeout() {
 }
 
 function selectOption(key: string) {
+  if (showConsent.value) return
   if (isObjectiveLocked.value) return
   const q = currentQuestion.value
   if (!q) return
@@ -426,7 +432,7 @@ watch(currentIndex, () => {
 
 // Keyboard navigation
 function onKeydown(e: KeyboardEvent) {
-  if (showSubmitConfirm.value || showObjectiveIntro.value) return
+  if (showSubmitConfirm.value || showObjectiveIntro.value || showConsent.value) return
   const q = currentQuestion.value
   if (!q) return
 
@@ -541,6 +547,8 @@ onUnmounted(() => {
         <span aria-hidden="true">→</span>
       </button>
     </footer>
+
+    <ConsentGate v-if="showConsent" @agreed="showConsent = false" />
 
     <Transition name="modal">
       <div v-if="showObjectiveIntro" class="modal-overlay">
