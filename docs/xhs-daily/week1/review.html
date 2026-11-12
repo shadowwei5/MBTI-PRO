@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MBTI-PRO 小红书 Week 1 审核台 · 7 天文案与图片</title>
+<style>
+:root { --paper:#FDF8F0; --card:#FFFFFF; --ink:#1E1D1A; --accent:#A63D2C; --muted:#6F685D; --rule:#E0D8CC; --ok:#2F4037; }
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:var(--paper); color:var(--ink); font-family:'Noto Sans SC','PingFang SC','Microsoft YaHei',sans-serif; font-size:14px; line-height:1.6; }
+.top { position:sticky; top:0; z-index:20; background:rgba(253,248,240,.97); border-bottom:1px solid var(--rule); padding:14px 28px; }
+.top-row { display:flex; align-items:center; gap:16px; flex-wrap:wrap; max-width:1600px; margin:0 auto; }
+.brand { font-family:'Noto Serif SC','Songti SC','SimSun',serif; font-size:18px; font-weight:500; letter-spacing:.04em; margin-right:6px; }
+.brand b { color:var(--accent); font-weight:500; }
+.nav { display:flex; gap:6px; flex-wrap:wrap; }
+.nav button { position:relative; border:1px solid var(--rule); background:var(--card); color:var(--muted); padding:7px 13px; border-radius:4px; cursor:pointer; font-size:13px; font-family:inherit; }
+.nav button:hover { border-color:var(--accent); color:var(--accent); }
+.nav button.on { background:var(--accent); border-color:var(--accent); color:#fff; }
+.badge { display:inline-block; width:14px; text-align:center; font-weight:700; }
+.badge.pass { color:#2F7A4F; } .badge.fix { color:#C0533F; } .badge.hold { color:#9C958E; }
+.spacer { flex:1; }
+.tools { display:flex; align-items:center; gap:8px; }
+.tools button { border:1px solid var(--rule); background:var(--card); color:var(--ink); padding:7px 12px; border-radius:4px; cursor:pointer; font-size:13px; font-family:inherit; }
+.tools button:hover { border-color:var(--accent); color:var(--accent); }
+#progress { font-size:12px; color:var(--muted); letter-spacing:.08em; min-width:80px; text-align:right; }
+.hint { max-width:1600px; margin:10px auto 0; font-size:12px; color:var(--muted); }
+.wrap { max-width:1600px; margin:0 auto; padding:28px; }
+.day { display:none; }
+.day.on { display:block; }
+.dayhead { border-bottom:1px solid var(--rule); padding-bottom:18px; margin-bottom:22px; }
+.daynum { font-family:'DM Mono','Consolas',monospace; font-size:12px; letter-spacing:.2em; color:var(--accent); }
+.dayhead h2 { font-family:'Noto Serif SC','Songti SC','SimSun',serif; font-size:34px; font-weight:500; margin:8px 0 10px; }
+.meta { font-size:13px; color:var(--muted); }
+.meta i { font-style:normal; color:var(--rule); margin:0 6px; }
+.cols { display:grid; grid-template-columns:minmax(0,440px) minmax(0,1fr); gap:24px; align-items:start; }
+.blk { background:var(--card); border:1px solid var(--rule); border-radius:6px; padding:14px 16px; margin-bottom:14px; }
+.lbl { font-size:12px; letter-spacing:.1em; color:var(--muted); margin-bottom:10px; display:flex; align-items:center; gap:10px; }
+.lbl small { font-weight:400; letter-spacing:0; color:var(--muted); opacity:.8; }
+.cp { margin-left:auto; border:1px solid var(--rule); background:transparent; color:var(--muted); font-size:11px; padding:2px 8px; border-radius:3px; cursor:pointer; font-family:inherit; }
+.cp:hover { border-color:var(--accent); color:var(--accent); }
+pre { white-space:pre-wrap; word-break:break-word; font-family:inherit; font-size:14px; line-height:1.85; }
+pre.body { font-size:14px; }
+.two { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+.two > div { min-width:0; }
+table { width:100%; border-collapse:collapse; font-size:12.5px; }
+th, td { border-top:1px solid var(--rule); padding:7px 6px; text-align:left; vertical-align:top; }
+th { width:38px; color:var(--accent); font-weight:500; white-space:nowrap; }
+td strong { color:var(--accent); font-weight:500; }
+code { font-family:'DM Mono','Consolas',monospace; font-size:12px; background:#F5F0E8; padding:1px 4px; border-radius:3px; }
+.checks { list-style:none; font-size:12.5px; }
+.checks li { display:flex; gap:8px; padding:4px 0; border-top:1px solid #F1ECE2; }
+.checks li:first-child { border-top:none; }
+.checks li.ok span { color:var(--ok); } .checks li.todo span { color:var(--accent); }
+.grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }
+figure { background:var(--card); border:1px solid var(--rule); border-radius:5px; overflow:hidden; }
+figure img { display:block; width:100%; height:auto; cursor:zoom-in; }
+figcaption { padding:7px 9px; font-size:11px; color:var(--muted); border-top:1px solid var(--rule); letter-spacing:.04em; }
+.review { margin-top:22px; background:var(--card); border:1px solid var(--rule); border-radius:6px; padding:16px; }
+.opts { display:flex; gap:20px; margin-bottom:12px; font-size:13px; }
+.opts label { cursor:pointer; display:flex; align-items:center; gap:6px; }
+textarea { width:100%; border:1px solid var(--rule); border-radius:4px; padding:10px 12px; font-family:inherit; font-size:13px; line-height:1.7; resize:vertical; background:#FDFBF7; color:var(--ink); }
+textarea:focus { outline:2px solid var(--accent); outline-offset:1px; }
+dialog { border:none; padding:0; background:transparent; max-width:94vw; max-height:94vh; }
+dialog::backdrop { background:rgba(30,29,26,.82); }
+dialog img { display:block; max-width:92vw; max-height:90vh; border-radius:4px; }
+@media (max-width:1100px) { .cols { grid-template-columns:1fr; } .grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media (max-width:640px) { .wrap { padding:16px; } .grid { grid-template-columns:1fr; } .two { grid-template-columns:1fr; } .dayhead h2 { font-size:26px; } }
+</style>
+</head>
+<body>
+<div class="top">
+  <div class="top-row">
+    <div class="brand">MBTI-PRO <b>/</b> Week 1 审核台</div>
+    <nav class="nav"><button data-day="1">D1<span class="badge"></span></button><button data-day="2">D2<span class="badge"></span></button><button data-day="3">D3<span class="badge"></span></button><button data-day="4">D4<span class="badge"></span></button><button data-day="5">D5<span class="badge"></span></button><button data-day="6">D6<span class="badge"></span></button><button data-day="7">D7<span class="badge"></span></button></nav>
+    <div class="spacer"></div>
+    <div class="tools"><button id="prev">← 上一天</button><button id="next">下一天 →</button><button id="export">导出审核结果</button></div>
+    <div id="progress">第 1 / 7 天</div>
+  </div>
+  <div class="hint">依次审核 7 天；文案可直接复制，图片点击放大。结论与备注自动保存在本机浏览器，点「导出审核结果」可把反馈交给我。键盘 ← → 切换。</div>
+</div>
+
+<div class="wrap">
+<section class="day" id="day1" data-day="1">
+  <div class="dayhead">
+    <div class="daynum">DAY 01 <span class="dot"></span></div>
+    <h2>16型之外，还有65种人</h2>
+    <div class="meta">图片：<code>day1/01.png</code> … <code>09.png</code>（9 张 1080×1440，3:4） <i>｜</i> 支柱：定义中间型 ｜ 独立信息增量：中间档存在、3×3×3×3=81 ｜ 题目 #1 E_I ｜ 结果 <code>ABCD</code> 全能者型</div>
+  </div>
+
+  <div class="cols">
+    <div class="col copy">
+      <div class="blk">
+        <div class="lbl">标题 <button class="cp" data-copy="t1">复制</button></div>
+        <pre id="t1">16型之外，还有65种人</pre>
+      </div>
+      <div class="blk">
+        <div class="lbl">正文 <button class="cp" data-copy="b1">复制</button></div>
+        <pre id="b1" class="body">同一个人，上周测出 ENFP，这周变成 INFP。不一定是题坏了。
+
+更常见的原因是：传统 16 型要求你在每个维度上二选一，可你本来就在中间。聚会里你确实喜欢热闹，加班那周你又只想一个人待着，两次都是真话。
+
+我们把四个维度各拆成三档：E/A/I、S/B/N、T/C/F、J/D/P。中间那一档不是「没测出来」，是单独的一种状态。3×3×3×3，一共 81 种坐标，16 型之外还有 65 种。
+
+比如 40 题里的第一道：「参加大型聚会后，我感到精力充沛、心情愉悦」和「参加大型聚会后，我需要独处一段时间来恢复精力」，很多人两个都想选。这套题允许你停在中间。
+
+我们做这套档案，不是要给你换个更准的标签，是想把「卡在中间」那部分说清楚。
+
+一眼看懂这个坐标的人，我第一个想到罗翔。讲台上他能把刑法讲得人人都听懂，访谈里却总在说读书、自省和别把自己太当回事；分析案例一层层抠逻辑，最后又落回普通人的处境。能站到台前，也能退回去独处，逻辑和体谅同时在线——四维都不往极端走，正是这个坐标最难的地方。
+
+你是哪一维卡在中间？评论区聊聊，我们先来：E/I。
+
+本内容仅供自我探索与娱乐参考，不构成心理诊断、医疗建议或招聘依据。MBTI-PRO 与 MBTI 官方机构无关联。</pre>
+      </div>
+      <div class="blk two">
+        <div><div class="lbl">话题标签 <button class="cp" data-copy="g1">复制</button></div><pre id="g1">#人格测试 #MBTI #自我探索 #中间型人格 #81型人格 #E人I人 #性格分析</pre></div>
+        <div><div class="lbl">置顶评论 <button class="cp" data-copy="p1">复制</button></div><pre id="p1">你是哪一维卡在中间？我先来：E/I，人多的时候能聊，散场后必须一个人待着。</pre></div>
+      </div>
+      <div class="blk">
+        <div class="lbl">9 图逐页文字</div>
+        <table><tbody><tr><th>P1</th><td>钩子两行大字（主）｜<strong>朱砂人物名 + 参照标签</strong>｜下方关系句 ｜ 无类型坐标主视觉</td></tr><tr><th>P2</th><td>「同一个人，上周测出 ENFP，这周变成 INFP。不一定是题坏了。」｜「两次都是真话，只是题目把「中间」挤掉了。」</td></tr><tr><th>P3</th><td>01 答案会随场景变</td></tr><tr><th>P4</th><td>02 常在两项之间犹豫</td></tr><tr><th>P5</th><td>03 四个字母说不完</td></tr><tr><th>P6</th><td><strong>人物关系句（大字主位）</strong> + 观点说明 ｜ 公式与四维字母降为页脚注脚（小字）</td></tr><tr><th>P7</th><td>原题 #1：聚会后精力充沛 / 需要独处恢复 ｜ A–E 五档量表</td></tr><tr><th>P8</th><td><strong>主：罗翔（当代真人 · 公开言行卡）</strong> ｜ 左侧大字关系句 ｜ <code>ABCD / 全能者型</code> 缩为小标签 ｜ 公开言行观察 · 非本人测评</td></tr><tr><th>P9</th><td>「你是哪一维卡在中间？」+ 固定免责</td></tr></tbody></table>
+      </div>
+      <div class="blk">
+        <div class="lbl">发布前自检</div>
+        <ul class="checks"><li class="ok"><span>☑</span>无外链 / 二维码 / 微信 / 「私我」</li><li class="ok"><span>☑</span>无绝对化、医疗化、诊断类表述</li><li class="ok"><span>☑</span>题量口径：40 题（正文与 P6 一致）</li><li class="ok"><span>☑</span>免责声明在正文尾与 P9</li><li class="ok"><span>☑</span>题目 #1 为 <code>server/src/seed.ts</code> 原文；<code>ABCD 全能者型</code> 为 <code>types.ts</code> 的 <code>TYPE_NAMES</code></li><li class="ok"><span>☑</span>本套图为本地 HTML/CSS 渲染，非 AI 生成图</li><li class="ok"><span>☑</span>人物已按 E/A/I · S/B/N · T/C/F · J/D/P 四维逐维核对，无明显矛盾；非产品结果页档案人物；无立绘 / 剧照 / 台词引用，真人走公开言行观察口径</li><li class="todo"><span>☐</span>三闸门 G1/G2/G3 全绿后才发布</li></ul>
+      </div>
+    </div>
+
+    <div class="col pics">
+      <div class="lbl">9 张成品图 <small>1080×1440 · 点击放大</small></div>
+      <div class="grid">
+        <figure><img src="day1/01.png" alt="P1 封面" loading="lazy">
+        <figcaption>P1 · 封面</figcaption></figure>
+        <figure><img src="day1/02.png" alt="P2 场景" loading="lazy">
+        <figcaption>P2 · 场景</figcaption></figure>
+        <figure><img src="day1/03.png" alt="P3 迹象一" loading="lazy">
+        <figcaption>P3 · 迹象一</figcaption></figure>
+        <figure><img src="day1/04.png" alt="P4 迹象二" loading="lazy">
+        <figcaption>P4 · 迹象二</figcaption></figure>
+        <figure><img src="day1/05.png" alt="P5 迹象三" loading="lazy">
+        <figcaption>P5 · 迹象三</figcaption></figure>
+        <figure><img src="day1/06.png" alt="P6 观点" loading="lazy">
+        <figcaption>P6 · 观点</figcaption></figure>
+        <figure><img src="day1/07.png" alt="P7 题目" loading="lazy">
+        <figcaption>P7 · 题目</figcaption></figure>
+        <figure><img src="day1/08.png" alt="P8 人物" loading="lazy">
+        <figcaption>P8 · 人物</figcaption></figure>
+        <figure><img src="day1/09.png" alt="P9 互动" loading="lazy">
+        <figcaption>P9 · 互动</figcaption></figure></div>
+    </div>
+  </div>
+
+  <div class="review">
+    <div class="lbl">审核结论</div>
+    <div class="opts">
+      <label><input type="radio" name="r1" value="pass">通过</label>
+      <label><input type="radio" name="r1" value="fix">需修改</label>
+      <label><input type="radio" name="r1" value="hold">待定</label>
+    </div>
+    <textarea id="note1" rows="3" placeholder="写下需要修改的点；编号列出更方便我逐条改。例如：1. 封面人物名再大一点 2. P6 公式保留"></textarea>
+  </div>
+</section>
+
+<section class="day" id="day2" data-day="2">
+  <div class="dayhead">
+    <div class="daynum">DAY 02 <span class="dot"></span></div>
+    <h2>你不是E，也不是I</h2>
+    <div class="meta">图片：<code>day2/01.png</code> … <code>09.png</code> <i>｜</i> 支柱：定义中间型 ｜ 独立信息增量：E/A/I 三档、切换耗电 ｜ 题目 #9 E_I ｜ 结果 <code>EBCD</code> 多面手型</div>
+  </div>
+
+  <div class="cols">
+    <div class="col copy">
+      <div class="blk">
+        <div class="lbl">标题 <button class="cp" data-copy="t2">复制</button></div>
+        <pre id="t2">你不是E，也不是I</pre>
+      </div>
+      <div class="blk">
+        <div class="lbl">正文 <button class="cp" data-copy="b2">复制</button></div>
+        <pre id="b2" class="body">会议里能连着讲两小时，回家路上却不想回任何一条消息。这不叫「人格分裂」，也不一定叫社恐。
+
+16 型只给你 E 或 I。81 型在中间留了一档 A：不是外向和内向各一半，而是你能按场合切换，切换本身会消耗电量。
+
+三个常见表现：会议里主动接话，散会后立刻想安静；能组织活动，但活动结束要空一整晚；别人说你外向，家里人说你话少，两边都是真的。
+
+40 题里有一道问沟通方式：「电话或语音沟通比文字沟通让我觉得更直接、更自在」对「文字沟通比电话或语音让我更自在，可以字斟句酌」。很多人两个都选过，只是不同日子。
+
+我们把它记成坐标，不记成评价。说到「外向又能把人聚起来」，大概很多人先想到路飞：草帽一伙里性格最拧的一群人，偏偏都愿意跟着他；既盯得住眼前的对手，也从不改那个最远的目标。目标不改、路线天天改，正是 D 档的样子。切换得漂亮的人，往往不是没有立场，是知道什么时候该收。
+
+你下班后需要多久才恢复？
+
+本内容仅供自我探索与娱乐参考，不构成心理诊断、医疗建议或招聘依据。MBTI-PRO 与 MBTI 官方机构无关联。</pre>
+      </div>
+      <div class="blk two">
+        <div><div class="lbl">话题标签 <button class="cp" data-copy="g2">复制</button></div><pre id="g2">#人格测试 #MBTI #自我探索 #中间型人格 #上班E下班I #社交电量 #性格分析</pre></div>
+        <div><div class="lbl">置顶评论 <button class="cp" data-copy="p2">复制</button></div><pre id="p2">你下班后要多久才恢复？我先来：大概 40 分钟，且不能有人跟我说话。</pre></div>
+      </div>
+      <div class="blk">
+        <div class="lbl">9 图逐页文字</div>
+        <table><tbody><tr><th>P1</th><td>钩子两行大字（主）｜<strong>朱砂人物名 + 参照标签</strong>｜下方关系句 ｜ 无类型坐标主视觉</td></tr><tr><th>P2</th><td>「会议里能连着讲两小时，回家路上却不想回任何一条消息。」｜「16 型只给 E 或 I；81 型在中间留了一档 A。」</td></tr><tr><th>P3</th><td>01 电量会看场合</td></tr><tr><th>P4</th><td>02 两边都能描述你</td></tr><tr><th>P5</th><td>03 切换本身会耗电</td></tr><tr><th>P6</th><td><strong>人物关系句（大字主位）</strong> + 观点说明 ｜ 公式与四维字母降为页脚注脚（小字）</td></tr><tr><th>P7</th><td>原题 #9：电话语音更自在 / 文字更自在 ｜ A–E 五档量表</td></tr><tr><th>P8</th><td><strong>主：路飞（大字角色名 + 剧情卡）</strong> ｜ 左侧大字关系句 ｜ <code>EBCD / 多面手型</code> 缩为小标签 ｜ 虚构角色 · 仅作性格类比</td></tr><tr><th>P9</th><td>「你下班后要多久才恢复？」+ 固定免责</td></tr></tbody></table>
+      </div>
+      <div class="blk">
+        <div class="lbl">发布前自检</div>
+        <ul class="checks"><li class="ok"><span>☑</span>无外链 / 二维码 / 微信 / 「私我」；无绝对化、医疗化表述</li><li class="ok"><span>☑</span>题量口径：40 题；免责声明在正文尾与 P9</li><li class="ok"><span>☑</span>题目 #9 为 <code>seed.ts</code> 原文；<code>EBCD 多面手型</code> 为 <code>types.ts</code> 的 <code>TYPE_NAMES</code></li><li class="ok"><span>☑</span>与 Day1 相比 P2/P3-P5/P7/P8 共 6 页内容全部不同</li><li class="ok"><span>☑</span>图为本地 HTML/CSS 渲染，非 AI 生成图</li><li class="ok"><span>☑</span>人物已按 E/A/I · S/B/N · T/C/F · J/D/P 四维逐维核对，无明显矛盾；非产品结果页档案人物；无立绘 / 剧照 / 台词引用，真人走公开言行观察口径</li><li class="todo"><span>☐</span>三闸门全绿后才发布</li></ul>
+      </div>
+    </div>
+
+    <div class="col pics">
+      <div class="lbl">9 张成品图 <small>1080×1440 · 点击放大</small></div>
+      <div class="grid">
+        <figure><img src="day2/01.png" alt="P1 封面" loading="lazy">
+        <figcaption>P1 · 封面</figcaption></figure>
+        <figure><img src="day2/02.png" alt="P2 场景" loading="lazy">
+        <figcaption>P2 · 场景</figcaption></figure>
+        <figure><img src="day2/03.png" alt="P3 迹象一" loading="lazy">
+        <figcaption>P3 · 迹象一</figcaption></figure>
+        <figure><img src="day2/04.png" alt="P4 迹象二" loading="lazy">
+        <figcaption>P4 · 迹象二</figcaption></figure>
+        <figure><img src="day2/05.png" alt="P5 迹象三" loading="lazy">
+        <figcaption>P5 · 迹象三</figcaption></figure>
+        <figure><img src="day2/06.png" alt="P6 观点" loading="lazy">
+        <figcaption>P6 · 观点</figcaption></figure>
+        <figure><img src="day2/07.png" alt="P7 题目" loading="lazy">
+        <figcaption>P7 · 题目</figcaption></figure>
+        <figure><img src="day2/08.png" alt="P8 人物" loading="lazy">
+        <figcaption>P8 · 人物</figcaption></figure>
+        <figure><img src="day2/09.png" alt="P9 互动" loading="lazy">
+        <figcaption>P9 · 互动</figcaption></figure></div>
+    </div>
+  </div>
+
+  <div class="review">
+    <div class="lbl">审核结论</div>
+    <div class="opts">
+      <label><input type="radio" name="r2" value="pass">通过</label>
+      <label><input type="radio" name="r2" value="fix">需修改</label>
+      <label><input type="radio" name="r2" value="hold">待定</label>
+    </div>
+    <textarea id="note2" rows="3" placeholder="写下需要修改的点；编号列出更方便我逐条改。例如：1. 封面人物名再大一点 2. P6 公式保留"></textarea>
+  </div>
+</section>
+
+<section class="day" id="day3" data-day="3">
+  <div class="dayhead">
+    <div class="daynum">DAY 03 <span class="dot"></span></div>
+    <h2>为什么每次测都不一样</h2>
+    <div class="meta">图片：<code>day3/01.png</code> … <code>09.png</code> <i>｜</i> 支柱：定义中间型 ｜ 独立信息增量：分数边界、S/N 场景依赖 ｜ 题目 #26 S_N ｜ 结果 <code>ANCD</code> 哲思者型</div>
+  </div>
+
+  <div class="cols">
+    <div class="col copy">
+      <div class="blk">
+        <div class="lbl">标题 <button class="cp" data-copy="t3">复制</button></div>
+        <pre id="t3">为什么每次测都不一样</pre>
+      </div>
+      <div class="blk">
+        <div class="lbl">正文 <button class="cp" data-copy="b3">复制</button></div>
+        <pre id="b3" class="body">上周测出 ENFP，这周变成 INFP。不一定是题库坏了。
+
+题目问的是「平时」，可你平时不止一种状态。聚会里你愿意主动认识人，加班那周你更想按流程和细节把事情做完——两次都是真话，只是被问到的场景不同。
+
+传统 16 型在每个维度上设一条分界线，分数差一两分就会被推到另一端。81 型把每一维拆成三档，边界附近的人有地方可落：3×3×3×3，一共 81 个坐标。
+
+40 题里有一道正好在问这个维度：「我做事注重细节和具体步骤，相信“眼见为实”」对「我关注事物背后的整体图景和规律，相信直觉的指引」。两栏都能选，也可以停在中间。
+
+所以「测出来会变」未必是测评不准，也可能是坐标系太粗。这个坐标最耐人寻味的参照是卡卡西：平时总迟到、一个人看书，带队的任务里却能在几步之前预判对手；算得清局面，也护得住同伴。安静和控场、推演和体谅在他身上同时成立，硬把他归到某一端，多少有点可惜。
+
+你换过几个结果？
+
+本内容仅供自我探索与娱乐参考，不构成心理诊断、医疗建议或招聘依据。MBTI-PRO 与 MBTI 官方机构无关联。</pre>
+      </div>
+      <div class="blk two">
+        <div><div class="lbl">话题标签 <button class="cp" data-copy="g3">复制</button></div><pre id="g3">#人格测试 #MBTI #自我探索 #中间型人格 #81型人格 #测不准 #性格分析</pre></div>
+        <div><div class="lbl">置顶评论 <button class="cp" data-copy="p3">复制</button></div><pre id="p3">你换过几个结果？我先来：见过同一个人一周换三个，后来发现是题目场景不同。</pre></div>
+      </div>
+      <div class="blk">
+        <div class="lbl">9 图逐页文字</div>
+        <table><tbody><tr><th>P1</th><td>钩子两行大字（主）｜<strong>朱砂人物名 + 参照标签</strong>｜下方关系句 ｜ 无类型坐标主视觉</td></tr><tr><th>P2</th><td>「上周测出 ENFP，这周变成 INFP。不一定是题库坏了。」｜「题目问的是「平时」，可你平时不止一种状态。」</td></tr><tr><th>P3</th><td>01 换个场景就换答案</td></tr><tr><th>P4</th><td>02 边界附近会来回跳</td></tr><tr><th>P5</th><td>03 不是测评不准</td></tr><tr><th>P6</th><td><strong>人物关系句（大字主位）</strong> + 观点说明 ｜ 公式与四维字母降为页脚注脚（小字）</td></tr><tr><th>P7</th><td>原题 #26：注重细节与具体步骤 / 关注整体图景与规律 ｜ A–E 五档量表</td></tr><tr><th>P8</th><td><strong>主：卡卡西（大字角色名 + 剧情卡）</strong> ｜ 左侧大字关系句 ｜ <code>ANCD / 哲思者型</code> 缩为小标签 ｜ 虚构角色 · 仅作性格类比</td></tr><tr><th>P9</th><td>「你换过几个结果？」+ 固定免责</td></tr></tbody></table>
+      </div>
+      <div class="blk">
+        <div class="lbl">发布前自检</div>
+        <ul class="checks"><li class="ok"><span>☑</span>无外链 / 二维码 / 微信 / 「私我」；无绝对化、医疗化表述</li><li class="ok"><span>☑</span>题量口径：40 题；免责声明在正文尾与 P9</li><li class="ok"><span>☑</span>题目 #26 为 <code>seed.ts</code> 原文（含「眼见为实」）；<code>ANCD 哲思者型</code> 为 <code>types.ts</code> 的 <code>TYPE_NAMES</code></li><li class="ok"><span>☑</span>与 Day2 相比 P2/P3-P5/P7/P8 共 6 页内容全部不同</li><li class="ok"><span>☑</span>图为本地 HTML/CSS 渲染，非 AI 生成图</li><li class="ok"><span>☑</span>人物已按 E/A/I · S/B/N · T/C/F · J/D/P 四维逐维核对，无明显矛盾；非产品结果页档案人物；无立绘 / 剧照 / 台词引用，真人走公开言行观察口径</li><li class="todo"><span>☐</span>三闸门全绿后才发布</li></ul>
+      </div>
+    </div>
+
+    <div class="col pics">
+      <div class="lbl">9 张成品图 <small>1080×1440 · 点击放大</small></div>
+      <div class="grid">
+        <figure><img src="day3/01.png" alt="P1 封面" loading="lazy">
+        <figcaption>P1 · 封面</figcaption></figure>
+        <figure><img src="day3/02.png" alt="P2 场景" loading="lazy">
+        <figcaption>P2 · 场景</figcaption></figure>
+        <figure><img src="day3/03.png" alt="P3 迹象一" loading="lazy">
+        <figcaption>P3 · 迹象一</figcaption></figure>
+        <figure><img src="day3/04.png" alt="P4 迹象二" loading="lazy">
+        <figcaption>P4 · 迹象二</figcaption></figure>
+        <figure><img src="day3/05.png" alt="P5 迹象三" loading="lazy">
+        <figcaption>P5 · 迹象三</figcaption></figure>
+        <figure><img src="day3/06.png" alt="P6 观点" loading="lazy">
+        <figcaption>P6 · 观点</figcaption></figure>
+        <figure><img src="day3/07.png" alt="P7 题目" loading="lazy">
+        <figcaption>P7 · 题目</figcaption></figure>
+        <figure><img src="day3/08.png" alt="P8 人物" loading="lazy">
+        <figcaption>P8 · 人物</figcaption></figure>
+        <figure><img src="day3/09.png" alt="P9 互动" loading="lazy">
+        <figcaption>P9 · 互动</figcaption></figure></div>
+    </div>
+  </div>
+
+  <div class="review">
+    <div class="lbl">审核结论</div>
+    <div class="opts">
+      <label><input type="radio" name="r3" value="pass">通过</label>
+      <label><input type="radio" name="r3" value="fix">需修改</label>
+      <label><input type="radio" name="r3" value="hold">待定</label>
+    </div>
+    <textarea id="note3" rows="3" placeholder="写下需要修改的点；编号列出更方便我逐条改。例如：1. 封面人物名再大一点 2. P6 公式保留"></textarea>
+  </div>
+</section>
+
+<section class="day" id="day4" data-day="4">
+  <div class="dayhead">
+    <div class="daynum">DAY 04 <span class="dot"></span></div>
+    <h2>能共情，也能抽离</h2>
+    <div class="meta">图片：<code>day4/01.png</code> … <code>09.png</code> <i>｜</i> 支柱：定义中间型 ｜ 独立信息增量：T/C/F 三档、C 不是和稀泥 ｜ 题目 #76 T_F ｜ 结果 <code>IBCD</code> 内省者型</div>
+  </div>
+
+  <div class="cols">
+    <div class="col copy">
+      <div class="blk">
+        <div class="lbl">标题 <button class="cp" data-copy="t4">复制</button></div>
+        <pre id="t4">能共情，也能抽离</pre>
+      </div>
+      <div class="blk">
+        <div class="lbl">正文 <button class="cp" data-copy="b4">复制</button></div>
+        <pre id="b4" class="body">朋友倾诉时你能接住情绪，转身又能把问题拆成几条可执行的步骤。讲道理和讲感受，不一定是二选一。
+
+16 型的 T/F 要求你选一边：要么优先逻辑和客观利弊，要么优先对人的影响和大家的感受。81 型在中间留了一档 C。
+
+C 不是和稀泥。三个具体表现：先安静听完，不急着给方案；重逻辑的人觉得你说得清楚，重感受的人愿意继续往下说；偶尔被说「太冷静」，其实是共情之后还会多想一步。
+
+40 题里有一道：「做决定时，我优先考虑逻辑分析和客观利弊」对「做决定时，我优先考虑对人的影响和大家的感受」。很多人两边都用过，只是场合不同。
+
+我们把它记成坐标，不记成「不够理性」或「不够温柔」。换成一个真人可能更好懂：周杰伦在采访里话一直不多，作品里却有极严密的编曲结构，也有极私人的情感表达。安静，两端又都抓得住——逻辑和感受不是二选一，IBCD 这个坐标要说的就是这个。
+
+你先接情绪，还是先拆问题？
+
+本内容仅供自我探索与娱乐参考，不构成心理诊断、医疗建议或招聘依据。MBTI-PRO 与 MBTI 官方机构无关联。</pre>
+      </div>
+      <div class="blk two">
+        <div><div class="lbl">话题标签 <button class="cp" data-copy="g4">复制</button></div><pre id="g4">#人格测试 #MBTI #自我探索 #中间型人格 #共情力 #理性与感性 #性格分析</pre></div>
+        <div><div class="lbl">置顶评论 <button class="cp" data-copy="p4">复制</button></div><pre id="p4">你先接情绪还是先拆问题？我先来：先安静听完，再问要不要一起想办法。</pre></div>
+      </div>
+      <div class="blk">
+        <div class="lbl">9 图逐页文字</div>
+        <table><tbody><tr><th>P1</th><td>钩子两行大字（主）｜<strong>朱砂人物名 + 参照标签</strong>｜下方关系句 ｜ 无类型坐标主视觉</td></tr><tr><th>P2</th><td>「朋友倾诉时你能接住情绪，转身又能把问题拆成几条可执行的步骤。」｜「讲道理和讲感受，不一定是二选一。」</td></tr><tr><th>P3</th><td>01 先接住再分析</td></tr><tr><th>P4</th><td>02 两边都听得进</td></tr><tr><th>P5</th><td>03 偶尔被说太冷静</td></tr><tr><th>P6</th><td><strong>人物关系句（大字主位）</strong> + 观点说明 ｜ 公式与四维字母降为页脚注脚（小字）</td></tr><tr><th>P7</th><td>原题 #76：优先逻辑与客观利弊 / 优先对人的影响与感受 ｜ A–E 五档量表</td></tr><tr><th>P8</th><td><strong>主：周杰伦（当代真人 · 公开言行卡）</strong> ｜ 左侧大字关系句 ｜ <code>IBCD / 内省者型</code> 缩为小标签 ｜ 公开言行观察 · 非本人测评</td></tr><tr><th>P9</th><td>「你先接情绪还是先拆问题？」+ 固定免责</td></tr></tbody></table>
+      </div>
+      <div class="blk">
+        <div class="lbl">发布前自检</div>
+        <ul class="checks"><li class="ok"><span>☑</span>无外链 / 二维码 / 微信 / 「私我」；无绝对化、医疗化表述</li><li class="ok"><span>☑</span>题量口径：40 题；免责声明在正文尾与 P9</li><li class="ok"><span>☑</span>题目 #76 为 <code>seed.ts</code> 原文；<code>IBCD 内省者型</code> 为 <code>types.ts</code> 的 <code>TYPE_NAMES</code></li><li class="ok"><span>☑</span>与 Day3 相比 P2/P3-P5/P7/P8 共 6 页内容全部不同</li><li class="ok"><span>☑</span>图为本地 HTML/CSS 渲染，非 AI 生成图</li><li class="ok"><span>☑</span>人物已按 E/A/I · S/B/N · T/C/F · J/D/P 四维逐维核对，无明显矛盾；非产品结果页档案人物；无立绘 / 剧照 / 台词引用，真人走公开言行观察口径</li><li class="todo"><span>☐</span>三闸门全绿后才发布</li></ul>
+      </div>
+    </div>
+
+    <div class="col pics">
+      <div class="lbl">9 张成品图 <small>1080×1440 · 点击放大</small></div>
+      <div class="grid">
+        <figure><img src="day4/01.png" alt="P1 封面" loading="lazy">
+        <figcaption>P1 · 封面</figcaption></figure>
+        <figure><img src="day4/02.png" alt="P2 场景" loading="lazy">
+        <figcaption>P2 · 场景</figcaption></figure>
+        <figure><img src="day4/03.png" alt="P3 迹象一" loading="lazy">
+        <figcaption>P3 · 迹象一</figcaption></figure>
+        <figure><img src="day4/04.png" alt="P4 迹象二" loading="lazy">
+        <figcaption>P4 · 迹象二</figcaption></figure>
+        <figure><img src="day4/05.png" alt="P5 迹象三" loading="lazy">
+        <figcaption>P5 · 迹象三</figcaption></figure>
+        <figure><img src="day4/06.png" alt="P6 观点" loading="lazy">
+        <figcaption>P6 · 观点</figcaption></figure>
+        <figure><img src="day4/07.png" alt="P7 题目" loading="lazy">
+        <figcaption>P7 · 题目</figcaption></figure>
+        <figure><img src="day4/08.png" alt="P8 人物" loading="lazy">
+        <figcaption>P8 · 人物</figcaption></figure>
+        <figure><img src="day4/09.png" alt="P9 互动" loading="lazy">
+        <figcaption>P9 · 互动</figcaption></figure></div>
+    </div>
+  </div>
+
+  <div class="review">
+    <div class="lbl">审核结论</div>
+    <div class="opts">
+      <label><input type="radio" name="r4" value="pass">通过</label>
+      <label><input type="radio" name="r4" value="fix">需修改</label>
+      <label><input type="radio" name="r4" value="hold">待定</label>
+    </div>
+    <textarea id="note4" rows="3" placeholder="写下需要修改的点；编号列出更方便我逐条改。例如：1. 封面人物名再大一点 2. P6 公式保留"></textarea>
+  </div>
+</section>
+
+<section class="day" id="day5" data-day="5">
+  <div class="dayhead">
+    <div class="daynum">DAY 05 <span class="dot"></span></div>
+    <h2>计划还是随缘</h2>
+    <div class="meta">图片：<code>day5/01.png</code> … <code>09.png</code> <i>｜</i> 支柱：定义中间型 ｜ 独立信息增量：J/D/P 三档、D 是可改的框架 ｜ 题目 #51 P_J ｜ 结果 <code>ABTD</code> 适应者型</div>
+  </div>
+
+  <div class="cols">
+    <div class="col copy">
+      <div class="blk">
+        <div class="lbl">标题 <button class="cp" data-copy="t5">复制</button></div>
+        <pre id="t5">计划还是随缘</pre>
+      </div>
+      <div class="blk">
+        <div class="lbl">正文 <button class="cp" data-copy="b5">复制</button></div>
+        <pre id="b5" class="body">行程表列得很细，但真临时改了，你也没那么难受。会排路线，也允许改路线，其实是同一件事。
+
+16 型要求最后一维二选一：J（计划）或 P（随缘）。81 型在中间留了 D。
+
+三个具体表现：关键节点和底线会提前想清楚，不靠临场发挥；细节留余地，愿意看当天状态再定；被临时打乱也不慌，因为改的是路径，不是目标。
+
+40 题里有一道：「我凡事喜欢提前制定计划并按时完成，拖延会让我感到焦虑」对「我不喜欢过早锁定计划，事情往往在最后一刻自然会有最好的呈现方式」。很多人两个都选过，只是不同项目。
+
+D 档不是拖延，也不是死板，是给计划留了可改的余量。很多人以为「会算」的人一定死守方案，可阿尔敏恰恰相反：平时安安静静，僵局里靠推演和代价计算找出路，方案一旦不成立立刻推翻重来。框架算得清、路径随时肯改，才是 ABTD「适应者型」的意思。
+
+你的计划会改几次？
+
+本内容仅供自我探索与娱乐参考，不构成心理诊断、医疗建议或招聘依据。MBTI-PRO 与 MBTI 官方机构无关联。</pre>
+      </div>
+      <div class="blk two">
+        <div><div class="lbl">话题标签 <button class="cp" data-copy="g5">复制</button></div><pre id="g5">#人格测试 #MBTI #自我探索 #中间型人格 #计划控 #随缘派 #性格分析</pre></div>
+        <div><div class="lbl">置顶评论 <button class="cp" data-copy="p5">复制</button></div><pre id="p5">你的计划会改几次？我先来：大节点不动，小安排常改。</pre></div>
+      </div>
+      <div class="blk">
+        <div class="lbl">9 图逐页文字</div>
+        <table><tbody><tr><th>P1</th><td>钩子两行大字（主）｜<strong>朱砂人物名 + 参照标签</strong>｜下方关系句 ｜ 无类型坐标主视觉</td></tr><tr><th>P2</th><td>「行程表列得很细，但真临时改了，你也没那么难受。」｜「会排路线，也允许改路线，这其实是同一件事。」</td></tr><tr><th>P3</th><td>01 大方向提前定</td></tr><tr><th>P4</th><td>02 细节留余地</td></tr><tr><th>P5</th><td>03 被打乱也不慌</td></tr><tr><th>P6</th><td><strong>人物关系句（大字主位）</strong> + 观点说明 ｜ 公式与四维字母降为页脚注脚（小字）</td></tr><tr><th>P7</th><td>原题 #51：提前计划并按时完成 / 不过早锁定计划 ｜ A–E 五档量表</td></tr><tr><th>P8</th><td><strong>主：阿尔敏（大字角色名 + 剧情卡）</strong> ｜ 左侧大字关系句 ｜ <code>ABTD / 适应者型</code> 缩为小标签 ｜ 虚构角色 · 仅作性格类比</td></tr><tr><th>P9</th><td>「你的计划会改几次？」+ 固定免责</td></tr></tbody></table>
+      </div>
+      <div class="blk">
+        <div class="lbl">发布前自检</div>
+        <ul class="checks"><li class="ok"><span>☑</span>无外链 / 二维码 / 微信 / 「私我」；无绝对化、医疗化表述</li><li class="ok"><span>☑</span>题量口径：40 题；免责声明在正文尾与 P9</li><li class="ok"><span>☑</span>题目 #51 为 <code>seed.ts</code> 原文；<code>ABTD 适应者型</code> 为 <code>types.ts</code> 的 <code>TYPE_NAMES</code></li><li class="ok"><span>☑</span>与 Day4 相比 P2/P3-P5/P7/P8 共 6 页内容全部不同</li><li class="ok"><span>☑</span>图为本地 HTML/CSS 渲染，非 AI 生成图</li><li class="ok"><span>☑</span>人物已按 E/A/I · S/B/N · T/C/F · J/D/P 四维逐维核对，无明显矛盾；非产品结果页档案人物；无立绘 / 剧照 / 台词引用，真人走公开言行观察口径</li><li class="todo"><span>☐</span>三闸门全绿后才发布</li></ul>
+      </div>
+    </div>
+
+    <div class="col pics">
+      <div class="lbl">9 张成品图 <small>1080×1440 · 点击放大</small></div>
+      <div class="grid">
+        <figure><img src="day5/01.png" alt="P1 封面" loading="lazy">
+        <figcaption>P1 · 封面</figcaption></figure>
+        <figure><img src="day5/02.png" alt="P2 场景" loading="lazy">
+        <figcaption>P2 · 场景</figcaption></figure>
+        <figure><img src="day5/03.png" alt="P3 迹象一" loading="lazy">
+        <figcaption>P3 · 迹象一</figcaption></figure>
+        <figure><img src="day5/04.png" alt="P4 迹象二" loading="lazy">
+        <figcaption>P4 · 迹象二</figcaption></figure>
+        <figure><img src="day5/05.png" alt="P5 迹象三" loading="lazy">
+        <figcaption>P5 · 迹象三</figcaption></figure>
+        <figure><img src="day5/06.png" alt="P6 观点" loading="lazy">
+        <figcaption>P6 · 观点</figcaption></figure>
+        <figure><img src="day5/07.png" alt="P7 题目" loading="lazy">
+        <figcaption>P7 · 题目</figcaption></figure>
+        <figure><img src="day5/08.png" alt="P8 人物" loading="lazy">
+        <figcaption>P8 · 人物</figcaption></figure>
+        <figure><img src="day5/09.png" alt="P9 互动" loading="lazy">
+        <figcaption>P9 · 互动</figcaption></figure></div>
+    </div>
+  </div>
+
+  <div class="review">
+    <div class="lbl">审核结论</div>
+    <div class="opts">
+      <label><input type="radio" name="r5" value="pass">通过</label>
+      <label><input type="radio" name="r5" value="fix">需修改</label>
+      <label><input type="radio" name="r5" value="hold">待定</label>
+    </div>
+    <textarea id="note5" rows="3" placeholder="写下需要修改的点；编号列出更方便我逐条改。例如：1. 封面人物名再大一点 2. P6 公式保留"></textarea>
+  </div>
+</section>
+
+<section class="day" id="day6" data-day="6">
+  <div class="dayhead">
+    <div class="daynum">DAY 06 <span class="dot"></span></div>
+    <h2>一张图看懂81型</h2>
+    <div class="meta">图片：<code>day6/01.png</code> … <code>09.png</code> <i>｜</i> 支柱：方法说明 ｜ 独立信息增量：2⁴=16 与 3⁴=81、40 题口径、不混逻辑推理题 ｜ 题目 #3 E_I ｜ 结果 <code>ESTD</code> 操盘手型</div>
+  </div>
+
+  <div class="cols">
+    <div class="col copy">
+      <div class="blk">
+        <div class="lbl">标题 <button class="cp" data-copy="t6">复制</button></div>
+        <pre id="t6">一张图看懂81型</pre>
+      </div>
+      <div class="blk">
+        <div class="lbl">正文 <button class="cp" data-copy="b6">复制</button></div>
+        <pre id="b6" class="body">四个维度，每个维度三档，组合起来到底有多少种人？
+
+16 型只在每个维度取两端：E 或 I、S 或 N、T 或 F、J 或 P，2×2×2×2＝16。81 型把中间那一档也算进来：E/A/I、S/B/N、T/C/F、J/D/P，3×3×3×3＝81。
+
+所以不是多造了 65 个标签，而是把原本被切掉的状态补回来。81 包含 16，端值组合仍然在里面；中间 65 种各自有独立的中文名与描述，不是「没测出来」的占位符。
+
+首发版本是 40 题、约 6-8 分钟，四个维度各 10 题，全部是双极主观题；我们特意没有把逻辑推理题算进人格类型——那是推理能力，不是性格倾向。
+
+比如其中一道：「我习惯边说话边思考，在交流中形成自己的观点」对「我习惯先在心中理清思路，然后再清晰地表达出来」。两端都清楚，中间也允许停。
+
+顺带说一句，81 型里不只是中间档有对照。像 ESTD「操盘手型」这样四个维度都偏明确的坐标，最容易想到托尼·斯塔克：高调、动手能力强、靠数据和工程判断推进，却也常临场把原方案推翻。每一型都有名字，也都有一个一眼能认出的人可以对照。
+
+你最想先看哪一档？
+
+本内容仅供自我探索与娱乐参考，不构成心理诊断、医疗建议或招聘依据。MBTI-PRO 与 MBTI 官方机构无关联。</pre>
+      </div>
+      <div class="blk two">
+        <div><div class="lbl">话题标签 <button class="cp" data-copy="g6">复制</button></div><pre id="g6">#人格测试 #MBTI #自我探索 #81型人格 #人格坐标 #性格测试 #性格分析</pre></div>
+        <div><div class="lbl">置顶评论 <button class="cp" data-copy="p6">复制</button></div><pre id="p6">你最想先看哪一档？我先来：先确认自己是不是真的在中间。</pre></div>
+      </div>
+      <div class="blk">
+        <div class="lbl">9 图逐页文字</div>
+        <table><tbody><tr><th>P1</th><td>钩子两行大字（主）｜<strong>朱砂人物名 + 参照标签</strong>｜下方关系句 ｜ 无类型坐标主视觉</td></tr><tr><th>P2</th><td>「四个维度，每个维度三档，组合起来到底有多少种人？」｜「不是多造 65 个标签，是把被切掉的状态补回来。」</td></tr><tr><th>P3</th><td>01 每维都有三档</td></tr><tr><th>P4</th><td>02 16 型是端值组合</td></tr><tr><th>P5</th><td>03 81 包含 16</td></tr><tr><th>P6</th><td><strong>人物关系句（大字主位）</strong> + 观点说明 ｜ 公式与四维字母降为页脚注脚（小字）</td></tr><tr><th>P7</th><td>原题 #3：边说边想 / 先理清思路再表达 ｜ A–E 五档量表</td></tr><tr><th>P8</th><td><strong>主：托尼·斯塔克（大字角色名 + 剧情卡）</strong> ｜ 左侧大字关系句 ｜ <code>ESTD / 操盘手型</code> 缩为小标签 ｜ 虚构角色 · 仅作性格类比</td></tr><tr><th>P9</th><td>「你最想先看哪一档？」+ 固定免责</td></tr></tbody></table>
+      </div>
+      <div class="blk">
+        <div class="lbl">发布前自检</div>
+        <ul class="checks"><li class="ok"><span>☑</span>无外链 / 二维码 / 微信 / 「私我」；无绝对化、医疗化表述</li><li class="ok"><span>☑</span>题量口径：40 题 / 6-8 分钟 / 四维各 10 题，与 <code>short-form.ts</code> 一致</li><li class="ok"><span>☑</span>免责声明在正文尾与 P9</li><li class="ok"><span>☑</span>题目 #3 为 <code>seed.ts</code> 原文；<code>ESTD 操盘手型</code> 为 <code>types.ts</code> 的 <code>TYPE_NAMES</code></li><li class="ok"><span>☑</span>与 Day5 相比 P2/P3-P5/P7/P8 共 6 页内容全部不同</li><li class="ok"><span>☑</span>图为本地 HTML/CSS 渲染，非 AI 生成图</li><li class="ok"><span>☑</span>人物已按 E/A/I · S/B/N · T/C/F · J/D/P 四维逐维核对，无明显矛盾；非产品结果页档案人物；无立绘 / 剧照 / 台词引用，真人走公开言行观察口径</li><li class="todo"><span>☐</span>三闸门全绿后才发布</li></ul>
+      </div>
+    </div>
+
+    <div class="col pics">
+      <div class="lbl">9 张成品图 <small>1080×1440 · 点击放大</small></div>
+      <div class="grid">
+        <figure><img src="day6/01.png" alt="P1 封面" loading="lazy">
+        <figcaption>P1 · 封面</figcaption></figure>
+        <figure><img src="day6/02.png" alt="P2 场景" loading="lazy">
+        <figcaption>P2 · 场景</figcaption></figure>
+        <figure><img src="day6/03.png" alt="P3 迹象一" loading="lazy">
+        <figcaption>P3 · 迹象一</figcaption></figure>
+        <figure><img src="day6/04.png" alt="P4 迹象二" loading="lazy">
+        <figcaption>P4 · 迹象二</figcaption></figure>
+        <figure><img src="day6/05.png" alt="P5 迹象三" loading="lazy">
+        <figcaption>P5 · 迹象三</figcaption></figure>
+        <figure><img src="day6/06.png" alt="P6 观点" loading="lazy">
+        <figcaption>P6 · 观点</figcaption></figure>
+        <figure><img src="day6/07.png" alt="P7 题目" loading="lazy">
+        <figcaption>P7 · 题目</figcaption></figure>
+        <figure><img src="day6/08.png" alt="P8 人物" loading="lazy">
+        <figcaption>P8 · 人物</figcaption></figure>
+        <figure><img src="day6/09.png" alt="P9 互动" loading="lazy">
+        <figcaption>P9 · 互动</figcaption></figure></div>
+    </div>
+  </div>
+
+  <div class="review">
+    <div class="lbl">审核结论</div>
+    <div class="opts">
+      <label><input type="radio" name="r6" value="pass">通过</label>
+      <label><input type="radio" name="r6" value="fix">需修改</label>
+      <label><input type="radio" name="r6" value="hold">待定</label>
+    </div>
+    <textarea id="note6" rows="3" placeholder="写下需要修改的点；编号列出更方便我逐条改。例如：1. 封面人物名再大一点 2. P6 公式保留"></textarea>
+  </div>
+</section>
+
+<section class="day" id="day7" data-day="7">
+  <div class="dayhead">
+    <div class="daynum">DAY 07 <span class="dot"></span></div>
+    <h2>中间型不是没性格</h2>
+    <div class="meta">图片：<code>day7/01.png</code> … <code>09.png</code> <i>｜</i> 支柱：定义中间型 / 读者问答 ｜ 独立信息增量：A/B/C/D 各有独立描述 ｜ 题目 #20 E_I ｜ 结果 <code>INFD</code> 沉思者型</div>
+  </div>
+
+  <div class="cols">
+    <div class="col copy">
+      <div class="blk">
+        <div class="lbl">标题 <button class="cp" data-copy="t7">复制</button></div>
+        <pre id="t7">中间型不是没性格</pre>
+      </div>
+      <div class="blk">
+        <div class="lbl">正文 <button class="cp" data-copy="b7">复制</button></div>
+        <pre id="b7" class="body">「你到底是什么型？」被问多了，中间型容易被误会成没立场。
+
+看见每一面，和没有自己的判断，不是一回事。三个常见表现：不急着站队，先把两边的前提问清楚；换场景换做法，不是随波逐流，是知道不同场景要不同解法；平时好说话，碰到原则反而最不容易被推动。
+
+81 型里的中间四档 A/B/C/D 各自有独立的名字和描述。比如 INFD「沉思者型」写的是「温柔而坚定的精神牧者」，ABCD「全能者型」写的是「万中无一的终极整合者」——都不是空着的占位符。
+
+40 题里有一道：「我通过与他人交流来整理和厘清自己的想法」对「我的内心世界很丰富，常常进行自我对话和反思」。两种都成立时，答案落在中间，不代表没答案。
+
+最容易被误读的大概是宇智波鼬。他明显是安静内向的那一类：很少解释自己，却早早把很多步之后的事都安排好；所有取舍都绕着要护的人转，局势一变又会重新落子。内向、看得远、以情感为底色、却不被计划困住——INFD「沉思者型」要说的就是这个：沉默跟没立场，从来是两回事。
+
+你被说过「没立场」吗？
+
+本内容仅供自我探索与娱乐参考，不构成心理诊断、医疗建议或招聘依据。MBTI-PRO 与 MBTI 官方机构无关联。</pre>
+      </div>
+      <div class="blk two">
+        <div><div class="lbl">话题标签 <button class="cp" data-copy="g7">复制</button></div><pre id="g7">#人格测试 #MBTI #自我探索 #中间型人格 #没立场 #81型人格 #性格分析</pre></div>
+        <div><div class="lbl">置顶评论 <button class="cp" data-copy="p7">复制</button></div><pre id="p7">你被说过没立场吗？我先来：被说过，但我只是不想在信息不全时下结论。</pre></div>
+      </div>
+      <div class="blk">
+        <div class="lbl">9 图逐页文字</div>
+        <table><tbody><tr><th>P1</th><td>钩子两行大字（主）｜<strong>朱砂人物名 + 参照标签</strong>｜下方关系句 ｜ 无类型坐标主视觉</td></tr><tr><th>P2</th><td>「「你到底是什么型？」被问多了，中间型容易被误会成没立场。」｜「看见每一面，和没有自己的判断，不是一回事。」</td></tr><tr><th>P3</th><td>01 不急着站队</td></tr><tr><th>P4</th><td>02 换场景换做法</td></tr><tr><th>P5</th><td>03 底线其实很清楚</td></tr><tr><th>P6</th><td><strong>人物关系句（大字主位）</strong> + 观点说明 ｜ 公式与四维字母降为页脚注脚（小字）</td></tr><tr><th>P7</th><td>原题 #20：与人交流整理想法 / 自我对话与反思 ｜ A–E 五档量表</td></tr><tr><th>P8</th><td><strong>主：宇智波鼬（大字角色名 + 剧情卡）</strong> ｜ 左侧大字关系句 ｜ <code>INFD / 沉思者型</code> 缩为小标签 ｜ 虚构角色 · 仅作性格类比</td></tr><tr><th>P9</th><td>「你被说过「没立场」吗？」+ 固定免责</td></tr></tbody></table>
+      </div>
+      <div class="blk">
+        <div class="lbl">发布前自检</div>
+        <ul class="checks"><li class="ok"><span>☑</span>无外链 / 二维码 / 微信 / 「私我」；无绝对化、医疗化表述</li><li class="ok"><span>☑</span>题量口径：40 题；免责声明在正文尾与 P9</li><li class="ok"><span>☑</span>题目 #20 为 <code>seed.ts</code> 原文；<code>INFD 沉思者型</code>、<code>ABCD 全能者型</code> 为 <code>types.ts</code> 的 <code>TYPE_NAMES</code>；两句类型描述取自 <code>TYPE_SUMMARIES</code></li><li class="ok"><span>☑</span>与 Day6 相比 P2/P3-P5/P7/P8 共 6 页内容全部不同</li><li class="ok"><span>☑</span>图为本地 HTML/CSS 渲染，非 AI 生成图</li><li class="ok"><span>☑</span>人物已按 E/A/I · S/B/N · T/C/F · J/D/P 四维逐维核对，无明显矛盾；非产品结果页档案人物；无立绘 / 剧照 / 台词引用，真人走公开言行观察口径</li><li class="todo"><span>☐</span>三闸门全绿后才发布</li></ul>
+      </div>
+    </div>
+
+    <div class="col pics">
+      <div class="lbl">9 张成品图 <small>1080×1440 · 点击放大</small></div>
+      <div class="grid">
+        <figure><img src="day7/01.png" alt="P1 封面" loading="lazy">
+        <figcaption>P1 · 封面</figcaption></figure>
+        <figure><img src="day7/02.png" alt="P2 场景" loading="lazy">
+        <figcaption>P2 · 场景</figcaption></figure>
+        <figure><img src="day7/03.png" alt="P3 迹象一" loading="lazy">
+        <figcaption>P3 · 迹象一</figcaption></figure>
+        <figure><img src="day7/04.png" alt="P4 迹象二" loading="lazy">
+        <figcaption>P4 · 迹象二</figcaption></figure>
+        <figure><img src="day7/05.png" alt="P5 迹象三" loading="lazy">
+        <figcaption>P5 · 迹象三</figcaption></figure>
+        <figure><img src="day7/06.png" alt="P6 观点" loading="lazy">
+        <figcaption>P6 · 观点</figcaption></figure>
+        <figure><img src="day7/07.png" alt="P7 题目" loading="lazy">
+        <figcaption>P7 · 题目</figcaption></figure>
+        <figure><img src="day7/08.png" alt="P8 人物" loading="lazy">
+        <figcaption>P8 · 人物</figcaption></figure>
+        <figure><img src="day7/09.png" alt="P9 互动" loading="lazy">
+        <figcaption>P9 · 互动</figcaption></figure></div>
+    </div>
+  </div>
+
+  <div class="review">
+    <div class="lbl">审核结论</div>
+    <div class="opts">
+      <label><input type="radio" name="r7" value="pass">通过</label>
+      <label><input type="radio" name="r7" value="fix">需修改</label>
+      <label><input type="radio" name="r7" value="hold">待定</label>
+    </div>
+    <textarea id="note7" rows="3" placeholder="写下需要修改的点；编号列出更方便我逐条改。例如：1. 封面人物名再大一点 2. P6 公式保留"></textarea>
+  </div>
+</section></div>
+
+<dialog id="lightbox"><img id="lbimg" alt="放大预览"></dialog>
+
+<script>
+var KEY = 'mbti-pro-xhs-week1-review';
+var state = {};
+try { state = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch (e) { state = {}; }
+var cur = 1;
+function badge(n) {
+  var s = state[n]; var el = document.querySelector('.nav button[data-day="' + n + '"] .badge');
+  if (!el) return;
+  el.textContent = !s || !s.status ? '' : (s.status === 'pass' ? '✓' : (s.status === 'fix' ? '!' : '·'));
+  el.className = 'badge ' + (!s || !s.status ? '' : s.status);
+}
+function save() { localStorage.setItem(KEY, JSON.stringify(state)); }
+function show(n) {
+  if (n < 1 || n > 7) return;
+  cur = n;
+  var all = document.querySelectorAll('.day');
+  for (var i = 0; i < all.length; i++) all[i].classList.toggle('on', +all[i].dataset.day === n);
+  var btns = document.querySelectorAll('.nav button[data-day]');
+  for (var j = 0; j < btns.length; j++) btns[j].classList.toggle('on', +btns[j].dataset.day === n);
+  document.getElementById('progress').textContent = '第 ' + n + ' / 7 天';
+  window.scrollTo(0, 0);
+}
+document.addEventListener('click', function (e) {
+  var nav = e.target.closest('.nav button[data-day]');
+  if (nav) { show(+nav.dataset.day); return; }
+  var cp = e.target.closest('.cp');
+  if (cp) {
+    var el = document.getElementById(cp.dataset.copy);
+    if (!el) return;
+    var txt = el.innerText;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(txt).then(function () { cp.textContent = '已复制'; setTimeout(function () { cp.textContent = '复制'; }, 1200); });
+    } else { cp.textContent = '请手动选中复制'; setTimeout(function () { cp.textContent = '复制'; }, 1600); }
+    return;
+  }
+  var im = e.target.closest('.grid img');
+  if (im) { document.getElementById('lbimg').src = im.src; document.getElementById('lightbox').showModal(); return; }
+  if (e.target.id === 'prev') show(cur - 1);
+  if (e.target.id === 'next') show(cur + 1);
+  if (e.target.id === 'export') {
+    var out = { exportedAt: new Date().toISOString(), days: state };
+    var blob = new Blob([JSON.stringify(out, null, 2)], { type: 'application/json' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = 'xhs-week1-review.json'; a.click();
+    URL.revokeObjectURL(a.href);
+  }
+});
+document.addEventListener('change', function (e) {
+  var r = e.target.closest('input[type="radio"]');
+  if (!r) return;
+  var n = +r.name.slice(1);
+  state[n] = state[n] || {}; state[n].status = r.value; save(); badge(n);
+});
+document.addEventListener('input', function (e) {
+  if (e.target.tagName !== 'TEXTAREA') return;
+  var n = +e.target.id.slice(4);
+  state[n] = state[n] || {}; state[n].note = e.target.value; save();
+});
+document.addEventListener('keydown', function (e) {
+  if (e.key === 'ArrowLeft') show(cur - 1);
+  if (e.key === 'ArrowRight') show(cur + 1);
+  if (e.key === 'Escape') { var d = document.getElementById('lightbox'); if (d.open) d.close(); }
+});
+document.getElementById('lightbox').addEventListener('click', function (e) { if (e.target === this) this.close(); });
+for (var n = 1; n <= 7; n++) {
+  var s = state[n]; if (!s) continue;
+  if (s.status) { var r = document.querySelector('input[name="r' + n + '"][value="' + s.status + '"]'); if (r) r.checked = true; }
+  var t = document.getElementById('note' + n); if (t && s.note) t.value = s.note;
+  badge(n);
+}
+show(1);
+</script>
+</body>
+</html>

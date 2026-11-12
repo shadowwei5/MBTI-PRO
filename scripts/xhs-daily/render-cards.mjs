@@ -8,7 +8,7 @@
 //       → 名人坐标篇备用稿
 // 只做本地 HTML 截图，不调用任何付费 AI 生图接口，不执行发布动作。
 import { chromium } from 'playwright';
-import { mkdirSync } from 'node:fs';
+import { mkdirSync, writeFileSync, renameSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
@@ -44,9 +44,21 @@ for (const t of targets) {
   if (count !== 9) throw new Error(`[${t.note}] 期望 9 页，实际 ${count} 页，请检查 NOTE.signs 是否为 3 条`);
 
   for (let i = 0; i < count; i++) {
-    await page.locator('.page').nth(i).screenshot({
-      path: resolve(t.out, `${String(i + 1).padStart(2, '0')}.png`)
-    });
+    const name = `${String(i + 1).padStart(2, '0')}.png`;
+    const file = resolve(t.out, name);
+    const tmp = resolve(t.out, `.${name}.${process.pid}.tmp`);
+    const buf = await page.locator('.page').nth(i).screenshot();
+    let done = false;
+    for (let attempt = 0; attempt < 3 && !done; attempt++) {
+      try {
+        writeFileSync(tmp, buf);
+        renameSync(tmp, file);
+        done = true;
+      } catch (err) {
+        if (attempt === 2) throw new Error(`写入失败 ${file}: ${err.message}`);
+        await new Promise(r => setTimeout(r, 200));
+      }
+    }
   }
   await page.close();
   total += count;

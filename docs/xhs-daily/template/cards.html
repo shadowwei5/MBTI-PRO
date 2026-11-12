@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>MBTI-PRO 小红书 9 图模板 · 对齐 v4 UI</title>
+<title>MBTI-PRO 小红书 9 图模板 · 人物驱动排期</title>
 <style>
 :root {
   --paper:#F2EDE3; --paper-light:#F8F4EC; --ink:#1E1D1A;
@@ -30,33 +30,30 @@ body { background:#DDD8CE; padding:40px 0; }
   color:var(--accent); }
 .hl { color:var(--accent); }
 
+/* 主：钩子文案 + 知名人物；次：核心观点/迹象/互动；注脚：类型码/坐标/公式/九组色 */
 .p1 .cover-title { position:absolute; left:96px; top:300px; font-size:106px; line-height:1.36; font-weight:500; }
-.p1 .cover-sub { position:absolute; left:96px; top:650px; font-size:36px; color:var(--muted); }
-.p1 .mini { position:absolute; right:96px; top:760px; width:300px; }
-.p1 .mini .mini-t { font-size:20px; letter-spacing:.16em; color:var(--muted); text-align:right; margin-bottom:26px; }
-.p1 .mini .mrow { height:34px; border-bottom:1px solid var(--rule); position:relative; }
-.p1 .mini .mrow i { position:absolute; top:-5px; width:11px; height:11px; border-radius:50%; background:var(--accent); }
+.p1 .person-line { position:absolute; left:96px; top:670px; font-size:52px; color:var(--accent); }
+.p1 .person-line span { font-size:22px; color:var(--muted); letter-spacing:.14em; margin-left:20px;
+  font-family:'DM Mono','Consolas',monospace; }
+.p1 .person-link { position:absolute; left:96px; top:780px; width:820px;
+  font-size:34px; line-height:1.8; color:var(--muted); }
 
 .p2 .spine { position:absolute; left:96px; top:300px; width:3px; height:660px; background:var(--accent); }
 .p2 .scene { position:absolute; left:142px; top:340px; width:790px; font-size:58px; line-height:1.8; }
 .p2 .note { position:absolute; left:142px; top:760px; width:780px; font-size:34px; line-height:1.8; color:var(--muted); }
 
-.sign .idx { position:absolute; right:80px; top:210px; font-size:220px; line-height:1; color:var(--faint); }
+.sign .idx { position:absolute; right:96px; top:210px; font-size:64px; line-height:1; color:var(--faint); }
 .sign .bar { position:absolute; left:96px; top:420px; width:72px; height:4px; background:var(--accent); }
 .sign .title { position:absolute; left:96px; top:480px; font-size:76px; }
 .sign .desc { position:absolute; left:96px; top:620px; width:840px; font-size:42px; line-height:1.8; color:#3A3833; }
 
-.p6 .formula { position:absolute; left:96px; top:270px; font-size:96px; font-weight:500; }
-.p6 .spectrum { position:absolute; left:96px; right:96px; top:440px; }
-.p6 .sp-row { height:128px; border-top:1px solid var(--rule); position:relative; }
-.p6 .sp-head { display:flex; justify-content:space-between; font-size:22px; letter-spacing:.12em;
-  color:var(--muted); margin-top:14px; }
-.p6 .sp-bar { position:absolute; left:0; right:0; top:72px; height:1px; background:var(--rule); }
-.p6 .sp-bar i { position:absolute; top:-6px; width:13px; height:13px; border-radius:50%; background:var(--accent); }
-.p6 .sp-foot { position:absolute; left:0; right:0; bottom:14px; display:flex; justify-content:space-between; align-items:baseline; }
-.p6 .sp-foot b { font-size:34px; font-weight:500; }
-.p6 .sp-foot span { font-size:20px; color:var(--muted); }
-.p6 .method-note { position:absolute; left:96px; top:1000px; width:888px; font-size:34px; line-height:1.8; color:var(--muted); }
+.p6 .lead { position:absolute; left:96px; top:290px; width:888px; font-size:58px; line-height:1.7; font-weight:500; }
+.p6 .lead-sub { position:absolute; left:96px; top:540px; width:888px; font-size:32px; line-height:1.8; color:var(--muted); }
+.p6 .footnote { position:absolute; left:96px; right:96px; bottom:280px;
+  border-top:1px solid var(--rule); padding-top:22px; }
+.p6 .formula { font-size:30px; font-weight:500; }
+.p6 .dimline { margin-top:12px; font-size:22px; letter-spacing:.1em; color:var(--muted);
+  font-family:'DM Mono','Consolas',monospace; }
 
 .p7 .q-title { position:absolute; left:96px; top:260px; font-size:64px; }
 .p7 .q-sub { position:absolute; left:96px; top:366px; font-size:26px; color:var(--muted); }
@@ -66,30 +63,28 @@ body { background:#DDD8CE; padding:40px 0; }
 .p7 .qcol + .qcol { border-left:1px solid var(--rule); }
 .p7 .qcol small { position:absolute; top:24px; left:44px; font-size:20px; letter-spacing:.14em; color:var(--muted); }
 .p7 .scale { position:absolute; left:96px; right:96px; top:820px; display:flex; }
-.p7 .scale div { flex:1; height:78px; border:1px solid var(--rule); border-right:none;
-  display:flex; align-items:center; justify-content:center; font-size:22px; color:var(--muted); }
+.p7 .scale div { flex:1; height:48px; border:1px solid var(--rule); border-right:none;
+  display:flex; align-items:center; justify-content:center; font-size:18px; color:var(--muted); }
 .p7 .scale div:last-child { border-right:1px solid var(--rule); }
 .p7 .qfoot { position:absolute; left:96px; top:950px; font-size:28px; color:var(--muted); }
 
-.p8 .archive-t { position:absolute; left:96px; top:250px; font-size:22px; letter-spacing:.18em; color:var(--muted); }
-.p8 .code { position:absolute; left:96px; top:320px; font-size:170px; line-height:1; font-weight:500; }
-.p8 .name { position:absolute; left:96px; top:540px; font-size:58px; }
-.p8 .name i { display:inline-block; width:18px; height:18px; background:var(--accent); margin-left:16px; vertical-align:middle; }
-.p8 .traits { position:absolute; left:96px; top:640px; font-size:28px; color:var(--muted); letter-spacing:.06em; }
-.p8 .quote { position:absolute; left:96px; top:760px; width:560px; border-left:3px solid var(--accent);
-  padding-left:32px; font-size:38px; line-height:1.8; }
-.p8 .card { position:absolute; right:96px; top:300px; width:290px; height:610px;
+.p8 .hook { position:absolute; left:96px; top:300px; width:490px; font-size:60px; line-height:1.65; font-weight:500; }
+.p8 .type-tag { position:absolute; left:96px; top:720px; font-size:22px; letter-spacing:.14em;
+  color:var(--accent); font-family:'DM Mono','Consolas',monospace; }
+.p8 .group { position:absolute; left:96px; top:790px; font-size:20px; color:var(--muted);
+  display:flex; align-items:center; gap:12px; }
+.p8 .swatch { width:24px; height:24px; }
+.p8 .card { position:absolute; right:96px; top:250px; width:364px; height:800px;
   border:1px solid var(--rule); background:var(--paper-light); padding:30px; }
 .p8 .card .c-no { font-size:19px; letter-spacing:.14em; color:var(--accent); }
-.p8 .card .c-name { font-size:52px; font-weight:500; margin-top:44px; }
-.p8 .card .c-field { font-size:22px; color:var(--muted); margin-top:12px; }
-.p8 .card .c-rule { height:1px; background:var(--rule); margin:28px 0 26px; }
-.p8 .card .c-story { font-size:24px; line-height:1.75; color:#3A3833; }
+.p8 .card .c-name { font-size:76px; font-weight:500; margin-top:40px; }
+.p8 .card .c-name.mid { font-size:60px; }
+.p8 .card .c-name.long { font-size:48px; }
+.p8 .card .c-field { font-size:24px; color:var(--muted); margin-top:12px; }
+.p8 .card .c-rule { height:1px; background:var(--rule); margin:26px 0 24px; }
+.p8 .card .c-story { font-size:28px; line-height:1.75; color:#3A3833; }
 .p8 .card .c-foot { position:absolute; left:30px; right:30px; bottom:28px;
   font-size:17px; letter-spacing:.06em; color:var(--muted); }
-.p8 .group { position:absolute; left:96px; top:1060px; font-size:30px; color:var(--muted);
-  display:flex; align-items:center; gap:16px; }
-.p8 .swatch { width:34px; height:34px; }
 
 .p9 .cta { position:absolute; left:96px; top:320px; width:880px; font-size:88px; line-height:1.5; font-weight:500; }
 .p9 .hint { position:absolute; left:96px; top:620px; font-size:34px; color:var(--muted); }
@@ -100,57 +95,232 @@ body { background:#DDD8CE; padding:40px 0; }
 <body>
 <div id="root"></div>
 <script>
-/* 每天只改 NOTE_LIBRARY 里对应的数据段：封面、场景、3 个迹象、题目、结果卡、互动问题。
-   版式对齐 2026-11-12 v4 UI：client/src/views/{HomeView,ResultView,TestView}.vue 的
-   --paper #f2ede3 / --ink #1e1d1a / --accent #a63d2c / --moss #2f4037 / --rule #d2c8b8，
-   三段式细线页头、朱砂章节编号、四维横向光谱、五档直角量表、超大衬线类型码档案卡。
-   禁止只改封面而不改 P2/P3-P5/P7/P8。
+/* 人物驱动排期（2026-11-12 20:40）
+   先锁定 7 位特质鲜明、15-35 岁一眼认出的角色，逐维定坐标，再让题目维度、四维落点、
+   九组色、钩子与文案全部跟着人物走。坐标优先用端值组合以取得最高吻合度。
+   四维口径（types.ts）：E 外向 / A 平衡 / I 内向；S 实感 / B 均衡 / N 直觉；
+   T 思考 / C 复合 / F 情感；J 判断 / D 动态 / P 感知。
+   光谱落点：E/S/T/J = 12（左端），I/N/F/P = 88（右端），A/B/C/D = 50。
+   人物只是「一眼认出」的参照，不是产品结果页的档案代表人物；只用文字提及，不放立绘/剧照/照片。
    预览：cards.html?note=day1 … day7 / elon
-   批量出图：node scripts/xhs-daily/render-cards.mjs --all
-   单日出图：node scripts/xhs-daily/render-cards.mjs --note day3 --out <目录> */
+   批量出图：node scripts/xhs-daily/render-cards.mjs --all */
+const DISCLAIMER = '本内容仅供自我探索与娱乐参考，不构成心理诊断、医疗建议或招聘依据。\nMBTI-PRO 与 MBTI 官方机构无关联。';
+
 const NOTE_DAY1 = {
   no: 1,
-  coverLines: ['16 型之外', '还有 65 种人'],
-  coverHighlight: '65 种',
-  coverSub: '81 型人格档案 · 第 001 期',
-  scene: '同一个人，上周测出 ENFP，这周变成 INFP。不一定是题坏了。',
-  sceneNote: '两次都是真话，只是题目把「中间」挤掉了。',
+  coverLines: ['吵、冲动', '却从不放弃人'], coverHighlight: '却从不放弃人',
+  scene: '吵、冲动、爱出风头，可他从没放弃过任何一个人。',
+  sceneNote: 'E、N、F、P 四个字母，在他身上几乎找不到反例。',
   signs: [
-    { title: '答案会随场景变', desc: '聚会里选了「喜欢热闹」，加班那周又选了「想一个人待着」。' },
-    { title: '常在两项之间犹豫', desc: '不是不知道自己是谁，是两个选项都像，也都不完全像。' },
-    { title: '四个字母说不完', desc: '最能描述你的那部分，往往就落在选项中间。' }
+    { title: '谁都不放过', desc: '被全村孤立，还是天天站在最热闹的地方喊要当火影。' },
+    { title: '信还没发生的事', desc: '不认「出身就这样」，认定没人走通的路也能走。' },
+    { title: '选择绕着人转', desc: '每次冒险的起点，都是某个被丢下的同伴。' }
   ],
   formula: '3 × 3 × 3 × 3 = 81',
   dims: [
-    { k: '01 能量来源', v: 'E / A / I', letter: 'A', dot: 50 },
-    { k: '02 认知方式', v: 'S / B / N', letter: 'B', dot: 50 },
-    { k: '03 决策方式', v: 'T / C / F', letter: 'C', dot: 50 },
-    { k: '04 生活态度', v: 'J / D / P', letter: 'D', dot: 50 }
+    { k: '01 能量来源', v: 'E / A / I', letter: 'E', dot: 12 },
+    { k: '02 认知方式', v: 'S / B / N', letter: 'N', dot: 88 },
+    { k: '03 决策方式', v: 'T / C / F', letter: 'F', dot: 88 },
+    { k: '04 生活态度', v: 'J / D / P', letter: 'P', dot: 88 }
   ],
-  methodNote: '每一维都有中间档。中间不是「没测出来」，是单独的一种状态。16 型之外还有 65 种坐标。',
+  methodNote: 'ENFP 是四个端值都鲜明的坐标。81 型在每一维还留了中间档——很多人并不在任何一端。',
   question: {
-    label: '40q-v1 · 原题 #1 · 能量来源',
-    left: '参加大型聚会后，我感到精力充沛、心情愉悦。',
-    right: '参加大型聚会后，我需要独处一段时间来恢复精力。',
+    label: '40q-v1 · 原题 #80 · 决策方式',
+    left: '朋友向我倾诉烦恼时，我倾向于先分析问题并提供解决方案。',
+    right: '朋友向我倾诉烦恼时，我倾向于先共情和接纳对方的情绪。',
     foot: '5 点量表 · 允许停在中间'
   },
-  result: {
-    code: 'ABCD', name: '全能者型', dims: ['A', 'B', 'C', 'D'],
-    note: '不是没有立场，是能看见每一面。',
-    group: 'BC 月光银灰组', color: '#8B95A0'
-  },
-  cta: '你是哪一维\n卡在中间？',
-  hint: '评论区聊聊，我们先来：E/I。',
-  disclaimer: '本内容仅供自我探索与娱乐参考，不构成心理诊断、医疗建议或招聘依据。\nMBTI-PRO 与 MBTI 官方机构无关联。'
+  result: { code: 'ENFP', name: '竞选者型', dims: ['E', 'N', 'F', 'P'], group: 'NF 翠绿组', color: '#2D8A4E' },
+  cta: '你身边有\n鸣人式的人吗？',
+  hint: '评论区聊聊，我们先来：有，而且通常是最吵的那个。',
+  disclaimer: DISCLAIMER
 };
 
-/* NO.031 名人坐标争议篇：只用文字与字母坐标，不放人物照片/仿肖像。
-   口径为「坐标演示」而非「判定」，见方案文档 5.7。 */
+const NOTE_DAY2 = {
+  no: 2,
+  coverLines: ['托尼不是 ESTJ', '是 ENTD'], coverHighlight: '是 ENTD',
+  scene: '他不是只会逞强的发明家，方案说推翻就推翻。',
+  sceneNote: 'E、N、T、D 四维，都能举出很具体的画面。',
+  signs: [
+    { title: '天生在台前', desc: '发布会、记者会、听证会，越多人看着他越来劲。' },
+    { title: '做还没存在的东西', desc: '战甲、清洁能源、AI，想的从来不是把现有流程优化一遍。' },
+    { title: '刚定的也敢推翻', desc: '从卖武器到承担后果，路线一不成立就当场换。' }
+  ],
+  formula: '3 × 3 × 3 × 3 = 81',
+  dims: [
+    { k: '01 能量来源', v: 'E / A / I', letter: 'E', dot: 12 },
+    { k: '02 认知方式', v: 'S / B / N', letter: 'N', dot: 88 },
+    { k: '03 决策方式', v: 'T / C / F', letter: 'T', dot: 12 },
+    { k: '04 生活态度', v: 'J / D / P', letter: 'D', dot: 50 }
+  ],
+  methodNote: 'D 是 J 与 P 之间的动态档：框架稳、路径可改。81 型把这种「会改路线」单独算一种。',
+  question: {
+    label: '40q-v1 · 原题 #26 · 认知方式',
+    left: '我做事注重细节和具体步骤，相信“眼见为实”。',
+    right: '我关注事物背后的整体图景和规律，相信直觉的指引。',
+    foot: '5 点量表 · 允许停在中间'
+  },
+  result: { code: 'ENTD', name: '战略家型', dims: ['E', 'N', 'T', 'D'], group: 'NT 深紫组', color: '#6B3FA0' },
+  cta: '你觉得他\n更像哪一型？',
+  hint: '评论区聊聊，我们先来：ENTD，S 那一维实在对不上。',
+  disclaimer: DISCLAIMER
+};
+
+const NOTE_DAY3 = {
+  no: 3,
+  coverLines: ['最少解释的人', '算得最远'], coverHighlight: '算得最远',
+  scene: '最少解释的那个人，往往把最远的几步都算好了。',
+  sceneNote: 'I、N、F、J，一个都不含糊。',
+  signs: [
+    { title: '几乎不解释', desc: '最重的决定都是一个人做完，连身边人也不告诉。' },
+    { title: '看很多步之后', desc: '把弟弟往后的人生，都算进了自己的布局里。' },
+    { title: '一切为了要护的人', desc: '所有取舍绕着一个人转，而不是绕着胜负。' }
+  ],
+  formula: '3 × 3 × 3 × 3 = 81',
+  dims: [
+    { k: '01 能量来源', v: 'E / A / I', letter: 'I', dot: 88 },
+    { k: '02 认知方式', v: 'S / B / N', letter: 'N', dot: 88 },
+    { k: '03 决策方式', v: 'T / C / F', letter: 'F', dot: 88 },
+    { k: '04 生活态度', v: 'J / D / P', letter: 'J', dot: 12 }
+  ],
+  methodNote: 'INFJ 是四个端值都明确的坐标；81 型在同一张图上保留了两端之间的 65 种状态。',
+  question: {
+    label: '40q-v1 · 原题 #76 · 决策方式',
+    left: '做决定时，我优先考虑逻辑分析和客观利弊。',
+    right: '做决定时，我优先考虑对人的影响和大家的感受。',
+    foot: '5 点量表 · 允许停在中间'
+  },
+  result: { code: 'INFJ', name: '提倡者型', dims: ['I', 'N', 'F', 'J'], group: 'NF 翠绿组', color: '#2D8A4E' },
+  cta: '你身边有\n这样的人吗？',
+  hint: '评论区聊聊，我们先来：有，而且往往最后才被看懂。',
+  disclaimer: DISCLAIMER
+};
+
+const NOTE_DAY4 = {
+  no: 4,
+  coverLines: ['不推演大道理', '靠眼前这一拳'], coverHighlight: '靠眼前这一拳',
+  scene: '不推演大道理，靠眼前这一拳做判断。',
+  sceneNote: 'E、S、F、P，端值非常干净。',
+  signs: [
+    { title: '把人聚起来', desc: '草帽一伙里最拧的一群人，偏偏都愿意跟着他。' },
+    { title: '活在当下', desc: '不先算全局，靠眼前这一拳、这一顿饭做判断。' },
+    { title: '先讲情义', desc: '伙伴有难就立刻掉头，从不先算代价。' }
+  ],
+  formula: '3 × 3 × 3 × 3 = 81',
+  dims: [
+    { k: '01 能量来源', v: 'E / A / I', letter: 'E', dot: 12 },
+    { k: '02 认知方式', v: 'S / B / N', letter: 'S', dot: 12 },
+    { k: '03 决策方式', v: 'T / C / F', letter: 'F', dot: 88 },
+    { k: '04 生活态度', v: 'J / D / P', letter: 'P', dot: 88 }
+  ],
+  methodNote: 'ESFP 是端值组合。81 型里，S 与 N、J 与 P 之间都有中间档，不是非此即彼。',
+  question: {
+    label: '40q-v1 · 原题 #11 · 能量来源',
+    left: '周末我更愿意出门参加活动，而不是待在家里。',
+    right: '周末我更愿意在家里安静地度过，做自己喜欢的事情。',
+    foot: '5 点量表 · 允许停在中间'
+  },
+  result: { code: 'ESFP', name: '表演者型', dims: ['E', 'S', 'F', 'P'], group: 'SP 暖金组', color: '#C8963E' },
+  cta: '你也靠\n眼前这一拳吗？',
+  hint: '评论区聊聊，我们先来：大体是，但会先想一秒。',
+  disclaimer: DISCLAIMER
+};
+
+const NOTE_DAY5 = {
+  no: 5,
+  coverLines: ['线索越碎', '他越看得清'], coverHighlight: '他越看得清',
+  scene: '线索越碎，他越先看到整张图。',
+  sceneNote: 'E、N、T、J，四个维度都偏到同一侧。',
+  signs: [
+    { title: '主动控场', desc: '一到现场就接住局面，把所有人调度起来。' },
+    { title: '从碎片看整张图', desc: '别人看到线索，他看到还没显形的真相。' },
+    { title: '只认证据', desc: '再合理的动机，也要能被现场细节验证才算数。' }
+  ],
+  formula: '3 × 3 × 3 × 3 = 81',
+  dims: [
+    { k: '01 能量来源', v: 'E / A / I', letter: 'E', dot: 12 },
+    { k: '02 认知方式', v: 'S / B / N', letter: 'N', dot: 88 },
+    { k: '03 决策方式', v: 'T / C / F', letter: 'T', dot: 12 },
+    { k: '04 生活态度', v: 'J / D / P', letter: 'J', dot: 12 }
+  ],
+  methodNote: 'ENTJ 是端值；但很多人在 N 与 S、J 与 P 之间，81 型把这些位置也画了出来。',
+  question: {
+    label: '40q-v1 · 原题 #79 · 决策方式',
+    left: '我倾向于用数据和事实来说服别人，而非诉诸情感。',
+    right: '我倾向于用打动人心的故事和情感共鸣来与人沟通。',
+    foot: '5 点量表 · 允许停在中间'
+  },
+  result: { code: 'ENTJ', name: '指挥官型', dims: ['E', 'N', 'T', 'J'], group: 'NT 深紫组', color: '#6B3FA0' },
+  cta: '你先看到\n细节还是全图？',
+  hint: '评论区聊聊，我们先来：先全图，再回头补细节。',
+  disclaimer: DISCLAIMER
+};
+
+const NOTE_DAY6 = {
+  no: 6,
+  coverLines: ['不按常理', '但每步都算过'], coverHighlight: '但每步都算过',
+  scene: '不按常理，但每一步都是算出来的。',
+  sceneNote: 'I、N、T、P，几乎没有中间态。',
+  signs: [
+    { title: '几乎不出门', desc: '连露面都交给代理人，独自吃掉所有信息。' },
+    { title: '先立假设再推', desc: '用概率和抽象模型缩小范围，而不是挨个排查。' },
+    { title: '纯逻辑判断', desc: '情感、立场、面子，都不进他的计算。' }
+  ],
+  formula: '3 × 3 × 3 × 3 = 81',
+  dims: [
+    { k: '01 能量来源', v: 'E / A / I', letter: 'I', dot: 88 },
+    { k: '02 认知方式', v: 'S / B / N', letter: 'N', dot: 88 },
+    { k: '03 决策方式', v: 'T / C / F', letter: 'T', dot: 12 },
+    { k: '04 生活态度', v: 'J / D / P', letter: 'P', dot: 88 }
+  ],
+  methodNote: 'INTP 是端值组合。81 型在每一维中间留了一档，边界附近的人不用被硬推到某一端。',
+  question: {
+    label: '40q-v1 · 原题 #54 · 生活态度',
+    left: '清晰的时间表和计划让我感到安心和有掌控感。',
+    right: '开放自由的时间安排让我感到轻松，可以随心所欲地支配时间。',
+    foot: '5 点量表 · 允许停在中间'
+  },
+  result: { code: 'INTP', name: '逻辑学家型', dims: ['I', 'N', 'T', 'P'], group: 'NT 深紫组', color: '#6B3FA0' },
+  cta: '你会先立\n假设吗？',
+  hint: '评论区聊聊，我们先来：会，而且经常推翻自己第一个假设。',
+  disclaimer: DISCLAIMER
+};
+
+const NOTE_DAY7 = {
+  no: 7,
+  coverLines: ['先理清规则', '再把人带出去'], coverHighlight: '再把人带出去',
+  scene: '先把规则理清，再把人带出去。',
+  sceneNote: 'E、S、T、J，每一维都能举出具体行为。',
+  signs: [
+    { title: '第一个举手', desc: '课堂上、行动里，都是最先把话说明白的那个人。' },
+    { title: '只信查得到的', desc: '书本、规则、可验证的细节，一样都不放过。' },
+    { title: '讲道理不讲情面', desc: '就算对朋友，也会先把事实和后果摆出来。' }
+  ],
+  formula: '3 × 3 × 3 × 3 = 81',
+  dims: [
+    { k: '01 能量来源', v: 'E / A / I', letter: 'E', dot: 12 },
+    { k: '02 认知方式', v: 'S / B / N', letter: 'S', dot: 12 },
+    { k: '03 决策方式', v: 'T / C / F', letter: 'T', dot: 12 },
+    { k: '04 生活态度', v: 'J / D / P', letter: 'J', dot: 12 }
+  ],
+  methodNote: 'ESTJ 是端值；81 型把每一维拆成三档，3×3×3×3 一共 81 个坐标，包含这 16 个端值。',
+  question: {
+    label: '40q-v1 · 原题 #51 · 生活态度',
+    left: '我凡事喜欢提前制定计划并按时完成，拖延会让我感到焦虑。',
+    right: '我不喜欢过早锁定计划，事情往往在最后一刻自然会有最好的呈现方式。',
+    foot: '5 点量表 · 允许停在中间'
+  },
+  result: { code: 'ESTJ', name: '总经理型', dims: ['E', 'S', 'T', 'J'], group: 'SJ 藏蓝组', color: '#2C5F8A' },
+  cta: '你会先查\n规则吗？',
+  hint: '评论区聊聊，我们先来：会，查完才敢往下走。',
+  disclaimer: DISCLAIMER
+};
+
+/* 备用第 8 篇：马斯克 INTP/INTJ 争议（坐标演示口径）。
+   本轮人物驱动排期只覆盖 day1-day7，此篇未同步重做，需要单独处理。 */
 const NOTE_ELON = {
   no: 31,
-  coverLines: ['两边都有道理', '他卡在中间'],
-  coverHighlight: '中间',
-  coverSub: '81 型人格档案 · 第 031 期 / 名人坐标演示',
+  coverLines: ['两边都有道理', '他卡在中间'], coverHighlight: '中间',
   scene: '网上吵了很久：他到底是 INTP 还是 INTJ？两边都能举出一堆公开言行。',
   sceneNote: '这不是给他贴标签，是一次坐标演示：看看中间那一档长什么样。',
   signs: [
@@ -160,9 +330,9 @@ const NOTE_ELON = {
   ],
   formula: 'J — D — P',
   dims: [
-    { k: '01 能量来源', v: 'E / A / I', letter: 'I', dot: 10 },
+    { k: '01 能量来源', v: 'E / A / I', letter: 'I', dot: 88 },
     { k: '02 认知方式', v: 'S / B / N', letter: 'N', dot: 88 },
-    { k: '03 决策方式', v: 'T / C / F', letter: 'T', dot: 10 },
+    { k: '03 决策方式', v: 'T / C / F', letter: 'T', dot: 12 },
     { k: '04 生活态度', v: 'J / D / P', letter: 'D', dot: 50 }
   ],
   methodNote: '争论的其实是最后这一维。16 型只能选 J 或 P；81 型在中间留了 D：既排路线，也允许改路线。',
@@ -172,236 +342,10 @@ const NOTE_ELON = {
     right: '我不喜欢过早锁定计划，事情往往在最后一刻自然会有最好的呈现方式。',
     foot: '5 点量表 · 允许停在中间'
   },
-  result: {
-    code: 'INTD', name: '蓝图家型', dims: ['I', 'N', 'T', 'D'],
-    note: '直觉的远见 + 逻辑的严谨 + 动态的弹性。',
-    group: 'NT 深紫组', color: '#6B3FA0'
-  },
+  result: { code: 'INTD', name: '蓝图家型', dims: ['I', 'N', 'T', 'D'], group: 'NT 深紫组', color: '#6B3FA0' },
   cta: '你觉得他更偏\n哪一边？',
   hint: '评论区聊聊，我们先来：看起来更像 D 档。',
   disclaimer: '说明：以上仅为基于公开言行的坐标演示，不是本人测评，不代表本人观点或背书，也不构成心理诊断、医疗建议或招聘依据。\nMBTI-PRO 与 MBTI 官方机构无关联。'
-};
-
-/* Week 1 · Day 2：E/I 中间档 A */
-const NOTE_DAY2 = {
-  no: 2,
-  coverLines: ['你不是 E', '也不是 I'],
-  coverHighlight: '也不是 I',
-  coverSub: '81 型人格档案 · 第 002 期',
-  scene: '会议里能连着讲两小时，回家路上却不想回任何一条消息。',
-  sceneNote: '16 型只给 E 或 I；81 型在中间留了一档 A。',
-  signs: [
-    { title: '电量会看场合', desc: '热闹时主动接话，散会后立刻想安静。' },
-    { title: '两边都能描述你', desc: '同事说你外向，家里人说你话少，其实都没说错。' },
-    { title: '切换本身会耗电', desc: '不是人格变了，是切换要付出代价，所以你需要独处恢复。' }
-  ],
-  formula: 'E — A — I',
-  dims: [
-    { k: '01 能量来源', v: 'E / A / I', letter: 'E', dot: 78 },
-    { k: '02 认知方式', v: 'S / B / N', letter: 'B', dot: 50 },
-    { k: '03 决策方式', v: 'T / C / F', letter: 'C', dot: 50 },
-    { k: '04 生活态度', v: 'J / D / P', letter: 'D', dot: 50 }
-  ],
-  methodNote: 'A 不是外向和内向各一半，是能按场合切换；切换会消耗电量，所以你才需要独处恢复。',
-  question: {
-    label: '40q-v1 · 原题 #9 · 能量来源',
-    left: '电话或语音沟通比文字沟通让我觉得更直接、更自在。',
-    right: '文字沟通比电话或语音让我更自在，可以字斟句酌。',
-    foot: '5 点量表 · 允许停在中间'
-  },
-  result: {
-    code: 'EBCD', name: '多面手型', dims: ['E', 'B', 'C', 'D'],
-    note: '热情又公正的召集人，能把完全不同的人聚到一起。',
-    group: 'BC 月光银灰组', color: '#8B95A0'
-  },
-  cta: '你下班后\n要多久才恢复？',
-  hint: '评论区聊聊，我们先来：大概 40 分钟，且不能有人跟我说话。',
-  disclaimer: '本内容仅供自我探索与娱乐参考，不构成心理诊断、医疗建议或招聘依据。\nMBTI-PRO 与 MBTI 官方机构无关联。'
-};
-
-/* Week 1 · Day 3：为什么每次测都不一样（S/N 维度） */
-const NOTE_DAY3 = {
-  no: 3,
-  coverLines: ['每次测', '都不一样？'],
-  coverHighlight: '都不一样？',
-  coverSub: '81 型人格档案 · 第 003 期',
-  scene: '上周测出 ENFP，这周变成 INFP。不一定是题库坏了。',
-  sceneNote: '题目问的是「平时」，可你平时不止一种状态。',
-  signs: [
-    { title: '换个场景就换答案', desc: '聚会里和加班周，你选的本来就不是同一种状态。' },
-    { title: '边界附近会来回跳', desc: '分数只差一两分，四个字母就换了一个。' },
-    { title: '不是测评不准', desc: '是二分法把连续的状态，硬切成了非此即彼的两半。' }
-  ],
-  formula: '3 × 3 × 3 × 3 = 81',
-  dims: [
-    { k: '01 能量来源', v: 'E / A / I', letter: 'A', dot: 50 },
-    { k: '02 认知方式', v: 'S / B / N', letter: 'N', dot: 88 },
-    { k: '03 决策方式', v: 'T / C / F', letter: 'C', dot: 50 },
-    { k: '04 生活态度', v: 'J / D / P', letter: 'D', dot: 50 }
-  ],
-  methodNote: '81 型把每一维拆成三档，边界附近的人不再被硬推到某一端。3×3×3×3，一共 81 个坐标。',
-  question: {
-    label: '40q-v1 · 原题 #26 · 认知方式',
-    left: '我做事注重细节和具体步骤，相信“眼见为实”。',
-    right: '我关注事物背后的整体图景和规律，相信直觉的指引。',
-    foot: '5 点量表 · 允许停在中间'
-  },
-  result: {
-    code: 'ANCD', name: '哲思者型', dims: ['A', 'N', 'C', 'D'],
-    note: '阅尽千帆后归于平和，说话不多，但每一句都值得记下来。',
-    group: 'NC 靛青组', color: '#3D7B8A'
-  },
-  cta: '你换过\n几个结果？',
-  hint: '评论区聊聊，我们先来：见过同一个人一周换三个。',
-  disclaimer: '本内容仅供自我探索与娱乐参考，不构成心理诊断、医疗建议或招聘依据。\nMBTI-PRO 与 MBTI 官方机构无关联。'
-};
-
-/* Week 1 · Day 4：T/F 中间档 C */
-const NOTE_DAY4 = {
-  no: 4,
-  coverLines: ['能共情', '也能抽离'],
-  coverHighlight: '也能抽离',
-  coverSub: '81 型人格档案 · 第 004 期',
-  scene: '朋友倾诉时你能接住情绪，转身又能把问题拆成几条可执行的步骤。',
-  sceneNote: '讲道理和讲感受，不一定是二选一。',
-  signs: [
-    { title: '先接住再分析', desc: '不会一上来就给方案，但也不会一直停在情绪里。' },
-    { title: '两边都听得进', desc: '重逻辑的人觉得你说得清楚，重感受的人愿意继续往下说。' },
-    { title: '偶尔被说太冷静', desc: '不是没共情，是共情之后还会多想一步。' }
-  ],
-  formula: 'T — C — F',
-  dims: [
-    { k: '01 能量来源', v: 'E / A / I', letter: 'I', dot: 12 },
-    { k: '02 认知方式', v: 'S / B / N', letter: 'B', dot: 50 },
-    { k: '03 决策方式', v: 'T / C / F', letter: 'C', dot: 50 },
-    { k: '04 生活态度', v: 'J / D / P', letter: 'D', dot: 50 }
-  ],
-  methodNote: 'T/F 中间留了一档 C：既看逻辑，也看对人的影响。不是和稀泥，是两种信息都不丢。',
-  question: {
-    label: '40q-v1 · 原题 #76 · 决策方式',
-    left: '做决定时，我优先考虑逻辑分析和客观利弊。',
-    right: '做决定时，我优先考虑对人的影响和大家的感受。',
-    foot: '5 点量表 · 允许停在中间'
-  },
-  result: {
-    code: 'IBCD', name: '内省者型', dims: ['I', 'B', 'C', 'D'],
-    note: '中立公正的和平主义者，不偏不倚却让人心服。',
-    group: 'BC 月光银灰组', color: '#8B95A0'
-  },
-  cta: '你先接情绪\n还是先拆问题？',
-  hint: '评论区聊聊，我们先来：先安静听完，再问要不要一起想办法。',
-  disclaimer: '本内容仅供自我探索与娱乐参考，不构成心理诊断、医疗建议或招聘依据。\nMBTI-PRO 与 MBTI 官方机构无关联。'
-};
-
-/* Week 1 · Day 5：J/P 中间档 D */
-const NOTE_DAY5 = {
-  no: 5,
-  coverLines: ['计划', '还是随缘'],
-  coverHighlight: '还是随缘',
-  coverSub: '81 型人格档案 · 第 005 期',
-  scene: '行程表列得很细，但真临时改了，你也没那么难受。',
-  sceneNote: '会排路线，也允许改路线，这其实是同一件事。',
-  signs: [
-    { title: '大方向提前定', desc: '关键节点和底线会先想清楚，不靠临场发挥。' },
-    { title: '细节留余地', desc: '具体怎么走，愿意看当天的状态再定。' },
-    { title: '被打乱也不慌', desc: '因为有框架，改的是路径，不是目标。' }
-  ],
-  formula: 'J — D — P',
-  dims: [
-    { k: '01 能量来源', v: 'E / A / I', letter: 'A', dot: 50 },
-    { k: '02 认知方式', v: 'S / B / N', letter: 'B', dot: 50 },
-    { k: '03 决策方式', v: 'T / C / F', letter: 'T', dot: 12 },
-    { k: '04 生活态度', v: 'J / D / P', letter: 'D', dot: 50 }
-  ],
-  methodNote: '16 型要求 J 或 P 二选一；81 型在中间留了 D：既排路线，也允许当场改蓝图。',
-  question: {
-    label: '40q-v1 · 原题 #51 · 生活态度',
-    left: '我凡事喜欢提前制定计划并按时完成，拖延会让我感到焦虑。',
-    right: '我不喜欢过早锁定计划，事情往往在最后一刻自然会有最好的呈现方式。',
-    foot: '5 点量表 · 允许停在中间'
-  },
-  result: {
-    code: 'ABTD', name: '适应者型', dims: ['A', 'B', 'T', 'D'],
-    note: '稳重中带着灵活策略，能站在上帝视角看问题，又不失行动的温度。',
-    group: 'BT 深炭灰组', color: '#4A4A4A'
-  },
-  cta: '你的计划\n会改几次？',
-  hint: '评论区聊聊，我们先来：大节点不动，小安排常改。',
-  disclaimer: '本内容仅供自我探索与娱乐参考，不构成心理诊断、医疗建议或招聘依据。\nMBTI-PRO 与 MBTI 官方机构无关联。'
-};
-
-/* Week 1 · Day 6：81 型怎么来的（方法篇） */
-const NOTE_DAY6 = {
-  no: 6,
-  coverLines: ['一张图', '看懂 81 型'],
-  coverHighlight: '看懂 81 型',
-  coverSub: '81 型人格档案 · 第 006 期',
-  scene: '四个维度，每个维度三档，组合起来到底有多少种人？',
-  sceneNote: '不是多造了 65 个标签，是把原本被切掉的状态补回来。',
-  signs: [
-    { title: '每维都有三档', desc: 'E/A/I、S/B/N、T/C/F、J/D/P，中间那档单独算一种。' },
-    { title: '16 型是端值组合', desc: '只有两端都明确时，四个字母才够用。' },
-    { title: '81 包含 16', desc: '不是推翻，是把中间 65 种也画进同一张坐标里。' }
-  ],
-  formula: '3 × 3 × 3 × 3 = 81',
-  dims: [
-    { k: '01 能量来源', v: 'E / A / I', letter: 'E', dot: 88 },
-    { k: '02 认知方式', v: 'S / B / N', letter: 'S', dot: 12 },
-    { k: '03 决策方式', v: 'T / C / F', letter: 'T', dot: 12 },
-    { k: '04 生活态度', v: 'J / D / P', letter: 'D', dot: 50 }
-  ],
-  methodNote: '40 题、约 6-8 分钟，四个维度各 10 题，全部是双极主观题；没有把逻辑推理题算进人格类型。',
-  question: {
-    label: '40q-v1 · 原题 #3 · 能量来源',
-    left: '我习惯边说话边思考，在交流中形成自己的观点。',
-    right: '我习惯先在心中理清思路，然后再清晰地表达出来。',
-    foot: '5 点量表 · 允许停在中间'
-  },
-  result: {
-    code: 'ESTD', name: '操盘手型', dims: ['E', 'S', 'T', 'D'],
-    note: '雷厉风行但会给人留余地，既能推动事情又能照顾人情。',
-    group: 'SD 琥珀组', color: '#D4782F'
-  },
-  cta: '你最想先看\n哪一档？',
-  hint: '评论区聊聊，我们先来：先确认自己是不是真的在中间。',
-  disclaimer: '本内容仅供自我探索与娱乐参考，不构成心理诊断、医疗建议或招聘依据。\nMBTI-PRO 与 MBTI 官方机构无关联。'
-};
-
-/* Week 1 · Day 7：中间型不等于没性格 */
-const NOTE_DAY7 = {
-  no: 7,
-  coverLines: ['中间 ≠', '没性格'],
-  coverHighlight: '没性格',
-  coverSub: '81 型人格档案 · 第 007 期',
-  scene: '「你到底是什么型？」被问多了，中间型容易被误会成没立场。',
-  sceneNote: '看见每一面，和没有自己的判断，不是一回事。',
-  signs: [
-    { title: '不急着站队', desc: '先把两边的前提问清楚，再决定要不要表态。' },
-    { title: '换场景换做法', desc: '不是随波逐流，是知道不同场景需要不同解法。' },
-    { title: '底线其实很清楚', desc: '平时好说话，碰到原则反而最不容易被推动。' }
-  ],
-  formula: 'A · B · C · D',
-  dims: [
-    { k: '01 能量来源', v: 'E / A / I', letter: 'I', dot: 12 },
-    { k: '02 认知方式', v: 'S / B / N', letter: 'N', dot: 88 },
-    { k: '03 决策方式', v: 'T / C / F', letter: 'F', dot: 88 },
-    { k: '04 生活态度', v: 'J / D / P', letter: 'D', dot: 50 }
-  ],
-  methodNote: '中间四档 A/B/C/D 各自有独立描述，不是「没测出来」的占位符。81 型里每一种都有名字。',
-  question: {
-    label: '40q-v1 · 原题 #20 · 能量来源',
-    left: '我通过与他人交流来整理和厘清自己的想法。',
-    right: '我的内心世界很丰富，常常进行自我对话和反思。',
-    foot: '5 点量表 · 允许停在中间'
-  },
-  result: {
-    code: 'INFD', name: '沉思者型', dims: ['I', 'N', 'F', 'D'],
-    note: '温柔而坚定的精神牧者，像一盏在旷野中静静发光的灯。',
-    group: 'NF 翠绿组', color: '#2D8A4E'
-  },
-  cta: '你被说过\n「没立场」吗？',
-  hint: '评论区聊聊，我们先来：被说过，但我只是不想在信息不全时下结论。',
-  disclaimer: '本内容仅供自我探索与娱乐参考，不构成心理诊断、医疗建议或招聘依据。\nMBTI-PRO 与 MBTI 官方机构无关联。'
 };
 
 const NOTE_LIBRARY = {
@@ -412,32 +356,27 @@ const NOTE_LIBRARY = {
 const pick = window.__NOTE_OVERRIDE || new URLSearchParams(location.search).get('note') || 'day1';
 const NOTE = NOTE_LIBRARY[pick] || NOTE_LIBRARY.day1;
 
-/* P8 代表人物：取自 server/src/content/celebrity-stories.ts 的 FEATURED_PROFILES 主人物。
-   story 为公开经历的忠实精简，不编造私生活、不使用网络伪名言。
-   口径是「档案给这个坐标配的人物」，不是「该人物测过本站」，也不判定本人。 */
+/* 人物按「新坐标」查表。全部为虚构角色：只用文字提及名字与作品名，
+   不放立绘/剧照/AI 仿图，不引用受版权保护的台词，不虚构授权或背书。
+   不是产品结果页的档案代表人物（FEATURED_PROFILES / CELEBRITY_MAP 仍是历史人物）。 */
 const PERSONS = {
-  ABCD: { name: '曾国藩', field: '晚清名臣', story: '书生带兵，组建湘军。以日记和家书自律，一生是「结硬寨、打呆仗」的长期主义。' },
-  EBCD: { name: '范蠡', field: '政治家 · 商人', story: '助越王勾践复国后急流勇退，改名经商成为巨富。懂得在最高点离场。' },
-  ANCD: { name: '哥德尔', field: '逻辑学家 · 数学家', story: '不完备定理证明：任何足够强的形式系统，都存在无法在系统内证明的真命题。' },
-  IBCD: { name: '李冰', field: '战国水利家', story: '主持修建都江堰，用鱼嘴、飞沙堰、宝瓶口把岷江变成水利系统，运行两千多年。' },
-  ABTD: { name: '亚当·斯密', field: '经济学家 · 哲学家', story: '《国富论》讲分工与看不见的手，《道德情操论》讲同情与道德判断。' },
-  ESTD: { name: '杜鲁门', field: '美国前总统', story: '接任罗斯福时几乎没人看好，后来在重大决定上留下强硬印记。桌上那句「责任止于此」。' },
-  INFD: { name: '卡夫卡', field: '作家', story: '白天是保险公司职员，业余写作《变形记》《城堡》，荒诞却精确得像现代生活。' },
-  INTD: { name: '康德', field: '哲学家', story: '一生几乎没离开柯尼斯堡，却用三大批判重写认识论与伦理学。' }
+  ENFP: { name: '漩涡鸣人', field: '《火影忍者》主角', story: '从小被村里孤立，却天天喊着要成为火影；把每个被丢下的人都一个个拉回来。', link: '不是不靠谱，是把所有人都算进了自己的计划。' },
+  ENTD: { name: '托尼·斯塔克', field: '漫威 / 钢铁侠', story: '从武器商人到造出战甲，想的永远是还没存在的东西；方案一旦不成立，当场推翻重做。', link: '想得远，也肯把刚定的方案当场推翻。' },
+  INFJ: { name: '宇智波鼬', field: '《火影忍者》角色', story: '在家族与村子之间做取舍，很少解释自己，却早早把很多步之后的事都安排好了。', link: '很少解释，不代表心里没有要守的东西。' },
+  ESFP: { name: '路飞', field: '《海贼王》主角', story: '为成为海贼王出海，靠身体和当下直觉一路往前；伙伴有难就立刻掉头，从不先算代价。', link: '不先算代价，不代表不知道自己要什么。' },
+  ENTJ: { name: '江户川柯南', field: '《名侦探柯南》主角', story: '高中生侦探工藤新一被卷入事件后身体缩小，仍靠碎片证据一步步把真相收网。', link: '线索越碎，他越能先看到整张图。' },
+  INTP: { name: 'L', field: '《死亡笔记》角色', story: '几乎不露面，靠抽象假设和概率推演逼近真相；作息与办案方式都异于常人。', link: '不按常理，但每一步都是算出来的。' },
+  ESTJ: { name: '赫敏·格兰杰', field: '《哈利·波特》角色', story: '把课本、规则和复习计划都安排得清清楚楚，靠可验证的事实把朋友一次次拉出麻烦。', link: '先把规则理清，再把人带出去。' },
+  INTD: { name: '阿尔敏', field: '《进击的巨人》角色', story: '平时安静，僵局里靠推演和代价计算找出路，方案一旦不成立就立刻推翻重来。', link: '框架算得清，路径却随时肯改。' }
 };
-const person = PERSONS[NOTE.result.code] || { name: '—', field: '', story: '该坐标的人物档案见结果页。' };
+const person = PERSONS[NOTE.result.code] || { name: '—', field: '', story: '该坐标的人物见审核台。', link: '一个一眼能认出的人，比坐标更好记。' };
+const personTag = '流行参照 / POP REFERENCE';
+const personFoot = '虚构角色 · 仅作性格类比<br>与作品版权方无关联 · 非官方';
 
 const esc = s => String(s).replace(/[&<>]/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[c]));
 const nl = s => esc(s).replace(/\n/g, '<br>');
 const no2 = String(NOTE.no).padStart(2, '0');
 const LABELS = ['COVER', 'SCENE', 'SIGN', 'SIGN', 'SIGN', 'COORDINATE', 'QUESTION', 'RESULT', 'NOTE'];
-const TRAIT = {
-  E:'外向型', A:'均衡型', I:'内向型',
-  N:'直觉型', B:'均衡感知', S:'实感型',
-  T:'思考型', C:'均衡决策', F:'情感型',
-  J:'判断型', D:'弹性型', P:'感知型'
-};
-const traits = NOTE.result.dims.map(d => TRAIT[d] || d).join(' · ');
 
 const shell = (inner, n) => `<section class="page">
   <div class="head mono">
@@ -455,11 +394,8 @@ const hlLine = t => t.includes(NOTE.coverHighlight)
 
 const p1 = `<div class="p1" style="position:absolute;inset:0">
   <div class="cover-title serif">${NOTE.coverLines.map(hlLine).join('<br>')}</div>
-  <div class="cover-sub">${esc(NOTE.coverSub)}</div>
-  <div class="mini mono">
-    <div class="mini-t">FOUR AXES / 81 POSITIONS</div>
-    ${NOTE.dims.map(d => `<div class="mrow"><i style="left:${d.dot}%"></i></div>`).join('')}
-  </div>
+  <div class="person-line serif">${esc(person.name)}<span>${personTag}</span></div>
+  <div class="person-link">${esc(person.link)}</div>
 </div>`;
 
 const p2 = `<div class="p2" style="position:absolute;inset:0">
@@ -476,13 +412,12 @@ const signs = NOTE.signs.map((s, i) => `<div class="sign" style="position:absolu
 </div>`);
 
 const p6 = `<div class="p6" style="position:absolute;inset:0">
-  <div class="formula serif">${esc(NOTE.formula)}</div>
-  <div class="spectrum">${NOTE.dims.map(d => `<div class="sp-row">
-    <div class="sp-head mono"><span>${esc(d.k)}</span><span>${esc(d.v)}</span></div>
-    <div class="sp-bar"><i style="left:${d.dot}%"></i></div>
-    <div class="sp-foot"><b class="serif">${esc(d.letter)}</b><span class="mono">100%</span></div>
-  </div>`).join('')}</div>
-  <div class="method-note">${esc(NOTE.methodNote)}</div>
+  <div class="lead serif">${esc(person.link)}</div>
+  <div class="lead-sub">${esc(NOTE.methodNote)}</div>
+  <div class="footnote">
+    <div class="formula serif">${esc(NOTE.formula)}</div>
+    <div class="dimline">${NOTE.dims.map(d => esc(d.v)).join('   ·   ')}</div>
+  </div>
 </div>`;
 
 const p7 = `<div class="p7" style="position:absolute;inset:0">
@@ -496,21 +431,20 @@ const p7 = `<div class="p7" style="position:absolute;inset:0">
   <div class="qfoot">${esc(NOTE.question.foot)} · 读两段描述，没有标准答案。</div>
 </div>`;
 
+const nameLen = [...person.name].length;
+const nameCls = nameLen <= 3 ? '' : (nameLen <= 5 ? ' mid' : ' long');
 const p8 = `<div class="p8" style="position:absolute;inset:0">
-  <div class="archive-t mono">YOUR ARCHIVE / 81-TYPE</div>
-  <div class="code serif">${esc(NOTE.result.code)}</div>
-  <div class="name serif">${esc(NOTE.result.name)}<i></i></div>
-  <div class="traits">${esc(traits)}</div>
-  <div class="quote serif">${esc(NOTE.result.note)}</div>
+  <div class="hook serif">${esc(person.link)}</div>
+  <div class="type-tag">${esc(NOTE.result.code)} / ${esc(NOTE.result.name)}</div>
+  <div class="group"><span class="swatch" style="background:${esc(NOTE.result.color || '#8B95A0')}"></span>${esc(NOTE.result.group)}</div>
   <div class="card">
-    <div class="c-no mono">REFERENCES / 01</div>
-    <div class="c-name serif">${esc(person.name)}</div>
+    <div class="c-no mono">POP REFERENCE / 01</div>
+    <div class="c-name serif${nameCls}">${esc(person.name)}</div>
     <div class="c-field">${esc(person.field)}</div>
     <div class="c-rule"></div>
     <div class="c-story">${esc(person.story)}</div>
-    <div class="c-foot mono">档案人物 · 非本人测评<br>PERSONALITY ARCHIVE</div>
+    <div class="c-foot mono">${personFoot}</div>
   </div>
-  <div class="group"><span class="swatch" style="background:${esc(NOTE.result.color || '#8B95A0')}"></span>${esc(NOTE.result.group)}</div>
 </div>`;
 
 const p9 = `<div class="p9" style="position:absolute;inset:0">
