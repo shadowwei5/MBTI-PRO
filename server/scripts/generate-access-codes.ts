@@ -43,7 +43,8 @@ const batch = arg('batch', `xhs-${new Date().toISOString().slice(0, 10)}`)
 const style = arg('style', 'numeric').toLowerCase() === 'alnum' ? 'alnum' : 'numeric'
 const digits = Math.max(4, Math.min(6, Number(arg('digits', '5')) || 5))
 const prefix = arg('prefix', 'MBTI').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 8) || 'MBTI'
-const maxRedemptions = Math.max(1, Math.min(10, Number(arg('max-redemptions', '3')) || 3))
+const maxRedemptions = Math.max(1, Math.min(100000, Number(arg('max-redemptions', '3')) || 3))
+// 统一码模式：--count 1 --max-redemptions 3000 生成一个全店共用码（发货说明为静态文本时的推荐做法）
 const days = Math.max(1, Math.min(730, Number(arg('days', '180')) || 180))
 
 const ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'

@@ -6,6 +6,10 @@ export const accessRoutes = Router()
 
 const MAX_ATTEMPTS = 30
 const WINDOW_MS = 10 * 60 * 1000
+// 统一码模式护栏：单个兑换码单日成功兑换上限。
+// 防止"码被公开分享后被脚本恶意刷 grant"把统一码次数耗光导致全店停摆；
+// 正常日销远低于此值。触发时提示次日再试。
+const DAILY_REDEEM_CAP = 500
 const attempts = new Map<string, { count: number; resetAt: number }>()
 
 function clientKey(req: Request): string {
@@ -73,6 +77,15 @@ accessRoutes.post('/redeem', async (req, res, next) => {
         throw new Error('USED_UP')
       }
 
+      const dayStart = new Date()
+      dayStart.setHours(0, 0, 0, 0)
+      const todayCount = await tx.accessGrant.count({
+        where: { code: code.code, createdAt: { gte: dayStart } },
+      })
+      if (todayCount >= DAILY_REDEEM_CAP) {
+        throw new Error('DAILY_LIMIT')
+      }
+
       await tx.accessCode.update({
         where: { code: code.code },
         data: { redemptions: { increment: 1 } },
@@ -105,6 +118,10 @@ accessRoutes.post('/redeem', async (req, res, next) => {
     }
     if (message === 'USED_UP') {
       res.status(409).json({ success: false, error: '兑换码使用次数已满，请联系店铺客服。' })
+      return
+    }
+    if (message === 'DAILY_LIMIT') {
+      res.status(429).json({ success: false, error: '今日兑换人数已达上限，请于明日 0 点后再试。' })
       return
     }
     next(err)

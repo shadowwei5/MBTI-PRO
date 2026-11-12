@@ -50,7 +50,7 @@ async function submit() {
         inputmode="text"
         autocomplete="one-time-code"
         spellcheck="false"
-        placeholder="例如 MBTI-ABCD-EFGH-JKLM"
+        placeholder="输入 5 位数字兑换码，如 82417"
         class="access-gate__input"
         :disabled="loading"
       />

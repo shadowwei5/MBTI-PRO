@@ -5,33 +5,19 @@
 
 ---
 
-## 1. 生成兑换码码池（必做，商品上架的"货"）
+## 1. 生成全店统一兑换码（必做，商品上架的"货"）
 
-码格式已按用户要求改为 **5 位纯数字**（如 82417，对标店铺 4-5 位数字验证码习惯；永不 0 开头，Excel 不会吞前导零）。生成脚本已随最新部署在服务器上。
+**实测：小红书个人店「自动发货」的发货说明是固定文本（≤500 字），不支持按订单填变量 → 采用统一码模式**（对标商家同做法），服务端已配护栏：单码 3000 次额度、单码单日成功兑换 ≤500 次防刷（`DAILY_REDEEM_CAP`）、180 天有效期。
 
-```bash
-ssh root@43.132.217.70 "cd /opt/MBTI-PRO/server && npx tsx scripts/generate-access-codes.ts --count 100 --batch xhs-first"
-```
-
-- 100 个码、每码可兑换 3 次、有效期 180 天（默认值，可用 `--max-redemptions` / `--days` 调整）。
-- 码直接写入服务器 SQLite（`AccessCode` 表），**本地 CSV 会同时输出**到 `/opt/MBTI-PRO/server/access-codes/xhs-first-<时间戳>.csv`。
-- 查看码列表（导入店铺用）：
+一条命令生成（写进线上 SQLite）：
 
 ```bash
-ssh root@43.132.217.70 "cat /opt/MBTI-PRO/server/access-codes/xhs-first-*.csv"
+ssh root@43.132.217.70 "cd /opt/MBTI-PRO/server && npx tsx scripts/generate-access-codes.ts --count 1 --max-redemptions 3000 --days 180 --batch xhs-unified"
 ```
 
-⚠️ 红线：整批码 **不要** 发到聊天群/网盘/笔记；`server/access-codes/` 已 gitignore。导入店铺后台后，建议服务器上保留 CSV 但权限收紧（`chmod 600`）。
-
-### 可选参数
-
-```bash
---count 200            # 数量（1-5000）
---digits 4|5|6         # 位数，默认 5
---max-redemptions 3    # 每码可兑换次数（1-10）
---days 180             # 有效天数（1-730）
---style alnum          # 回退旧 MBTI-XXXX-XXXX-XXXX 格式（一般不用）
-```
+- 输出示例里会打印实际码（5 位数字）；`cat /opt/MBTI-PRO/server/access-codes/xhs-unified-*.csv` 可再查看。
+- **把实际码替换**进发货说明模板（`docs/access-code-fulfillment.md` §2.3，模板里示例码是 82417），整段 ≤500 字直接粘贴到商品「自动发货 → 发货说明」。
+- 监控兑换量：`select redemptions from AccessCode where code='实际码';` 接近 3000 就换新码（生成新的 → 编辑商品发货说明 → disable 旧码）。
 
 ## 2. 小红书店铺自动发货配置（网页操作，非服务器）
 
