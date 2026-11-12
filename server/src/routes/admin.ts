@@ -1,4 +1,4 @@
-import { Router } from 'express'
+import { Router, type Request, type Response } from 'express'
 import { prisma } from '../index.js'
 import { ADMIN_DIMENSION_LABELS, ADMIN_QUESTION_TYPE_LABELS, isValidQuestionTiming } from '../services/adminStats.js'
 import { sendPaidReportEmail } from './payment.js'
@@ -10,8 +10,24 @@ export const adminRoutes = Router()
 
 loadServerEnv()
 
+const ADMIN_KEY = process.env.ADMIN_KEY || ''
+
+function assertAdminKey(req: Request, res: Response): boolean {
+  const queryKey = typeof req.query.key === 'string' ? req.query.key : ''
+  const bodyKey = req.body && typeof req.body === 'object' && 'key' in req.body
+    ? (req.body as { key?: unknown }).key
+    : undefined
+  const key = queryKey || (typeof bodyKey === 'string' ? bodyKey : '')
+  if (!ADMIN_KEY || key !== ADMIN_KEY) {
+    res.status(403).json({ success: false, error: 'Forbidden' })
+    return false
+  }
+  return true
+}
+
 // GET /api/admin/stats — 仪表盘全部统计数据
-adminRoutes.get('/stats', async (_req, res, next) => {
+adminRoutes.get('/stats', async (req, res, next) => {
+  if (!assertAdminKey(req, res)) return
   try {
     const now = new Date()
     const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate())
@@ -192,11 +208,7 @@ adminRoutes.get('/stats', async (_req, res, next) => {
 // POST /api/admin/resend-report — 强制发送指定人格报告到指定邮箱
 adminRoutes.post('/resend-report', async (req, res, next) => {
   try {
-    const key = req.query.key as string || req.body?.key
-    if (key !== process.env.ADMIN_KEY && key !== 'mbti-pro-admin-2026') {
-      res.status(403).json({ success: false, error: 'Forbidden' })
-      return
-    }
+    if (!assertAdminKey(req, res)) return
 
     const email = typeof req.query.email === 'string' ? req.query.email : req.body?.email
     const typeCode = (typeof req.query.typeCode === 'string' ? req.query.typeCode : req.body?.typeCode || 'ISFP').toUpperCase()
@@ -215,11 +227,7 @@ adminRoutes.post('/resend-report', async (req, res, next) => {
 // POST /api/admin/resend-paid-emails — 补发已支付但未成功发送的深度报告邮件
 adminRoutes.post('/resend-paid-emails', async (req, res, next) => {
   try {
-    const key = req.query.key as string || req.body?.key
-    if (key !== process.env.ADMIN_KEY && key !== 'mbti-pro-admin-2026') {
-      res.status(403).json({ success: false, error: 'Forbidden' })
-      return
-    }
+    if (!assertAdminKey(req, res)) return
 
     const orders = await prisma.paymentOrder.findMany({
       where: { paid: true, emailSentAt: null, email: { not: null } },
@@ -269,11 +277,7 @@ adminRoutes.post('/resend-paid-emails', async (req, res, next) => {
 // POST /api/admin/emails — 导出邮箱列表(简单鉴权)
 adminRoutes.get('/emails', async (req, res, next) => {
   try {
-    const key = req.query.key as string
-    if (key !== process.env.ADMIN_KEY && key !== 'mbti-pro-admin-2026') {
-      res.status(403).json({ success: false, error: 'Forbidden' })
-      return
-    }
+    if (!assertAdminKey(req, res)) return
     const emails = await prisma.userEmail.findMany({
       orderBy: { createdAt: 'desc' },
       select: { email: true, typeCode: true, source: true, createdAt: true },
@@ -285,8 +289,9 @@ adminRoutes.get('/emails', async (req, res, next) => {
 })
 
 // GET /api/admin/traffic — 流量来源分析
-adminRoutes.get('/traffic', async (_req, res, next) => {
+adminRoutes.get('/traffic', async (req, res, next) => {
   try {
+    if (!assertAdminKey(req, res)) return
     const [utmSources, utmMediums, deviceBreakdown] = await Promise.all([
       prisma.testRecord.groupBy({ by: ['utmSource'], _count: true, where: { utmSource: { not: null } }, orderBy: { _count: { utmSource: 'desc' } } }),
       prisma.testRecord.groupBy({ by: ['utmMedium'], _count: true, where: { utmMedium: { not: null } }, orderBy: { _count: { utmMedium: 'desc' } } }),

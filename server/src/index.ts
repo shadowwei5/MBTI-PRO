@@ -15,6 +15,7 @@ import { referralRoutes } from './routes/referrals.js'
 import { adminRoutes } from './routes/admin.js'
 import { socialUnlockRoutes } from './routes/socialUnlocks.js'
 import { shareUnlockRoutes } from './routes/shareUnlocks.js'
+import { accessRoutes } from './routes/access.js'
 import emailRoutes from './routes/email.js'
 
 loadServerEnv()
@@ -28,7 +29,11 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 // CORS锛氬紑鍙戠幆澧?+ 鐢熶骇鍩熷悕
 const ALLOWED_ORIGINS = [
   'http://localhost:5173', 'http://localhost:5174', 'http://localhost:4173',
+  // 局域网调试：手机与电脑同一 WiFi 时访问本机开发/预览服务
+  'http://192.168.1.2:3001', 'http://192.168.1.2:5173', 'http://192.168.1.2:4173',
+  'http://192.168.1.1:3001',
   process.env.CLIENT_ORIGIN,
+  process.env.EXTRA_ORIGINS,
 ].filter(Boolean) as string[]
 
 app.use(cors({ origin: ALLOWED_ORIGINS }))
@@ -44,6 +49,7 @@ app.use('/api/donation', donationRoutes)
 app.use('/api/referrals', referralRoutes)
 app.use('/api/social-unlocks', socialUnlockRoutes)
 app.use('/api/share-unlocks', shareUnlockRoutes)
+app.use('/api/access', accessRoutes)
 app.use('/api/admin', adminRoutes)
 app.use('/api/email', emailRoutes)
 

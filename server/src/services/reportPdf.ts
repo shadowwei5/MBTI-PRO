@@ -5,7 +5,7 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 import { scalePopulationFor81 } from './population.js'
 import { TYPE_SUMMARIES } from '../content/types.js'
-import { getTypeDimensionModules } from '../content/dimension-modules.js'
+import { getLifeAdviceModules } from '../content/life-advice.js'
 
 const prisma = new PrismaClient()
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -163,7 +163,7 @@ export async function getReportData(typeCode: string): Promise<ReportData | null
   const type = await prisma.personalityType.findUnique({ where: { code } })
   if (!type) return null
 
-  const dimModules = getTypeDimensionModules(type.code)
+  const dimModules = getLifeAdviceModules(type.code)
   return {
     code: type.code,
     name: type.name,

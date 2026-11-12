@@ -13,6 +13,7 @@
     "db:studio": "prisma studio",
     "demo:export": "tsx scripts/export-demo-data.ts",
     "demo:verify": "tsx scripts/verify-demo-build.ts",
+    "access:codes": "tsx scripts/generate-access-codes.ts",
     "test": "vitest run",
     "test:watch": "vitest"
   },

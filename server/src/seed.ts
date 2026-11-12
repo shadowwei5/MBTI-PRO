@@ -195,9 +195,10 @@ async function main() {
   // Hand-crafted types (4 traditional types with premium content)
   const handCraftedCodes = new Set(handCraftedTypes.map(t => t.code))
   for (const t of handCraftedTypes) {
+    const { summary: _summary, ...typeData } = t
     await prisma.personalityType.create({
       data: {
-        ...t,
+        ...typeData,
         strengths: JSON.stringify(t.strengths),
         growthAreas: JSON.stringify(t.growthAreas),
         careers: JSON.stringify(t.careers),
@@ -214,9 +215,10 @@ async function main() {
   for (const code of allCodes) {
     if (handCraftedCodes.has(code)) continue
     const t = buildTypeContent(code)
+    const { summary: _summary, ...typeData } = t
     await prisma.personalityType.create({
       data: {
-        ...t,
+        ...typeData,
         strengths: JSON.stringify(t.strengths),
         growthAreas: JSON.stringify(t.growthAreas),
         careers: JSON.stringify(t.careers),

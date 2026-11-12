@@ -77,42 +77,36 @@ check('演示环境横幅存在', home.text.includes('演示环境'))
 
 // 2. 测试页
 const test = await visit('测试页', '/test', 'demo_2_test.png')
-check('题干正常渲染', test.text.includes('认同'))
+check('题干正常渲染', test.text.includes('情境选择题') || test.text.includes('认同'))
+check('题目总数为 40', test.text.includes('共 40 题') || test.text.includes('/ 40'))
 
-// 3. 结果页（无测试数据 → 不应出现付费墙）
+// 3. 结果页（无测试数据 → 不展示解锁卡）
 const bare = await visit('结果页（无测试数据）', '/result/ENTJ', 'demo_3_result.png')
 check('含类型名', bare.text.includes('ENTJ'))
-check('无测试数据时不显示付费墙', !bare.text.includes('查看完整报告'))
+check('无测试数据时不显示解锁卡', !bare.text.includes('解锁完整 81 型报告'))
 
-// 4. 结果页（带测试数据 → 应出现付费墙 + 演示解锁）
+// 4. 结果页（带测试数据 → 演示环境直接展示完整报告）
 const params = new URLSearchParams({
   scores: JSON.stringify({ E_I: 15, S_N: 12, T_F: 9, P_J: 11, T_F_sub: 6, T_F_obj: 3 }),
   chars: JSON.stringify({ E_I: 'E', S_N: 'N', T_F: 'T', P_J: 'J' }),
-  dimTotals: JSON.stringify({ E_I: 25, S_N: 25, T_F: 25, P_J: 25 }),
-  dimAnswered: JSON.stringify({ E_I: 25, S_N: 25, T_F: 25, P_J: 25 }),
+  dimTotals: JSON.stringify({ E_I: 10, S_N: 10, T_F: 10, P_J: 10 }),
+  dimAnswered: JSON.stringify({ E_I: 10, S_N: 10, T_F: 10, P_J: 10 }),
   recordId: 'demo-record',
 })
-const full = await visit('结果页（含测试数据）', `/result/ENTJ?${params}`, 'demo_4_paywall.png')
-check('付费墙出现', full.text.includes('深度人格报告'))
-check('演示解锁按钮出现', full.text.includes('查看完整报告'))
+const full = await visit('结果页（含测试数据）', `/result/ENTJ?${params}`, 'demo_4_full.png')
+check('演示环境直接展示完整报告', full.text.includes('人格概览') && full.text.includes('四维深度解析'))
+check('不出现兑换码解锁卡', !full.text.includes('解锁完整 81 型报告'))
 check('未出现"发送到邮箱"的虚假承诺', !full.text.includes('发送到你的邮箱'))
 
-// 5. 点击演示解锁
-const btn = page.getByRole('button', { name: /查看完整报告/ })
-if (await btn.count()) {
-  const before = full.text.length
-  await btn.first().click()
-  await page.waitForTimeout(1800)
-  await page.screenshot({ path: `${OUT}/demo_5_unlocked.png` })
-  const after = (await page.locator('body').innerText()).replace(/\s+/g, ' ').trim()
-  console.log(`\n===== 演示解锁后 =====`)
-  console.log(`正文长度 ${before} → ${after.length}`)
-  check('出现已解锁提示', after.includes('已解锁'))
-  check('深度内容展开', after.length > before + 400)
-} else {
-  console.log('\n✗ 未找到演示解锁按钮')
-  failures++
-}
+// 5. 检查 40 题版所有题目都能加载
+const questionCount = await page.evaluate(async () => {
+  const res = await fetch('/demo/questions.json')
+  const data = await res.json()
+  return data.length
+})
+console.log(`\n===== 题库 =====`)
+console.log(`questions.json 题数: ${questionCount}`)
+check('静态题库为 40 题', questionCount === 40)
 
 await browser.close()
 

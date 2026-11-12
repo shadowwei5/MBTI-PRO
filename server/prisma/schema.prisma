@@ -194,3 +194,30 @@ model ShareUnlock {
   @@index([channel])
   @@index([createdAt])
 }
+
+// 小红书 0.99 元商品兑换码：一码可解锁全部测试与报告内容。
+model AccessCode {
+  code           String        @id
+  batch          String?
+  note           String?
+  maxRedemptions Int           @default(3)
+  redemptions    Int           @default(0)
+  disabled       Boolean       @default(false)
+  expiresAt      DateTime?
+  createdAt      DateTime      @default(now())
+  grants         AccessGrant[]
+
+  @@index([batch])
+  @@index([disabled])
+}
+
+model AccessGrant {
+  token      String     @id
+  code       String
+  accessCode AccessCode @relation(fields: [code], references: [code], onDelete: Cascade)
+  createdAt  DateTime   @default(now())
+  lastSeenAt DateTime   @default(now())
+
+  @@index([code])
+  @@index([createdAt])
+}

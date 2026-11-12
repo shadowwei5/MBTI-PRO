@@ -2,10 +2,12 @@
 import { prisma } from '../index.js'
 import { sendPaymentEmail } from '../services/email.js'
 import { validateCompleteHighConfidenceRecord } from '../services/testRecordEligibility.js'
+import { loadServerEnv } from '../config/env.js'
 
 export const socialUnlockRoutes = Router()
 
-const ADMIN_FALLBACK_KEY = 'mbti-pro-admin-2026'
+loadServerEnv()
+const ADMIN_KEY = process.env.ADMIN_KEY || ''
 const MAX_SCREENSHOT_CHARS = 6_000_000
 const VALID_PLATFORMS = new Set(['douyin', 'xiaohongshu'])
 
@@ -15,7 +17,7 @@ function isValidEmail(email: string) {
 
 function assertAdminKey(req: Request, res: Response): boolean {
   const key = typeof req.query.key === 'string' ? req.query.key : req.body?.key
-  if (key !== process.env.ADMIN_KEY && key !== ADMIN_FALLBACK_KEY) {
+  if (!ADMIN_KEY || key !== ADMIN_KEY) {
     res.status(403).json({ success: false, error: 'Forbidden' })
     return false
   }

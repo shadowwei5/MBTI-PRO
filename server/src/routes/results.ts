@@ -1,9 +1,11 @@
 import { Router } from 'express'
 import { prisma } from '../index.js'
 import { calculateScore, type Answers, type QuestionMeta, type AnswerKey } from '../services/scoring.js'
-import { getTypeDimensionModules } from '../content/dimension-modules.js'
+import { getLifeAdviceModules } from '../content/life-advice.js'
+import { getCelebrityProfiles } from '../content/types.js'
 import { isOrderPaid } from './payment.js'
 import { isShareUnlockValid } from './shareUnlocks.js'
+import { isAccessGrantValid } from './access.js'
 import { scalePopulationFor81 } from '../services/population.js'
 
 // 81型人格总结内联（避免types.ts导入链问题）
@@ -215,10 +217,12 @@ resultRoutes.get('/:typeCode', async (req, res, next) => {
       res.status(404).json({ success: false, error: 'Type not found' })
       return
     }
-    const paid = unlockToken && recordId
-      ? await isOrderPaid(type.code, unlockToken, recordId) || await isShareUnlockValid(type.code, unlockToken, recordId)
+    const paid = unlockToken
+      ? await isAccessGrantValid(unlockToken) ||
+        (recordId ? await isOrderPaid(type.code, unlockToken, recordId) || await isShareUnlockValid(type.code, unlockToken, recordId) : false)
       : false
-    const dimModules = paid ? getTypeDimensionModules(type.code) : null
+    const dimModules = paid ? getLifeAdviceModules(type.code) : null
+    const celebrities = paid ? JSON.parse(type.celebrities || '[]') : []
 
     // Parse JSON fields
     res.json({
@@ -238,7 +242,8 @@ resultRoutes.get('/:typeCode', async (req, res, next) => {
         growthAreas: paid ? JSON.parse(type.growthAreas) : [],
         careers: paid ? JSON.parse(type.careers) : [],
         suitableFields: paid ? JSON.parse(type.suitableFields) : [],
-        celebrities: paid ? JSON.parse(type.celebrities || '[]') : [],
+        celebrities,
+        celebrityStories: paid ? getCelebrityProfiles(type.code, celebrities) : [],
         imageUrl: `/api/images/${type.code}`,
         paid,
       },

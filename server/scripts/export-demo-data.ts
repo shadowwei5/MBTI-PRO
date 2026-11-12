@@ -16,8 +16,9 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-import { buildTypeContent, generateAllTypeCodes } from '../src/content/types.js'
-import { DIMENSION_MODULES } from '../src/content/dimension-modules.js'
+import { buildTypeContent, generateAllTypeCodes, getCelebrityProfiles } from '../src/content/types.js'
+import { getLifeAdviceModules } from '../src/content/life-advice.js'
+import { SHORT_FORM_QUESTION_IDS } from '../src/content/short-form.js'
 import { questions } from '../src/seed.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -29,18 +30,25 @@ const SRC_IMG_DIR = path.join(SERVER_DIR, 'generated_images', 'mediums')
 function main() {
   fs.mkdirSync(OUT_DIR, { recursive: true })
 
-  // ── 题库 ────────────────────────────────────────────────
-  const qs = questions.map((q) => ({
-    id: q.id,
-    text: q.text,
-    textLeft: q.textLeft ?? null,
-    textRight: q.textRight ?? null,
-    dimension: q.dimension,
-    type: q.type,
-    options: q.options,
-    // 演示模式下的评分在客户端完成，客观题需要正确答案
-    correctAnswer: q.correctAnswer ?? null,
-  }))
+  // ── 题库（只导出首发 40 题，按固定展示顺序）─────────────
+  const seedById = new Map(questions.map(q => [q.id, q]))
+  const qs = SHORT_FORM_QUESTION_IDS
+    .map(id => seedById.get(id))
+    .filter((q): q is NonNullable<typeof q> => Boolean(q))
+    .map((q) => ({
+      id: q.id,
+      text: q.text,
+      textLeft: q.textLeft ?? null,
+      textRight: q.textRight ?? null,
+      dimension: q.dimension,
+      type: q.type,
+      options: q.options,
+      // 演示模式下的评分在客户端完成，客观题需要正确答案
+      correctAnswer: q.correctAnswer ?? null,
+    }))
+  if (qs.length !== SHORT_FORM_QUESTION_IDS.length) {
+    throw new Error(`题库导出不完整：期望 ${SHORT_FORM_QUESTION_IDS.length} 题，实际 ${qs.length} 题`)
+  }
   fs.writeFileSync(
     path.join(OUT_DIR, 'questions.json'),
     JSON.stringify(qs, null, 0),
@@ -51,6 +59,7 @@ function main() {
   const codes = generateAllTypeCodes()
   const types = codes.map((code) => {
     const t = buildTypeContent(code) as Record<string, unknown>
+    const depth = getLifeAdviceModules(code)
     return {
       code,
       name: t.name,
@@ -63,10 +72,11 @@ function main() {
       suitableFields: t.suitableFields,
       population: t.population ?? null,
       celebrities: t.celebrities ?? null,
-      eiModule: DIMENSION_MODULES[code]?.eiModule ?? null,
-      snModule: DIMENSION_MODULES[code]?.snModule ?? null,
-      tfModule: DIMENSION_MODULES[code]?.tfModule ?? null,
-      pjModule: DIMENSION_MODULES[code]?.pjModule ?? null,
+      celebrityStories: getCelebrityProfiles(code, t.celebrities),
+      eiModule: depth.eiModule,
+      snModule: depth.snModule,
+      tfModule: depth.tfModule,
+      pjModule: depth.pjModule,
       imageUrl: `/demo/images/${code}.webp`,
     }
   })
