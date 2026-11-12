@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>MBTI-PRO 小红书商品图 · 5 张 1080×1440</title>
+<style>
+:root {
+  --paper:#F2EDE3; --paper-light:#F8F4EC; --ink:#1E1D1A;
+  --accent:#A63D2C; --moss:#2F4037; --muted:#6F685D;
+  --rule:#D2C8B8; --faint:#E3DDD0;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#DDD8CE; padding:40px 0; }
+#root { display:flex; flex-direction:column; align-items:center; gap:24px; }
+.page { width:1080px; height:1440px; background:var(--paper); position:relative; overflow:hidden;
+  color:var(--ink); font-family:'Noto Sans SC','PingFang SC','Microsoft YaHei',sans-serif; }
+.serif { font-family:'Noto Serif SC','Songti SC','STSong','SimSun',serif; }
+.mono { font-family:'DM Mono','Consolas','Courier New',monospace; }
+.hl { color:var(--accent); }
+
+.head { position:absolute; top:56px; left:96px; right:96px; display:flex; justify-content:space-between;
+  align-items:baseline; padding-bottom:20px; border-bottom:1px solid var(--rule);
+  font-size:20px; letter-spacing:.16em; color:var(--muted); }
+.head .h-l { color:var(--ink); font-weight:500; letter-spacing:.24em; }
+.head .h-r { color:var(--accent); }
+.footer { position:absolute; left:96px; right:96px; bottom:64px; border-top:1px solid var(--rule);
+  padding-top:18px; display:flex; justify-content:space-between; font-size:19px;
+  letter-spacing:.12em; color:var(--muted); }
+.eyebrow { position:absolute; left:96px; top:170px; font-size:24px; letter-spacing:.2em; color:var(--accent); }
+
+/* ── P1 主图 ── */
+.p1 .cover-title { position:absolute; left:96px; top:300px; width:900px; font-size:118px; line-height:1.34; font-weight:500; }
+.p1 .cover-sub { position:absolute; left:96px; top:700px; width:880px; font-size:40px; line-height:1.75; color:var(--muted); }
+.p1 .stat-band { position:absolute; left:96px; right:96px; top:930px; display:flex; border-top:1px solid var(--ink); border-bottom:1px solid var(--rule); }
+.p1 .stat { flex:1; padding:26px 0 30px; border-right:1px solid var(--rule); }
+.p1 .stat:last-child { border-right:0; }
+.p1 .stat b { display:block; font-family:'Noto Serif SC','Songti SC',serif; font-size:64px; font-weight:600; line-height:1.1; }
+.p1 .stat span { display:block; margin-top:8px; font-size:22px; letter-spacing:.12em; color:var(--muted); }
+.p1 .price-line { position:absolute; left:96px; right:96px; top:1180px; display:flex; align-items:baseline; gap:26px; }
+.p1 .price { font-family:'Noto Serif SC','Songti SC',serif; font-size:96px; font-weight:600; color:var(--accent); }
+.p1 .price-note { font-size:30px; color:var(--ink); }
+.p1 .price-note small { display:block; font-size:20px; color:var(--muted); margin-top:8px; letter-spacing:.08em; }
+
+/* ── P2 你将获得 ── */
+.p2 .bar { position:absolute; left:96px; top:300px; width:72px; height:4px; background:var(--accent); }
+.p2 .title { position:absolute; left:96px; top:352px; font-size:76px; font-weight:500; }
+.p2 .list { position:absolute; left:96px; right:96px; top:510px; bottom:150px; border-top:1px solid var(--ink);
+  display:flex; flex-direction:column; }
+.p2 .row { flex:1; display:grid; grid-template-columns:120px 200px 1fr; gap:24px; padding:18px 0; border-bottom:1px solid var(--rule); align-items:center; }
+.p2 .row:last-child { border-bottom:0; }
+.p2 .idx { font-family:'DM Mono',monospace; font-size:26px; color:var(--accent); }
+.p2 .key { font-family:'Noto Serif SC',serif; font-size:38px; font-weight:600; }
+.p2 .val { font-size:26px; line-height:1.65; color:var(--muted); }
+
+/* ── P3 使用三步 ── */
+.p3 .title { position:absolute; left:96px; top:352px; font-size:76px; font-weight:500; }
+.p3 .bar { position:absolute; left:96px; top:300px; width:72px; height:4px; background:var(--accent); }
+.p3 .stack { position:absolute; left:96px; right:96px; top:480px; bottom:250px; display:flex; flex-direction:column; gap:18px; }
+.p3 .step { flex:1; padding:24px 42px; border:1px solid var(--rule); background:var(--paper-light); }
+.p3 .step .no { font-family:'DM Mono',monospace; font-size:24px; color:var(--accent); letter-spacing:.18em; }
+.p3 .step h3 { margin:8px 0 8px; font-family:'Noto Serif SC',serif; font-size:40px; font-weight:600; }
+.p3 .step p { font-size:25px; line-height:1.65; color:var(--muted); }
+.p3 .auto { position:absolute; left:96px; right:96px; top:1212px; padding-top:22px; border-top:1px solid var(--ink);
+  font-size:24px; line-height:1.6; color:var(--ink); white-space:nowrap; }
+.p3 .auto b { color:var(--accent); font-weight:600; }
+
+/* ── P4 报告样式示意 ── */
+.p4 .mini { position:absolute; left:150px; top:264px; width:780px; height:930px;
+  border:1px solid var(--ink); background:var(--paper); padding:40px 48px; }
+.p4 .mini .mh { display:flex; justify-content:space-between; font-family:'DM Mono',monospace; font-size:16px;
+  letter-spacing:.14em; color:var(--muted); padding-bottom:14px; border-bottom:1px solid var(--rule); }
+.p4 .mini .mk { margin-top:22px; font-family:'DM Mono',monospace; font-size:16px; letter-spacing:.16em; color:var(--accent); }
+.p4 .mini .code { margin-top:6px; font-family:'Noto Serif SC',serif; font-size:120px; font-weight:600; letter-spacing:-.02em; }
+.p4 .mini .name { margin-top:2px; font-family:'Noto Serif SC',serif; font-size:34px; }
+.p4 .mini .axis { margin-top:30px; }
+.p4 .mini .arow { display:grid; grid-template-columns:30px 150px 1fr 1fr; gap:14px; align-items:center; padding:13px 0; border-top:1px solid var(--rule); }
+.p4 .mini .arow:first-child { border-top:0; }
+.p4 .mini .ai { font-family:'DM Mono',monospace; font-size:15px; color:var(--accent); }
+.p4 .mini .al { font-size:20px; }
+.p4 .mini .aline { position:relative; height:1px; background:var(--rule); }
+.p4 .mini .adot { position:absolute; top:-4px; width:9px; height:9px; border-radius:50%; background:var(--accent); }
+.p4 .mini .ap { font-family:'DM Mono',monospace; font-size:18px; color:var(--muted); text-align:right; }
+.p4 .mini .person { margin-top:34px; padding-top:20px; border-top:1px solid var(--rule); font-size:20px; color:var(--muted); }
+.p4 .mini .person b { font-family:'Noto Serif SC',serif; font-size:24px; color:var(--ink); }
+.p4 .cap { position:absolute; left:96px; top:1222px; width:888px; font-size:22px; line-height:1.65; color:var(--muted); }
+
+/* ── P5 购买须知 ── */
+.p5 .bar { position:absolute; left:96px; top:300px; width:72px; height:4px; background:var(--accent); }
+.p5 .title { position:absolute; left:96px; top:352px; font-size:76px; font-weight:500; }
+.p5 .blk { position:absolute; left:96px; right:96px; padding:30px 0; border-bottom:1px solid var(--rule); }
+.p5 .blk h3 { font-family:'Noto Serif SC',serif; font-size:34px; font-weight:600; margin-bottom:12px; }
+.p5 .blk h3 i { font-style:normal; font-family:'DM Mono',monospace; font-size:20px; color:var(--accent); margin-right:16px; }
+.p5 .blk p { font-size:24px; line-height:1.8; color:var(--muted); }
+.p5 .warn { position:absolute; left:96px; right:96px; top:1130px; padding:24px 30px; border:1px solid var(--accent);
+  background:rgba(166,61,44,.05); font-size:24px; line-height:1.75; color:var(--ink); }
+</style>
+</head>
+<body>
+<div id="root">
+
+<!-- P1 主图 -->
+<section class="page p1">
+  <div class="head"><span class="h-l">MBTI — PRO</span><span class="h-r">81-TYPE PERSONALITY ARCHIVE</span></div>
+  <p class="eyebrow">PERSONALITY ARCHIVE / 电子版人格测评</p>
+  <h1 class="cover-title serif">16 型之外，<br/>还有 <span class="hl">65 种人</span>。</h1>
+  <p class="cover-sub">40 道情境题，把"中间状态"也当作答案。<br/>一份能解释你为什么总在两难的人格档案报告。</p>
+  <div class="stat-band">
+    <div class="stat"><b>40</b><span>道情境题</span></div>
+    <div class="stat"><b>81</b><span>种人格坐标</span></div>
+    <div class="stat"><b>4</b><span>个维度深读</span></div>
+    <div class="stat"><b>6-8<span style="font-size:34px">分钟</span></b><span>可中断续答</span></div>
+  </div>
+  <div class="price-line">
+    <span class="price">0.99<span style="font-size:44px"> 元</span></span>
+    <span class="price-note">一次兑换 · 解锁全部报告内容<small>下单自动发货 · 手机电脑均可作答</small></span>
+  </div>
+  <div class="footer"><span>MBTI-PRO / 81 TYPES</span><span>结果仅供自我探索参考</span></div>
+</section>
+
+<!-- P2 你将获得 -->
+<section class="page p2">
+  <div class="head"><span class="h-l">MBTI — PRO</span><span class="h-r">WHAT YOU GET</span></div>
+  <div class="bar"></div>
+  <h1 class="title serif">你将获得什么</h1>
+  <div class="list">
+    <div class="row"><span class="idx">01</span><span class="key">40 道情境题</span><span class="val">每题描述一个具体场景，选更像你的那一段。约 6-8 分钟，可中断、进度自动保存。</span></div>
+    <div class="row"><span class="idx">02</span><span class="key">81 型人格坐标</span><span class="val">不止 16 型：主类型 + 相邻候选型 + 四个维度的连续得分，承认"中间态"也是答案。</span></div>
+    <div class="row"><span class="idx">03</span><span class="key">四维深度解析</span><span class="val">用你这一型的代表人物（如曾国藩、莎士比亚、奥黛丽·赫本）的生平与关键抉择，给出四条人生建议。</span></div>
+    <div class="row"><span class="idx">04</span><span class="key">档案风分享海报</span><span class="val">报告生成后可一键保存 3:4 海报，含你的人格坐标与代表人物。</span></div>
+    <div class="row"><span class="idx">05</span><span class="key">纸质档案式排版</span><span class="val">纸色底、细线、宋体大字——像一份被认真整理过的个人档案，而不是营销页。</span></div>
+  </div>
+  <div class="footer"><span>MBTI-PRO / 81 TYPES</span><span>全部内容一次兑换解锁</span></div>
+</section>
+
+<!-- P3 使用三步 -->
+<section class="page p3">
+  <div class="head"><span class="h-l">MBTI — PRO</span><span class="h-r">HOW TO USE</span></div>
+  <div class="bar"></div>
+  <h1 class="title serif">三步开始</h1>
+  <div class="stack">
+    <div class="step">
+      <p class="no">STEP 01 / 自动发货</p>
+      <h3>下单后立即查看兑换码</h3>
+      <p>付款成功后系统自动发货：在「订单详情」或发货消息里复制你的专属兑换码（形如 XXXX-XXXX-XXXX-XXXX）。</p>
+    </div>
+    <div class="step">
+      <p class="no">STEP 02 / 打开测评页</p>
+      <h3>点击发货消息里的测评链接</h3>
+      <p>链接会自动完成兑换并进入答题页；若未自动解锁，在首页点「开始测试」，手动输入兑换码即可。</p>
+    </div>
+    <div class="step">
+      <p class="no">STEP 03 / 作答出报告</p>
+      <h3>40 题 · 约 6-8 分钟 · 即刻出报告</h3>
+      <p>答完立刻解锁完整档案报告。中途可退出，进度自动保存，回来接着答。</p>
+    </div>
+  </div>
+  <p class="auto"><b>全程自动发货 · 无需等待客服</b> · 一码一人 · 有效期 180 天 · 售后走订单页</p>
+  <div class="footer"><span>MBTI-PRO / 81 TYPES</span><span>无需下载 App</span></div>
+</section>
+
+<!-- P4 报告样式示意 -->
+<section class="page p4">
+  <div class="head"><span class="h-l">MBTI — PRO</span><span class="h-r">REPORT PREVIEW</span></div>
+  <div class="mini">
+    <div class="mh"><span>MBTI — PRO</span><span>PERSONALITY ARCHIVE</span></div>
+    <p class="mk">YOUR ARCHIVE / 04</p>
+    <div class="code serif">INFP</div>
+    <p class="name serif">调停者型 · 理想主义看守者</p>
+    <div class="axis">
+      <div class="arow"><span class="ai">01</span><span class="al">能量来源</span><span class="aline"><span class="adot" style="left:18%"></span></span><span class="ap">I ······· E</span></div>
+      <div class="arow"><span class="ai">02</span><span class="al">认知方式</span><span class="aline"><span class="adot" style="left:70%"></span></span><span class="ap">N ······· S</span></div>
+      <div class="arow"><span class="ai">03</span><span class="al">决策方式</span><span class="aline"><span class="adot" style="left:38%"></span></span><span class="ap">F ······· T</span></div>
+      <div class="arow"><span class="ai">04</span><span class="al">生活态度</span><span class="aline"><span class="adot" style="left:62%"></span></span><span class="ap">P ······· J</span></div>
+    </div>
+    <div class="person">代表人物 · <b>莎士比亚</b>（剧作家 / 诗人）· 从斯特拉特福来到伦敦，做演员、写剧本、入股剧团</div>
+    <div class="person" style="border-top:1px solid var(--rule); margin-top:18px; padding-top:18px;">
+      四维深度解析 · 以代表人物的生平与关键抉择，给出四条人生建议
+    </div>
+  </div>
+  <p class="cap">▲ 报告样式示意（数据为演示样例）。实际报告含人格概览、四维深度解析、代表人物与分享海报，以你本人的作答结果生成。</p>
+  <div class="footer"><span>MBTI-PRO / 81 TYPES</span><span>纸质档案式排版</span></div>
+</section>
+
+<!-- P5 购买须知 -->
+<section class="page p5">
+  <div class="head"><span class="h-l">MBTI — PRO</span><span class="h-r">BEFORE YOU BUY</span></div>
+  <div class="bar"></div>
+  <h1 class="title serif">购买须知</h1>
+
+  <div class="blk" style="top:510px;">
+    <h3><i>01</i>商品性质</h3>
+    <p>虚拟数字内容：兑换码自动发货、即时交付，不涉及实物物流。按《消费者权益保护法》，数字化商品交付完成后原则上不适用七日无理由退货。</p>
+  </div>
+  <div class="blk" style="top:710px;">
+    <h3><i>02</i>可退款情形</h3>
+    <p>兑换码未使用未过期且未开始测评；同一订单重复支付；自动发货失败或发码错误；服务器故障导致无法完成测评。在订单页「申请售后」，24 小时内响应。</p>
+  </div>
+  <div class="blk" style="top:930px;">
+    <h3><i>03</i>使用规则</h3>
+    <p>一码一人，有效期 180 天，最多 3 台设备。答题进度保存在你的浏览器里，清除缓存后重新输入同一兑换码即可继续。</p>
+  </div>
+
+  <div class="warn">
+    本测评仅供自我探索与娱乐参考，不构成心理诊断、医疗建议或招聘依据。请勿将结果用于评判他人。
+  </div>
+  <div class="footer"><span>MBTI-PRO / 81 TYPES</span><span>遇问题请走订单页售后</span></div>
+</section>
+
+</div>
+</body>
+</html>
