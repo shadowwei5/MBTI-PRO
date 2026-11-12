@@ -29,17 +29,21 @@ body { background:#DDD8CE; padding:40px 0; }
 .eyebrow { position:absolute; left:96px; top:170px; font-size:24px; letter-spacing:.2em; color:var(--accent); }
 
 /* ── P1 主图 ── */
-.p1 .cover-title { position:absolute; left:96px; top:300px; width:900px; font-size:118px; line-height:1.34; font-weight:500; }
-.p1 .cover-sub { position:absolute; left:96px; top:700px; width:880px; font-size:40px; line-height:1.75; color:var(--muted); }
-.p1 .stat-band { position:absolute; left:96px; right:96px; top:930px; display:flex; border-top:1px solid var(--ink); border-bottom:1px solid var(--rule); }
+.p1 .brand { position:absolute; left:96px; top:248px; font-family:'Noto Serif SC','Songti SC','Playfair Display',serif;
+  font-size:152px; font-weight:600; letter-spacing:-.015em; line-height:1; }
+.p1 .brand span { color:var(--accent); }
+.p1 .cover-title { position:absolute; left:96px; top:458px; font-size:66px; font-weight:500; }
+.p1 .cover-title .hl { font-weight:600; }
+.p1 .hook { position:absolute; left:96px; top:584px; font-size:32px; color:var(--muted); }
+.p1 .stat-band { position:absolute; left:96px; right:96px; top:700px; display:flex; border-top:1px solid var(--ink); border-bottom:1px solid var(--rule); }
 .p1 .stat { flex:1; padding:26px 0 30px; border-right:1px solid var(--rule); }
 .p1 .stat:last-child { border-right:0; }
 .p1 .stat b { display:block; font-family:'Noto Serif SC','Songti SC',serif; font-size:64px; font-weight:600; line-height:1.1; }
 .p1 .stat span { display:block; margin-top:8px; font-size:22px; letter-spacing:.12em; color:var(--muted); }
-.p1 .price-line { position:absolute; left:96px; right:96px; top:1180px; display:flex; align-items:baseline; gap:26px; }
+.p1 .price-line { position:absolute; left:96px; right:96px; top:956px; display:flex; align-items:baseline; gap:26px; }
 .p1 .price { font-family:'Noto Serif SC','Songti SC',serif; font-size:96px; font-weight:600; color:var(--accent); }
 .p1 .price-note { font-size:30px; color:var(--ink); }
-.p1 .price-note small { display:block; font-size:20px; color:var(--muted); margin-top:8px; letter-spacing:.08em; }
+.p1 .price-note small { display:block; font-size:20px; color:var(--muted); margin-top:10px; letter-spacing:.08em; }
 
 /* ── P2 你将获得 ── */
 .p2 .bar { position:absolute; left:96px; top:300px; width:72px; height:4px; background:var(--accent); }
@@ -102,8 +106,9 @@ body { background:#DDD8CE; padding:40px 0; }
 <section class="page p1">
   <div class="head"><span class="h-l">MBTI — PRO</span><span class="h-r">81-TYPE PERSONALITY ARCHIVE</span></div>
   <p class="eyebrow">PERSONALITY ARCHIVE / 电子版人格测评</p>
-  <h1 class="cover-title serif">16 型之外，<br/>还有 <span class="hl">65 种人</span>。</h1>
-  <p class="cover-sub">40 道情境题，把"中间状态"也当作答案。<br/>一份能解释你为什么总在两难的人格档案报告。</p>
+  <h1 class="brand serif">MBTI<span>-PRO</span></h1>
+  <h2 class="cover-title serif"><span class="hl">81 型</span>人格测试 · 完整档案报告</h2>
+  <p class="hook">16 型之外，还有 65 种人 —— 把"中间状态"也当作答案。</p>
   <div class="stat-band">
     <div class="stat"><b>40</b><span>道情境题</span></div>
     <div class="stat"><b>81</b><span>种人格坐标</span></div>
@@ -141,7 +146,7 @@ body { background:#DDD8CE; padding:40px 0; }
     <div class="step">
       <p class="no">STEP 01 / 自动发货</p>
       <h3>下单后立即查看兑换码</h3>
-      <p>付款成功后系统自动发货：在「订单详情」或发货消息里复制你的专属兑换码（形如 XXXX-XXXX-XXXX-XXXX）。</p>
+      <p>付款成功后系统自动发货：在「订单详情」或发货消息里复制你的专属兑换码（5 位数字，如 82417）。</p>
     </div>
     <div class="step">
       <p class="no">STEP 02 / 打开测评页</p>

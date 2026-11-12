@@ -7,7 +7,8 @@
 
 ```bash
 cd server
-npm run access:codes -- --count 100 --batch xhs-2026-11 --prefix MBTI --max-redemptions 3 --days 180
+npm run access:codes -- --count 100 --batch xhs-2026-11 --max-redemptions 3 --days 180
+# 默认生成 5 位纯数字码（如 82417，对标店铺 4-5 位验证码习惯）；--style alnum 可回退旧长码
 ```
 
 生成结果：
@@ -20,7 +21,7 @@ CSV 字段：
 
 ```text
 code,batch,maxRedemptions,expiresAt
-MBTI-XXXX-XXXX-XXXX,xhs-2026-11,3,2027-05-11T...
+82417,xhs-2026-11,3,2027-05-11T...   ← 5 位纯数字，不以 0 开头
 ```
 
 `server/access-codes/` 已加入 `.gitignore`，**不要把兑换码 CSV 提交到仓库或公开网盘**。
