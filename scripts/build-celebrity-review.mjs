@@ -424,11 +424,12 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
   </div>
 
   <div class="panel">
-    <h3>流行角色覆盖 <em>${stats.pop} 位 · 分布在 ${stats.popTypes} / 81 型 · 每型只放一位，排在第 2 位（紧跟主人物）</em></h3>
+    <h3>流行角色覆盖 <em>${stats.pop} 位 · 分布在 ${stats.popTypes} / 81 型 · 每型最多两位，排在第 2–3 位（紧跟主人物）</em></h3>
     <div class="lv-list">
       ${popRows.sort((a, b) => a.codes[0].localeCompare(b.codes[0])).map(r => `<div class="lv-row"><div class="k"><code>${r.codes.join(' / ')}</code>${esc(typeNames[r.codes[0]] || '')}</div><div class="v"><b>${esc(r.name)}</b> · ${esc(r.work)}</div></div>`).join('')}
     </div>
-    <p class="story" style="margin-top:10px">只加「明显对应」的：角色本身的四维要能说清楚，不为覆盖而硬凑。所以 81 型里还有 69 型没有流行角色——其中 27 个「均衡组」（A / B / C / D 中间档）几乎是空白，因为热门角色多是端值性格，中间档很难找到公认对应的人，这部分要继续找。</p>
+    <p class="story" style="margin-top:10px">只加「明显对应」的：角色本身的四维要能说清楚，不为覆盖而硬凑。所以 81 型里仍有 ${81 - stats.popTypes} 型没有流行角色——其中大部分是「均衡组」（A / B / C / D 中间档），因为热门角色多是端值性格，中间档很难找到公认对应的人。</p>
+    <p class="story" style="margin-top:8px;color:var(--muted)">口径说明：本表的「流行角色」指动漫 / 影视 / 游戏 / 类型小说里的虚构人物，以 <code>scripts/pop-culture-reps.json</code> 为准。宋江（《水浒传》）属文学虚构人物，未计入这 ${stats.pop} 位，但同样按虚构角色处理——身份带作品名、页面带类比声明。</p>
   </div>
 
   <div class="panel">

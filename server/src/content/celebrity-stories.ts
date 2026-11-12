@@ -287,7 +287,7 @@ export const FEATURED_PROFILES: Record<string, CelebrityProfile> = {
     name: '孔子',
     field: '思想家 / 教育家',
     story: '周游列国十四年，整理六经，开创私学。他的教育理念影响东亚两千年，而他一生大多数时间并不被当时的权力中心重用。',
-    quote: '学而不思则罔，思而不学则殆。',
+    quote: '学而不思则罔，思而不学则殆。——《论语·为政》',
   },
   ASTD: {
     name: '王安石',
@@ -352,7 +352,7 @@ export const FEATURED_PROFILES: Record<string, CelebrityProfile> = {
   ISFD: {
     name: '扁鹊',
     field: '战国名医',
-    story: '以望闻问切和早期诊断闻名，《史记》记载他见蔡桓公的故事。他代表一种能力：在问题还没爆发时，就看见它。',
+    story: '以望闻问切和早期诊断闻名，《韩非子》记载他见蔡桓公的故事；《史记》记载他望齐桓侯而退。他代表一种能力：在问题还没爆发时，就看见它。',
   },
   IBCJ: {
     name: '韩非',
@@ -372,7 +372,7 @@ export const FEATURED_PROFILES: Record<string, CelebrityProfile> = {
   ESCP: {
     name: '汤姆·克鲁斯',
     field: '演员 / 制片人',
-    story: '好莱坞动作明星，以亲自完成高风险特技著称。他对动作场面的控制近乎偏执，把“现场感”变成了自己的职业标识。',
+    story: '好莱坞动作明星，以亲自完成高风险特技著称。他对动作场面的控制有极高标准，把“现场感”变成了自己的职业标识。',
   },
   ESFP: {
     name: '玛丽莲·梦露',

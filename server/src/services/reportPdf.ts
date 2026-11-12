@@ -5,6 +5,7 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 import { scalePopulationFor81 } from './population.js'
 import { TYPE_SUMMARIES, getCelebrityNames } from '../content/types.js'
+import { getCelebrityField } from '../content/celebrity-fields.js'
 import { getLifeAdviceModules } from '../content/life-advice.js'
 
 const prisma = new PrismaClient()
@@ -125,8 +126,14 @@ function list(items: string[]): string {
   return items.map(item => `<li>${escapeHtml(item)}</li>`).join('')
 }
 
-function tags(items: string[]): string {
-  return items.map(item => `<span class="tag">${escapeHtml(item)}</span>`).join('')
+/** 代表人物：姓名 · 身份两列，与网页 03 / REFERENCES 的信息量对齐 */
+function people(items: string[]): string {
+  return items
+    .map(item => {
+      const field = getCelebrityField(item)
+      return `<li class="person"><span class="person-name">${escapeHtml(item)}</span><span class="person-field">${escapeHtml(field)}</span></li>`
+    })
+    .join('')
 }
 
 function portraitDataUri(typeCode: string): string {
@@ -214,7 +221,14 @@ h2{font-size:24px;font-weight:700;color:#C8963E;margin:40px 0 16px;padding-botto
 h3{font-size:18px;font-weight:600;color:#4A4540;margin:24px 0 12px}
 p,li{font-size:15px;line-height:1.8;color:#4A4540}
 ul{padding-left:20px;margin:8px 0 16px}.tags{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
-.tag{background:#F0EBE0;color:#6B6560;padding:4px 14px;border-radius:20px;font-size:13px}.module{background:#FAF8F5;border-radius:14px;padding:20px 24px;margin:16px 0}
+.tag{background:#F0EBE0;color:#6B6560;padding:4px 14px;border-radius:20px;font-size:13px}
+.people{list-style:none;padding:0;margin:12px 0 0;border-top:1px solid #E0D8CC}
+.people .person{display:flex;justify-content:space-between;align-items:baseline;gap:16px;margin:0;padding:9px 0;border-bottom:1px solid #F0EBE0}
+.people .person-name{font-size:14px;color:#2D2A26;font-weight:600}
+.people .person-field{font-size:12px;color:#8A837C;text-align:right}
+.person-note{margin:10px 0 0;font-size:11px;line-height:1.7;color:#9C958E}
+.depth-note{margin:16px 0 0;font-size:11px;line-height:1.7;color:#9C958E}
+.module{background:#FAF8F5;border-radius:14px;padding:20px 24px;margin:16px 0}
 .module .dim-result{font-size:14px;color:#6B6560;margin-bottom:8px}.module .dim-result strong{font-size:18px;color:#C8963E}
 .footer{text-align:center;margin-top:60px;padding-top:20px;border-top:1.5px solid #E0D8CC;color:#9C958E;font-size:13px}.footer p{margin:4px 0;color:#9C958E}
 </style></head>
@@ -229,12 +243,13 @@ ${t.population ? `<p class="population">占总人口比例：<strong>${escapeHtm
 <h2>成长空间</h2><ul>${list(t.growthAreas)}</ul>
 <h2>职业推荐</h2><ul>${list(t.careers)}</ul>
 ${t.suitableFields.length ? `<h3>适合领域</h3><ul>${list(t.suitableFields)}</ul>` : ''}
-${t.celebrities.length ? `<h2>代表人物</h2><div class="tags">${tags(t.celebrities)}</div>` : ''}
-${dimModule(t.code, 'E_I', '能量来源（E/A/I 维度）', t.eiModule)}
-${dimModule(t.code, 'S_N', '认知方式（S/B/N 维度）', t.snModule)}
-${dimModule(t.code, 'T_F', '决策方式（T/C/F 维度）', t.tfModule)}
-${dimModule(t.code, 'P_J', '生活态度（P/D/J 维度）', t.pjModule)}
-<div class="footer"><p>MBTI-PRO · 81型人格深度解析</p><p>mbti-pro.com</p></div>
+${t.celebrities.length ? `<h2>代表人物</h2><ul class="people">${people(t.celebrities)}</ul><p class="person-note">标注作品名的为虚构角色，仅作性格类比，与作品版权方无关联；真人部分只引用公开可查的经历，不代表本人测评或认可。</p>` : ''}
+${dimModule(t.code, 'E_I', '起点与志向', t.eiModule)}
+${dimModule(t.code, 'S_N', '看世界的角度', t.snModule)}
+${dimModule(t.code, 'T_F', '关键抉择', t.tfModule)}
+${dimModule(t.code, 'P_J', '代价与教训', t.pjModule)}
+<p class="depth-note">以上四条由该型主人物的公开生平与关键抉择推导，仅作性格参照，不构成对人物本人的测评或评价。</p>
+<div class="footer"><p>MBTI-PRO · 81型人格深度解析</p><p>mbti-pro.com</p><p>结果仅供个人参考，不构成临床诊断或招聘决策依据。</p></div>
 </body></html>`
 }
 

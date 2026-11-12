@@ -62,6 +62,26 @@ scripts/         视频管线、图片生成、数据脚本
 
 修改名称时两个位置都必须更新。部署脚本已包含 `npx tsx scripts/fix-names.ts` 自动修复数据库名称。
 
+### 代表人物选人红线（强制）
+
+81 型「代表人物」是付费内容的一部分，选人须遵守三条红线（来源：DSH 内容审核 2026-11-13 · Y4）：
+
+1. **在世政治人物、在世宗教领袖、在世道德模范**一律不进**主人物位**；次位可以，且只写正面公开身份。
+2. **有暴力犯罪、加害他人记录的真人**一律不用（顾城即此类，已写入 `scripts/audit-depth-content.mjs` 的 `VIOLENCE_BLACKLIST`）。
+3. 已故人物的死因 / 疾病 / 性取向 / 司法遭遇，只在**中性、公开、已被主流媒体长期报道**的范围内引用，不新增细节、不做评价。
+
+名单唯一事实源是 `server/src/content/types.ts` 的 `CELEBRITY_MAP`。改完必须同步三处，否则线上仍是旧名单：
+
+```bash
+cd server
+npx tsx ../scripts/audit-depth-content.mjs   # 必须退出码 0
+npx tsx ../scripts/sync-handcrafted-celebrities.mjs
+npx tsx ../scripts/sync-db-celebrities.mjs
+npm run demo:export                          # client/public/demo/types.json 是内容快照
+```
+
+新增姓名的身份必须补进 `server/src/content/celebrity-fields.ts`，虚构角色还要登记 `scripts/pop-culture-reps.json`（身份写《作品》），否则结果页会显示「公众人物」或审核表不标「流行」。
+
 ### 部署流程
 
 ```bash

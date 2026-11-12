@@ -90,10 +90,10 @@ const card = (r) => {
     ${r.quote ? `<blockquote>“${esc(r.quote)}”</blockquote>` : '<p class="noquote">（这一型没有引言）</p>'}
   </div>
   <div class="mods">
-    <div class="mrow"><span>能量来源</span><p>${esc(r.modules.eiModule)}</p></div>
-    <div class="mrow"><span>认知方式</span><p>${esc(r.modules.snModule)}</p></div>
-    <div class="mrow"><span>决策方式</span><p>${esc(r.modules.tfModule)}</p></div>
-    <div class="mrow"><span>生活态度</span><p>${esc(r.modules.pjModule)}</p></div>
+    <div class="mrow"><span>起点与志向</span><p>${esc(r.modules.eiModule)}</p></div>
+    <div class="mrow"><span>看世界的角度</span><p>${esc(r.modules.snModule)}</p></div>
+    <div class="mrow"><span>关键抉择</span><p>${esc(r.modules.tfModule)}</p></div>
+    <div class="mrow"><span>代价与教训</span><p>${esc(r.modules.pjModule)}</p></div>
   </div>
   <div class="review">
     <div class="opts">
@@ -116,7 +116,7 @@ const sections = Object.keys(GROUPS).map(g => {
 
 const html = `<!DOCTYPE html>
 <html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>MBTI-PRO · 81 型代表人物与四维深度解析（DSH 审核稿）</title>
+<title>MBTI-PRO · 81 型代表人物与人物解读（DSH 审核稿）</title>
 <style>
 :root{--paper:#FBF6EE;--card:#fff;--ink:#1E1D1A;--muted:#6F685D;--rule:#E2D9CB;--accent:#A63D2C;--ok:#2F7A4F;--warn:#B4762A}
 *{margin:0;padding:0;box-sizing:border-box}
@@ -177,7 +177,7 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
 @media(max-width:640px){.wrap{padding:14px}.grid{grid-template-columns:1fr}}
 </style></head><body>
 <div class="top"><div class="row">
-  <div class="brand">MBTI-PRO <b>/</b> 81 型 · 代表人物 + 四维深度解析</div>
+  <div class="brand">MBTI-PRO <b>/</b> 81 型 · 代表人物 + 人物解读</div>
   <div class="stat" id="progress">已审 0 / 81</div>
   <div class="sp"></div>
   <input type="search" id="q" placeholder="搜类型码 / 中文名 / 人物名…">
@@ -188,7 +188,7 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
 <div class="wrap">
   <div class="hero">
     <h1>这是结果页会原样展示给用户的两块内容</h1>
-    <p><b>03 / REFERENCES 代表人物</b>（每人带身份）与 <b>04 / DEPTH 四维深度解析</b>（主人物生平 + 引言 + 能量来源 / 认知方式 / 决策方式 / 生活态度）。每张卡下面可点「通过 / 需改 / 存疑」并写意见，最后导出 JSON 回传。生成时间 ${esc(stamp)}，内容全部来自代码，改数据后重跑 <code>scripts/build-depth-review.mjs</code> 即可刷新。</p>
+    <p><b>03 / REFERENCES 代表人物</b>（每人带身份）与 <b>04 / DEPTH 代表人物解读</b>（主人物生平 + 引言 + 起点与志向 / 看世界的角度 / 关键抉择 / 代价与教训）。每张卡下面可点「通过 / 需改 / 存疑」并写意见，最后导出 JSON 回传。生成时间 ${esc(stamp)}，内容全部来自代码，改数据后重跑 <code>scripts/build-depth-review.mjs</code> 即可刷新。</p>
   </div>
   <div class="summary">
     <div class="kpi"><b>${rows.length}</b><span>型</span></div>
@@ -251,26 +251,26 @@ const depthBlocks = rows.map(r => `### ${r.code} ${r.name}（${r.group}）
 
 - **主人物**：${r.main} · ${r.mainField}
 - **生平**：${r.story}
-${r.quote ? `- **引言**：「${r.quote}」\n` : ''}- **能量来源**：${r.modules.eiModule}
-- **认知方式**：${r.modules.snModule}
-- **决策方式**：${r.modules.tfModule}
-- **生活态度**：${r.modules.pjModule}
+${r.quote ? `- **引言**：「${r.quote}」\n` : ''}- **起点与志向**：${r.modules.eiModule}
+- **看世界的角度**：${r.modules.snModule}
+- **关键抉择**：${r.modules.tfModule}
+- **代价与教训**：${r.modules.pjModule}
 - **代表人物**：${r.people.map(p => p.name + (POP[p.name] ? `（${POP[p.name]}）` : '')).join(' / ')}
 `).join('\n')
 
-const md = `# 内容审核交接 · 81 型代表人物 + 四维深度解析（DSH 审核端）
+const md = `# 内容审核交接 · 81 型代表人物 + 人物解读（DSH 审核端）
 
 > 生成时间：${stamp}｜数据源：\`server/src/content/types.ts\`、\`celebrity-stories.ts\`、\`life-advice.ts\`
-> **你要审的是用户付费后会在结果页看到的两块内容**：\`03 / REFERENCES 代表人物\` 与页面最底部的 \`04 / DEPTH 四维深度解析\`。
+> **你要审的是用户付费后会在结果页看到的两块内容**：\`03 / REFERENCES 代表人物\` 与页面最底部的 \`04 / DEPTH 代表人物解读\`。
 > 本文档由 \`scripts/build-depth-review.mjs\` 从代码生成，改数据后重跑即可刷新；内容不会手写。
 
 ## 0. 三分钟版（只看这里就能开工）
 
 | | 状态 |
 |---|---|
-| 81 型代表人物 | 317 个位次 / 317 个不同的人，跨型共用 0；其中 42 位是流行角色（动漫 / 影视），覆盖 41 / 81 型 |
+| 81 型代表人物 | ${rows.reduce((n, r) => n + r.people.length, 0)} 个位次 / ${new Set(rows.flatMap(r => r.people.map(p => p.name))).size} 个不同的人，跨型共用 0；其中 ${Object.keys(POP).length} 位是流行角色（动漫 / 影视 / 译制文学，登记于 \`scripts/pop-culture-reps.json\`），分布在 ${rows.filter(r => r.people.some(p => POP[p.name])).length} / 81 型；另有 1 位文学虚构人物（宋江），未计入该台账，口径见代表人物审核表 |
 | 选人准则 | ① 一眼认出 ② 四维无硬伤 ③ 不与其它型共用；中间档另用「争议即中间档」机制（角色本身有公认争议 = 中间档的实证） |
-| 四维深度解析 | 每型 4 条（能量来源 / 认知方式 / 决策方式 / 生活态度），全部由该型**主人物**的公开生平推导，主人物是历史或当代真人，**不含虚构角色** |
+| 代表人物解读 | 每型 4 条（起点与志向 / 看世界的角度 / 关键抉择 / 代价与教训），全部由该型**主人物**的公开生平与关键抉择推导，主人物是历史或当代真人，**不含虚构角色** |
 | 已排除 | 近代国内政治人物已全部移出（周恩来 / 宋庆龄 / 何香凝），公益符号（雷锋）也已移出 |
 | 合规声明 | 结果页代表人物区底部固定一句：标注作品名的为虚构角色，仅作性格类比，与作品版权方无关联；真人部分只引用公开可查的经历，不代表本人测评或认可 |
 
@@ -302,7 +302,7 @@ ENTJ | 四维 | 建议 | 第 3 条「关键抉择」与拿破仑公开经历对�
 |---|---|---|---|---|---|
 ${nameRows}
 
-## 4. 四维深度解析全文（81 型）
+## 4. 代表人物解读全文（81 型）
 
 > 这就是结果页最底部 \`04 / DEPTH\` 区块逐字展示的内容。
 
@@ -318,16 +318,15 @@ ${depthBlocks}
 ${noPop.map(r => `${r.code} ${r.name}：${r.people.map(p => p.name).join('、')}`).join('\n')}
 **请你判断**：哪些属于「该换但没有合适的」，哪些属于「真人已经够好、不需要角色」。
 
-### 5.3 边界人物（我拿不准，留给你定）
-名单里仍有以下偏敏感或偏公共符号的人物，若你认为商业产品里不合适，说一声我换掉：
-蔡元培、张桂梅、钱学森、邓稼先、白求恩、陶行知、雷锋（已换）、周恩来/宋庆龄/何香凝（已换）。
+### 5.3 边界人物（DSH 意见：全部保留 + 立三条红线）
+蔡元培、张桂梅、钱学森、邓稼先、白求恩、陶行知——DSH 复核结论为**全部保留**：前四位是已故/在世的正面公共人物，后两位是历史人物，商业产品做性格类比不构成风险。已移出的雷锋、周恩来、宋庆龄、何香凝维持移出。三条红线（在世政治/宗教/道德模范不进主人物位；有暴力犯罪记录者不用；死因/疾病/性取向/司法遭遇只引主流公开报道）已写入 \`AGENTS.md\`，并把顾城列入 \`scripts/audit-depth-content.mjs\` 的黑名单做机器兜底。
 
-### 5.4 置信度低的两位流行角色
-IBCP 求知者型 · 有马公生（《四月是你的谎言》）与 IBFP 逸趣者型 · 埼玉（《一拳超人》）是我把握最低的两位，争议点记在 \`docs/xhs-daily/dispute-library.md\`。若你认为明显不搭，我直接换。
+### 5.4 置信度低的流行角色（已按 DSH 意见处理）
+原 IBCP 求知者型 · 有马公生（《四月是你的谎言》）已换为 **芙莉莲（《葬送的芙莉莲》）**——IBCP 是「内向 / 均衡 / 复合 / 感知」，核心是沉浸式吸收与钻研，有马公生的成长弧偏情绪不偏求知；芙莉莲以百年尺度积累魔法知识，四维与受众认知度都更贴。IBFP 逸趣者型 · 埼玉（《一拳超人》）按 DSH 意见**保留**。
 
 ## 6. 你可能会问的几个问题
 
-- **为什么虚构角色不写进四维深度解析？** 那四条建议要基于真实公开经历推导，虚构角色没有可查生平，所以主人物一律是真人；虚构角色只出现在代表人物名单里，且带作品名与类比声明。
+- **为什么虚构角色不写进代表人物解读？** 那四条建议要基于真实公开经历推导，虚构角色没有可查生平，所以主人物一律是真人；虚构角色只出现在代表人物名单里，且带作品名与类比声明。
 - **换主人物要改多少东西？** \`celebrity-stories.ts\` 的该型侧写与引言 + \`life-advice.ts\` 的该型 6 条素材 + 结果页大字。改完重跑本脚本与 \`build-celebrity-review.mjs\` 即可。
 - **争议角色怎么定的？** 见 \`docs/xhs-daily/dispute-library.md\`，每位流行角色记了争议维、两边证据和一句话钩子，可直接拿来做日更选题。
 `

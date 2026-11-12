@@ -262,26 +262,27 @@ onUnmounted(() => { jsonLdScript?.remove() })
         </section>
 
         <section v-if="typeData?.eiModule || typeData?.snModule || typeData?.tfModule || typeData?.pjModule" class="result-section">
-          <div class="section-head"><span>04 / DEPTH</span><h2>四维深度解析</h2></div>
+          <div class="section-head"><span>04 / DEPTH</span><h2>代表人物解读</h2></div>
           <div v-if="featuredProfile" class="depth-person">
             <p class="depth-person-kicker">PERSON IN CONTEXT / {{ featuredProfile.name }} · {{ featuredProfile.field }}</p>
-            <p class="depth-person-story">下面四条建议，都来自这位人物公开可查的经历：精力投向、判断方式、关键抉择，以及代价最后落在哪里。</p>
+            <p class="depth-person-story">下面四条建议，都来自这位人物公开可查的经历：他从哪里起步、怎么看局面、怎么做关键抉择，以及代价最后落在哪里。</p>
             <blockquote v-if="featuredProfile.quote">“{{ featuredProfile.quote }}”</blockquote>
           </div>
           <div class="depth-list">
             <div v-if="typeData?.eiModule" class="depth-row">
-              <span>能量来源</span><p>{{ typeData.eiModule }}</p>
+              <span>起点与志向</span><p>{{ typeData.eiModule }}</p>
             </div>
             <div v-if="typeData?.snModule" class="depth-row">
-              <span>认知方式</span><p>{{ typeData.snModule }}</p>
+              <span>看世界的角度</span><p>{{ typeData.snModule }}</p>
             </div>
             <div v-if="typeData?.tfModule" class="depth-row">
-              <span>决策方式</span><p>{{ typeData.tfModule }}</p>
+              <span>关键抉择</span><p>{{ typeData.tfModule }}</p>
             </div>
             <div v-if="typeData?.pjModule" class="depth-row">
-              <span>生活态度</span><p>{{ typeData.pjModule }}</p>
+              <span>代价与教训</span><p>{{ typeData.pjModule }}</p>
             </div>
           </div>
+          <p class="depth-note">以上四条由该型主人物的公开生平与关键抉择推导，仅作性格参照，不构成对人物本人的测评或评价。</p>
         </section>
       </div>
 
@@ -502,6 +503,7 @@ onUnmounted(() => { jsonLdScript?.remove() })
 .depth-row { display: grid; grid-template-columns: 120px 1fr; gap: 24px; padding: 20px 0; border-bottom: 1px solid var(--rule); }
 .depth-row > span { color: var(--accent); font-family: "DM Mono", "SF Mono", Consolas, "Roboto Mono", monospace; font-size: 10px; letter-spacing: .05em; padding-top: 4px; }
 .depth-row p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.9; }
+.depth-note { margin: 14px 0 0; color: var(--muted); font-size: 11px; line-height: 1.7; }
 
 .result-actions { display: flex; align-items: center; gap: 22px; padding: 38px 0 20px; border-top: 1px solid var(--rule); }
 .primary-action {

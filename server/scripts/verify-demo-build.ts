@@ -94,7 +94,7 @@ const params = new URLSearchParams({
   recordId: 'demo-record',
 })
 const full = await visit('结果页（含测试数据）', `/result/ENTJ?${params}`, 'demo_4_full.png')
-check('演示环境直接展示完整报告', full.text.includes('人格概览') && full.text.includes('四维深度解析'))
+check('演示环境直接展示完整报告', full.text.includes('人格概览') && full.text.includes('代表人物解读'))
 check('不出现兑换码解锁卡', !full.text.includes('解锁完整 81 型报告'))
 check('未出现"发送到邮箱"的虚假承诺', !full.text.includes('发送到你的邮箱'))
 
