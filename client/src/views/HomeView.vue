@@ -2,7 +2,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { api } from '../services/api'
-import { getAccessToken, redeemAccessCode } from '../services/access'
+import { clearAccessToken, getAccessToken, redeemAccessCode } from '../services/access'
 import { IS_DEMO } from '../services/demoMode'
 import AccessGate from '../components/AccessGate.vue'
 
@@ -20,6 +20,10 @@ const dimensions = [
 onMounted(async () => {
   window.scrollTo({ top: 0, behavior: 'instant' })
   const params = new URLSearchParams(window.location.search)
+  // 卖家自查入口：/?reset=1 清除本机解锁令牌，恢复"需输码"状态（不影响兑换码额度，重输码即可再解锁）
+  if (params.get('reset') === '1') {
+    clearAccessToken()
+  }
   const referralCode = params.get('ref')
   if (referralCode) {
     localStorage.setItem('mbti-pro-referral-code', referralCode)
