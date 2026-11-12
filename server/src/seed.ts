@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client'
 import { pathToFileURL } from 'node:url'
-import { buildTypeContent, handCraftedTypes, generateAllTypeCodes } from './content/types.js'
+import { buildTypeContent, handCraftedTypes, generateAllTypeCodes, getCelebrityNames } from './content/types.js'
 
 const prisma = new PrismaClient()
 
@@ -203,7 +203,8 @@ async function main() {
         growthAreas: JSON.stringify(t.growthAreas),
         careers: JSON.stringify(t.careers),
         suitableFields: JSON.stringify(t.suitableFields),
-        celebrities: JSON.stringify(t.celebrities),
+        // 代表人物以 CELEBRITY_MAP 为准，避免手写副本写进库后长期漂移
+        celebrities: JSON.stringify(getCelebrityNames(t.code, t.celebrities)),
       },
     })
   }
@@ -223,7 +224,8 @@ async function main() {
         growthAreas: JSON.stringify(t.growthAreas),
         careers: JSON.stringify(t.careers),
         suitableFields: JSON.stringify(t.suitableFields),
-        celebrities: JSON.stringify(t.celebrities),
+        // 代表人物以 CELEBRITY_MAP 为准，避免手写副本写进库后长期漂移
+        celebrities: JSON.stringify(getCelebrityNames(t.code, t.celebrities)),
       },
     })
     autoCount++

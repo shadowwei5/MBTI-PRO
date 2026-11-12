@@ -144,7 +144,7 @@ export const FEATURED_PROFILES: Record<string, CelebrityProfile> = {
     story: '在战争、瘟疫和帝国危机中写下《沉思录》。他用自我对话维持秩序，把“控制能控制的，接受不能控制的”变成日常练习。',
   },
   IBTD: {
-    name: '熊彼特',
+    name: '约瑟夫·熊彼特',
     field: '经济学家',
     story: '提出“创造性破坏”，认为资本主义靠企业家不断推翻旧结构来更新自己。他既赞美创新，也担忧精英与大众之间的张力。',
   },
@@ -229,7 +229,7 @@ export const FEATURED_PROFILES: Record<string, CelebrityProfile> = {
     story: '从斯特拉特福来到伦敦，做演员、写剧本、入股剧团。他写喜剧、悲剧和历史剧，用独白把人的犹疑、嫉妒和爱欲变成可被反复引用的语言。',
   },
   IBFJ: {
-    name: '黑塞',
+    name: '赫尔曼·黑塞',
     field: '作家',
     story: '《荒原狼》《悉达多》写现代人的分裂与寻求。他经历战争、婚姻破裂，也从东方哲学中寻找答案；作品因此既有孤独，也有疗愈。',
   },
@@ -249,7 +249,7 @@ export const FEATURED_PROFILES: Record<string, CelebrityProfile> = {
     story: '从种植园主到大陆军总司令，再到美国首任总统。他最大的政治贡献之一，是主动放弃权力、确立总统任期传统，让制度比个人更长久。',
   },
   ESTD: {
-    name: '杜鲁门',
+    name: '哈里·杜鲁门',
     field: '美国前总统',
     story: '接任罗斯福时几乎没人看好，后来却在原子弹、马歇尔计划和朝鲜战争等重大决定上留下强硬印记。他桌上那句“责任止于此”，是典型的执行者信条。',
   },
@@ -259,7 +259,7 @@ export const FEATURED_PROFILES: Record<string, CelebrityProfile> = {
     story: '作为盟军最高指挥官策划诺曼底登陆，后来以总统身份推动州际公路系统。他擅长协调不同国家的将领，把复杂联盟变成可执行的计划。',
   },
   ESCD: {
-    name: '麦克阿瑟',
+    name: '道格拉斯·麦克阿瑟',
     field: '五星上将',
     story: '太平洋战场的名将，仁川登陆是其军事生涯的高光。他的自我戏剧化和对权力的坚持，也最终导致与杜鲁门的冲突。',
   },

@@ -2,7 +2,7 @@ import { Router } from 'express'
 import { prisma } from '../index.js'
 import { calculateScore, type Answers, type QuestionMeta, type AnswerKey } from '../services/scoring.js'
 import { getLifeAdviceModules } from '../content/life-advice.js'
-import { getCelebrityProfiles } from '../content/types.js'
+import { getCelebrityNames, getCelebrityProfiles } from '../content/types.js'
 import { isOrderPaid } from './payment.js'
 import { isShareUnlockValid } from './shareUnlocks.js'
 import { isAccessGrantValid } from './access.js'
@@ -177,7 +177,7 @@ resultRoutes.get('/', async (_req, res, next) => {
       success: true,
       data: types.map(t => ({
         ...t,
-        celebrities: JSON.parse(t.celebrities || '[]'),
+        celebrities: getCelebrityNames(t.code, JSON.parse(t.celebrities || '[]')),
         imageUrl: `/api/images/${t.code}`,
       })),
     })
@@ -222,7 +222,10 @@ resultRoutes.get('/:typeCode', async (req, res, next) => {
         (recordId ? await isOrderPaid(type.code, unlockToken, recordId) || await isShareUnlockValid(type.code, unlockToken, recordId) : false)
       : false
     const dimModules = paid ? getLifeAdviceModules(type.code) : null
-    const celebrities = paid ? JSON.parse(type.celebrities || '[]') : []
+    // 代表人物以 CELEBRITY_MAP 为准；库里的 celebrities 列只有在 MAP 缺项时才兜底，
+    // 防止早期 seed 写进去的旧名单在线上继续出现（2026-11-12 上线前核对）
+    const dbCelebrities: string[] = JSON.parse(type.celebrities || '[]')
+    const celebrities = paid ? getCelebrityNames(type.code, dbCelebrities) : []
 
     // Parse JSON fields
     res.json({

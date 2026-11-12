@@ -4,7 +4,7 @@ import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import { scalePopulationFor81 } from './population.js'
-import { TYPE_SUMMARIES } from '../content/types.js'
+import { TYPE_SUMMARIES, getCelebrityNames } from '../content/types.js'
 import { getLifeAdviceModules } from '../content/life-advice.js'
 
 const prisma = new PrismaClient()
@@ -174,7 +174,7 @@ export async function getReportData(typeCode: string): Promise<ReportData | null
     careers: JSON.parse(type.careers),
     suitableFields: JSON.parse(type.suitableFields),
     population: scalePopulationFor81(type.population),
-    celebrities: JSON.parse(type.celebrities || '[]'),
+    celebrities: getCelebrityNames(type.code, JSON.parse(type.celebrities || '[]')),
     eiModule: dimModules.eiModule,
     snModule: dimModules.snModule,
     tfModule: dimModules.tfModule,

@@ -1,0 +1,2809 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MBTI-PRO · 81 型代表人物（修正结果审核表）</title>
+<style>
+:root{--paper:#FBF6EE;--card:#fff;--ink:#1E1D1A;--muted:#6F685D;--rule:#E2D9CB;--accent:#A63D2C;--ok:#2F7A4F;--warn:#B4762A;--new:#2F7A4F}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font:14px/1.65 'Noto Sans SC','PingFang SC','Microsoft YaHei',sans-serif}
+.top{position:sticky;top:0;z-index:30;background:rgba(251,246,238,.97);border-bottom:1px solid var(--rule);padding:12px 24px}
+.row{max-width:1680px;margin:0 auto;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.brand{font-size:16px;font-weight:600;letter-spacing:.02em}
+.brand b{color:var(--accent)}
+.stat{font-size:12px;color:var(--muted);letter-spacing:.04em}
+.sp{flex:1}
+input[type=search],select{border:1px solid var(--rule);background:#fff;color:var(--ink);padding:7px 11px;border-radius:5px;font:13px/1 inherit;font-family:inherit}
+input[type=search]{width:250px}
+button{border:1px solid var(--rule);background:#fff;color:var(--ink);padding:7px 12px;border-radius:5px;cursor:pointer;font:13px/1 inherit;font-family:inherit}
+button:hover{border-color:var(--accent);color:var(--accent)}
+button.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.wrap{max-width:1680px;margin:0 auto;padding:22px 24px 60px}
+.hero{background:#fff;border:1px solid var(--rule);border-left:4px solid var(--accent);border-radius:6px;padding:16px 20px;margin-bottom:18px}
+.hero h1{font-size:19px;font-family:'Noto Serif SC','Songti SC',serif;letter-spacing:.02em}
+.hero p{font-size:13px;color:#3A3833;margin-top:6px;line-height:1.8}
+.hero p b{color:var(--accent)}
+.hero .meta{font-size:11.5px;color:var(--muted);margin-top:8px;letter-spacing:.03em}
+.summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:10px;margin-bottom:18px}
+.kpi{background:#fff;border:1px solid var(--rule);border-radius:6px;padding:12px 14px}
+.kpi b{display:block;font-size:24px;font-family:'DM Mono',monospace}
+.kpi span{font-size:12px;color:var(--muted)}
+.kpi.good b{color:var(--ok)}
+.kpi.acc b{color:var(--accent)}
+.kpi.warn b{color:var(--warn)}
+.panel{background:#fff;border:1px solid var(--rule);border-radius:6px;padding:14px 16px;margin-bottom:22px}
+.panel h3{font-size:14px;margin-bottom:10px}
+.panel h3 em{font-style:normal;color:var(--muted);font-weight:400;font-size:12px;margin-left:8px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{border-top:1px solid var(--rule);padding:7px 8px;text-align:left;vertical-align:top}
+th{font-size:12px;color:var(--muted);font-weight:500;background:#FDFBF7}
+code{font-family:'DM Mono',monospace;background:#F3EEE4;padding:1px 5px;border-radius:3px;font-size:12px;margin-right:5px}
+.tname-sm{font-family:'Noto Serif SC','Songti SC',serif;font-size:13px}
+.grp-inline{color:#fff;font-size:10.5px;padding:1px 7px;border-radius:9px;white-space:nowrap}
+.muted{color:var(--muted)}
+.old{opacity:.9}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-size:12px;border:1px solid var(--rule);border-radius:12px;padding:2px 9px;background:#fff;cursor:help;white-space:nowrap}
+.chip.muted{color:var(--muted)}
+.chip b{color:var(--new);font-weight:600;margin-left:5px;font-size:11px}
+.chip.new{border-color:#BFDCCB;background:#F4FAF6}
+.chip.del{color:#8A7F73;background:#F6F2EA;text-decoration:line-through;text-decoration-color:#C9B9A4}
+.check{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px}
+.chk{border:1px solid var(--rule);border-radius:6px;padding:10px 12px;background:#FDFBF7}
+.chk.ok{border-left:3px solid var(--ok)}
+.chk.bad{border-left:3px solid var(--warn);background:#FDF6EA}
+.chk-h{display:flex;align-items:center;gap:8px;font-size:13px;margin-bottom:4px}
+.chk-h em{font-style:normal;font-family:'DM Mono',monospace;color:var(--muted);margin-left:auto}
+.badge{font-size:10.5px;padding:1px 7px;border-radius:9px;color:#fff;background:var(--ok)}
+.chk.bad .badge{background:var(--warn)}
+.chk p{font-size:12px;color:var(--muted);line-height:1.7}
+.lv-list{display:grid;gap:8px}
+.lv-row{display:flex;gap:10px;align-items:flex-start;font-size:13px;border-top:1px solid #F1ECE2;padding-top:8px}
+.lv-row .k{flex:none;width:132px;font-weight:600;font-size:12.5px}
+.lv-row .v{color:#3A3833;flex:1}
+.group{margin-bottom:26px}
+.group h2{font-size:17px;display:flex;align-items:center;gap:9px;margin:0 0 12px;padding-bottom:8px;border-bottom:1px solid var(--rule)}
+.group h2 em{font-style:normal;font-size:12px;color:var(--muted);font-weight:400}
+.swatch{width:12px;height:12px;border-radius:2px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(370px,1fr));gap:14px}
+.card{background:#fff;border:1px solid var(--rule);border-radius:8px;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.card[data-changed="1"]{border-color:#D8C6B2}
+.card header{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.code{font-family:'DM Mono',monospace;font-size:22px;font-weight:600;letter-spacing:.06em}
+.tname{font-family:'Noto Serif SC','Songti SC',serif;font-size:16px}
+.flag{font-size:10.5px;color:var(--accent);border:1px solid #E7CFC7;background:#FDF3F0;border-radius:9px;padding:1px 7px}
+.grp{margin-left:auto;color:#fff;font-size:11px;padding:2px 8px;border-radius:10px;letter-spacing:.04em}
+.dims{display:flex;gap:6px}
+.dim{display:flex;align-items:center;gap:4px;font-family:'DM Mono',monospace;font-size:13px;border:1px solid var(--rule);border-radius:4px;padding:1px 7px}
+.dim i{font-style:normal;font-family:'Noto Sans SC',sans-serif;font-size:11px;color:var(--muted)}
+.lab{font-size:11px;letter-spacing:.1em;color:var(--muted);margin-bottom:4px}
+.lab b{color:var(--ink)}
+.main{background:#FBF8F2;border:1px solid #EFE7DA;border-radius:6px;padding:10px 12px}
+.pname{font-family:'Noto Serif SC','Songti SC',serif;font-size:20px;font-weight:600}
+.pname span{font-family:'Noto Sans SC',sans-serif;font-size:12px;font-weight:400;color:var(--muted);margin-left:8px}
+.story{font-size:12.5px;line-height:1.7;color:#3A3833;margin-top:5px}
+.was{background:#FCFAF6;border:1px dashed var(--rule);border-radius:6px;padding:8px 10px}
+.issues{display:flex;flex-direction:column;gap:2px}
+.issues span{font-size:11.5px;color:var(--warn);background:#FDF6EA;border-left:2px solid var(--warn);padding:2px 8px}
+.review{border-top:1px dashed var(--rule);padding-top:9px;margin-top:auto}
+.opts{display:flex;gap:14px;font-size:12.5px;margin-bottom:6px}
+.opts label{display:flex;align-items:center;gap:4px;cursor:pointer}
+textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8px;font:12.5px/1.6 inherit;font-family:inherit;resize:vertical;background:#FDFBF7;color:var(--ink)}
+.card[data-state=pass]{box-shadow:inset 3px 0 0 var(--ok)}
+.card[data-state=fix]{box-shadow:inset 3px 0 0 var(--accent)}
+.card[data-state=hold]{box-shadow:inset 3px 0 0 var(--warn)}
+.hide{display:none!important}
+@media(max-width:640px){.wrap{padding:14px}.grid{grid-template-columns:1fr}input[type=search]{width:100%}}
+</style>
+</head>
+<body>
+<div class="top">
+  <div class="row">
+    <div class="brand">MBTI-PRO <b>/</b> 81 型代表人物 · 修正结果</div>
+    <div class="stat" id="progress">已审 0 / 81</div>
+    <div class="sp"></div>
+    <input type="search" id="q" placeholder="搜类型码 / 中文名 / 人物名…">
+    <select id="group"><option value="">全部 9 组</option><option value="SP">SP 暖金组</option><option value="SD">SD 琥珀组</option><option value="SJ">SJ 藏蓝组</option><option value="BT">BT 深炭灰组</option><option value="BC">BC 月光银灰组</option><option value="BF">BF 暖燕麦组</option><option value="NT">NT 深紫组</option><option value="NC">NC 靛青组</option><option value="NF">NF 翠绿组</option></select>
+    <button id="only">只看本轮改过的</button>
+    <button id="todo">只看没审的</button>
+    <button id="export">导出审核结果</button>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="hero">
+    <h1>81 型代表人物已按三条准则全库改完，这是改动清单与审核入口</h1>
+    <p>准则一「一眼认出」：换掉只在小圈子里有名的人（教科书人物、地方史人物、冷门学者）；准则二「四维无硬伤」：人选要能自圆其说地落在该坐标上；准则三「不与其它型共用」：同一个人只在一个型里出现。下方 81 张卡就是<b>产品里会显示的全部内容</b>，标「本轮已改」的卡片底部附了改动前的名单。</p>
+    <div class="meta">数据源 server/src/content/types.ts · 生成时间 2026/11/12 23:31:31 · 由 node scripts/build-celebrity-review.mjs 生成，改代码后重跑即可刷新</div>
+  </div>
+
+  <div class="summary">
+    <div class="kpi"><b>81</b><span>类型数</span></div>
+    <div class="kpi"><b>307</b><span>代表人物位次</span></div>
+    <div class="kpi good"><b>307</b><span>去重人数（=位次，无共用）</span></div>
+    <div class="kpi good"><b>0</b><span>跨型共用的人</span></div>
+    <div class="kpi acc"><b>46</b><span>本轮改过名单的型</span></div>
+    <div class="kpi acc"><b>69</b><span>本轮变动位次</span></div>
+    <div class="kpi"><b>51 / 43</b><span>新进入 / 移出人数</span></div>
+    <div class="kpi good"><b>0</b><span>自动校验硬伤</span></div>
+  </div>
+
+  <div class="panel">
+    <h3>四项自动校验 <em>每次重跑脚本都会重算；全绿才允许上线</em></h3>
+    <div class="check">
+      
+  <div class="chk ok">
+    <div class="chk-h"><span class="badge">通过</span><b>主人物与名单对不上</b><em>0</em></div>
+    <p>81 位主人物的名字与代表人物名单逐字一致，结果页不会出现「同一个人两个名字」。</p>
+  </div>
+      
+  <div class="chk ok">
+    <div class="chk-h"><span class="badge">通过</span><b>身份字典缺字段</b><em>0</em></div>
+    <p>307 个位次都有可显示身份（295 条字典记录 + 主人物自带的领域），结果页与 PDF 报告不会出现「相关人物」兜底。</p>
+  </div>
+      
+  <div class="chk ok">
+    <div class="chk-h"><span class="badge">通过</span><b>同一个人被多个型共用</b><em>0</em></div>
+    <p>307 个位次对应 307 个不同的人，一个人只属于一个型。</p>
+  </div>
+      
+  <div class="chk ok">
+    <div class="chk-h"><span class="badge">通过</span><b>handCraftedTypes 副本漂移</b><em>0</em></div>
+    <p>16 个手工维护的传统型各带一份 celebrities 副本，已与 CELEBRITY_MAP 逐字对齐——原本 13 个对不上，而 seed 会把副本写进数据库。</p>
+  </div>
+    </div>
+    
+  </div>
+
+  <div class="panel">
+    <h3>一处数据源，五处消费 <em>这次不只改名单，把会读到旧名单的五条路径都收在同一个出口</em></h3>
+    <div class="lv-list">
+      <div class="lv-row"><div class="k">CELEBRITY_MAP</div><div class="v">server/src/content/types.ts，81 型的唯一事实源。</div></div>
+      <div class="lv-row"><div class="k">handCraftedTypes</div><div class="v">16 个手工传统型自带的 celebrities 副本，原本 13 个与 MAP 不一致 → 已逐字对齐（scripts/sync-handcrafted-celebrities.mjs）。</div></div>
+      <div class="lv-row"><div class="k">数据库 celebrities 列</div><div class="v">seed 曾把副本写进库，库里 81 行里有 50 行是旧名单 → 已就地更新，不清库（server/scripts/sync-db-celebrities.mjs）。</div></div>
+      <div class="lv-row"><div class="k">结果 / 列表 / PDF 接口</div><div class="v">三处读取统一走 getCelebrityNames()：MAP 有值就不再看库里的历史副本。</div></div>
+      <div class="lv-row"><div class="k">demo 静态样本</div><div class="v">client/public/demo/types.json（VITE_DEMO_MODE=1 时前端直读）→ 已同步，81 型零差异（scripts/sync-demo-types.mjs）。</div></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h3>本轮换人明细 <em>46 个型 · 69 个位次 · 删除线为移出、绿底为新增</em></h3>
+    <table>
+      <thead><tr><th style="width:150px">类型</th><th style="width:130px">组</th><th style="width:36%">移出</th><th>新增（附身份）</th></tr></thead>
+      <tbody><tr>
+    <td><code>ABCD</code><span class="tname-sm">全能者型</span></td>
+    <td><span class="grp-inline" style="background:#8B95A0">BC 月光银灰组</span></td>
+    <td class="old"><span class="chip del">冯道</span><span class="chip del">李沆</span><span class="chip del">吕端</span></td>
+    <td><span class="chip new">亚里士多德<b>哲学家 / 博物学家</b></span><span class="chip new">歌德<b>作家 / 思想家</b></span><span class="chip new">张謇<b>实业家 / 教育家</b></span></td>
+  </tr><tr>
+    <td><code>ABCJ</code><span class="tname-sm">平衡者型</span></td>
+    <td><span class="grp-inline" style="background:#8B95A0">BC 月光银灰组</span></td>
+    <td class="old"><span class="chip del">申不害</span><span class="chip del">田穰苴</span><span class="chip del">赵充国</span></td>
+    <td><span class="chip new">李鸿章<b>晚清重臣</b></span><span class="chip new">俾斯麦<b>德意志帝国首任宰相</b></span></td>
+  </tr><tr>
+    <td><code>ABFD</code><span class="tname-sm">温润者型</span></td>
+    <td><span class="grp-inline" style="background:#B8956A">BF 暖燕麦组</span></td>
+    <td class="old"><span class="chip del">米哈伊·契克森米哈伊</span></td>
+    <td><span class="chip new">林语堂<b>作家 / 学者</b></span></td>
+  </tr><tr>
+    <td><code>ABTD</code><span class="tname-sm">适应者型</span></td>
+    <td><span class="grp-inline" style="background:#4A4A4A">BT 深炭灰组</span></td>
+    <td class="old"><span class="chip del">管仲</span><span class="chip del">桑弘羊</span></td>
+    <td><span class="chip new">吴敬琏<b>经济学家</b></span></td>
+  </tr><tr>
+    <td><code>ABTJ</code><span class="tname-sm">执行师型</span></td>
+    <td><span class="grp-inline" style="background:#4A4A4A">BT 深炭灰组</span></td>
+    <td class="old"><span class="chip del">司马光</span><span class="chip del">韩非子</span></td>
+    <td><span class="chip new">弗朗西斯·培根<b>哲学家</b></span><span class="chip new">马基雅维利<b>政治思想家</b></span></td>
+  </tr><tr>
+    <td><code>ANCP</code><span class="tname-sm">创意家型</span></td>
+    <td><span class="grp-inline" style="background:#3D7B8A">NC 靛青组</span></td>
+    <td class="old"><span class="chip del">姚期智</span></td>
+    <td><span class="chip new">杨振宁<b>理论物理学家 / 诺贝尔物理学奖得主</b></span></td>
+  </tr><tr>
+    <td><code>ANFD</code><span class="tname-sm">理想家型</span></td>
+    <td><span class="grp-inline" style="background:#2D8A4E">NF 翠绿组</span></td>
+    <td class="old"><span class="chip del">梁漱溟</span></td>
+    <td><span class="chip new">史铁生<b>作家</b></span></td>
+  </tr><tr>
+    <td><code>ANFJ</code><span class="tname-sm">引导者型</span></td>
+    <td><span class="grp-inline" style="background:#2D8A4E">NF 翠绿组</span></td>
+    <td class="old"><span class="chip del">奥黛丽·赫本</span></td>
+    <td><span class="chip new">杨澜<b>主持人 / 媒体人</b></span></td>
+  </tr><tr>
+    <td><code>ANTD</code><span class="tname-sm">构想家型</span></td>
+    <td><span class="grp-inline" style="background:#6B3FA0">NT 深紫组</span></td>
+    <td class="old"><span class="chip del">郭守敬</span></td>
+    <td><span class="chip new">诺伯特·维纳<b>数学家 / 控制论创始人</b></span></td>
+  </tr><tr>
+    <td><code>ANTJ</code><span class="tname-sm">策划者型</span></td>
+    <td><span class="grp-inline" style="background:#6B3FA0">NT 深紫组</span></td>
+    <td class="old"><span class="chip del">德鲁克</span></td>
+    <td><span class="muted">（只做精简，未补人）</span></td>
+  </tr><tr>
+    <td><code>ANTP</code><span class="tname-sm">思辨者型</span></td>
+    <td><span class="grp-inline" style="background:#6B3FA0">NT 深紫组</span></td>
+    <td class="old"><span class="chip del">费曼</span></td>
+    <td><span class="chip new">道金斯<b>演化生物学家</b></span></td>
+  </tr><tr>
+    <td><code>ASCD</code><span class="tname-sm">稳健者型</span></td>
+    <td><span class="grp-inline" style="background:#D4782F">SD 琥珀组</span></td>
+    <td class="old"><span class="chip del">李纲</span></td>
+    <td><span class="chip new">苏武<b>西汉使节</b></span></td>
+  </tr><tr>
+    <td><code>ASCP</code><span class="tname-sm">技艺者型</span></td>
+    <td><span class="grp-inline" style="background:#C8963E">SP 暖金组</span></td>
+    <td class="old"><span class="chip del">卡地亚</span></td>
+    <td><span class="muted">（只做精简，未补人）</span></td>
+  </tr><tr>
+    <td><code>ASFD</code><span class="tname-sm">援助者型</span></td>
+    <td><span class="grp-inline" style="background:#D4782F">SD 琥珀组</span></td>
+    <td class="old"><span class="chip del">况钟</span><span class="chip del">徐有功</span></td>
+    <td><span class="chip new">钟南山<b>呼吸病学专家</b></span></td>
+  </tr><tr>
+    <td><code>ASTJ</code><span class="tname-sm">管理者型</span></td>
+    <td><span class="grp-inline" style="background:#2C5F8A">SJ 藏蓝组</span></td>
+    <td class="old"><span class="chip del">海瑞</span><span class="chip del">司马光</span></td>
+    <td><span class="chip new">李光耀<b>政治家 / 新加坡首任总理</b></span></td>
+  </tr><tr>
+    <td><code>EBCD</code><span class="tname-sm">多面手型</span></td>
+    <td><span class="grp-inline" style="background:#8B95A0">BC 月光银灰组</span></td>
+    <td class="old"><span class="chip del">刘晏</span><span class="chip del">曾国藩</span><span class="chip del">郑观应</span></td>
+    <td><span class="chip new">沈万三<b>元末明初商人</b></span><span class="chip new">胡雪岩<b>晚清商人</b></span></td>
+  </tr><tr>
+    <td><code>EBCJ</code><span class="tname-sm">协调者型</span></td>
+    <td><span class="grp-inline" style="background:#8B95A0">BC 月光银灰组</span></td>
+    <td class="old"><span class="chip del">子产</span><span class="chip del">张居正</span></td>
+    <td><span class="chip new">张仪<b>战国纵横家</b></span><span class="chip new">基辛格<b>美国前国务卿</b></span></td>
+  </tr><tr>
+    <td><code>EBCP</code><span class="tname-sm">自由人型</span></td>
+    <td><span class="grp-inline" style="background:#8B95A0">BC 月光银灰组</span></td>
+    <td class="old"><span class="chip del">安东尼·波登</span><span class="chip del">弗雷德·阿斯泰尔</span></td>
+    <td><span class="chip new">大张伟<b>歌手 / 主持人</b></span></td>
+  </tr><tr>
+    <td><code>EBFJ</code><span class="tname-sm">凝聚者型</span></td>
+    <td><span class="grp-inline" style="background:#B8956A">BF 暖燕麦组</span></td>
+    <td class="old"><span class="chip del">晏阳初</span></td>
+    <td><span class="chip new">白求恩<b>外科医生 / 国际主义战士</b></span></td>
+  </tr><tr>
+    <td><code>EBFP</code><span class="tname-sm">乐天派型</span></td>
+    <td><span class="grp-inline" style="background:#B8956A">BF 暖燕麦组</span></td>
+    <td class="old"><span class="chip del">舒马赫</span></td>
+    <td><span class="chip new">蔡澜<b>作家 / 美食家</b></span></td>
+  </tr><tr>
+    <td><code>EBTD</code><span class="tname-sm">践行者型</span></td>
+    <td><span class="grp-inline" style="background:#4A4A4A">BT 深炭灰组</span></td>
+    <td class="old"><span class="chip del">沃伦·巴菲特</span><span class="chip del">王永庆</span></td>
+    <td><span class="chip new">山姆·沃尔顿<b>沃尔玛创始人</b></span></td>
+  </tr><tr>
+    <td><code>EBTJ</code><span class="tname-sm">推行者型</span></td>
+    <td><span class="grp-inline" style="background:#4A4A4A">BT 深炭灰组</span></td>
+    <td class="old"><span class="chip del">乔治·巴顿</span><span class="chip del">董明珠</span></td>
+    <td><span class="chip new">安迪·格鲁夫<b>英特尔前 CEO</b></span><span class="chip new">贝索斯<b>亚马逊创始人</b></span></td>
+  </tr><tr>
+    <td><code>EBTP</code><span class="tname-sm">机变者型</span></td>
+    <td><span class="grp-inline" style="background:#4A4A4A">BT 深炭灰组</span></td>
+    <td class="old"><span class="chip del">迈克尔·克莱顿</span></td>
+    <td><span class="chip new">黄渤<b>演员 / 导演</b></span></td>
+  </tr><tr>
+    <td><code>ENCJ</code><span class="tname-sm">开拓者型</span></td>
+    <td><span class="grp-inline" style="background:#3D7B8A">NC 靛青组</span></td>
+    <td class="old"><span class="chip del">艾森豪威尔</span></td>
+    <td><span class="chip new">孙正义<b>投资家 / 软银创始人</b></span></td>
+  </tr><tr>
+    <td><code>ENCP</code><span class="tname-sm">先驱者型</span></td>
+    <td><span class="grp-inline" style="background:#3D7B8A">NC 靛青组</span></td>
+    <td class="old"><span class="chip del">尼古拉·特斯拉</span></td>
+    <td><span class="muted">（只做精简，未补人）</span></td>
+  </tr><tr>
+    <td><code>ENFD</code><span class="tname-sm">鼓舞者型</span></td>
+    <td><span class="grp-inline" style="background:#2D8A4E">NF 翠绿组</span></td>
+    <td class="old"><span class="chip del">特蕾莎修女</span></td>
+    <td><span class="chip new">罗翔<b>法学教授</b></span></td>
+  </tr><tr>
+    <td><code>ENFP</code><span class="tname-sm">竞选者型</span></td>
+    <td><span class="grp-inline" style="background:#2D8A4E">NF 翠绿组</span></td>
+    <td class="old"><span class="chip del">宫崎骏</span></td>
+    <td><span class="chip new">周星驰<b>演员 / 导演</b></span></td>
+  </tr><tr>
+    <td><code>ENTJ</code><span class="tname-sm">指挥官型</span></td>
+    <td><span class="grp-inline" style="background:#6B3FA0">NT 深紫组</span></td>
+    <td class="old"><span class="chip del">罗斯福</span></td>
+    <td><span class="chip new">富兰克林·罗斯福<b>美国第 32 任总统</b></span></td>
+  </tr><tr>
+    <td><code>IBCD</code><span class="tname-sm">内省者型</span></td>
+    <td><span class="grp-inline" style="background:#8B95A0">BC 月光银灰组</span></td>
+    <td class="old"><span class="chip del">郑国</span><span class="chip del">召信臣</span></td>
+    <td><span class="chip new">屠呦呦<b>药学家 / 诺贝尔生理学或医学奖得主</b></span></td>
+  </tr><tr>
+    <td><code>IBCJ</code><span class="tname-sm">权衡者型</span></td>
+    <td><span class="grp-inline" style="background:#8B95A0">BC 月光银灰组</span></td>
+    <td class="old"><span class="chip del">慎到</span></td>
+    <td><span class="muted">（只做精简，未补人）</span></td>
+  </tr><tr>
+    <td><code>IBFJ</code><span class="tname-sm">体恤者型</span></td>
+    <td><span class="grp-inline" style="background:#B8956A">BF 暖燕麦组</span></td>
+    <td class="old"><span class="chip del">佩索阿</span></td>
+    <td><span class="chip new">余华<b>作家</b></span></td>
+  </tr><tr>
+    <td><code>IBTD</code><span class="tname-sm">审慎者型</span></td>
+    <td><span class="grp-inline" style="background:#4A4A4A">BT 深炭灰组</span></td>
+    <td class="old"><span class="chip del">商鞅</span><span class="chip del">吴起</span></td>
+    <td><span class="chip new">塔勒布<b>风险管理学者 / 作家</b></span></td>
+  </tr><tr>
+    <td><code>IBTJ</code><span class="tname-sm">规划者型</span></td>
+    <td><span class="grp-inline" style="background:#4A4A4A">BT 深炭灰组</span></td>
+    <td class="old"><span class="chip del">曾国藩</span><span class="chip del">左宗棠</span></td>
+    <td><span class="chip new">查理·芒格<b>投资家 / 伯克希尔副董事长</b></span></td>
+  </tr><tr>
+    <td><code>IBTP</code><span class="tname-sm">钻研者型</span></td>
+    <td><span class="grp-inline" style="background:#4A4A4A">BT 深炭灰组</span></td>
+    <td class="old"><span class="chip del">道尔顿</span><span class="chip del">郦道元</span></td>
+    <td><span class="chip new">袁隆平<b>农学家</b></span><span class="chip new">珍·古道尔<b>灵长类动物学家</b></span></td>
+  </tr><tr>
+    <td><code>INCD</code><span class="tname-sm">洞见者型</span></td>
+    <td><span class="grp-inline" style="background:#3D7B8A">NC 靛青组</span></td>
+    <td class="old"><span class="chip del">徐光启</span></td>
+    <td><span class="chip new">居里夫人<b>物理学家 / 化学家</b></span></td>
+  </tr><tr>
+    <td><code>INFJ</code><span class="tname-sm">提倡者型</span></td>
+    <td><span class="grp-inline" style="background:#2D8A4E">NF 翠绿组</span></td>
+    <td class="old"><span class="chip del">特蕾莎修女</span></td>
+    <td><span class="chip new">杜甫<b>唐代诗人</b></span></td>
+  </tr><tr>
+    <td><code>INFP</code><span class="tname-sm">调停者型</span></td>
+    <td><span class="grp-inline" style="background:#2D8A4E">NF 翠绿组</span></td>
+    <td class="old"><span class="chip del">梵高</span></td>
+    <td><span class="chip new">圣埃克苏佩里<b>法国作家 / 飞行员</b></span></td>
+  </tr><tr>
+    <td><code>INTD</code><span class="tname-sm">蓝图家型</span></td>
+    <td><span class="grp-inline" style="background:#6B3FA0">NT 深紫组</span></td>
+    <td class="old"><span class="chip del">孙武</span></td>
+    <td><span class="chip new">海德格尔<b>哲学家</b></span></td>
+  </tr><tr>
+    <td><code>INTP</code><span class="tname-sm">逻辑学家型</span></td>
+    <td><span class="grp-inline" style="background:#6B3FA0">NT 深紫组</span></td>
+    <td class="old"><span class="chip del">达尔文</span><span class="chip del">亚当·斯密</span></td>
+    <td><span class="chip new">尼古拉·特斯拉<b>发明家 / 电气工程师</b></span><span class="chip new">老子<b>道家思想家</b></span></td>
+  </tr><tr>
+    <td><code>ISCD</code><span class="tname-sm">精工者型</span></td>
+    <td><span class="grp-inline" style="background:#D4782F">SD 琥珀组</span></td>
+    <td class="old"><span class="chip del">贾思勰</span><span class="chip del">李诫</span></td>
+    <td><span class="chip new">祖冲之<b>数学家 / 天文学家</b></span><span class="chip new">詹天佑<b>铁路工程师</b></span></td>
+  </tr><tr>
+    <td><code>ISCJ</code><span class="tname-sm">慎行者型</span></td>
+    <td><span class="grp-inline" style="background:#2C5F8A">SJ 藏蓝组</span></td>
+    <td class="old"><span class="chip del">刘知几</span></td>
+    <td><span class="chip new">陈寅恪<b>历史学家</b></span></td>
+  </tr><tr>
+    <td><code>ISCP</code><span class="tname-sm">巧手型</span></td>
+    <td><span class="grp-inline" style="background:#C8963E">SP 暖金组</span></td>
+    <td class="old"><span class="chip del">李春</span><span class="chip del">马钧</span></td>
+    <td><span class="chip new">贝聿铭<b>建筑师</b></span></td>
+  </tr><tr>
+    <td><code>ISFJ</code><span class="tname-sm">守卫者型</span></td>
+    <td><span class="grp-inline" style="background:#2C5F8A">SJ 藏蓝组</span></td>
+    <td class="old"><span class="chip del">孟母</span><span class="chip del">岳母</span></td>
+    <td><span class="chip new">林巧稚<b>妇产科医学家</b></span></td>
+  </tr><tr>
+    <td><code>ISFP</code><span class="tname-sm">探险家型</span></td>
+    <td><span class="grp-inline" style="background:#C8963E">SP 暖金组</span></td>
+    <td class="old"><span class="chip del">李白</span></td>
+    <td><span class="chip new">王菲<b>歌手</b></span></td>
+  </tr><tr>
+    <td><code>ISTJ</code><span class="tname-sm">物流师型</span></td>
+    <td><span class="grp-inline" style="background:#2C5F8A">SJ 藏蓝组</span></td>
+    <td class="old"><span class="chip del">乔治·华盛顿</span><span class="chip del">诸葛亮</span></td>
+    <td><span class="chip new">默克尔<b>德国前总理</b></span></td>
+  </tr><tr>
+    <td><code>ISTP</code><span class="tname-sm">鉴赏家型</span></td>
+    <td><span class="grp-inline" style="background:#C8963E">SP 暖金组</span></td>
+    <td class="old"><span class="chip del">乔布斯</span></td>
+    <td><span class="chip new">詹姆斯·戴森<b>发明家 / 戴森创始人</b></span></td>
+  </tr></tbody>
+    </table>
+    
+  </div>
+
+  <div class="panel">
+    <h3>进出人员全名单 <em>新进入 51 人 / 移出 43 人（移出者多数只是换了写法，人还在该型里）</em></h3>
+    <div class="lv-row" style="border-top:none;padding-top:0">
+      <div class="k" style="color:var(--new)">新进入</div>
+      <div class="v"><div class="chips"><span class="chip new" title="美国第 32 任总统">富兰克林·罗斯福</span><span class="chip new" title="投资家 / 软银创始人">孙正义</span><span class="chip new" title="英特尔前 CEO">安迪·格鲁夫</span><span class="chip new" title="亚马逊创始人">贝索斯</span><span class="chip new" title="沃尔玛创始人">山姆·沃尔顿</span><span class="chip new" title="演员 / 导演">黄渤</span><span class="chip new" title="数学家 / 控制论创始人">诺伯特·维纳</span><span class="chip new" title="演化生物学家">道金斯</span><span class="chip new" title="理论物理学家 / 诺贝尔物理学奖得主">杨振宁</span><span class="chip new" title="哲学家">弗朗西斯·培根</span><span class="chip new" title="政治思想家">马基雅维利</span><span class="chip new" title="经济学家">吴敬琏</span><span class="chip new" title="哲学家">海德格尔</span><span class="chip new" title="道家思想家">老子</span><span class="chip new" title="物理学家 / 化学家">居里夫人</span><span class="chip new" title="投资家 / 伯克希尔副董事长">查理·芒格</span><span class="chip new" title="风险管理学者 / 作家">塔勒布</span><span class="chip new" title="农学家">袁隆平</span><span class="chip new" title="灵长类动物学家">珍·古道尔</span><span class="chip new" title="法学教授">罗翔</span><span class="chip new" title="演员 / 导演">周星驰</span><span class="chip new" title="外科医生 / 国际主义战士">白求恩</span><span class="chip new" title="作家 / 美食家">蔡澜</span><span class="chip new" title="主持人 / 媒体人">杨澜</span><span class="chip new" title="作家">史铁生</span><span class="chip new" title="作家 / 学者">林语堂</span><span class="chip new" title="唐代诗人">杜甫</span><span class="chip new" title="法国作家 / 飞行员">圣埃克苏佩里</span><span class="chip new" title="作家">余华</span><span class="chip new" title="战国纵横家">张仪</span><span class="chip new" title="美国前国务卿">基辛格</span><span class="chip new" title="元末明初商人">沈万三</span><span class="chip new" title="晚清商人">胡雪岩</span><span class="chip new" title="政治家 / 新加坡首任总理">李光耀</span><span class="chip new" title="西汉使节">苏武</span><span class="chip new" title="呼吸病学专家">钟南山</span><span class="chip new" title="晚清重臣">李鸿章</span><span class="chip new" title="德意志帝国首任宰相">俾斯麦</span><span class="chip new" title="哲学家 / 博物学家">亚里士多德</span><span class="chip new" title="作家 / 思想家">歌德</span><span class="chip new" title="实业家 / 教育家">张謇</span><span class="chip new" title="德国前总理">默克尔</span><span class="chip new" title="历史学家">陈寅恪</span><span class="chip new" title="数学家 / 天文学家">祖冲之</span><span class="chip new" title="铁路工程师">詹天佑</span><span class="chip new" title="妇产科医学家">林巧稚</span><span class="chip new" title="药学家 / 诺贝尔生理学或医学奖得主">屠呦呦</span><span class="chip new" title="歌手 / 主持人">大张伟</span><span class="chip new" title="发明家 / 戴森创始人">詹姆斯·戴森</span><span class="chip new" title="建筑师">贝聿铭</span><span class="chip new" title="歌手">王菲</span></div></div>
+    </div>
+    <div class="lv-row">
+      <div class="k">移出</div>
+      <div class="v"><div class="chips"><span class="chip del" title="不再出现在任何型">罗斯福</span><span class="chip del" title="不再出现在任何型">乔治·巴顿</span><span class="chip del" title="不再出现在任何型">沃伦·巴菲特</span><span class="chip del" title="不再出现在任何型">王永庆</span><span class="chip del" title="不再出现在任何型">迈克尔·克莱顿</span><span class="chip del" title="不再出现在任何型">德鲁克</span><span class="chip del" title="不再出现在任何型">郭守敬</span><span class="chip del" title="不再出现在任何型">姚期智</span><span class="chip del" title="不再出现在任何型">韩非子</span><span class="chip del" title="不再出现在任何型">桑弘羊</span><span class="chip del" title="不再出现在任何型">孙武</span><span class="chip del" title="不再出现在任何型">道尔顿</span><span class="chip del" title="不再出现在任何型">郦道元</span><span class="chip del" title="不再出现在任何型">晏阳初</span><span class="chip del" title="不再出现在任何型">舒马赫</span><span class="chip del" title="不再出现在任何型">梁漱溟</span><span class="chip del" title="不再出现在任何型">米哈伊·契克森米哈伊</span><span class="chip del" title="不再出现在任何型">佩索阿</span><span class="chip del" title="不再出现在任何型">子产</span><span class="chip del" title="不再出现在任何型">刘晏</span><span class="chip del" title="不再出现在任何型">郑观应</span><span class="chip del" title="不再出现在任何型">李纲</span><span class="chip del" title="不再出现在任何型">况钟</span><span class="chip del" title="不再出现在任何型">徐有功</span><span class="chip del" title="不再出现在任何型">申不害</span><span class="chip del" title="不再出现在任何型">田穰苴</span><span class="chip del" title="不再出现在任何型">赵充国</span><span class="chip del" title="不再出现在任何型">冯道</span><span class="chip del" title="不再出现在任何型">李沆</span><span class="chip del" title="不再出现在任何型">吕端</span><span class="chip del" title="不再出现在任何型">刘知几</span><span class="chip del" title="不再出现在任何型">贾思勰</span><span class="chip del" title="不再出现在任何型">李诫</span><span class="chip del" title="不再出现在任何型">孟母</span><span class="chip del" title="不再出现在任何型">岳母</span><span class="chip del" title="不再出现在任何型">慎到</span><span class="chip del" title="不再出现在任何型">郑国</span><span class="chip del" title="不再出现在任何型">召信臣</span><span class="chip del" title="不再出现在任何型">安东尼·波登</span><span class="chip del" title="不再出现在任何型">弗雷德·阿斯泰尔</span><span class="chip del" title="不再出现在任何型">卡地亚</span><span class="chip del" title="不再出现在任何型">李春</span><span class="chip del" title="不再出现在任何型">马钧</span></div></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h3>怎么审 <em>这次要你判断的只有一件事：这 81 组人，认不认得出、说不说得通</em></h3>
+    <p class="story">① 点右上「只看本轮改过的」，只看 46 张改过的卡，重点看绿标「新」与卡底灰掉的改前名单。
+    ② 每张卡自问三句：主人物一眼能认出吗？其余三位有凑数的吗？这四个人放在这个坐标上说得通吗？
+    ③ 逐张点「通过 / 需改 / 存疑」并写一句意见，点「导出审核结果」把 JSON 发我，我按你的标记再改一轮。</p>
+  </div>
+
+  <div id="sections"><section class="group" data-group="SP">
+    <h2><span class="swatch" style="background:#C8963E"></span>SP 暖金组
+      <em>实感 · 感知 P · 9 型 · 本轮改 4</em></h2>
+    <div class="grid">
+<article class="card" data-code="ASCP" data-group="SP" data-changed="1" data-issues="0" data-search="ASCP 技艺者型 米开朗基罗 罗丹 王羲之 米开朗基罗 罗丹 卡地亚 王羲之 米开朗基罗">
+  <header>
+    <div class="code" style="color:#C8963E">ASCP</div>
+    <div class="tname">技艺者型</div>
+    <div class="flag">本轮已改</div>
+    <div class="grp" style="background:#C8963E">SP 暖金组</div>
+  </header>
+  <div class="dims"><span class="dim d0">A<i>平衡</i></span><span class="dim d1">S<i>实感</i></span><span class="dim d2">C<i>复合</i></span><span class="dim d3">P<i>感知</i></span></div>
+  <div class="main">
+    <div class="lab">主人物 / 结果页展示</div>
+    <div class="pname">米开朗基罗<span>雕塑家 / 画家 / 建筑师</span></div>
+    <p class="story">雕刻《大卫》、绘制西斯廷天顶画。他相信形象本来就在石头里，创作者只是去掉多余的部分——这是典型的“用手思考”。</p>
+  </div>
+  <div class="others">
+    <div class="lab">其余代表人物 <b>2</b></div>
+    <div class="chips"><span class="chip" title="法国雕塑家">罗丹</span><span class="chip" title="东晋书法家">王羲之</span></div>
+  </div>
+  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">米开朗基罗</span><span class="chip del">罗丹</span><span class="chip del">卡地亚</span><span class="chip del">王羲之</span></div></div>
+  
+  <div class="review">
+    <div class="opts">
+      <label><input type="radio" name="r-ASCP" value="pass">通过</label>
+      <label><input type="radio" name="r-ASCP" value="fix">需改</label>
+      <label><input type="radio" name="r-ASCP" value="hold">存疑</label>
+    </div>
+    <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
+  </div>
+</article>
+<article class="card" data-code="ASFP" data-group="SP" data-changed="0" data-issues="0" data-search="ASFP 生活家型 奥黛丽·赫本 张国荣 周润发 山口百惠  奥黛丽·赫本">
+  <header>
+    <div class="code" style="color:#C8963E">ASFP</div>
+    <div class="tname">生活家型</div>
+    
+    <div class="grp" style="background:#C8963E">SP 暖金组</div>
+  </header>
+  <div class="dims"><span class="dim d0">A<i>平衡</i></span><span class="dim d1">S<i>实感</i></span><span class="dim d2">F<i>情感</i></span><span class="dim d3">P<i>感知</i></span></div>
+  <div class="main">
+    <div class="lab">主人物 / 结果页展示</div>
+    <div class="pname">奥黛丽·赫本<span>演员 / 人道主义者</span></div>
+    <p class="story">《罗马假日》让她成为银幕经典，晚年投入联合国儿童基金会。她的优雅不是装饰，而是一种把注意力放在别人身上的能力。</p>
+  </div>
+  <div class="others">
+    <div class="lab">其余代表人物 <b>3</b></div>
+    <div class="chips"><span class="chip" title="中国香港演员 / 歌手">张国荣</span><span class="chip" title="中国香港演员">周润发</span><span class="chip" title="日本演员 / 歌手">山口百惠</span></div>
+  </div>
+  
+  
+  <div class="review">
+    <div class="opts">
+      <label><input type="radio" name="r-ASFP" value="pass">通过</label>
+      <label><input type="radio" name="r-ASFP" value="fix">需改</label>
+      <label><input type="radio" name="r-ASFP" value="hold">存疑</label>
+    </div>
+    <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
+  </div>
+</article>
+<article class="card" data-code="ASTP" data-group="SP" data-changed="0" data-issues="0" data-search="ASTP 匠人型 鲁班 黄道婆 毕昇 张衡  鲁班">
+  <header>
+    <div class="code" style="color:#C8963E">ASTP</div>
+    <div class="tname">匠人型</div>
+    
+    <div class="grp" style="background:#C8963E">SP 暖金组</div>
+  </header>
+  <div class="dims"><span class="dim d0">A<i>平衡</i></span><span class="dim d1">S<i>实感</i></span><span class="dim d2">T<i>思考</i></span><span class="dim d3">P<i>感知</i></span></div>
+  <div class="main">
+    <div class="lab">主人物 / 结果页展示</div>
+    <div class="pname">鲁班<span>工匠 / 发明家</span></div>
+    <p class="story">中国古代工匠的象征，传说发明锯、刨等工具。他的名字后来成为“巧匠”的代称，代表用双手解决具体问题的智慧。</p>
+  </div>
+  <div class="others">
+    <div class="lab">其余代表人物 <b>3</b></div>
+    <div class="chips"><span class="chip" title="元代棉纺织技术革新者">黄道婆</span><span class="chip" title="北宋活字印刷发明者">毕昇</span><span class="chip" title="东汉科学家 / 文学家">张衡</span></div>
+  </div>
+  
+  
+  <div class="review">
+    <div class="opts">
+      <label><input type="radio" name="r-ASTP" value="pass">通过</label>
+      <label><input type="radio" name="r-ASTP" value="fix">需改</label>
+      <label><input type="radio" name="r-ASTP" value="hold">存疑</label>
+    </div>
+    <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
+  </div>
+</article>
+<article class="card" data-code="ESCP" data-group="SP" data-changed="0" data-issues="0" data-search="ESCP 行动派型 汤姆·克鲁斯 甄子丹 杰森·斯坦森 吴京  汤姆·克鲁斯">
+  <header>
+    <div class="code" style="color:#C8963E">ESCP</div>
+    <div class="tname">行动派型</div>
+    
+    <div class="grp" style="background:#C8963E">SP 暖金组</div>
+  </header>
+  <div class="dims"><span class="dim d0">E<i>外向</i></span><span class="dim d1">S<i>实感</i></span><span class="dim d2">C<i>复合</i></span><span class="dim d3">P<i>感知</i></span></div>
+  <div class="main">
+    <div class="lab">主人物 / 结果页展示</div>
+    <div class="pname">汤姆·克鲁斯<span>演员 / 制片人</span></div>
+    <p class="story">好莱坞动作明星，以亲自完成高风险特技著称。他对动作场面的控制近乎偏执，把“现场感”变成了自己的职业标识。</p>
+  </div>
+  <div class="others">
+    <div class="lab">其余代表人物 <b>3</b></div>
+    <div class="chips"><span class="chip" title="中国香港演员 / 动作导演">甄子丹</span><span class="chip" title="英国演员">杰森·斯坦森</span><span class="chip" title="演员 / 导演">吴京</span></div>
+  </div>
+  
+  
+  <div class="review">
+    <div class="opts">
+      <label><input type="radio" name="r-ESCP" value="pass">通过</label>
+      <label><input type="radio" name="r-ESCP" value="fix">需改</label>
+      <label><input type="radio" name="r-ESCP" value="hold">存疑</label>
+    </div>
+    <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
+  </div>
+</article>
+<article class="card" data-code="ESFP" data-group="SP" data-changed="0" data-issues="0" data-search="ESFP 表演者型 玛丽莲·梦露 埃尔顿·约翰 邓丽君 碧梨  玛丽莲·梦露">
+  <header>
+    <div class="code" style="color:#C8963E">ESFP</div>
+    <div class="tname">表演者型</div>
+    
+    <div class="grp" style="background:#C8963E">SP 暖金组</div>
+  </header>
+  <div class="dims"><span class="dim d0">E<i>外向</i></span><span class="dim d1">S<i>实感</i></span><span class="dim d2">F<i>情感</i></span><span class="dim d3">P<i>感知</i></span></div>
+  <div class="main">
+    <div class="lab">主人物 / 结果页展示</div>
+    <div class="pname">玛丽莲·梦露<span>演员 / 流行文化偶像</span></div>
+    <p class="story">以脆弱与性感并存的银幕形象成为流行文化符号。她的表演天赋和私人生活长期被凝视，笑容背后是并不轻松的一生。</p>
+  </div>
+  <div class="others">
+    <div class="lab">其余代表人物 <b>3</b></div>
+    <div class="chips"><span class="chip" title="歌手 / 作曲家">埃尔顿·约翰</span><span class="chip" title="中国台湾歌手">邓丽君</span><span class="chip" title="美国歌手 / 词曲作者">碧梨</span></div>
+  </div>
+  
+  
+  <div class="review">
+    <div class="opts">
+      <label><input type="radio" name="r-ESFP" value="pass">通过</label>
+      <label><input type="radio" name="r-ESFP" value="fix">需改</label>
+      <label><input type="radio" name="r-ESFP" value="hold">存疑</label>
+    </div>
+    <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
+  </div>
+</article>
+<article class="card" data-code="ESTP" data-group="SP" data-changed="0" data-issues="0" data-search="ESTP 企业家型 迈克尔·乔丹 李小龙 成龙 埃尔文·约翰逊  迈克尔·乔丹">
+  <header>
+    <div class="code" style="color:#C8963E">ESTP</div>
+    <div class="tname">企业家型</div>
+    
+    <div class="grp" style="background:#C8963E">SP 暖金组</div>
+  </header>
+  <div class="dims"><span class="dim d0">E<i>外向</i></span><span class="dim d1">S<i>实感</i></span><span class="dim d2">T<i>思考</i></span><span class="dim d3">P<i>感知</i></span></div>
+  <div class="main">
+    <div class="lab">主人物 / 结果页展示</div>
+    <div class="pname">迈克尔·乔丹<span>篮球运动员</span></div>
+    <p class="story">六次 NBA 总冠军，以关键时刻的竞争心著称。他把身体天赋、临场判断和反复训练结合到极致，也把“输球后的第二天”变成训练日。</p>
+  </div>
+  <div class="others">
+    <div class="lab">其余代表人物 <b>3</b></div>
+    <div class="chips"><span class="chip" title="武术家 / 演员">李小龙</span><span class="chip" title="中国香港演员 / 动作导演">成龙</span><span class="chip" title="篮球运动员">埃尔文·约翰逊</span></div>
+  </div>
+  
+  
+  <div class="review">
+    <div class="opts">
+      <label><input type="radio" name="r-ESTP" value="pass">通过</label>
+      <label><input type="radio" name="r-ESTP" value="fix">需改</label>
+      <label><input type="radio" name="r-ESTP" value="hold">存疑</label>
+    </div>
+    <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
+  </div>
+</article>
+<article class="card" data-code="ISCP" data-group="SP" data-changed="1" data-issues="0" data-search="ISCP 巧手型 蔡伦 贝聿铭 沈寿 蔡伦 李春 沈寿 马钧 蔡伦">
+  <header>
+    <div class="code" style="color:#C8963E">ISCP</div>
+    <div class="tname">巧手型</div>
+    <div class="flag">本轮已改</div>
+    <div class="grp" style="background:#C8963E">SP 暖金组</div>
+  </header>
+  <div class="dims"><span class="dim d0">I<i>内向</i></span><span class="dim d1">S<i>实感</i></span><span class="dim d2">C<i>复合</i></span><span class="dim d3">P<i>感知</i></span></div>
+  <div class="main">
+    <div class="lab">主人物 / 结果页展示</div>
+    <div class="pname">蔡伦<span>造纸术改良者</span></div>
+    <p class="story">改进造纸术，让纸张逐渐取代竹简和缣帛。他的发明降低了知识传播的成本，也让更多人有机会读书。</p>
+  </div>
+  <div class="others">
+    <div class="lab">其余代表人物 <b>2</b></div>
+    <div class="chips"><span class="chip new" title="建筑师">贝聿铭<b>新</b></span><span class="chip" title="清末刺绣艺术家">沈寿</span></div>
+  </div>
+  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">蔡伦</span><span class="chip del">李春</span><span class="chip del">沈寿</span><span class="chip del">马钧</span></div></div>
+  
+  <div class="review">
+    <div class="opts">
+      <label><input type="radio" name="r-ISCP" value="pass">通过</label>
+      <label><input type="radio" name="r-ISCP" value="fix">需改</label>
+      <label><input type="radio" name="r-ISCP" value="hold">存疑</label>
+    </div>
+    <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
+  </div>
+</article>
+<article class="card" data-code="ISFP" data-group="SP" data-changed="1" data-issues="0" data-search="ISFP 探险家型 梵高 王菲 齐白石 张大千 梵高 李白 齐白石 张大千 梵高">
+  <header>
+    <div class="code" style="color:#C8963E">ISFP</div>
+    <div class="tname">探险家型</div>
+    <div class="flag">本轮已改</div>
+    <div class="grp" style="background:#C8963E">SP 暖金组</div>
+  </header>
+  <div class="dims"><span class="dim d0">I<i>内向</i></span><span class="dim d1">S<i>实感</i></span><span class="dim d2">F<i>情感</i></span><span class="dim d3">P<i>感知</i></span></div>
+  <div class="main">
+    <div class="lab">主人物 / 结果页展示</div>
+    <div class="pname">梵高<span>画家</span></div>
+    <p class="story">二十七岁才开始画画，十年间留下两千多幅作品。生前只卖出少量画作，死后却成为现代艺术最被热爱的名字之一。</p>
+  </div>
+  <div class="others">
+    <div class="lab">其余代表人物 <b>3</b></div>
+    <div class="chips"><span class="chip new" title="歌手">王菲<b>新</b></span><span class="chip" title="画家">齐白石</span><span class="chip" title="画家">张大千</span></div>
+  </div>
+  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">梵高</span><span class="chip del">李白</span><span class="chip del">齐白石</span><span class="chip del">张大千</span></div></div>
+  
+  <div class="review">
+    <div class="opts">
+      <label><input type="radio" name="r-ISFP" value="pass">通过</label>
+      <label><input type="radio" name="r-ISFP" value="fix">需改</label>
+      <label><input type="radio" name="r-ISFP" value="hold">存疑</label>
+    </div>
+    <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
+  </div>
+</article>
+<article class="card" data-code="ISTP" data-group="SP" data-changed="1" data-issues="0" data-search="ISTP 鉴赏家型 安藤忠雄 詹姆斯·戴森 原研哉 乔纳森·艾维 安藤忠雄 乔布斯 原研哉 乔纳森·艾维 安藤忠雄">
+  <header>
+    <div class="code" style="color:#C8963E">ISTP</div>
+    <div class="tname">鉴赏家型</div>
+    <div class="flag">本轮已改</div>
+    <div class="grp" style="background:#C8963E">SP 暖金组</div>
+  </header>
+  <div class="dims"><span class="dim d0">I<i>内向</i></span><span class="dim d1">S<i>实感</i></span><span class="dim d2">T<i>思考</i></span><span class="dim d3">P<i>感知</i></span></div>
+  <div class="main">
+    <div class="lab">主人物 / 结果页展示</div>
+    <div class="pname">安藤忠雄<span>建筑师</span></div>
+    <p class="story">没有建筑科班背景，靠拳击、旅行和自学进入建筑。他用清水混凝土、光和几何体做教堂与美术馆，靠现场感和材料直觉工作。</p>
+  </div>
+  <div class="others">
+    <div class="lab">其余代表人物 <b>3</b></div>
+    <div class="chips"><span class="chip new" title="发明家 / 戴森创始人">詹姆斯·戴森<b>新</b></span><span class="chip" title="平面设计师">原研哉</span><span class="chip" title="工业设计师 / 苹果前设计主管">乔纳森·艾维</span></div>
+  </div>
+  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">安藤忠雄</span><span class="chip del">乔布斯</span><span class="chip del">原研哉</span><span class="chip del">乔纳森·艾维</span></div></div>
+  
+  <div class="review">
+    <div class="opts">
+      <label><input type="radio" name="r-ISTP" value="pass">通过</label>
+      <label><input type="radio" name="r-ISTP" value="fix">需改</label>
+      <label><input type="radio" name="r-ISTP" value="hold">存疑</label>
+    </div>
+    <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
+  </div>
+</article></div>
+  </section>
+<section class="group" data-group="SD">
+    <h2><span class="swatch" style="background:#D4782F"></span>SD 琥珀组
+      <em>实感 · 动态 D · 9 型 · 本轮改 3</em></h2>
+    <div class="grid">
+<article class="card" data-code="ASCD" data-group="SD" data-changed="1" data-issues="0" data-search="ASCD 稳健者型 于谦 文天祥 史可法 苏武 于谦 文天祥 史可法 李纲 于谦">
+  <header>
+    <div class="code" style="color:#D4782F">ASCD</div>
+    <div class="tname">稳健者型</div>
+    <div class="flag">本轮已改</div>
+    <div class="grp" style="background:#D4782F">SD 琥珀组</div>
+  </header>
+  <div class="dims"><span class="dim d0">A<i>平衡</i></span><span class="dim d1">S<i>实感</i></span><span class="dim d2">C<i>复合</i></span><span class="dim d3">D<i>动态</i></span></div>
+  <div class="main">
+    <div class="lab">主人物 / 结果页展示</div>
+    <div class="pname">于谦<span>明朝大臣</span></div>
+    <p class="story">土木堡之变后力主守北京，组织北京保卫战，避免明朝在危机中崩盘。他的结局也说明：刚直与权力场之间，往往没有安全距离。</p>
+  </div>
+  <div class="others">
+    <div class="lab">其余代表人物 <b>3</b></div>
+    <div class="chips"><span class="chip" title="南宋名臣 / 诗人">文天祥</span><span class="chip" title="明末抗清名臣">史可法</span><span class="chip new" title="西汉使节">苏武<b>新</b></span></div>
+  </div>
+  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">于谦</span><span class="chip del">文天祥</span><span class="chip del">史可法</span><span class="chip del">李纲</span></div></div>
+  
+  <div class="review">
+    <div class="opts">
+      <label><input type="radio" name="r-ASCD" value="pass">通过</label>
+      <label><input type="radio" name="r-ASCD" value="fix">需改</label>
+      <label><input type="radio" name="r-ASCD" value="hold">存疑</label>
+    </div>
+    <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
+  </div>
+</article>
+<article class="card" data-code="ASFD" data-group="SD" data-changed="1" data-issues="0" data-search="ASFD 援助者型 宋慈 钟南山 海瑞 宋慈 况钟 海瑞 徐有功 宋慈">
+  <header>
+    <div class="code" style="color:#D4782F">ASFD</div>
+    <div class="tname">援助者型</div>
+    <div class="flag">本轮已改</div>
+    <div class="grp" style="background:#D4782F">SD 琥珀组</div>
+  </header>
+  <div class="dims"><span class="dim d0">A<i>平衡</i></span><span class="dim d1">S<i>实感</i></span><span class="dim d2">F<i>情感</i></span><span class="dim d3">D<i>动态</i></span></div>
+  <div class="main">
+    <div class="lab">主人物 / 结果页展示</div>
+    <div class="pname">宋慈<span>南宋法医学家</span></div>
+    <p class="story">著《洗冤集录》，用现场检验和证据链纠正冤案。他把“替死者说话”变成一套可以传授的技术，而不是只靠个人直觉。</p>
+  </div>
+  <div class="others">
+    <div class="lab">其余代表人物 <b>2</b></div>
+    <div class="chips"><span class="chip new" title="呼吸病学专家">钟南山<b>新</b></span><span class="chip" title="明代名臣">海瑞</span></div>
+  </div>
+  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">宋慈</span><span class="chip del">况钟</span><span class="chip del">海瑞</span><span class="chip del">徐有功</span></div></div>
+  
+  <div class="review">
+    <div class="opts">
+      <label><input type="radio" name="r-ASFD" value="pass">通过</label>
+      <label><input type="radio" name="r-ASFD" value="fix">需改</label>
+      <label><input type="radio" name="r-ASFD" value="hold">存疑</label>
+    </div>
+    <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
+  </div>
+</article>
+<article class="card" data-code="ASTD" data-group="SD" data-changed="0" data-issues="0" data-search="ASTD 常务者型 王安石 张居正 范仲淹 魏征  王安石">
+  <header>
+    <div class="code" style="color:#D4782F">ASTD</div>
+    <div class="tname">常务者型</div>
+    
+    <div class="grp" style="background:#D4782F">SD 琥珀组</div>
+  </header>
+  <div class="dims"><span class="dim d0">A<i>平衡</i></span><span class="dim d1">S<i>实感</i></span><span class="dim d2">T<i>思考</i></span><span class="dim d3">D<i>动态</i></span></div>
+  <div class="main">
+    <div class="lab">主人物 / 结果页展示</div>
+    <div class="pname">王安石<span>北宋政治家 / 文学家</span></div>
+    <p class="story">北宋变法者，青苗法、免役法试图用制度解决财政与民生。改革触怒既得利益，也留下长期争议；他不是不知道阻力，而是选择先动手。</p>
+  </div>
+  <div class="others">
+    <div class="lab">其余代表人物 <b>3</b></div>
+    <div class="chips"><span class="chip" title="明代内阁首辅">张居正</span><span class="chip" title="北宋政治家 / 文学家">范仲淹</span><span class="chip" title="唐初谏臣">魏征</span></div>
+  </div>
+  
+  
+  <div class="review">
+    <div class="opts">
+      <label><input type="radio" name="r-ASTD" value="pass">通过</label>
+      <label><input type="radio" name="r-ASTD" value="fix">需改</label>
+      <label><input type="radio" name="r-ASTD" value="hold">存疑</label>
+    </div>
+    <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
+  </div>
+</article>
+<article class="card" data-code="ESCD" data-group="SD" data-changed="0" data-issues="0" data-search="ESCD 实干家型 道格拉斯·麦克阿瑟 戚继光 年羹尧 郭子仪  道格拉斯·麦克阿瑟">
+  <header>
+    <div class="code" style="color:#D4782F">ESCD</div>
+    <div class="tname">实干家型</div>
+    
+    <div class="grp" style="background:#D4782F">SD 琥珀组</div>
+  </header>
+  <div class="dims"><span class="dim d0">E<i>外向</i></span><span class="dim d1">S<i>实感</i></span><span class="dim d2">C<i>复合</i></span><span class="dim d3">D<i>动态</i></span></div>
+  <div class="main">
+    <div class="lab">主人物 / 结果页展示</div>
+    <div class="pname">道格拉斯·麦克阿瑟<span>五星上将</span></div>
+    <p class="story">太平洋战场的名将，仁川登陆是其军事生涯的高光。他的自我戏剧化和对权力的坚持，也最终导致与杜鲁门的冲突。</p>
+  </div>
+  <div class="others">
+    <div class="lab">其余代表人物 <b>3</b></div>
+    <div class="chips"><span class="chip" title="明代抗倭名将">戚继光</span><span class="chip" title="清代将领">年羹尧</span><span class="chip" title="唐代名将">郭子仪</span></div>
+  </div>
+  
+  
+  <div class="review">
+    <div class="opts">
+      <label><input type="radio" name="r-ESCD" value="pass">通过</label>
+      <label><input type="radio" name="r-ESCD" value="fix">需改</label>
+      <label><input type="radio" name="r-ESCD" value="hold">存疑</label>
+    </div>
+    <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
+  </div>
+</article>
+<article class="card" data-code="ESFD" data-group="SD" data-changed="0" data-issues="0" data-search="ESFD 呵护者型 刘备 宋江 信陵君 孟尝君  刘备">
+  <header>
+    <div class="code" style="color:#D4782F">ESFD</div>
+    <div class="tname">呵护者型</div>
+    
+    <div class="grp" style="background:#D4782F">SD 琥珀组</div>
+  </header>
+  <div class="dims"><span class="dim d0">E<i>外向</i></span><span class="dim d1">S<i>实感</i></span><span class="dim d2">F<i>情感</i></span><span class="dim d3">D<i>动态</i></span></div>
+  <div class="main">
+    <div class="lab">主人物 / 结果页展示</div>
+    <div class="pname">刘备<span>蜀汉开国皇帝</span></div>
+    <p class="story">从织席贩履到三分天下，靠“仁义”的叙事聚拢关羽、张飞、诸葛亮。他的成功不是单点能力，而是关系、耐心和让人愿意跟随的复利。</p>
+  </div>
+  <div class="others">
+    <div class="lab">其余代表人物 <b>3</b></div>
+    <div class="chips"><span class="chip" title="《水浒传》人物">宋江</span><span class="chip" title="战国四公子之一">信陵君</span><span class="chip" title="战国四公子之一">孟尝君</span></div>
+  </div>
+  
+  
+  <div class="review">
+    <div class="opts">
+      <label><input type="radio" name="r-ESFD" value="pass">通过</label>
+      <label><input type="radio" name="r-ESFD" value="fix">需改</label>
+      <label><input type="radio" name="r-ESFD" value="hold">存疑</label>
+    </div>
+    <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
+  </div>
+</article>
+<article class="card" data-code="ESTD" data-group="SD" data-changed="0" data-issues="0" data-search="ESTD 操盘手型 哈里·杜鲁门 巴顿 林则徐 左宗棠  哈里·杜鲁门">
+  <header>
+    <div class="code" style="color:#D4782F">ESTD</div>
+    <div class="tname">操盘手型</div>
+    
+    <div class="grp" style="background:#D4782F">SD 琥珀组</div>
+  </header>
+  <div class="dims"><span class="dim d0">E<i>外向</i></span><span class="dim d1">S<i>实感</i></span><span class="dim d2">T<i>思考</i></span><span class="dim d3">D<i>动态</i></span></div>
+  <div class="main">
+    <div class="lab">主人物 / 结果页展示</div>
+    <div class="pname">哈里·杜鲁门<span>美国前总统</span></div>
+    <p class="story">接任罗斯福时几乎没人看好，后来却在原子弹、马歇尔计划和朝鲜战争等重大决定上留下强硬印记。他桌上那句“责任止于此”，是典型的执行者信条。</p>
+  </div>
+  <div class="others">
+    <div class="lab">其余代表人物 <b>3</b></div>
+    <div class="chips"><span class="chip" title="美国陆军将领">巴顿</span><span class="chip" title="清代禁烟名臣">林则徐</span><span class="chip" title="晚清名臣">左宗棠</span></div>
+  </div>
+  
+  
+  <div class="review">
+    <div class="opts">
+      <label><input type="radio" name="r-ESTD" value="pass">通过</label>
+      <label><input type="radio" name="r-ESTD" value="fix">需改</label>
+      <label><input type="radio" name="r-ESTD" value="hold">存疑</label>
+    </div>
+    <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
+  </div>
+</article>
+<article class="card" data-code="ISCD" data-group="SD" data-changed="1" data-issues="0" data-search="ISCD 精工者型 祖冲之 宋应星 詹天佑 徐光启 贾思勰 宋应星 李诫 徐光启 宋应星">
+  <header>
+    <div class="code" style="color:#D4782F">ISCD</div>
+    <div class="tname">精工者型</div>
+    <div class="flag">本轮已改</div>
+    <div class="grp" style="background:#D4782F">SD 琥珀组</div>
+  </header>
+  <div class="dims"><span class="dim d0">I<i>内向</i></span><span class="dim d1">S<i>实感</i></span><span class="dim d2">C<i>复合</i></span><span class="dim d3">D<i>动态</i></span></div>
+  <div class="main">
+    <div class="lab">主人物 / 结果页展示</div>
+    <div class="pname">宋应星<span>科学家 / 《天工开物》作者</span></div>
+    <p class="story">多次科举不第，却把农业与手工业技术写成《天工开物》。他记录的是匠人的经验，而不是书斋里的空谈。</p>
+  </div>
+  <div class="others">
+    <div class="lab">其余代表人物 <b>3</b></div>
+    <div class="chips"><span class="chip new" title="数学家 / 天文学家">祖冲之<b>新</b></span><span class="chip new" title="铁路工程师">詹天佑<b>新</b></span><span class="chip" title="明代科学家">徐光启</span></div>
+  </div>
+  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">贾思勰</span><span class="chip del">宋应星</span><span class="chip del">李诫</span><span class="chip del">徐光启</span></div></div>
+  
+  <div class="review">
+    <div class="opts">
+      <label><input type="radio" name="r-ISCD" value="pass">通过</label>
+      <label><input type="radio" name="r-ISCD" value="fix">需改</label>
+      <label><input type="radio" name="r-ISCD" value="hold">存疑</label>
+    </div>
+    <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
+  </div>
+</article>
+<article class="card" data-code="ISFD" data-group="SD" data-changed="0" data-issues="0" data-search="ISFD 关怀者型 扁鹊 华佗 张仲景 孙思邈  扁鹊">
+  <header>
+    <div class="code" style="color:#D4782F">ISFD</div>
+    <div class="tname">关怀者型</div>
+    
+    <div class="grp" style="background:#D4782F">SD 琥珀组</div>
+  </header>
+  <div class="dims"><span class="dim d0">I<i>内向</i></span><span class="dim d1">S<i>实感</i></span><span class="dim d2">F<i>情感</i></span><span class="dim d3">D<i>动态</i></span></div>
+  <div class="main">
+    <div class="lab">主人物 / 结果页展示</div>
+    <div class="pname">扁鹊<span>战国名医</span></div>
+    <p class="story">以望闻问切和早期诊断闻名，《史记》记载他见蔡桓公的故事。他代表一种能力：在问题还没爆发时，就看见它。</p>
+  </div>
+  <div class="others">
+    <div class="lab">其余代表人物 <b>3</b></div>
+    <div class="chips"><span class="chip" title="东汉医学家">华佗</span><span class="chip" title="东汉医学家">张仲景</span><span class="chip" title="唐代医学家">孙思邈</span></div>
+  </div>
+  
+  
+  <div class="review">
+    <div class="opts">
+      <label><input type="radio" name="r-ISFD" value="pass">通过</label>
+      <label><input type="radio" name="r-ISFD" value="fix">需改</label>
+      <label><input type="radio" name="r-ISFD" value="hold">存疑</label>
+    </div>
+    <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
+  </div>
+</article>
+<article class="card" data-code="ISTD" data-group="SD" data-changed="0" data-issues="0" data-search="ISTD 深耕者型 孙子 吴起 韩信 李靖  孙子">
+  <header>
+    <div class="code" style="color:#D4782F">ISTD</div>
+    <div class="tname">深耕者型</div>
+    
+    <div class="grp" style="background:#D4782F">SD 琥珀组</div>
+  </header>
+  <div class="dims"><span class="dim d0">I<i>内向</i></span><span class="dim d1">S<i>实感</i></span><span class="dim d2">T<i>思考</i></span><span class="dim d3">D<i>动态</i></span></div>
+  <div class="main">
+    <div class="lab">主人物 / 结果页展示</div>
+    <div class="pname">孙子<span>军事家 / 《孙子兵法》作者</span></div>
+    <p class="story">强调“先胜而后战”，把战争从勇气问题变成情报、后勤和形势的系统问题。他的思想后来成为战略管理的通用语言。</p>
+  </div>
+  <div class="others">
+    <div class="lab">其余代表人物 <b>3</b></div>
+    <div class="chips"><span class="chip" title="战国军事家">吴起</span><span class="chip" title="西汉开国名将">韩信</span><span class="chip" title="唐初名将">李靖</span></div>
+  </div>
+  
+  
+  <div class="review">
+    <div class="opts">
+      <label><input type="radio" name="r-ISTD" value="pass">通过</label>
+      <label><input type="radio" name="r-ISTD" value="fix">需改</label>
+      <label><input type="radio" name="r-ISTD" value="hold">存疑</label>
+    </div>
+    <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
+  </div>
+</article></div>
+  </section>
+<section class="group" data-group="SJ">
+    <h2><span class="swatch" style="background:#2C5F8A"></span>SJ 藏蓝组
+      <em>实感 · 判断 J · 9 型 · 本轮改 4</em></h2>
+    <div class="grid">
+<article class="card" data-code="ASCJ" data-group="SJ" data-changed="0" data-issues="0" data-search="ASCJ 维护者型 萧何 狄仁杰 寇准 杜如晦  萧何">
+  <header>
+    <div class="code" style="color:#2C5F8A">ASCJ</div>
+    <div class="tname">维护者型</div>
+    
+    <div class="grp" style="background:#2C5F8A">SJ 藏蓝组</div>
+  </header>
+  <div class="dims"><span class="dim d0">A<i>平衡</i></span><span class="dim d1">S<i>实感</i></span><span class="dim d2">C<i>复合</i></span><span class="dim d3">J<i>判断</i></span></div>
+  <div class="main">
+    <div class="lab">主人物 / 结果页展示</div>
+    <div class="pname">萧何<span>西汉丞相</span></div>
+    <p class="story">刘邦的丞相，入咸阳时先收律令图书，后来负责后勤与制度。他不站在最亮的战场，却为汉朝搭好了能运转的地基。</p>
+  </div>
+  <div class="others">
+    <div class="lab">其余代表人物 <b>3</b></div>
+    <div class="chips"><span class="chip" title="唐代名臣">狄仁杰</span><span class="chip" title="北宋宰相">寇准</span><span class="chip" title="唐初宰相">杜如晦</span></div>
+  </div>
+  
+  
+  <div class="review">
+    <div class="opts">
+      <label><input type="radio" name="r-ASCJ" value="pass">通过</label>
+      <label><input type="radio" name="r-ASCJ" value="fix">需改</label>
+      <label><input type="radio" name="r-ASCJ" value="hold">存疑</label>
+    </div>
+    <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
+  </div>
+</article>
+<article class="card" data-code="ASFJ" data-group="SJ" data-changed="0" data-issues="0" data-search="ASFJ 服务者型 关羽 岳飞 秦琼 尉迟恭  关羽">
+  <header>
+    <div class="code" style="color:#2C5F8A">ASFJ</div>
+    <div class="tname">服务者型</div>
+    
+    <div class="grp" style="background:#2C5F8A">SJ 藏蓝组</div>
+  </header>
+  <div class="dims"><span class="dim d0">A<i>平衡</i></span><span class="dim d1">S<i>实感</i></span><span class="dim d2">F<i>情感</i></span><span class="dim d3">J<i>判断</i></span></div>
+  <div class="main">
+    <div class="lab">主人物 / 结果页展示</div>
+    <div class="pname">关羽<span>三国名将</span></div>
+    <p class="story">以忠义形象进入民间信仰，成为“义”的文化符号。他的傲慢也导致荆州失守，忠诚与自负在他身上同时成立。</p>
+  </div>
+  <div class="others">
+    <div class="lab">其余代表人物 <b>3</b></div>
+    <div class="chips"><span class="chip" title="南宋名将">岳飞</span><span class="chip" title="唐初名将">秦琼</span><span class="chip" title="唐初名将">尉迟恭</span></div>
+  </div>
+  
+  
+  <div class="review">
+    <div class="opts">
+      <label><input type="radio" name="r-ASFJ" value="pass">通过</label>
+      <label><input type="radio" name="r-ASFJ" value="fix">需改</label>
+      <label><input type="radio" name="r-ASFJ" value="hold">存疑</label>
+    </div>
+    <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
+  </div>
+</article>
+<article class="card" data-code="ASTJ" data-group="SJ" data-changed="1" data-issues="0" data-search="ASTJ 管理者型 孔子 包拯 李光耀 孔子 包拯 海瑞 司马光 孔子">
+  <header>
+    <div class="code" style="color:#2C5F8A">ASTJ</div>
+    <div class="tname">管理者型</div>
+    <div class="flag">本轮已改</div>
+    <div class="grp" style="background:#2C5F8A">SJ 藏蓝组</div>
+  </header>
+  <div class="dims"><span class="dim d0">A<i>平衡</i></span><span class="dim d1">S<i>实感</i></span><span class="dim d2">T<i>思考</i></span><span class="dim d3">J<i>判断</i></span></div>
+  <div class="main">
+    <div class="lab">主人物 / 结果页展示</div>
+    <div class="pname">孔子<span>思想家 / 教育家</span></div>
+    <p class="story">周游列国十四年，整理六经，开创私学。他的教育理念影响东亚两千年，而他一生大多数时间并不被当时的权力中心重用。</p>
+  </div>
+  <div class="others">
+    <div class="lab">其余代表人物 <b>2</b></div>
+    <div class="chips"><span class="chip" title="北宋名臣">包拯</span><span class="chip new" title="政治家 / 新加坡首任总理">李光耀<b>新</b></span></div>
+  </div>
+  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">孔子</span><span class="chip del">包拯</span><span class="chip del">海瑞</span><span class="chip del">司马光</span></div></div>
+  
+  <div class="review">
+    <div class="opts">
+      <label><input type="radio" name="r-ASTJ" value="pass">通过</label>
+      <label><input type="radio" name="r-ASTJ" value="fix">需改</label>
+      <label><input type="radio" name="r-ASTJ" value="hold">存疑</label>
+    </div>
+    <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
+  </div>
+</article>
+<article class="card" data-code="ESCJ" data-group="SJ" data-changed="0" data-issues="0" data-search="ESCJ 组织者型 艾森豪威尔 蒙哥马利 卫青 霍去病  艾森豪威尔">
+  <header>
+    <div class="code" style="color:#2C5F8A">ESCJ</div>
+    <div class="tname">组织者型</div>
+    
+    <div class="grp" style="background:#2C5F8A">SJ 藏蓝组</div>
+  </header>
+  <div class="dims"><span class="dim d0">E<i>外向</i></span><span class="dim d1">S<i>实感</i></span><span class="dim d2">C<i>复合</i></span><span class="dim d3">J<i>判断</i></span></div>
+  <div class="main">
+    <div class="lab">主人物 / 结果页展示</div>
+    <div class="pname">艾森豪威尔<span>盟军最高指挥官 / 美国总统</span></div>
+    <p class="story">作为盟军最高指挥官策划诺曼底登陆，后来以总统身份推动州际公路系统。他擅长协调不同国家的将领，把复杂联盟变成可执行的计划。</p>
+  </div>
+  <div class="others">
+    <div class="lab">其余代表人物 <b>3</b></div>
+    <div class="chips"><span class="chip" title="英国陆军元帅">蒙哥马利</span><span class="chip" title="西汉名将">卫青</span><span class="chip" title="西汉名将">霍去病</span></div>
+  </div>
+  
+  
+  <div class="review">
+    <div class="opts">
+      <label><input type="radio" name="r-ESCJ" value="pass">通过</label>
+      <label><input type="radio" name="r-ESCJ" value="fix">需改</label>
+      <label><input type="radio" name="r-ESCJ" value="hold">存疑</label>
+    </div>
+    <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
+  </div>
+</article>
+<article class="card" data-code="ESFJ" data-group="SJ" data-changed="0" data-issues="0" data-search="ESFJ 执政官型 比尔·克林顿 泰勒·斯威夫特 周恩来 雷锋  比尔·克林顿">
+  <header>
+    <div class="code" style="color:#2C5F8A">ESFJ</div>
+    <div class="tname">执政官型</div>
+    
+    <div class="grp" style="background:#2C5F8A">SJ 藏蓝组</div>
+  </header>
+  <div class="dims"><span class="dim d0">E<i>外向</i></span><span class="dim d1">S<i>实感</i></span><span class="dim d2">F<i>情感</i></span><span class="dim d3">J<i>判断</i></span></div>
+  <div class="main">
+    <div class="lab">主人物 / 结果页展示</div>
+    <div class="pname">比尔·克林顿<span>美国前总统</span></div>
+    <p class="story">从阿肯色小镇走到白宫，擅长共情、连接和记住别人的名字。他的总统任期伴随经济增长，也伴随弹劾与个人行为的争议。</p>
+  </div>
+  <div class="others">
+    <div class="lab">其余代表人物 <b>3</b></div>
+    <div class="chips"><span class="chip" title="美国歌手 / 词曲作者">泰勒·斯威夫特</span><span class="chip" title="中华人民共和国国务院总理">周恩来</span><span class="chip" title="解放军战士 / 模范人物">雷锋</span></div>
+  </div>
+  
+  
+  <div class="review">
+    <div class="opts">
+      <label><input type="radio" name="r-ESFJ" value="pass">通过</label>
+      <label><input type="radio" name="r-ESFJ" value="fix">需改</label>
+      <label><input type="radio" name="r-ESFJ" value="hold">存疑</label>
+    </div>
+    <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
+  </div>
+</article>
+<article class="card" data-code="ESTJ" data-group="SJ" data-changed="0" data-issues="0" data-search="ESTJ 总经理型 乔治·华盛顿 伊丽莎白二世 李嘉诚 董明珠  乔治·华盛顿">
+  <header>
+    <div class="code" style="color:#2C5F8A">ESTJ</div>
+    <div class="tname">总经理型</div>
+    
+    <div class="grp" style="background:#2C5F8A">SJ 藏蓝组</div>
+  </header>
+  <div class="dims"><span class="dim d0">E<i>外向</i></span><span class="dim d1">S<i>实感</i></span><span class="dim d2">T<i>思考</i></span><span class="dim d3">J<i>判断</i></span></div>
+  <div class="main">
+    <div class="lab">主人物 / 结果页展示</div>
+    <div class="pname">乔治·华盛顿<span>美国首任总统</span></div>
+    <p class="story">从种植园主到大陆军总司令，再到美国首任总统。他最大的政治贡献之一，是主动放弃权力、确立总统任期传统，让制度比个人更长久。</p>
+  </div>
+  <div class="others">
+    <div class="lab">其余代表人物 <b>3</b></div>
+    <div class="chips"><span class="chip" title="英国女王">伊丽莎白二世</span><span class="chip" title="中国香港企业家">李嘉诚</span><span class="chip" title="企业家 / 格力电器董事长">董明珠</span></div>
+  </div>
+  
+  
+  <div class="review">
+    <div class="opts">
+      <label><input type="radio" name="r-ESTJ" value="pass">通过</label>
+      <label><input type="radio" name="r-ESTJ" value="fix">需改</label>
+      <label><input type="radio" name="r-ESTJ" value="hold">存疑</label>
+    </div>
+    <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
+  </div>
+</article>
+<article class="card" data-code="ISCJ" data-group="SJ" data-changed="1" data-issues="0" data-search="ISCJ 慎行者型 班固 陈寿 司马光 陈寅恪 班固 陈寿 司马光 刘知几 班固">
+  <header>
+    <div class="code" style="color:#2C5F8A">ISCJ</div>
+    <div class="tname">慎行者型</div>
+    <div class="flag">本轮已改</div>
+    <div class="grp" style="background:#2C5F8A">SJ 藏蓝组</div>
+  </header>
+  <div class="dims"><span class="dim d0">I<i>内向</i></span><span class="dim d1">S<i>实感</i></span><span class="dim d2">C<i>复合</i></span><span class="dim d3">J<i>判断</i></span></div>
+  <div class="main">
+    <div class="lab">主人物 / 结果页展示</div>
+    <div class="pname">班固<span>史学家 / 文学家</span></div>
+    <p class="story">继承父亲班彪的遗稿，用二十多年写成《汉书》，首创纪传体断代史。他把一个王朝的制度、人物与日常都收进同一部书里。</p>
+  </div>
+  <div class="others">
+    <div class="lab">其余代表人物 <b>3</b></div>
+    <div class="chips"><span class="chip" title="西晋史学家">陈寿</span><span class="chip" title="北宋史学家 / 政治家">司马光</span><span class="chip new" title="历史学家">陈寅恪<b>新</b></span></div>
+  </div>
+  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">班固</span><span class="chip del">陈寿</span><span class="chip del">司马光</span><span class="chip del">刘知几</span></div></div>
+  
+  <div class="review">
+    <div class="opts">
+      <label><input type="radio" name="r-ISCJ" value="pass">通过</label>
+      <label><input type="radio" name="r-ISCJ" value="fix">需改</label>
+      <label><input type="radio" name="r-ISCJ" value="hold">存疑</label>
+    </div>
+    <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
+  </div>
+</article>
+<article class="card" data-code="ISFJ" data-group="SJ" data-changed="1" data-issues="0" data-search="ISFJ 守卫者型 特蕾莎修女 凯特王妃 林巧稚 特蕾莎修女 凯特王妃 孟母 岳母 特蕾莎修女">
+  <header>
+    <div class="code" style="color:#2C5F8A">ISFJ</div>
+    <div class="tname">守卫者型</div>
+    <div class="flag">本轮已改</div>
+    <div class="grp" style="background:#2C5F8A">SJ 藏蓝组</div>
+  </header>
+  <div class="dims"><span class="dim d0">I<i>内向</i></span><span class="dim d1">S<i>实感</i></span><span class="dim d2">F<i>情感</i></span><span class="dim d3">J<i>判断</i></span></div>
+  <div class="main">
+    <div class="lab">主人物 / 结果页展示</div>
+    <div class="pname">特蕾莎修女<span>人道主义者</span></div>
+    <p class="story">在加尔各答服务穷人，创立仁爱传教修女会。她的奉献被全世界看见，也伴随对制度、信仰与资源分配的长期争议。</p>
+  </div>
+  <div class="others">
+    <div class="lab">其余代表人物 <b>2</b></div>
+    <div class="chips"><span class="chip" title="英国王室成员">凯特王妃</span><span class="chip new" title="妇产科医学家">林巧稚<b>新</b></span></div>
+  </div>
+  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">特蕾莎修女</span><span class="chip del">凯特王妃</span><span class="chip del">孟母</span><span class="chip del">岳母</span></div></div>
+  
+  <div class="review">
+    <div class="opts">
+      <label><input type="radio" name="r-ISFJ" value="pass">通过</label>
+      <label><input type="radio" name="r-ISFJ" value="fix">需改</label>
+      <label><input type="radio" name="r-ISFJ" value="hold">存疑</label>
+    </div>
+    <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
+  </div>
+</article>
+<article class="card" data-code="ISTJ" data-group="SJ" data-changed="1" data-issues="0" data-search="ISTJ 物流师型 巴菲特 默克尔 曾参 巴菲特 乔治·华盛顿 曾参 诸葛亮 巴菲特">
+  <header>
+    <div class="code" style="color:#2C5F8A">ISTJ</div>
+    <div class="tname">物流师型</div>
+    <div class="flag">本轮已改</div>
+    <div class="grp" style="background:#2C5F8A">SJ 藏蓝组</div>
+  </header>
+  <div class="dims"><span class="dim d0">I<i>内向</i></span><span class="dim d1">S<i>实感</i></span><span class="dim d2">T<i>思考</i></span><span class="dim d3">J<i>判断</i></span></div>
+  <div class="main">
+    <div class="lab">主人物 / 结果页展示</div>
+    <div class="pname">巴菲特<span>投资家</span></div>
+    <p class="story">从少年送报、读财报开始，用长期主义和复利构建投资体系。他的“能力圈”原则是典型的务实判断：不懂的东西，不碰。</p>
+  </div>
+  <div class="others">
+    <div class="lab">其余代表人物 <b>2</b></div>
+    <div class="chips"><span class="chip new" title="德国前总理">默克尔<b>新</b></span><span class="chip" title="孔子弟子 / 儒家学者">曾参</span></div>
+  </div>
+  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">巴菲特</span><span class="chip del">乔治·华盛顿</span><span class="chip del">曾参</span><span class="chip del">诸葛亮</span></div></div>
+  
+  <div class="review">
+    <div class="opts">
+      <label><input type="radio" name="r-ISTJ" value="pass">通过</label>
+      <label><input type="radio" name="r-ISTJ" value="fix">需改</label>
+      <label><input type="radio" name="r-ISTJ" value="hold">存疑</label>
+    </div>
+    <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
+  </div>
+</article></div>
+  </section>
+<section class="group" data-group="BT">
+    <h2><span class="swatch" style="background:#4A4A4A"></span>BT 深炭灰组
+      <em>均衡 · 思考 T · 9 型 · 本轮改 8</em></h2>
+    <div class="grid">
+<article class="card" data-code="ABTD" data-group="BT" data-changed="1" data-issues="0" data-search="ABTD 适应者型 亚当·斯密 凯恩斯 吴敬琏 亚当·斯密 凯恩斯 管仲 桑弘羊 亚当·斯密">
+  <header>
+    <div class="code" style="color:#4A4A4A">ABTD</div>
+    <div class="tname">适应者型</div>
+    <div class="flag">本轮已改</div>
+    <div class="grp" style="background:#4A4A4A">BT 深炭灰组</div>
+  </header>
+  <div class="dims"><span class="dim d0">A<i>平衡</i></span><span class="dim d1">B<i>均衡</i></span><span class="dim d2">T<i>思考</i></span><span class="dim d3">D<i>动态</i></span></div>
+  <div class="main">
+    <div class="lab">主人物 / 结果页展示</div>
+    <div class="pname">亚当·斯密<span>经济学家 / 哲学家</span></div>
+    <p class="story">《国富论》提出分工与“看不见的手”，《道德情操论》则讨论同情与道德判断。他并不是只讲自利，而是在解释市场如何与人的情感共存。</p>
+  </div>
+  <div class="others">
+    <div class="lab">其余代表人物 <b>2</b></div>
+    <div class="chips"><span class="chip" title="经济学家">凯恩斯</span><span class="chip new" title="经济学家">吴敬琏<b>新</b></span></div>
+  </div>
+  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">亚当·斯密</span><span class="chip del">凯恩斯</span><span class="chip del">管仲</span><span class="chip del">桑弘羊</span></div></div>
+  
+  <div class="review">
+    <div class="opts">
+      <label><input type="radio" name="r-ABTD" value="pass">通过</label>
+      <label><input type="radio" name="r-ABTD" value="fix">需改</label>
+      <label><input type="radio" name="r-ABTD" value="hold">存疑</label>
+    </div>
+    <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
+  </div>
+</article>
+<article class="card" data-code="ABTJ" data-group="BT" data-changed="1" data-issues="0" data-search="ABTJ 执行师型 司马迁 弗朗西斯·培根 荀子 马基雅维利 司马迁 司马光 荀子 韩非子 司马迁">
+  <header>
+    <div class="code" style="color:#4A4A4A">ABTJ</div>
+    <div class="tname">执行师型</div>
+    <div class="flag">本轮已改</div>
+    <div class="grp" style="background:#4A4A4A">BT 深炭灰组</div>
+  </header>
+  <div class="dims"><span class="dim d0">A<i>平衡</i></span><span class="dim d1">B<i>均衡</i></span><span class="dim d2">T<i>思考</i></span><span class="dim d3">J<i>判断</i></span></div>
+  <div class="main">
+    <div class="lab">主人物 / 结果页展示</div>
+    <div class="pname">司马迁<span>史学家 / 文学家</span></div>
+    <p class="story">遭受宫刑后完成《史记》，用纪传体把三千年历史写成一个个人的选择与命运。他把个人的屈辱转成一项跨越一生的工程。</p>
+  </div>
+  <div class="others">
+    <div class="lab">其余代表人物 <b>3</b></div>
+    <div class="chips"><span class="chip new" title="哲学家">弗朗西斯·培根<b>新</b></span><span class="chip" title="儒家思想家">荀子</span><span class="chip new" title="政治思想家">马基雅维利<b>新</b></span></div>
+  </div>
+  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">司马迁</span><span class="chip del">司马光</span><span class="chip del">荀子</span><span class="chip del">韩非子</span></div></div>
+  
+  <div class="review">
+    <div class="opts">
+      <label><input type="radio" name="r-ABTJ" value="pass">通过</label>
+      <label><input type="radio" name="r-ABTJ" value="fix">需改</label>
+      <label><input type="radio" name="r-ABTJ" value="hold">存疑</label>
+    </div>
+    <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
+  </div>
+</article>
+<article class="card" data-code="ABTP" data-group="BT" data-changed="0" data-issues="0" data-search="ABTP 灵活者型 达尔文 林奈 李时珍 法布尔  达尔文">
+  <header>
+    <div class="code" style="color:#4A4A4A">ABTP</div>
+    <div class="tname">灵活者型</div>
+    
+    <div class="grp" style="background:#4A4A4A">BT 深炭灰组</div>
+  </header>
+  <div class="dims"><span class="dim d0">A<i>平衡</i></span><span class="dim d1">B<i>均衡</i></span><span class="dim d2">T<i>思考</i></span><span class="dim d3">P<i>感知</i></span></div>
+  <div class="main">
+    <div class="lab">主人物 / 结果页展示</div>
+    <div class="pname">达尔文<span>生物学家</span></div>
+    <p class="story">乘小猎犬号考察五年，之后用二十多年积累证据，才出版《物种起源》。他先让证据说话，再提出一个会动摇世界观的理论。</p>
+  </div>
+  <div class="others">
+    <div class="lab">其余代表人物 <b>3</b></div>
+    <div class="chips"><span class="chip" title="瑞典博物学家">林奈</span><span class="chip" title="明代医药学家">李时珍</span><span class="chip" title="法国昆虫学家">法布尔</span></div>
+  </div>
+  
+  
+  <div class="review">
+    <div class="opts">
+      <label><input type="radio" name="r-ABTP" value="pass">通过</label>
+      <label><input type="radio" name="r-ABTP" value="fix">需改</label>
+      <label><input type="radio" name="r-ABTP" value="hold">存疑</label>
+    </div>
+    <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
+  </div>
+</article>
+<article class="card" data-code="EBTD" data-group="BT" data-changed="1" data-issues="0" data-search="EBTD 践行者型 稻盛和夫 山姆·沃尔顿 安德鲁·卡内基 稻盛和夫 沃伦·巴菲特 安德鲁·卡内基 王永庆 稻盛和夫">
+  <header>
+    <div class="code" style="color:#4A4A4A">EBTD</div>
+    <div class="tname">践行者型</div>
+    <div class="flag">本轮已改</div>
+    <div class="grp" style="background:#4A4A4A">BT 深炭灰组</div>
+  </header>
+  <div class="dims"><span class="dim d0">E<i>外向</i></span><span class="dim d1">B<i>均衡</i></span><span class="dim d2">T<i>思考</i></span><span class="dim d3">D<i>动态</i></span></div>
+  <div class="main">
+    <div class="lab">主人物 / 结果页展示</div>
+    <div class="pname">稻盛和夫<span>企业家 / 经营者</span></div>
+    <p class="story">创办京瓷和 KDDI，晚年重整日航。他把“作为人，何谓正确”作为经营判断的起点，用极强的目标感把哲学、会计和现场管理拧成一套系统。</p>
+  </div>
+  <div class="others">
+    <div class="lab">其余代表人物 <b>2</b></div>
+    <div class="chips"><span class="chip new" title="沃尔玛创始人">山姆·沃尔顿<b>新</b></span><span class="chip" title="美国钢铁企业家 / 慈善家">安德鲁·卡内基</span></div>
+  </div>
+  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">稻盛和夫</span><span class="chip del">沃伦·巴菲特</span><span class="chip del">安德鲁·卡内基</span><span class="chip del">王永庆</span></div></div>
+  
+  <div class="review">
+    <div class="opts">
+      <label><input type="radio" name="r-EBTD" value="pass">通过</label>
+      <label><input type="radio" name="r-EBTD" value="fix">需改</label>
+      <label><input type="radio" name="r-EBTD" value="hold">存疑</label>
+    </div>
+    <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
+  </div>
+</article>
+<article class="card" data-code="EBTJ" data-group="BT" data-changed="1" data-issues="0" data-search="EBTJ 推行者型 亨利·福特 洛克菲勒 安迪·格鲁夫 贝索斯 亨利·福特 洛克菲勒 乔治·巴顿 董明珠 亨利·福特">
+  <header>
+    <div class="code" style="color:#4A4A4A">EBTJ</div>
+    <div class="tname">推行者型</div>
+    <div class="flag">本轮已改</div>
+    <div class="grp" style="background:#4A4A4A">BT 深炭灰组</div>
+  </header>
+  <div class="dims"><span class="dim d0">E<i>外向</i></span><span class="dim d1">B<i>均衡</i></span><span class="dim d2">T<i>思考</i></span><span class="dim d3">J<i>判断</i></span></div>
+  <div class="main">
+    <div class="lab">主人物 / 结果页展示</div>
+    <div class="pname">亨利·福特<span>福特汽车创始人</span></div>
+    <p class="story">用流水线把汽车从奢侈品变成大众商品，也用高薪和标准化重塑工厂。他对效率的执念带来产业革命，也暴露出控制欲和单一目标的反面。</p>
+  </div>
+  <div class="others">
+    <div class="lab">其余代表人物 <b>3</b></div>
+    <div class="chips"><span class="chip" title="美国石油企业家 / 慈善家">洛克菲勒</span><span class="chip new" title="英特尔前 CEO">安迪·格鲁夫<b>新</b></span><span class="chip new" title="亚马逊创始人">贝索斯<b>新</b></span></div>
+  </div>
+  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">亨利·福特</span><span class="chip del">洛克菲勒</span><span class="chip del">乔治·巴顿</span><span class="chip del">董明珠</span></div></div>
+  
+  <div class="review">
+    <div class="opts">
+      <label><input type="radio" name="r-EBTJ" value="pass">通过</label>
+      <label><input type="radio" name="r-EBTJ" value="fix">需改</label>
+      <label><input type="radio" name="r-EBTJ" value="hold">存疑</label>
+    </div>
+    <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
+  </div>
+</article>
+<article class="card" data-code="EBTP" data-group="BT" data-changed="1" data-issues="0" data-search="EBTP 机变者型 费曼 卡尔·萨根 刘慈欣 黄渤 费曼 卡尔·萨根 刘慈欣 迈克尔·克莱顿 费曼">
+  <header>
+    <div class="code" style="color:#4A4A4A">EBTP</div>
+    <div class="tname">机变者型</div>
+    <div class="flag">本轮已改</div>
+    <div class="grp" style="background:#4A4A4A">BT 深炭灰组</div>
+  </header>
+  <div class="dims"><span class="dim d0">E<i>外向</i></span><span class="dim d1">B<i>均衡</i></span><span class="dim d2">T<i>思考</i></span><span class="dim d3">P<i>感知</i></span></div>
+  <div class="main">
+    <div class="lab">主人物 / 结果页展示</div>
+    <div class="pname">费曼<span>物理学家 / 教师</span></div>
+    <p class="story">诺贝尔物理学奖得主，也是能把复杂问题拆成小实验的教师。在挑战者号事故调查中，他用一杯冰水演示橡胶密封圈失效，让技术问题变得人人都能看懂。</p>
+  </div>
+  <div class="others">
+    <div class="lab">其余代表人物 <b>3</b></div>
+    <div class="chips"><span class="chip" title="天文学家 / 科普作家">卡尔·萨根</span><span class="chip" title="科幻作家">刘慈欣</span><span class="chip new" title="演员 / 导演">黄渤<b>新</b></span></div>
+  </div>
+  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">费曼</span><span class="chip del">卡尔·萨根</span><span class="chip del">刘慈欣</span><span class="chip del">迈克尔·克莱顿</span></div></div>
+  
+  <div class="review">
+    <div class="opts">
+      <label><input type="radio" name="r-EBTP" value="pass">通过</label>
+      <label><input type="radio" name="r-EBTP" value="fix">需改</label>
+      <label><input type="radio" name="r-EBTP" value="hold">存疑</label>
+    </div>
+    <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
+  </div>
+</article>
+<article class="card" data-code="IBTD" data-group="BT" data-changed="1" data-issues="0" data-search="IBTD 审慎者型 约瑟夫·熊彼特 哈耶克 塔勒布 约瑟夫·熊彼特 哈耶克 商鞅 吴起 约瑟夫·熊彼特">
+  <header>
+    <div class="code" style="color:#4A4A4A">IBTD</div>
+    <div class="tname">审慎者型</div>
+    <div class="flag">本轮已改</div>
+    <div class="grp" style="background:#4A4A4A">BT 深炭灰组</div>
+  </header>
+  <div class="dims"><span class="dim d0">I<i>内向</i></span><span class="dim d1">B<i>均衡</i></span><span class="dim d2">T<i>思考</i></span><span class="dim d3">D<i>动态</i></span></div>
+  <div class="main">
+    <div class="lab">主人物 / 结果页展示</div>
+    <div class="pname">约瑟夫·熊彼特<span>经济学家</span></div>
+    <p class="story">提出“创造性破坏”，认为资本主义靠企业家不断推翻旧结构来更新自己。他既赞美创新，也担忧精英与大众之间的张力。</p>
+  </div>
+  <div class="others">
+    <div class="lab">其余代表人物 <b>2</b></div>
+    <div class="chips"><span class="chip" title="经济学家 / 政治哲学家">哈耶克</span><span class="chip new" title="风险管理学者 / 作家">塔勒布<b>新</b></span></div>
+  </div>
+  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">约瑟夫·熊彼特</span><span class="chip del">哈耶克</span><span class="chip del">商鞅</span><span class="chip del">吴起</span></div></div>
+  
+  <div class="review">
+    <div class="opts">
+      <label><input type="radio" name="r-IBTD" value="pass">通过</label>
+      <label><input type="radio" name="r-IBTD" value="fix">需改</label>
+      <label><input type="radio" name="r-IBTD" value="hold">存疑</label>
+    </div>
+    <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
+  </div>
+</article>
+<article class="card" data-code="IBTJ" data-group="BT" data-changed="1" data-issues="0" data-search="IBTJ 规划者型 马可·奥勒留 查理·芒格 塞涅卡 马可·奥勒留 曾国藩 塞涅卡 左宗棠 马可·奥勒留">
+  <header>
+    <div class="code" style="color:#4A4A4A">IBTJ</div>
+    <div class="tname">规划者型</div>
+    <div class="flag">本轮已改</div>
+    <div class="grp" style="background:#4A4A4A">BT 深炭灰组</div>
+  </header>
+  <div class="dims"><span class="dim d0">I<i>内向</i></span><span class="dim d1">B<i>均衡</i></span><span class="dim d2">T<i>思考</i></span><span class="dim d3">J<i>判断</i></span></div>
+  <div class="main">
+    <div class="lab">主人物 / 结果页展示</div>
+    <div class="pname">马可·奥勒留<span>罗马皇帝 / 斯多葛哲学家</span></div>
+    <p class="story">在战争、瘟疫和帝国危机中写下《沉思录》。他用自我对话维持秩序，把“控制能控制的，接受不能控制的”变成日常练习。</p>
+  </div>
+  <div class="others">
+    <div class="lab">其余代表人物 <b>2</b></div>
+    <div class="chips"><span class="chip new" title="投资家 / 伯克希尔副董事长">查理·芒格<b>新</b></span><span class="chip" title="古罗马哲学家">塞涅卡</span></div>
+  </div>
+  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">马可·奥勒留</span><span class="chip del">曾国藩</span><span class="chip del">塞涅卡</span><span class="chip del">左宗棠</span></div></div>
+  
+  <div class="review">
+    <div class="opts">
+      <label><input type="radio" name="r-IBTJ" value="pass">通过</label>
+      <label><input type="radio" name="r-IBTJ" value="fix">需改</label>
+      <label><input type="radio" name="r-IBTJ" value="hold">存疑</label>
+    </div>
+    <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
+  </div>
+</article>
+<article class="card" data-code="IBTP" data-group="BT" data-changed="1" data-issues="0" data-search="IBTP 钻研者型 孟德尔 袁隆平 徐霞客 珍·古道尔 孟德尔 道尔顿 徐霞客 郦道元 孟德尔">
+  <header>
+    <div class="code" style="color:#4A4A4A">IBTP</div>
+    <div class="tname">钻研者型</div>
+    <div class="flag">本轮已改</div>
+    <div class="grp" style="background:#4A4A4A">BT 深炭灰组</div>
+  </header>
+  <div class="dims"><span class="dim d0">I<i>内向</i></span><span class="dim d1">B<i>均衡</i></span><span class="dim d2">T<i>思考</i></span><span class="dim d3">P<i>感知</i></span></div>
+  <div class="main">
+    <div class="lab">主人物 / 结果页展示</div>
+    <div class="pname">孟德尔<span>遗传学奠基人</span></div>
+    <p class="story">在修道院花园里种豌豆，用统计方法发现遗传分离规律。成果被忽视三十多年，直到后来才成为现代遗传学的起点。</p>
+  </div>
+  <div class="others">
+    <div class="lab">其余代表人物 <b>3</b></div>
+    <div class="chips"><span class="chip new" title="农学家">袁隆平<b>新</b></span><span class="chip" title="明代地理学家 / 旅行家">徐霞客</span><span class="chip new" title="灵长类动物学家">珍·古道尔<b>新</b></span></div>
+  </div>
+  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">孟德尔</span><span class="chip del">道尔顿</span><span class="chip del">徐霞客</span><span class="chip del">郦道元</span></div></div>
+  
+  <div class="review">
+    <div class="opts">
+      <label><input type="radio" name="r-IBTP" value="pass">通过</label>
+      <label><input type="radio" name="r-IBTP" value="fix">需改</label>
+      <label><input type="radio" name="r-IBTP" value="hold">存疑</label>
+    </div>
+    <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
+  </div>
+</article></div>
+  </section>
+<section class="group" data-group="BC">
+    <h2><span class="swatch" style="background:#8B95A0"></span>BC 月光银灰组
+      <em>均衡 · 复合 C · 9 型 · 本轮改 7</em></h2>
+    <div class="grid">
+<article class="card" data-code="ABCD" data-group="BC" data-changed="1" data-issues="0" data-search="ABCD 全能者型 曾国藩 亚里士多德 歌德 张謇 曾国藩 冯道 李沆 吕端 曾国藩">
+  <header>
+    <div class="code" style="color:#8B95A0">ABCD</div>
+    <div class="tname">全能者型</div>
+    <div class="flag">本轮已改</div>
+    <div class="grp" style="background:#8B95A0">BC 月光银灰组</div>
+  </header>
+  <div class="dims"><span class="dim d0">A<i>平衡</i></span><span class="dim d1">B<i>均衡</i></span><span class="dim d2">C<i>复合</i></span><span class="dim d3">D<i>动态</i></span></div>
+  <div class="main">
+    <div class="lab">主人物 / 结果页展示</div>
+    <div class="pname">曾国藩<span>晚清名臣</span></div>
+    <p class="story">书生带兵，组建湘军平定太平天国。他以日记和家书自律，也因镇压手段和时代局限受到争议；他的一生是“结硬寨、打呆仗”的长期主义。</p>
+  </div>
+  <div class="others">
+    <div class="lab">其余代表人物 <b>3</b></div>
+    <div class="chips"><span class="chip new" title="哲学家 / 博物学家">亚里士多德<b>新</b></span><span class="chip new" title="作家 / 思想家">歌德<b>新</b></span><span class="chip new" title="实业家 / 教育家">张謇<b>新</b></span></div>
+  </div>
+  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">曾国藩</span><span class="chip del">冯道</span><span class="chip del">李沆</span><span class="chip del">吕端</span></div></div>
+  
+  <div class="review">
+    <div class="opts">
+      <label><input type="radio" name="r-ABCD" value="pass">通过</label>
+      <label><input type="radio" name="r-ABCD" value="fix">需改</label>
+      <label><input type="radio" name="r-ABCD" value="hold">存疑</label>
+    </div>
+    <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
+  </div>
+</article>
+<article class="card" data-code="ABCJ" data-group="BC" data-changed="1" data-issues="0" data-search="ABCJ 平衡者型 李斯 李鸿章 俾斯麦 李斯 申不害 田穰苴 赵充国 李斯">
+  <header>
+    <div class="code" style="color:#8B95A0">ABCJ</div>
+    <div class="tname">平衡者型</div>
+    <div class="flag">本轮已改</div>
+    <div class="grp" style="background:#8B95A0">BC 月光银灰组</div>
+  </header>
+  <div class="dims"><span class="dim d0">A<i>平衡</i></span><span class="dim d1">B<i>均衡</i></span><span class="dim d2">C<i>复合</i></span><span class="dim d3">J<i>判断</i></span></div>
+  <div class="main">
+    <div class="lab">主人物 / 结果页展示</div>
+    <div class="pname">李斯<span>秦朝丞相</span></div>
+    <p class="story">从楚国小吏到秦朝丞相，推动郡县制与文字统一。他与赵高合谋也葬送了自己，是“制度能力”与“政治判断”分离的典型。</p>
+  </div>
+  <div class="others">
+    <div class="lab">其余代表人物 <b>2</b></div>
+    <div class="chips"><span class="chip new" title="晚清重臣">李鸿章<b>新</b></span><span class="chip new" title="德意志帝国首任宰相">俾斯麦<b>新</b></span></div>
+  </div>
+  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">李斯</span><span class="chip del">申不害</span><span class="chip del">田穰苴</span><span class="chip del">赵充国</span></div></div>
+  
+  <div class="review">
+    <div class="opts">
+      <label><input type="radio" name="r-ABCJ" value="pass">通过</label>
+      <label><input type="radio" name="r-ABCJ" value="fix">需改</label>
+      <label><input type="radio" name="r-ABCJ" value="hold">存疑</label>
+    </div>
+    <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
+  </div>
+</article>
+<article class="card" data-code="ABCP" data-group="BC" data-changed="0" data-issues="0" data-search="ABCP 洒脱者型 宫崎骏 华特·迪士尼 手冢治虫 张艺谋  宫崎骏">
+  <header>
+    <div class="code" style="color:#8B95A0">ABCP</div>
+    <div class="tname">洒脱者型</div>
+    
+    <div class="grp" style="background:#8B95A0">BC 月光银灰组</div>
+  </header>
+  <div class="dims"><span class="dim d0">A<i>平衡</i></span><span class="dim d1">B<i>均衡</i></span><span class="dim d2">C<i>复合</i></span><span class="dim d3">P<i>感知</i></span></div>
+  <div class="main">
+    <div class="lab">主人物 / 结果页展示</div>
+    <div class="pname">宫崎骏<span>动画导演</span></div>
+    <p class="story">吉卜力工作室的核心创作者，《千与千寻》《龙猫》把幻想世界建成可触摸的日常。他坚持手绘，也反复在作品里追问人与自然的关系。</p>
+  </div>
+  <div class="others">
+    <div class="lab">其余代表人物 <b>3</b></div>
+    <div class="chips"><span class="chip" title="动画制片人 / 迪士尼创始人">华特·迪士尼</span><span class="chip" title="日本漫画家">手冢治虫</span><span class="chip" title="电影导演">张艺谋</span></div>
+  </div>
+  
+  
+  <div class="review">
+    <div class="opts">
+      <label><input type="radio" name="r-ABCP" value="pass">通过</label>
+      <label><input type="radio" name="r-ABCP" value="fix">需改</label>
+      <label><input type="radio" name="r-ABCP" value="hold">存疑</label>
+    </div>
+    <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
+  </div>
+</article>
+<article class="card" data-code="EBCD" data-group="BC" data-changed="1" data-issues="0" data-search="EBCD 多面手型 范蠡 沈万三 胡雪岩 范蠡 刘晏 曾国藩 郑观应 范蠡">
+  <header>
+    <div class="code" style="color:#8B95A0">EBCD</div>
+    <div class="tname">多面手型</div>
+    <div class="flag">本轮已改</div>
+    <div class="grp" style="background:#8B95A0">BC 月光银灰组</div>
+  </header>
+  <div class="dims"><span class="dim d0">E<i>外向</i></span><span class="dim d1">B<i>均衡</i></span><span class="dim d2">C<i>复合</i></span><span class="dim d3">D<i>动态</i></span></div>
+  <div class="main">
+    <div class="lab">主人物 / 结果页展示</div>
+    <div class="pname">范蠡<span>政治家 / 商人</span></div>
+    <p class="story">助越王勾践复国后急流勇退，改名经商成为巨富。他懂得在权力与市场之间切换，也懂得在最高点离场。</p>
+  </div>
+  <div class="others">
+    <div class="lab">其余代表人物 <b>2</b></div>
+    <div class="chips"><span class="chip new" title="元末明初商人">沈万三<b>新</b></span><span class="chip new" title="晚清商人">胡雪岩<b>新</b></span></div>
+  </div>
+  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">范蠡</span><span class="chip del">刘晏</span><span class="chip del">曾国藩</span><span class="chip del">郑观应</span></div></div>
+  
+  <div class="review">
+    <div class="opts">
+      <label><input type="radio" name="r-EBCD" value="pass">通过</label>
+      <label><input type="radio" name="r-EBCD" value="fix">需改</label>
+      <label><input type="radio" name="r-EBCD" value="hold">存疑</label>
+    </div>
+    <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
+  </div>
+</article>
+<article class="card" data-code="EBCJ" data-group="BC" data-changed="1" data-issues="0" data-search="EBCJ 协调者型 吕不韦 张仪 基辛格 姚崇 吕不韦 子产 张居正 姚崇 吕不韦">
+  <header>
+    <div class="code" style="color:#8B95A0">EBCJ</div>
+    <div class="tname">协调者型</div>
+    <div class="flag">本轮已改</div>
+    <div class="grp" style="background:#8B95A0">BC 月光银灰组</div>
+  </header>
+  <div class="dims"><span class="dim d0">E<i>外向</i></span><span class="dim d1">B<i>均衡</i></span><span class="dim d2">C<i>复合</i></span><span class="dim d3">J<i>判断</i></span></div>
+  <div class="main">
+    <div class="lab">主人物 / 结果页展示</div>
+    <div class="pname">吕不韦<span>秦国丞相 / 商人</span></div>
+    <p class="story">商人出身的秦相，组织门客编撰《吕氏春秋》，把政治投资和学术工程结合。他懂得如何把资源、人才和时机组织成一个更大的局。</p>
+  </div>
+  <div class="others">
+    <div class="lab">其余代表人物 <b>3</b></div>
+    <div class="chips"><span class="chip new" title="战国纵横家">张仪<b>新</b></span><span class="chip new" title="美国前国务卿">基辛格<b>新</b></span><span class="chip" title="唐代宰相">姚崇</span></div>
+  </div>
+  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">吕不韦</span><span class="chip del">子产</span><span class="chip del">张居正</span><span class="chip del">姚崇</span></div></div>
+  
+  <div class="review">
+    <div class="opts">
+      <label><input type="radio" name="r-EBCJ" value="pass">通过</label>
+      <label><input type="radio" name="r-EBCJ" value="fix">需改</label>
+      <label><input type="radio" name="r-EBCJ" value="hold">存疑</label>
+    </div>
+    <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
+  </div>
+</article>
+<article class="card" data-code="EBCP" data-group="BC" data-changed="1" data-issues="0" data-search="EBCP 自由人型 贝尔·格里尔斯 大张伟 埃尔维斯·普雷斯利 贝尔·格里尔斯 安东尼·波登 弗雷德·阿斯泰尔 埃尔维斯·普雷斯利 贝尔·格里尔斯">
+  <header>
+    <div class="code" style="color:#8B95A0">EBCP</div>
+    <div class="tname">自由人型</div>
+    <div class="flag">本轮已改</div>
+    <div class="grp" style="background:#8B95A0">BC 月光银灰组</div>
+  </header>
+  <div class="dims"><span class="dim d0">E<i>外向</i></span><span class="dim d1">B<i>均衡</i></span><span class="dim d2">C<i>复合</i></span><span class="dim d3">P<i>感知</i></span></div>
+  <div class="main">
+    <div class="lab">主人物 / 结果页展示</div>
+    <div class="pname">贝尔·格里尔斯<span>探险家 / 主持人</span></div>
+    <p class="story">前英国特种兵，《荒野求生》主持人。他把极端环境变成电视冒险，也把“先活下来，再讲道理”的现场判断带给观众。</p>
+  </div>
+  <div class="others">
+    <div class="lab">其余代表人物 <b>2</b></div>
+    <div class="chips"><span class="chip new" title="歌手 / 主持人">大张伟<b>新</b></span><span class="chip" title="歌手 / 演员">埃尔维斯·普雷斯利</span></div>
+  </div>
+  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">贝尔·格里尔斯</span><span class="chip del">安东尼·波登</span><span class="chip del">弗雷德·阿斯泰尔</span><span class="chip del">埃尔维斯·普雷斯利</span></div></div>
+  
+  <div class="review">
+    <div class="opts">
+      <label><input type="radio" name="r-EBCP" value="pass">通过</label>
+      <label><input type="radio" name="r-EBCP" value="fix">需改</label>
+      <label><input type="radio" name="r-EBCP" value="hold">存疑</label>
+    </div>
+    <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
+  </div>
+</article>
+<article class="card" data-code="IBCD" data-group="BC" data-changed="1" data-issues="0" data-search="IBCD 内省者型 屠呦呦 李冰 西门豹 郑国 李冰 西门豹 召信臣 李冰">
+  <header>
+    <div class="code" style="color:#8B95A0">IBCD</div>
+    <div class="tname">内省者型</div>
+    <div class="flag">本轮已改</div>
+    <div class="grp" style="background:#8B95A0">BC 月光银灰组</div>
+  </header>
+  <div class="dims"><span class="dim d0">I<i>内向</i></span><span class="dim d1">B<i>均衡</i></span><span class="dim d2">C<i>复合</i></span><span class="dim d3">D<i>动态</i></span></div>
+  <div class="main">
+    <div class="lab">主人物 / 结果页展示</div>
+    <div class="pname">李冰<span>战国水利家</span></div>
+    <p class="story">主持修建都江堰，用鱼嘴、飞沙堰、宝瓶口把岷江变成成都平原的水利系统。它运行两千多年，是“把系统做对”的典范。</p>
+  </div>
+  <div class="others">
+    <div class="lab">其余代表人物 <b>2</b></div>
+    <div class="chips"><span class="chip new" title="药学家 / 诺贝尔生理学或医学奖得主">屠呦呦<b>新</b></span><span class="chip" title="战国魏国地方官">西门豹</span></div>
+  </div>
+  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">郑国</span><span class="chip del">李冰</span><span class="chip del">西门豹</span><span class="chip del">召信臣</span></div></div>
+  
+  <div class="review">
+    <div class="opts">
+      <label><input type="radio" name="r-IBCD" value="pass">通过</label>
+      <label><input type="radio" name="r-IBCD" value="fix">需改</label>
+      <label><input type="radio" name="r-IBCD" value="hold">存疑</label>
+    </div>
+    <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
+  </div>
+</article>
+<article class="card" data-code="IBCJ" data-group="BC" data-changed="1" data-issues="0" data-search="IBCJ 权衡者型 管仲 韩非 商鞅 管仲 慎到 韩非 商鞅 韩非">
+  <header>
+    <div class="code" style="color:#8B95A0">IBCJ</div>
+    <div class="tname">权衡者型</div>
+    <div class="flag">本轮已改</div>
+    <div class="grp" style="background:#8B95A0">BC 月光银灰组</div>
+  </header>
+  <div class="dims"><span class="dim d0">I<i>内向</i></span><span class="dim d1">B<i>均衡</i></span><span class="dim d2">C<i>复合</i></span><span class="dim d3">J<i>判断</i></span></div>
+  <div class="main">
+    <div class="lab">主人物 / 结果页展示</div>
+    <div class="pname">韩非<span>法家思想家</span></div>
+    <p class="story">法家集大成者，主张“法、术、势”结合。他的文章被秦王政欣赏，本人却死于秦国的政治斗争，思想与命运形成残酷反差。</p>
+  </div>
+  <div class="others">
+    <div class="lab">其余代表人物 <b>2</b></div>
+    <div class="chips"><span class="chip" title="春秋齐国政治家">管仲</span><span class="chip" title="战国改革家">商鞅</span></div>
+  </div>
+  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">管仲</span><span class="chip del">慎到</span><span class="chip del">韩非</span><span class="chip del">商鞅</span></div></div>
+  
+  <div class="review">
+    <div class="opts">
+      <label><input type="radio" name="r-IBCJ" value="pass">通过</label>
+      <label><input type="radio" name="r-IBCJ" value="fix">需改</label>
+      <label><input type="radio" name="r-IBCJ" value="hold">存疑</label>
+    </div>
+    <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
+  </div>
+</article>
+<article class="card" data-code="IBCP" data-group="BC" data-changed="0" data-issues="0" data-search="IBCP 求知者型 肖邦 德彪西 谭盾 坂本龙一  肖邦">
+  <header>
+    <div class="code" style="color:#8B95A0">IBCP</div>
+    <div class="tname">求知者型</div>
+    
+    <div class="grp" style="background:#8B95A0">BC 月光银灰组</div>
+  </header>
+  <div class="dims"><span class="dim d0">I<i>内向</i></span><span class="dim d1">B<i>均衡</i></span><span class="dim d2">C<i>复合</i></span><span class="dim d3">P<i>感知</i></span></div>
+  <div class="main">
+    <div class="lab">主人物 / 结果页展示</div>
+    <div class="pname">肖邦<span>作曲家 / 钢琴家</span></div>
+    <p class="story">几乎只为钢琴写作，把波兰的乡愁变成夜曲、玛祖卡和波罗乃兹。他离开故土，却让故乡的声音进入整个欧洲。</p>
+  </div>
+  <div class="others">
+    <div class="lab">其余代表人物 <b>3</b></div>
+    <div class="chips"><span class="chip" title="作曲家">德彪西</span><span class="chip" title="作曲家">谭盾</span><span class="chip" title="作曲家 / 音乐家">坂本龙一</span></div>
+  </div>
+  
+  
+  <div class="review">
+    <div class="opts">
+      <label><input type="radio" name="r-IBCP" value="pass">通过</label>
+      <label><input type="radio" name="r-IBCP" value="fix">需改</label>
+      <label><input type="radio" name="r-IBCP" value="hold">存疑</label>
+    </div>
+    <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
+  </div>
+</article></div>
+  </section>
+<section class="group" data-group="BF">
+    <h2><span class="swatch" style="background:#B8956A"></span>BF 暖燕麦组
+      <em>均衡 · 情感 F · 9 型 · 本轮改 4</em></h2>
+    <div class="grid">
+<article class="card" data-code="ABFD" data-group="BF" data-changed="1" data-issues="0" data-search="ABFD 温润者型 马斯洛 林语堂 川端康成 杨绛 马斯洛 米哈伊·契克森米哈伊 川端康成 杨绛 马斯洛">
+  <header>
+    <div class="code" style="color:#B8956A">ABFD</div>
+    <div class="tname">温润者型</div>
+    <div class="flag">本轮已改</div>
+    <div class="grp" style="background:#B8956A">BF 暖燕麦组</div>
+  </header>
+  <div class="dims"><span class="dim d0">A<i>平衡</i></span><span class="dim d1">B<i>均衡</i></span><span class="dim d2">F<i>情感</i></span><span class="dim d3">D<i>动态</i></span></div>
+  <div class="main">
+    <div class="lab">主人物 / 结果页展示</div>
+    <div class="pname">马斯洛<span>心理学家</span></div>
+    <p class="story">提出需求层次与自我实现，研究健康人格而不是只研究病人。他的理论影响管理、教育与心理治疗，也被后来者批评为过于线性和乐观。</p>
+  </div>
+  <div class="others">
+    <div class="lab">其余代表人物 <b>3</b></div>
+    <div class="chips"><span class="chip new" title="作家 / 学者">林语堂<b>新</b></span><span class="chip" title="日本作家">川端康成</span><span class="chip" title="作家 / 翻译家">杨绛</span></div>
+  </div>
+  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">马斯洛</span><span class="chip del">米哈伊·契克森米哈伊</span><span class="chip del">川端康成</span><span class="chip del">杨绛</span></div></div>
+  
+  <div class="review">
+    <div class="opts">
+      <label><input type="radio" name="r-ABFD" value="pass">通过</label>
+      <label><input type="radio" name="r-ABFD" value="fix">需改</label>
+      <label><input type="radio" name="r-ABFD" value="hold">存疑</label>
+    </div>
+    <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
+  </div>
+</article>
+<article class="card" data-code="ABFJ" data-group="BF" data-changed="0" data-issues="0" data-search="ABFJ 和谐者型 甘地 罗曼·罗兰 老舍 冰心  甘地">
+  <header>
+    <div class="code" style="color:#B8956A">ABFJ</div>
+    <div class="tname">和谐者型</div>
+    
+    <div class="grp" style="background:#B8956A">BF 暖燕麦组</div>
+  </header>
+  <div class="dims"><span class="dim d0">A<i>平衡</i></span><span class="dim d1">B<i>均衡</i></span><span class="dim d2">F<i>情感</i></span><span class="dim d3">J<i>判断</i></span></div>
+  <div class="main">
+    <div class="lab">主人物 / 结果页展示</div>
+    <div class="pname">甘地<span>印度独立运动领袖</span></div>
+    <p class="story">用非暴力不合作推动印度独立，纺车和食盐长征成为象征。他的理想主义与组织能力同样强大，但个人生活与政治判断也一直存在争议。</p>
+  </div>
+  <div class="others">
+    <div class="lab">其余代表人物 <b>3</b></div>
+    <div class="chips"><span class="chip" title="法国作家">罗曼·罗兰</span><span class="chip" title="作家">老舍</span><span class="chip" title="作家 / 诗人">冰心</span></div>
+  </div>
+  
+  
+  <div class="review">
+    <div class="opts">
+      <label><input type="radio" name="r-ABFJ" value="pass">通过</label>
+      <label><input type="radio" name="r-ABFJ" value="fix">需改</label>
+      <label><input type="radio" name="r-ABFJ" value="hold">存疑</label>
+    </div>
+    <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
+  </div>
+</article>
+<article class="card" data-code="ABFP" data-group="BF" data-changed="0" data-issues="0" data-search="ABFP 悠然者型 纪伯伦 梭罗 徐志摩 顾城  梭罗">
+  <header>
+    <div class="code" style="color:#B8956A">ABFP</div>
+    <div class="tname">悠然者型</div>
+    
+    <div class="grp" style="background:#B8956A">BF 暖燕麦组</div>
+  </header>
+  <div class="dims"><span class="dim d0">A<i>平衡</i></span><span class="dim d1">B<i>均衡</i></span><span class="dim d2">F<i>情感</i></span><span class="dim d3">P<i>感知</i></span></div>
+  <div class="main">
+    <div class="lab">主人物 / 结果页展示</div>
+    <div class="pname">梭罗<span>作家 / 哲学家</span></div>
+    <p class="story">在瓦尔登湖边独居两年，写下《瓦尔登湖》。他主张简化生活、亲近自然，也因拒绝缴税而入狱，把观念直接活成了行动。</p>
+  </div>
+  <div class="others">
+    <div class="lab">其余代表人物 <b>3</b></div>
+    <div class="chips"><span class="chip" title="黎巴嫩诗人 / 散文家">纪伯伦</span><span class="chip" title="诗人">徐志摩</span><span class="chip" title="诗人">顾城</span></div>
+  </div>
+  
+  
+  <div class="review">
+    <div class="opts">
+      <label><input type="radio" name="r-ABFP" value="pass">通过</label>
+      <label><input type="radio" name="r-ABFP" value="fix">需改</label>
+      <label><input type="radio" name="r-ABFP" value="hold">存疑</label>
+    </div>
+    <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
+  </div>
+</article>
+<article class="card" data-code="EBFD" data-group="BF" data-changed="0" data-issues="0" data-search="EBFD 社交家型 埃莉诺·罗斯福 宋庆龄 何香凝 张桂梅  埃莉诺·罗斯福">
+  <header>
+    <div class="code" style="color:#B8956A">EBFD</div>
+    <div class="tname">社交家型</div>
+    
+    <div class="grp" style="background:#B8956A">BF 暖燕麦组</div>
+  </header>
+  <div class="dims"><span class="dim d0">E<i>外向</i></span><span class="dim d1">B<i>均衡</i></span><span class="dim d2">F<i>情感</i></span><span class="dim d3">D<i>动态</i></span></div>
+  <div class="main">
+    <div class="lab">主人物 / 结果页展示</div>
+    <div class="pname">埃莉诺·罗斯福<span>外交家 / 人权活动家</span></div>
+    <p class="story">作为罗斯福总统的妻子，她把第一夫人的位置变成公共行动平台，推动联合国《世界人权宣言》。她用共情和耐心把不同立场的人拉到同一张桌子前。</p>
+  </div>
+  <div class="others">
+    <div class="lab">其余代表人物 <b>3</b></div>
+    <div class="chips"><span class="chip" title="社会活动家 / 国家名誉主席">宋庆龄</span><span class="chip" title="画家 / 社会活动家">何香凝</span><span class="chip" title="教育家 / 华坪女高校长">张桂梅</span></div>
+  </div>
+  
+  
+  <div class="review">
+    <div class="opts">
+      <label><input type="radio" name="r-EBFD" value="pass">通过</label>
+      <label><input type="radio" name="r-EBFD" value="fix">需改</label>
+      <label><input type="radio" name="r-EBFD" value="hold">存疑</label>
+    </div>
+    <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
+  </div>
+</article>
+<article class="card" data-code="EBFJ" data-group="BF" data-changed="1" data-issues="0" data-search="EBFJ 凝聚者型 南丁格尔 白求恩 陶行知 史怀哲 南丁格尔 晏阳初 陶行知 史怀哲 南丁格尔">
+  <header>
+    <div class="code" style="color:#B8956A">EBFJ</div>
+    <div class="tname">凝聚者型</div>
+    <div class="flag">本轮已改</div>
+    <div class="grp" style="background:#B8956A">BF 暖燕麦组</div>
+  </header>
+  <div class="dims"><span class="dim d0">E<i>外向</i></span><span class="dim d1">B<i>均衡</i></span><span class="dim d2">F<i>情感</i></span><span class="dim d3">J<i>判断</i></span></div>
+  <div class="main">
+    <div class="lab">主人物 / 结果页展示</div>
+    <div class="pname">南丁格尔<span>护士 / 统计学家</span></div>
+    <p class="story">克里米亚战争中改革护理与卫生统计，用图表和数据说服军方。她让护理从杂务变成专业，也让“照顾人”成为一门可以用证据改进的工作。</p>
+  </div>
+  <div class="others">
+    <div class="lab">其余代表人物 <b>3</b></div>
+    <div class="chips"><span class="chip new" title="外科医生 / 国际主义战士">白求恩<b>新</b></span><span class="chip" title="教育家">陶行知</span><span class="chip" title="医生 / 人道主义者">史怀哲</span></div>
+  </div>
+  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">南丁格尔</span><span class="chip del">晏阳初</span><span class="chip del">陶行知</span><span class="chip del">史怀哲</span></div></div>
+  
+  <div class="review">
+    <div class="opts">
+      <label><input type="radio" name="r-EBFJ" value="pass">通过</label>
+      <label><input type="radio" name="r-EBFJ" value="fix">需改</label>
+      <label><input type="radio" name="r-EBFJ" value="hold">存疑</label>
+    </div>
+    <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
+  </div>
+</article>
+<article class="card" data-code="EBFP" data-group="BF" data-changed="1" data-issues="0" data-search="EBFP 乐天派型 沃尔特·惠特曼 蔡澜 三毛 大仲马 沃尔特·惠特曼 舒马赫 三毛 大仲马 沃尔特·惠特曼">
+  <header>
+    <div class="code" style="color:#B8956A">EBFP</div>
+    <div class="tname">乐天派型</div>
+    <div class="flag">本轮已改</div>
+    <div class="grp" style="background:#B8956A">BF 暖燕麦组</div>
+  </header>
+  <div class="dims"><span class="dim d0">E<i>外向</i></span><span class="dim d1">B<i>均衡</i></span><span class="dim d2">F<i>情感</i></span><span class="dim d3">P<i>感知</i></span></div>
+  <div class="main">
+    <div class="lab">主人物 / 结果页展示</div>
+    <div class="pname">沃尔特·惠特曼<span>诗人</span></div>
+    <p class="story">《草叶集》用自由长句歌颂普通人的身体与生活。他做过教师、记者、护士，战争与城市都是他的素材，生活本身就是他的诗。</p>
+  </div>
+  <div class="others">
+    <div class="lab">其余代表人物 <b>3</b></div>
+    <div class="chips"><span class="chip new" title="作家 / 美食家">蔡澜<b>新</b></span><span class="chip" title="作家 / 旅行文学作者">三毛</span><span class="chip" title="法国小说家">大仲马</span></div>
+  </div>
+  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">沃尔特·惠特曼</span><span class="chip del">舒马赫</span><span class="chip del">三毛</span><span class="chip del">大仲马</span></div></div>
+  
+  <div class="review">
+    <div class="opts">
+      <label><input type="radio" name="r-EBFP" value="pass">通过</label>
+      <label><input type="radio" name="r-EBFP" value="fix">需改</label>
+      <label><input type="radio" name="r-EBFP" value="hold">存疑</label>
+    </div>
+    <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
+  </div>
+</article>
+<article class="card" data-code="IBFD" data-group="BF" data-changed="0" data-issues="0" data-search="IBFD 内敛者型 狄金森 蒙田 张爱玲 萧红  狄金森">
+  <header>
+    <div class="code" style="color:#B8956A">IBFD</div>
+    <div class="tname">内敛者型</div>
+    
+    <div class="grp" style="background:#B8956A">BF 暖燕麦组</div>
+  </header>
+  <div class="dims"><span class="dim d0">I<i>内向</i></span><span class="dim d1">B<i>均衡</i></span><span class="dim d2">F<i>情感</i></span><span class="dim d3">D<i>动态</i></span></div>
+  <div class="main">
+    <div class="lab">主人物 / 结果页展示</div>
+    <div class="pname">狄金森<span>诗人</span></div>
+    <p class="story">生前几乎不发表诗，死后成为美国诗歌的核心人物。她用短句、破折号和极小的日常场景，写出内心世界的巨大振幅。</p>
+  </div>
+  <div class="others">
+    <div class="lab">其余代表人物 <b>3</b></div>
+    <div class="chips"><span class="chip" title="法国散文家">蒙田</span><span class="chip" title="作家">张爱玲</span><span class="chip" title="作家">萧红</span></div>
+  </div>
+  
+  
+  <div class="review">
+    <div class="opts">
+      <label><input type="radio" name="r-IBFD" value="pass">通过</label>
+      <label><input type="radio" name="r-IBFD" value="fix">需改</label>
+      <label><input type="radio" name="r-IBFD" value="hold">存疑</label>
+    </div>
+    <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
+  </div>
+</article>
+<article class="card" data-code="IBFJ" data-group="BF" data-changed="1" data-issues="0" data-search="IBFJ 体恤者型 赫尔曼·黑塞 契诃夫 沈从文 余华 赫尔曼·黑塞 契诃夫 沈从文 佩索阿 赫尔曼·黑塞">
+  <header>
+    <div class="code" style="color:#B8956A">IBFJ</div>
+    <div class="tname">体恤者型</div>
+    <div class="flag">本轮已改</div>
+    <div class="grp" style="background:#B8956A">BF 暖燕麦组</div>
+  </header>
+  <div class="dims"><span class="dim d0">I<i>内向</i></span><span class="dim d1">B<i>均衡</i></span><span class="dim d2">F<i>情感</i></span><span class="dim d3">J<i>判断</i></span></div>
+  <div class="main">
+    <div class="lab">主人物 / 结果页展示</div>
+    <div class="pname">赫尔曼·黑塞<span>作家</span></div>
+    <p class="story">《荒原狼》《悉达多》写现代人的分裂与寻求。他经历战争、婚姻破裂，也从东方哲学中寻找答案；作品因此既有孤独，也有疗愈。</p>
+  </div>
+  <div class="others">
+    <div class="lab">其余代表人物 <b>3</b></div>
+    <div class="chips"><span class="chip" title="俄国剧作家">契诃夫</span><span class="chip" title="作家">沈从文</span><span class="chip new" title="作家">余华<b>新</b></span></div>
+  </div>
+  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">赫尔曼·黑塞</span><span class="chip del">契诃夫</span><span class="chip del">沈从文</span><span class="chip del">佩索阿</span></div></div>
+  
+  <div class="review">
+    <div class="opts">
+      <label><input type="radio" name="r-IBFJ" value="pass">通过</label>
+      <label><input type="radio" name="r-IBFJ" value="fix">需改</label>
+      <label><input type="radio" name="r-IBFJ" value="hold">存疑</label>
+    </div>
+    <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
+  </div>
+</article>
+<article class="card" data-code="IBFP" data-group="BF" data-changed="0" data-issues="0" data-search="IBFP 逸趣者型 王尔德 拜伦 雪莱 济慈  王尔德">
+  <header>
+    <div class="code" style="color:#B8956A">IBFP</div>
+    <div class="tname">逸趣者型</div>
+    
+    <div class="grp" style="background:#B8956A">BF 暖燕麦组</div>
+  </header>
+  <div class="dims"><span class="dim d0">I<i>内向</i></span><span class="dim d1">B<i>均衡</i></span><span class="dim d2">F<i>情感</i></span><span class="dim d3">P<i>感知</i></span></div>
+  <div class="main">
+    <div class="lab">主人物 / 结果页展示</div>
+    <div class="pname">王尔德<span>作家 / 剧作家</span></div>
+    <p class="story">《道林·格雷的画像》和社交喜剧让他成名，入狱后写下《自深渊》。他的机智、审美和坠落同样戏剧化，成为“唯美主义”的复杂注脚。</p>
+  </div>
+  <div class="others">
+    <div class="lab">其余代表人物 <b>3</b></div>
+    <div class="chips"><span class="chip" title="英国诗人">拜伦</span><span class="chip" title="英国诗人">雪莱</span><span class="chip" title="英国诗人">济慈</span></div>
+  </div>
+  
+  
+  <div class="review">
+    <div class="opts">
+      <label><input type="radio" name="r-IBFP" value="pass">通过</label>
+      <label><input type="radio" name="r-IBFP" value="fix">需改</label>
+      <label><input type="radio" name="r-IBFP" value="hold">存疑</label>
+    </div>
+    <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
+  </div>
+</article></div>
+  </section>
+<section class="group" data-group="NT">
+    <h2><span class="swatch" style="background:#6B3FA0"></span>NT 深紫组
+      <em>直觉 · 思考 T · 9 型 · 本轮改 6</em></h2>
+    <div class="grid">
+<article class="card" data-code="ANTD" data-group="NT" data-changed="1" data-issues="0" data-search="ANTD 构想家型 图灵 约翰·纳什 赫伯特·西蒙 诺伯特·维纳 图灵 约翰·纳什 赫伯特·西蒙 郭守敬 图灵">
+  <header>
+    <div class="code" style="color:#6B3FA0">ANTD</div>
+    <div class="tname">构想家型</div>
+    <div class="flag">本轮已改</div>
+    <div class="grp" style="background:#6B3FA0">NT 深紫组</div>
+  </header>
+  <div class="dims"><span class="dim d0">A<i>平衡</i></span><span class="dim d1">N<i>直觉</i></span><span class="dim d2">T<i>思考</i></span><span class="dim d3">D<i>动态</i></span></div>
+  <div class="main">
+    <div class="lab">主人物 / 结果页展示</div>
+    <div class="pname">图灵<span>数学家 / 计算机科学先驱</span></div>
+    <p class="story">用图灵机定义计算的边界，二战期间参与破解恩尼格玛密码。他的抽象思维改变了世界，也亲历了时代对少数群体的残酷对待。</p>
+  </div>
+  <div class="others">
+    <div class="lab">其余代表人物 <b>3</b></div>
+    <div class="chips"><span class="chip" title="数学家 / 经济学家">约翰·纳什</span><span class="chip" title="经济学家 / 人工智能先驱">赫伯特·西蒙</span><span class="chip new" title="数学家 / 控制论创始人">诺伯特·维纳<b>新</b></span></div>
+  </div>
+  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">图灵</span><span class="chip del">约翰·纳什</span><span class="chip del">赫伯特·西蒙</span><span class="chip del">郭守敬</span></div></div>
+  
+  <div class="review">
+    <div class="opts">
+      <label><input type="radio" name="r-ANTD" value="pass">通过</label>
+      <label><input type="radio" name="r-ANTD" value="fix">需改</label>
+      <label><input type="radio" name="r-ANTD" value="hold">存疑</label>
+    </div>
+    <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
+  </div>
+</article>
+<article class="card" data-code="ANTJ" data-group="NT" data-changed="1" data-issues="0" data-search="ANTJ 策划者型 迈克尔·波特 钱学森 张良 迈克尔·波特 德鲁克 钱学森 张良 迈克尔·波特">
+  <header>
+    <div class="code" style="color:#6B3FA0">ANTJ</div>
+    <div class="tname">策划者型</div>
+    <div class="flag">本轮已改</div>
+    <div class="grp" style="background:#6B3FA0">NT 深紫组</div>
+  </header>
+  <div class="dims"><span class="dim d0">A<i>平衡</i></span><span class="dim d1">N<i>直觉</i></span><span class="dim d2">T<i>思考</i></span><span class="dim d3">J<i>判断</i></span></div>
+  <div class="main">
+    <div class="lab">主人物 / 结果页展示</div>
+    <div class="pname">迈克尔·波特<span>战略学者</span></div>
+    <p class="story">用五力模型、价值链和竞争战略把商业分析变成一门学科。他的框架擅长解释结构，但也常被批评低估了人的复杂性和快速变化的环境。</p>
+  </div>
+  <div class="others">
+    <div class="lab">其余代表人物 <b>2</b></div>
+    <div class="chips"><span class="chip" title="空气动力学家 / 航天科学家">钱学森</span><span class="chip" title="西汉开国谋臣">张良</span></div>
+  </div>
+  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">迈克尔·波特</span><span class="chip del">德鲁克</span><span class="chip del">钱学森</span><span class="chip del">张良</span></div></div>
+  
+  <div class="review">
+    <div class="opts">
+      <label><input type="radio" name="r-ANTJ" value="pass">通过</label>
+      <label><input type="radio" name="r-ANTJ" value="fix">需改</label>
+      <label><input type="radio" name="r-ANTJ" value="hold">存疑</label>
+    </div>
+    <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
+  </div>
+</article>
+<article class="card" data-code="ANTP" data-group="NT" data-changed="1" data-issues="0" data-search="ANTP 思辨者型 霍金 道金斯 卡尔·波普尔 史蒂芬·平克 霍金 费曼 卡尔·波普尔 史蒂芬·平克 霍金">
+  <header>
+    <div class="code" style="color:#6B3FA0">ANTP</div>
+    <div class="tname">思辨者型</div>
+    <div class="flag">本轮已改</div>
+    <div class="grp" style="background:#6B3FA0">NT 深紫组</div>
+  </header>
+  <div class="dims"><span class="dim d0">A<i>平衡</i></span><span class="dim d1">N<i>直觉</i></span><span class="dim d2">T<i>思考</i></span><span class="dim d3">P<i>感知</i></span></div>
+  <div class="main">
+    <div class="lab">主人物 / 结果页展示</div>
+    <div class="pname">霍金<span>理论物理学家</span></div>
+    <p class="story">在渐冻症持续侵蚀身体的情况下，完成黑洞辐射等研究，并用《时间简史》把宇宙学带给普通读者。身体被限制，思想却一直向外。</p>
+  </div>
+  <div class="others">
+    <div class="lab">其余代表人物 <b>3</b></div>
+    <div class="chips"><span class="chip new" title="演化生物学家">道金斯<b>新</b></span><span class="chip" title="科学哲学家">卡尔·波普尔</span><span class="chip" title="认知心理学家 / 语言学家">史蒂芬·平克</span></div>
+  </div>
+  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">霍金</span><span class="chip del">费曼</span><span class="chip del">卡尔·波普尔</span><span class="chip del">史蒂芬·平克</span></div></div>
+  
+  <div class="review">
+    <div class="opts">
+      <label><input type="radio" name="r-ANTP" value="pass">通过</label>
+      <label><input type="radio" name="r-ANTP" value="fix">需改</label>
+      <label><input type="radio" name="r-ANTP" value="hold">存疑</label>
+    </div>
+    <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
+  </div>
+</article>
+<article class="card" data-code="ENTD" data-group="NT" data-changed="0" data-issues="0" data-search="ENTD 战略家型 亚历山大大帝 杰克·韦尔奇 张一鸣 凯撒  亚历山大大帝">
+  <header>
+    <div class="code" style="color:#6B3FA0">ENTD</div>
+    <div class="tname">战略家型</div>
+    
+    <div class="grp" style="background:#6B3FA0">NT 深紫组</div>
+  </header>
+  <div class="dims"><span class="dim d0">E<i>外向</i></span><span class="dim d1">N<i>直觉</i></span><span class="dim d2">T<i>思考</i></span><span class="dim d3">D<i>动态</i></span></div>
+  <div class="main">
+    <div class="lab">主人物 / 结果页展示</div>
+    <div class="pname">亚历山大大帝<span>马其顿国王</span></div>
+    <p class="story">二十岁登基，十三年间从希腊一路打到印度。他用速度和决断建立帝国，却没有建立能延续帝国的治理结构——这既是开拓者的高光，也是开拓者的代价。</p>
+  </div>
+  <div class="others">
+    <div class="lab">其余代表人物 <b>3</b></div>
+    <div class="chips"><span class="chip" title="通用电气前首席执行官">杰克·韦尔奇</span><span class="chip" title="字节跳动创始人">张一鸣</span><span class="chip" title="古罗马统帅 / 政治家">凯撒</span></div>
+  </div>
+  
+  
+  <div class="review">
+    <div class="opts">
+      <label><input type="radio" name="r-ENTD" value="pass">通过</label>
+      <label><input type="radio" name="r-ENTD" value="fix">需改</label>
+      <label><input type="radio" name="r-ENTD" value="hold">存疑</label>
+    </div>
+    <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
+  </div>
+</article>
+<article class="card" data-code="ENTJ" data-group="NT" data-changed="1" data-issues="0" data-search="ENTJ 指挥官型 拿破仑 撒切尔夫人 富兰克林·罗斯福 任正非 拿破仑 撒切尔夫人 罗斯福 任正非 拿破仑">
+  <header>
+    <div class="code" style="color:#6B3FA0">ENTJ</div>
+    <div class="tname">指挥官型</div>
+    <div class="flag">本轮已改</div>
+    <div class="grp" style="background:#6B3FA0">NT 深紫组</div>
+  </header>
+  <div class="dims"><span class="dim d0">E<i>外向</i></span><span class="dim d1">N<i>直觉</i></span><span class="dim d2">T<i>思考</i></span><span class="dim d3">J<i>判断</i></span></div>
+  <div class="main">
+    <div class="lab">主人物 / 结果页展示</div>
+    <div class="pname">拿破仑<span>军事家 / 政治家</span></div>
+    <p class="story">从炮兵军官到法兰西皇帝，他擅长把宏大目标拆成一场场可执行的战役，把资源集中到决胜点。滑铁卢也提醒人们：极强的控制欲和对速度的迷信，最终会成为系统的风险。</p>
+  </div>
+  <div class="others">
+    <div class="lab">其余代表人物 <b>3</b></div>
+    <div class="chips"><span class="chip" title="英国前首相">撒切尔夫人</span><span class="chip new" title="美国第 32 任总统">富兰克林·罗斯福<b>新</b></span><span class="chip" title="华为创始人">任正非</span></div>
+  </div>
+  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">拿破仑</span><span class="chip del">撒切尔夫人</span><span class="chip del">罗斯福</span><span class="chip del">任正非</span></div></div>
+  
+  <div class="review">
+    <div class="opts">
+      <label><input type="radio" name="r-ENTJ" value="pass">通过</label>
+      <label><input type="radio" name="r-ENTJ" value="fix">需改</label>
+      <label><input type="radio" name="r-ENTJ" value="hold">存疑</label>
+    </div>
+    <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
+  </div>
+</article>
+<article class="card" data-code="ENTP" data-group="NT" data-changed="0" data-issues="0" data-search="ENTP 辩论家型 丘吉尔 达·芬奇 马克·吐温 马云  丘吉尔">
+  <header>
+    <div class="code" style="color:#6B3FA0">ENTP</div>
+    <div class="tname">辩论家型</div>
+    
+    <div class="grp" style="background:#6B3FA0">NT 深紫组</div>
+  </header>
+  <div class="dims"><span class="dim d0">E<i>外向</i></span><span class="dim d1">N<i>直觉</i></span><span class="dim d2">T<i>思考</i></span><span class="dim d3">P<i>感知</i></span></div>
+  <div class="main">
+    <div class="lab">主人物 / 结果页展示</div>
+    <div class="pname">丘吉尔<span>英国首相 / 作家</span></div>
+    <p class="story">二战最黑暗的时期，他用语言把恐惧转化为行动，也用不断试探、辩论和调整的策略撑过不列颠空战。他并非从不犯错，但他擅长在不确定中保持进攻姿态。</p>
+  </div>
+  <div class="others">
+    <div class="lab">其余代表人物 <b>3</b></div>
+    <div class="chips"><span class="chip" title="文艺复兴画家 / 工程师">达·芬奇</span><span class="chip" title="美国作家">马克·吐温</span><span class="chip" title="阿里巴巴创始人">马云</span></div>
+  </div>
+  
+  
+  <div class="review">
+    <div class="opts">
+      <label><input type="radio" name="r-ENTP" value="pass">通过</label>
+      <label><input type="radio" name="r-ENTP" value="fix">需改</label>
+      <label><input type="radio" name="r-ENTP" value="hold">存疑</label>
+    </div>
+    <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
+  </div>
+</article>
+<article class="card" data-code="INTD" data-group="NT" data-changed="1" data-issues="0" data-search="INTD 蓝图家型 康德 叔本华 朱熹 海德格尔 康德 叔本华 朱熹 孙武 康德">
+  <header>
+    <div class="code" style="color:#6B3FA0">INTD</div>
+    <div class="tname">蓝图家型</div>
+    <div class="flag">本轮已改</div>
+    <div class="grp" style="background:#6B3FA0">NT 深紫组</div>
+  </header>
+  <div class="dims"><span class="dim d0">I<i>内向</i></span><span class="dim d1">N<i>直觉</i></span><span class="dim d2">T<i>思考</i></span><span class="dim d3">D<i>动态</i></span></div>
+  <div class="main">
+    <div class="lab">主人物 / 结果页展示</div>
+    <div class="pname">康德<span>哲学家</span></div>
+    <p class="story">一生几乎没离开柯尼斯堡，却用三大批判重写认识论与伦理学。他的日常散步准时到可以给邻居对表，思想却走得极远。</p>
+  </div>
+  <div class="others">
+    <div class="lab">其余代表人物 <b>3</b></div>
+    <div class="chips"><span class="chip" title="哲学家">叔本华</span><span class="chip" title="南宋理学家">朱熹</span><span class="chip new" title="哲学家">海德格尔<b>新</b></span></div>
+  </div>
+  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">康德</span><span class="chip del">叔本华</span><span class="chip del">朱熹</span><span class="chip del">孙武</span></div></div>
+  
+  <div class="review">
+    <div class="opts">
+      <label><input type="radio" name="r-INTD" value="pass">通过</label>
+      <label><input type="radio" name="r-INTD" value="fix">需改</label>
+      <label><input type="radio" name="r-INTD" value="hold">存疑</label>
+    </div>
+    <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
+  </div>
+</article>
+<article class="card" data-code="INTJ" data-group="NT" data-changed="0" data-issues="0" data-search="INTJ 建筑师型 尼采 马斯克 曹操 诸葛亮  尼采">
+  <header>
+    <div class="code" style="color:#6B3FA0">INTJ</div>
+    <div class="tname">建筑师型</div>
+    
+    <div class="grp" style="background:#6B3FA0">NT 深紫组</div>
+  </header>
+  <div class="dims"><span class="dim d0">I<i>内向</i></span><span class="dim d1">N<i>直觉</i></span><span class="dim d2">T<i>思考</i></span><span class="dim d3">J<i>判断</i></span></div>
+  <div class="main">
+    <div class="lab">主人物 / 结果页展示</div>
+    <div class="pname">尼采<span>哲学家 / 古典语文学家</span></div>
+    <p class="story">二十四岁成为巴塞尔大学教授，后来用格言和谱系学拆解道德、真理与宗教。他生前影响有限，死后却成为现代思想绕不开的名字。</p>
+  </div>
+  <div class="others">
+    <div class="lab">其余代表人物 <b>3</b></div>
+    <div class="chips"><span class="chip" title="企业家 / 特斯拉与 SpaceX 创始人">马斯克</span><span class="chip" title="东汉末年政治家 / 诗人">曹操</span><span class="chip" title="三国蜀汉丞相">诸葛亮</span></div>
+  </div>
+  
+  
+  <div class="review">
+    <div class="opts">
+      <label><input type="radio" name="r-INTJ" value="pass">通过</label>
+      <label><input type="radio" name="r-INTJ" value="fix">需改</label>
+      <label><input type="radio" name="r-INTJ" value="hold">存疑</label>
+    </div>
+    <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
+  </div>
+</article>
+<article class="card" data-code="INTP" data-group="NT" data-changed="1" data-issues="0" data-search="INTP 逻辑学家型 爱因斯坦 尼古拉·特斯拉 老子 庄子 爱因斯坦 达尔文 庄子 亚当·斯密 爱因斯坦">
+  <header>
+    <div class="code" style="color:#6B3FA0">INTP</div>
+    <div class="tname">逻辑学家型</div>
+    <div class="flag">本轮已改</div>
+    <div class="grp" style="background:#6B3FA0">NT 深紫组</div>
+  </header>
+  <div class="dims"><span class="dim d0">I<i>内向</i></span><span class="dim d1">N<i>直觉</i></span><span class="dim d2">T<i>思考</i></span><span class="dim d3">P<i>感知</i></span></div>
+  <div class="main">
+    <div class="lab">主人物 / 结果页展示</div>
+    <div class="pname">爱因斯坦<span>理论物理学家</span></div>
+    <p class="story">1905 年一年内发表光电效应、狭义相对论等论文。他靠思想实验和数学直觉工作，而不是靠实验室设备；相对论后来改变了整个物理学。</p>
+  </div>
+  <div class="others">
+    <div class="lab">其余代表人物 <b>3</b></div>
+    <div class="chips"><span class="chip new" title="发明家 / 电气工程师">尼古拉·特斯拉<b>新</b></span><span class="chip new" title="道家思想家">老子<b>新</b></span><span class="chip" title="道家思想家">庄子</span></div>
+  </div>
+  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">爱因斯坦</span><span class="chip del">达尔文</span><span class="chip del">庄子</span><span class="chip del">亚当·斯密</span></div></div>
+  
+  <div class="review">
+    <div class="opts">
+      <label><input type="radio" name="r-INTP" value="pass">通过</label>
+      <label><input type="radio" name="r-INTP" value="fix">需改</label>
+      <label><input type="radio" name="r-INTP" value="hold">存疑</label>
+    </div>
+    <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
+  </div>
+</article></div>
+  </section>
+<section class="group" data-group="NC">
+    <h2><span class="swatch" style="background:#3D7B8A"></span>NC 靛青组
+      <em>直觉 · 复合 C · 9 型 · 本轮改 4</em></h2>
+    <div class="grid">
+<article class="card" data-code="ANCD" data-group="NC" data-changed="0" data-issues="0" data-search="ANCD 哲思者型 哥德尔 维特根斯坦 陈省身 莱布尼茨  哥德尔">
+  <header>
+    <div class="code" style="color:#3D7B8A">ANCD</div>
+    <div class="tname">哲思者型</div>
+    
+    <div class="grp" style="background:#3D7B8A">NC 靛青组</div>
+  </header>
+  <div class="dims"><span class="dim d0">A<i>平衡</i></span><span class="dim d1">N<i>直觉</i></span><span class="dim d2">C<i>复合</i></span><span class="dim d3">D<i>动态</i></span></div>
+  <div class="main">
+    <div class="lab">主人物 / 结果页展示</div>
+    <div class="pname">哥德尔<span>逻辑学家 / 数学家</span></div>
+    <p class="story">不完备定理证明：任何足够强的形式系统，都存在无法在系统内证明的真命题。他一生在逻辑的极限与个人的偏执之间摇摆。</p>
+  </div>
+  <div class="others">
+    <div class="lab">其余代表人物 <b>3</b></div>
+    <div class="chips"><span class="chip" title="哲学家">维特根斯坦</span><span class="chip" title="数学家">陈省身</span><span class="chip" title="数学家 / 哲学家">莱布尼茨</span></div>
+  </div>
+  
+  
+  <div class="review">
+    <div class="opts">
+      <label><input type="radio" name="r-ANCD" value="pass">通过</label>
+      <label><input type="radio" name="r-ANCD" value="fix">需改</label>
+      <label><input type="radio" name="r-ANCD" value="hold">存疑</label>
+    </div>
+    <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
+  </div>
+</article>
+<article class="card" data-code="ANCJ" data-group="NC" data-changed="0" data-issues="0" data-search="ANCJ 设计者型 笛卡尔 斯宾诺莎 王阳明 沈括  笛卡尔">
+  <header>
+    <div class="code" style="color:#3D7B8A">ANCJ</div>
+    <div class="tname">设计者型</div>
+    
+    <div class="grp" style="background:#3D7B8A">NC 靛青组</div>
+  </header>
+  <div class="dims"><span class="dim d0">A<i>平衡</i></span><span class="dim d1">N<i>直觉</i></span><span class="dim d2">C<i>复合</i></span><span class="dim d3">J<i>判断</i></span></div>
+  <div class="main">
+    <div class="lab">主人物 / 结果页展示</div>
+    <div class="pname">笛卡尔<span>哲学家 / 数学家</span></div>
+    <p class="story">用“怀疑一切”的方法寻找不可怀疑的起点，提出“我思故我在”；同时创立解析几何，把代数与几何连接起来。他既是怀疑者，也是体系建造者。</p>
+  </div>
+  <div class="others">
+    <div class="lab">其余代表人物 <b>3</b></div>
+    <div class="chips"><span class="chip" title="哲学家">斯宾诺莎</span><span class="chip" title="明代思想家">王阳明</span><span class="chip" title="北宋科学家">沈括</span></div>
+  </div>
+  
+  
+  <div class="review">
+    <div class="opts">
+      <label><input type="radio" name="r-ANCJ" value="pass">通过</label>
+      <label><input type="radio" name="r-ANCJ" value="fix">需改</label>
+      <label><input type="radio" name="r-ANCJ" value="hold">存疑</label>
+    </div>
+    <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
+  </div>
+</article>
+<article class="card" data-code="ANCP" data-group="NC" data-changed="1" data-issues="0" data-search="ANCP 创意家型 冯·诺依曼 香农 杨振宁 帕斯卡 冯·诺依曼 香农 姚期智 帕斯卡 冯·诺依曼">
+  <header>
+    <div class="code" style="color:#3D7B8A">ANCP</div>
+    <div class="tname">创意家型</div>
+    <div class="flag">本轮已改</div>
+    <div class="grp" style="background:#3D7B8A">NC 靛青组</div>
+  </header>
+  <div class="dims"><span class="dim d0">A<i>平衡</i></span><span class="dim d1">N<i>直觉</i></span><span class="dim d2">C<i>复合</i></span><span class="dim d3">P<i>感知</i></span></div>
+  <div class="main">
+    <div class="lab">主人物 / 结果页展示</div>
+    <div class="pname">冯·诺依曼<span>数学家 / 计算机架构先驱</span></div>
+    <p class="story">从博弈论到计算机体系结构，他参与曼哈顿计划，也能把高度抽象的数学迅速转成工程方案。他的大脑像一台跨学科的高速转换器。</p>
+  </div>
+  <div class="others">
+    <div class="lab">其余代表人物 <b>3</b></div>
+    <div class="chips"><span class="chip" title="数学家 / 信息论创始人">香农</span><span class="chip new" title="理论物理学家 / 诺贝尔物理学奖得主">杨振宁<b>新</b></span><span class="chip" title="数学家 / 哲学家">帕斯卡</span></div>
+  </div>
+  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">冯·诺依曼</span><span class="chip del">香农</span><span class="chip del">姚期智</span><span class="chip del">帕斯卡</span></div></div>
+  
+  <div class="review">
+    <div class="opts">
+      <label><input type="radio" name="r-ANCP" value="pass">通过</label>
+      <label><input type="radio" name="r-ANCP" value="fix">需改</label>
+      <label><input type="radio" name="r-ANCP" value="hold">存疑</label>
+    </div>
+    <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
+  </div>
+</article>
+<article class="card" data-code="ENCD" data-group="NC" data-changed="0" data-issues="0" data-search="ENCD 变革者型 乔布斯 雷军 理查德·布兰森 李开复  乔布斯">
+  <header>
+    <div class="code" style="color:#3D7B8A">ENCD</div>
+    <div class="tname">变革者型</div>
+    
+    <div class="grp" style="background:#3D7B8A">NC 靛青组</div>
+  </header>
+  <div class="dims"><span class="dim d0">E<i>外向</i></span><span class="dim d1">N<i>直觉</i></span><span class="dim d2">C<i>复合</i></span><span class="dim d3">D<i>动态</i></span></div>
+  <div class="main">
+    <div class="lab">主人物 / 结果页展示</div>
+    <div class="pname">乔布斯<span>苹果公司联合创始人</span></div>
+    <p class="story">被自己创办的公司赶走后，他创办 NeXT、收购皮克斯，回归苹果后用 iPod 和 iPhone 重做产品线。他的现实扭曲力场既能逼出不可能，也会把团队推到极限。</p>
+  </div>
+  <div class="others">
+    <div class="lab">其余代表人物 <b>3</b></div>
+    <div class="chips"><span class="chip" title="小米创始人">雷军</span><span class="chip" title="英国企业家 / 维珍创始人">理查德·布兰森</span><span class="chip" title="计算机科学家 / 投资人">李开复</span></div>
+  </div>
+  
+  
+  <div class="review">
+    <div class="opts">
+      <label><input type="radio" name="r-ENCD" value="pass">通过</label>
+      <label><input type="radio" name="r-ENCD" value="fix">需改</label>
+      <label><input type="radio" name="r-ENCD" value="hold">存疑</label>
+    </div>
+    <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
+  </div>
+</article>
+<article class="card" data-code="ENCJ" data-group="NC" data-changed="1" data-issues="0" data-search="ENCJ 开拓者型 比尔·盖茨 彼得·德鲁克 柳传志 孙正义 比尔·盖茨 彼得·德鲁克 柳传志 艾森豪威尔 比尔·盖茨">
+  <header>
+    <div class="code" style="color:#3D7B8A">ENCJ</div>
+    <div class="tname">开拓者型</div>
+    <div class="flag">本轮已改</div>
+    <div class="grp" style="background:#3D7B8A">NC 靛青组</div>
+  </header>
+  <div class="dims"><span class="dim d0">E<i>外向</i></span><span class="dim d1">N<i>直觉</i></span><span class="dim d2">C<i>复合</i></span><span class="dim d3">J<i>判断</i></span></div>
+  <div class="main">
+    <div class="lab">主人物 / 结果页展示</div>
+    <div class="pname">比尔·盖茨<span>企业家 / 慈善家</span></div>
+    <p class="story">从编程少年到微软掌门，他擅长把技术趋势变成平台和标准。离开微软后，他又用系统化方法处理公共卫生与气候问题，把“规模”从商业扩展到公益。</p>
+  </div>
+  <div class="others">
+    <div class="lab">其余代表人物 <b>3</b></div>
+    <div class="chips"><span class="chip" title="管理学家">彼得·德鲁克</span><span class="chip" title="联想创始人">柳传志</span><span class="chip new" title="投资家 / 软银创始人">孙正义<b>新</b></span></div>
+  </div>
+  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">比尔·盖茨</span><span class="chip del">彼得·德鲁克</span><span class="chip del">柳传志</span><span class="chip del">艾森豪威尔</span></div></div>
+  
+  <div class="review">
+    <div class="opts">
+      <label><input type="radio" name="r-ENCJ" value="pass">通过</label>
+      <label><input type="radio" name="r-ENCJ" value="fix">需改</label>
+      <label><input type="radio" name="r-ENCJ" value="hold">存疑</label>
+    </div>
+    <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
+  </div>
+</article>
+<article class="card" data-code="ENCP" data-group="NC" data-changed="1" data-issues="0" data-search="ENCP 先驱者型 爱迪生 马化腾 富兰克林 爱迪生 尼古拉·特斯拉 马化腾 富兰克林 爱迪生">
+  <header>
+    <div class="code" style="color:#3D7B8A">ENCP</div>
+    <div class="tname">先驱者型</div>
+    <div class="flag">本轮已改</div>
+    <div class="grp" style="background:#3D7B8A">NC 靛青组</div>
+  </header>
+  <div class="dims"><span class="dim d0">E<i>外向</i></span><span class="dim d1">N<i>直觉</i></span><span class="dim d2">C<i>复合</i></span><span class="dim d3">P<i>感知</i></span></div>
+  <div class="main">
+    <div class="lab">主人物 / 结果页展示</div>
+    <div class="pname">爱迪生<span>发明家 / 企业家</span></div>
+    <p class="story">他用实验室和专利系统把发明变成产业。电灯并非他一个人的发明，但他把电力、灯泡、发电和商业模式组织成一个可规模化的系统。</p>
+  </div>
+  <div class="others">
+    <div class="lab">其余代表人物 <b>2</b></div>
+    <div class="chips"><span class="chip" title="腾讯创始人">马化腾</span><span class="chip" title="美国开国元勋 / 科学家">富兰克林</span></div>
+  </div>
+  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">爱迪生</span><span class="chip del">尼古拉·特斯拉</span><span class="chip del">马化腾</span><span class="chip del">富兰克林</span></div></div>
+  
+  <div class="review">
+    <div class="opts">
+      <label><input type="radio" name="r-ENCP" value="pass">通过</label>
+      <label><input type="radio" name="r-ENCP" value="fix">需改</label>
+      <label><input type="radio" name="r-ENCP" value="hold">存疑</label>
+    </div>
+    <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
+  </div>
+</article>
+<article class="card" data-code="INCD" data-group="NC" data-changed="1" data-issues="0" data-search="INCD 洞见者型 哥白尼 伽利略 居里夫人 麦克斯韦 哥白尼 伽利略 徐光启 麦克斯韦 哥白尼">
+  <header>
+    <div class="code" style="color:#3D7B8A">INCD</div>
+    <div class="tname">洞见者型</div>
+    <div class="flag">本轮已改</div>
+    <div class="grp" style="background:#3D7B8A">NC 靛青组</div>
+  </header>
+  <div class="dims"><span class="dim d0">I<i>内向</i></span><span class="dim d1">N<i>直觉</i></span><span class="dim d2">C<i>复合</i></span><span class="dim d3">D<i>动态</i></span></div>
+  <div class="main">
+    <div class="lab">主人物 / 结果页展示</div>
+    <div class="pname">哥白尼<span>天文学家</span></div>
+    <p class="story">在教会体系内提出日心说，用数学重新安排宇宙的中心。他的著作出版于去世当年，革命却刚刚开始。</p>
+  </div>
+  <div class="others">
+    <div class="lab">其余代表人物 <b>3</b></div>
+    <div class="chips"><span class="chip" title="物理学家 / 天文学家">伽利略</span><span class="chip new" title="物理学家 / 化学家">居里夫人<b>新</b></span><span class="chip" title="物理学家">麦克斯韦</span></div>
+  </div>
+  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">哥白尼</span><span class="chip del">伽利略</span><span class="chip del">徐光启</span><span class="chip del">麦克斯韦</span></div></div>
+  
+  <div class="review">
+    <div class="opts">
+      <label><input type="radio" name="r-INCD" value="pass">通过</label>
+      <label><input type="radio" name="r-INCD" value="fix">需改</label>
+      <label><input type="radio" name="r-INCD" value="hold">存疑</label>
+    </div>
+    <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
+  </div>
+</article>
+<article class="card" data-code="INCJ" data-group="NC" data-changed="0" data-issues="0" data-search="INCJ 分析家型 薛定谔 海森堡 邓稼先 开普勒  薛定谔">
+  <header>
+    <div class="code" style="color:#3D7B8A">INCJ</div>
+    <div class="tname">分析家型</div>
+    
+    <div class="grp" style="background:#3D7B8A">NC 靛青组</div>
+  </header>
+  <div class="dims"><span class="dim d0">I<i>内向</i></span><span class="dim d1">N<i>直觉</i></span><span class="dim d2">C<i>复合</i></span><span class="dim d3">J<i>判断</i></span></div>
+  <div class="main">
+    <div class="lab">主人物 / 结果页展示</div>
+    <div class="pname">薛定谔<span>物理学家</span></div>
+    <p class="story">提出波动方程，参与量子力学奠基；晚年写《生命是什么》，把物理思维带进生物学，影响了 DNA 结构的发现者。</p>
+  </div>
+  <div class="others">
+    <div class="lab">其余代表人物 <b>3</b></div>
+    <div class="chips"><span class="chip" title="物理学家">海森堡</span><span class="chip" title="核物理学家 / 两弹元勋">邓稼先</span><span class="chip" title="天文学家">开普勒</span></div>
+  </div>
+  
+  
+  <div class="review">
+    <div class="opts">
+      <label><input type="radio" name="r-INCJ" value="pass">通过</label>
+      <label><input type="radio" name="r-INCJ" value="fix">需改</label>
+      <label><input type="radio" name="r-INCJ" value="hold">存疑</label>
+    </div>
+    <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
+  </div>
+</article>
+<article class="card" data-code="INCP" data-group="NC" data-changed="0" data-issues="0" data-search="INCP 理论家型 拉马努金 庞加莱 华罗庚 希尔伯特  拉马努金">
+  <header>
+    <div class="code" style="color:#3D7B8A">INCP</div>
+    <div class="tname">理论家型</div>
+    
+    <div class="grp" style="background:#3D7B8A">NC 靛青组</div>
+  </header>
+  <div class="dims"><span class="dim d0">I<i>内向</i></span><span class="dim d1">N<i>直觉</i></span><span class="dim d2">C<i>复合</i></span><span class="dim d3">P<i>感知</i></span></div>
+  <div class="main">
+    <div class="lab">主人物 / 结果页展示</div>
+    <div class="pname">拉马努金<span>数学家</span></div>
+    <p class="story">从印度小镇靠自学写出数千个公式，写信给英国数学家哈代后赴剑桥。他的直觉常常先于证明，至今仍在启发数论研究。</p>
+  </div>
+  <div class="others">
+    <div class="lab">其余代表人物 <b>3</b></div>
+    <div class="chips"><span class="chip" title="数学家 / 物理学家">庞加莱</span><span class="chip" title="数学家">华罗庚</span><span class="chip" title="数学家">希尔伯特</span></div>
+  </div>
+  
+  
+  <div class="review">
+    <div class="opts">
+      <label><input type="radio" name="r-INCP" value="pass">通过</label>
+      <label><input type="radio" name="r-INCP" value="fix">需改</label>
+      <label><input type="radio" name="r-INCP" value="hold">存疑</label>
+    </div>
+    <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
+  </div>
+</article></div>
+  </section>
+<section class="group" data-group="NF">
+    <h2><span class="swatch" style="background:#2D8A4E"></span>NF 翠绿组
+      <em>直觉 · 情感 F · 9 型 · 本轮改 6</em></h2>
+    <div class="grid">
+<article class="card" data-code="ANFD" data-group="NF" data-changed="1" data-issues="0" data-search="ANFD 理想家型 荣格 维克多·弗兰克尔 史铁生 萨特 荣格 维克多·弗兰克尔 梁漱溟 萨特 荣格">
+  <header>
+    <div class="code" style="color:#2D8A4E">ANFD</div>
+    <div class="tname">理想家型</div>
+    <div class="flag">本轮已改</div>
+    <div class="grp" style="background:#2D8A4E">NF 翠绿组</div>
+  </header>
+  <div class="dims"><span class="dim d0">A<i>平衡</i></span><span class="dim d1">N<i>直觉</i></span><span class="dim d2">F<i>情感</i></span><span class="dim d3">D<i>动态</i></span></div>
+  <div class="main">
+    <div class="lab">主人物 / 结果页展示</div>
+    <div class="pname">荣格<span>心理学家</span></div>
+    <p class="story">从弗洛伊德的学生到分析心理学创立者，提出集体无意识与原型。他的影响横跨心理治疗、艺术、宗教与流行文化，也始终带着神秘主义色彩。</p>
+  </div>
+  <div class="others">
+    <div class="lab">其余代表人物 <b>3</b></div>
+    <div class="chips"><span class="chip" title="精神病学家 / 意义治疗创始人">维克多·弗兰克尔</span><span class="chip new" title="作家">史铁生<b>新</b></span><span class="chip" title="法国哲学家 / 作家">萨特</span></div>
+  </div>
+  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">荣格</span><span class="chip del">维克多·弗兰克尔</span><span class="chip del">梁漱溟</span><span class="chip del">萨特</span></div></div>
+  
+  <div class="review">
+    <div class="opts">
+      <label><input type="radio" name="r-ANFD" value="pass">通过</label>
+      <label><input type="radio" name="r-ANFD" value="fix">需改</label>
+      <label><input type="radio" name="r-ANFD" value="hold">存疑</label>
+    </div>
+    <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
+  </div>
+</article>
+<article class="card" data-code="ANFJ" data-group="NF" data-changed="1" data-issues="0" data-search="ANFJ 引导者型 林徽因 村上春树 杨澜 泰戈尔 林徽因 村上春树 奥黛丽·赫本 泰戈尔 林徽因">
+  <header>
+    <div class="code" style="color:#2D8A4E">ANFJ</div>
+    <div class="tname">引导者型</div>
+    <div class="flag">本轮已改</div>
+    <div class="grp" style="background:#2D8A4E">NF 翠绿组</div>
+  </header>
+  <div class="dims"><span class="dim d0">A<i>平衡</i></span><span class="dim d1">N<i>直觉</i></span><span class="dim d2">F<i>情感</i></span><span class="dim d3">J<i>判断</i></span></div>
+  <div class="main">
+    <div class="lab">主人物 / 结果页展示</div>
+    <div class="pname">林徽因<span>建筑师 / 诗人</span></div>
+    <p class="story">参与国徽和人民英雄纪念碑设计，也写诗、写散文。她在古建筑调查与文学之间穿梭，用审美和理性同时处理空间与文字。</p>
+  </div>
+  <div class="others">
+    <div class="lab">其余代表人物 <b>3</b></div>
+    <div class="chips"><span class="chip" title="日本作家">村上春树</span><span class="chip new" title="主持人 / 媒体人">杨澜<b>新</b></span><span class="chip" title="印度诗人">泰戈尔</span></div>
+  </div>
+  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">林徽因</span><span class="chip del">村上春树</span><span class="chip del">奥黛丽·赫本</span><span class="chip del">泰戈尔</span></div></div>
+  
+  <div class="review">
+    <div class="opts">
+      <label><input type="radio" name="r-ANFJ" value="pass">通过</label>
+      <label><input type="radio" name="r-ANFJ" value="fix">需改</label>
+      <label><input type="radio" name="r-ANFJ" value="hold">存疑</label>
+    </div>
+    <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
+  </div>
+</article>
+<article class="card" data-code="ANFP" data-group="NF" data-changed="0" data-issues="0" data-search="ANFP 诗性者型 J·K·罗琳 屈原 安徒生 托尔金  J·K·罗琳">
+  <header>
+    <div class="code" style="color:#2D8A4E">ANFP</div>
+    <div class="tname">诗性者型</div>
+    
+    <div class="grp" style="background:#2D8A4E">NF 翠绿组</div>
+  </header>
+  <div class="dims"><span class="dim d0">A<i>平衡</i></span><span class="dim d1">N<i>直觉</i></span><span class="dim d2">F<i>情感</i></span><span class="dim d3">P<i>感知</i></span></div>
+  <div class="main">
+    <div class="lab">主人物 / 结果页展示</div>
+    <div class="pname">J·K·罗琳<span>作家</span></div>
+    <p class="story">在失业与单亲困境中写下《哈利·波特》，被多家出版社拒绝后出版。她用故事构建了一个全球共同记忆，也把“被排斥的人找到归属”写成了主线。</p>
+  </div>
+  <div class="others">
+    <div class="lab">其余代表人物 <b>3</b></div>
+    <div class="chips"><span class="chip" title="战国诗人 / 楚国大夫">屈原</span><span class="chip" title="丹麦童话作家">安徒生</span><span class="chip" title="英国作家 / 语言学家">托尔金</span></div>
+  </div>
+  
+  
+  <div class="review">
+    <div class="opts">
+      <label><input type="radio" name="r-ANFP" value="pass">通过</label>
+      <label><input type="radio" name="r-ANFP" value="fix">需改</label>
+      <label><input type="radio" name="r-ANFP" value="hold">存疑</label>
+    </div>
+    <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
+  </div>
+</article>
+<article class="card" data-code="ENFD" data-group="NF" data-changed="1" data-issues="0" data-search="ENFD 鼓舞者型 马丁·路德·金 马拉拉 孟子 罗翔 马丁·路德·金 马拉拉 孟子 特蕾莎修女 马丁·路德·金">
+  <header>
+    <div class="code" style="color:#2D8A4E">ENFD</div>
+    <div class="tname">鼓舞者型</div>
+    <div class="flag">本轮已改</div>
+    <div class="grp" style="background:#2D8A4E">NF 翠绿组</div>
+  </header>
+  <div class="dims"><span class="dim d0">E<i>外向</i></span><span class="dim d1">N<i>直觉</i></span><span class="dim d2">F<i>情感</i></span><span class="dim d3">D<i>动态</i></span></div>
+  <div class="main">
+    <div class="lab">主人物 / 结果页展示</div>
+    <div class="pname">马丁·路德·金<span>民权运动领袖</span></div>
+    <p class="story">用非暴力运动推动民权法案，“我有一个梦想”成为公共记忆。他把道德愿景转成组织策略，也清楚每一次行动都要承受代价。</p>
+  </div>
+  <div class="others">
+    <div class="lab">其余代表人物 <b>3</b></div>
+    <div class="chips"><span class="chip" title="巴基斯坦教育活动家">马拉拉</span><span class="chip" title="思想家 / 儒家代表">孟子</span><span class="chip new" title="法学教授">罗翔<b>新</b></span></div>
+  </div>
+  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">马丁·路德·金</span><span class="chip del">马拉拉</span><span class="chip del">孟子</span><span class="chip del">特蕾莎修女</span></div></div>
+  
+  <div class="review">
+    <div class="opts">
+      <label><input type="radio" name="r-ENFD" value="pass">通过</label>
+      <label><input type="radio" name="r-ENFD" value="fix">需改</label>
+      <label><input type="radio" name="r-ENFD" value="hold">存疑</label>
+    </div>
+    <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
+  </div>
+</article>
+<article class="card" data-code="ENFJ" data-group="NF" data-changed="0" data-issues="0" data-search="ENFJ 主人公型 奥巴马 奥普拉·温弗瑞 曼德拉 蔡元培  奥巴马">
+  <header>
+    <div class="code" style="color:#2D8A4E">ENFJ</div>
+    <div class="tname">主人公型</div>
+    
+    <div class="grp" style="background:#2D8A4E">NF 翠绿组</div>
+  </header>
+  <div class="dims"><span class="dim d0">E<i>外向</i></span><span class="dim d1">N<i>直觉</i></span><span class="dim d2">F<i>情感</i></span><span class="dim d3">J<i>判断</i></span></div>
+  <div class="main">
+    <div class="lab">主人物 / 结果页展示</div>
+    <div class="pname">奥巴马<span>美国前总统</span></div>
+    <p class="story">从社区组织者到美国总统，他擅长用叙事把个人故事变成公共愿景。演讲是他的工具，组织和对节奏的判断才是他的底层能力。</p>
+  </div>
+  <div class="others">
+    <div class="lab">其余代表人物 <b>3</b></div>
+    <div class="chips"><span class="chip" title="美国电视主持人">奥普拉·温弗瑞</span><span class="chip" title="南非前总统 / 反种族隔离领袖">曼德拉</span><span class="chip" title="教育家 / 北京大学校长">蔡元培</span></div>
+  </div>
+  
+  
+  <div class="review">
+    <div class="opts">
+      <label><input type="radio" name="r-ENFJ" value="pass">通过</label>
+      <label><input type="radio" name="r-ENFJ" value="fix">需改</label>
+      <label><input type="radio" name="r-ENFJ" value="hold">存疑</label>
+    </div>
+    <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
+  </div>
+</article>
+<article class="card" data-code="ENFP" data-group="NF" data-changed="1" data-issues="0" data-search="ENFP 竞选者型 罗宾·威廉姆斯 周星驰 苏轼 汪曾祺 罗宾·威廉姆斯 宫崎骏 苏轼 汪曾祺 罗宾·威廉姆斯">
+  <header>
+    <div class="code" style="color:#2D8A4E">ENFP</div>
+    <div class="tname">竞选者型</div>
+    <div class="flag">本轮已改</div>
+    <div class="grp" style="background:#2D8A4E">NF 翠绿组</div>
+  </header>
+  <div class="dims"><span class="dim d0">E<i>外向</i></span><span class="dim d1">N<i>直觉</i></span><span class="dim d2">F<i>情感</i></span><span class="dim d3">P<i>感知</i></span></div>
+  <div class="main">
+    <div class="lab">主人物 / 结果页展示</div>
+    <div class="pname">罗宾·威廉姆斯<span>演员 / 喜剧演员</span></div>
+    <p class="story">以即兴、模仿和共情把疯狂能量带上银幕，既能演喜剧也能演《死亡诗社》这样的老师。他在笑声背后长期与抑郁搏斗。</p>
+  </div>
+  <div class="others">
+    <div class="lab">其余代表人物 <b>3</b></div>
+    <div class="chips"><span class="chip new" title="演员 / 导演">周星驰<b>新</b></span><span class="chip" title="北宋文学家 / 书画家">苏轼</span><span class="chip" title="作家">汪曾祺</span></div>
+  </div>
+  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">罗宾·威廉姆斯</span><span class="chip del">宫崎骏</span><span class="chip del">苏轼</span><span class="chip del">汪曾祺</span></div></div>
+  
+  <div class="review">
+    <div class="opts">
+      <label><input type="radio" name="r-ENFP" value="pass">通过</label>
+      <label><input type="radio" name="r-ENFP" value="fix">需改</label>
+      <label><input type="radio" name="r-ENFP" value="hold">存疑</label>
+    </div>
+    <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
+  </div>
+</article>
+<article class="card" data-code="INFD" data-group="NF" data-changed="0" data-issues="0" data-search="INFD 沉思者型 卡夫卡 里尔克 曹雪芹 普鲁斯特  卡夫卡">
+  <header>
+    <div class="code" style="color:#2D8A4E">INFD</div>
+    <div class="tname">沉思者型</div>
+    
+    <div class="grp" style="background:#2D8A4E">NF 翠绿组</div>
+  </header>
+  <div class="dims"><span class="dim d0">I<i>内向</i></span><span class="dim d1">N<i>直觉</i></span><span class="dim d2">F<i>情感</i></span><span class="dim d3">D<i>动态</i></span></div>
+  <div class="main">
+    <div class="lab">主人物 / 结果页展示</div>
+    <div class="pname">卡夫卡<span>作家</span></div>
+    <p class="story">白天是保险公司职员，业余写作《变形记》《城堡》。他笔下的人在官僚系统和家庭期待中失去名字，荒诞却精确地像现代生活。</p>
+  </div>
+  <div class="others">
+    <div class="lab">其余代表人物 <b>3</b></div>
+    <div class="chips"><span class="chip" title="奥地利诗人">里尔克</span><span class="chip" title="清代小说家">曹雪芹</span><span class="chip" title="法国作家">普鲁斯特</span></div>
+  </div>
+  
+  
+  <div class="review">
+    <div class="opts">
+      <label><input type="radio" name="r-INFD" value="pass">通过</label>
+      <label><input type="radio" name="r-INFD" value="fix">需改</label>
+      <label><input type="radio" name="r-INFD" value="hold">存疑</label>
+    </div>
+    <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
+  </div>
+</article>
+<article class="card" data-code="INFJ" data-group="NF" data-changed="1" data-issues="0" data-search="INFJ 提倡者型 柏拉图 陀思妥耶夫斯基 鲁迅 杜甫 柏拉图 陀思妥耶夫斯基 鲁迅 特蕾莎修女 柏拉图">
+  <header>
+    <div class="code" style="color:#2D8A4E">INFJ</div>
+    <div class="tname">提倡者型</div>
+    <div class="flag">本轮已改</div>
+    <div class="grp" style="background:#2D8A4E">NF 翠绿组</div>
+  </header>
+  <div class="dims"><span class="dim d0">I<i>内向</i></span><span class="dim d1">N<i>直觉</i></span><span class="dim d2">F<i>情感</i></span><span class="dim d3">J<i>判断</i></span></div>
+  <div class="main">
+    <div class="lab">主人物 / 结果页展示</div>
+    <div class="pname">柏拉图<span>哲学家</span></div>
+    <p class="story">苏格拉底的学生，创办学园，用对话录保存并改造老师的思想。《理想国》既是一部政治哲学，也是一场关于教育、正义与灵魂秩序的长期实验。</p>
+  </div>
+  <div class="others">
+    <div class="lab">其余代表人物 <b>3</b></div>
+    <div class="chips"><span class="chip" title="俄国作家">陀思妥耶夫斯基</span><span class="chip" title="作家">鲁迅</span><span class="chip new" title="唐代诗人">杜甫<b>新</b></span></div>
+  </div>
+  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">柏拉图</span><span class="chip del">陀思妥耶夫斯基</span><span class="chip del">鲁迅</span><span class="chip del">特蕾莎修女</span></div></div>
+  
+  <div class="review">
+    <div class="opts">
+      <label><input type="radio" name="r-INFJ" value="pass">通过</label>
+      <label><input type="radio" name="r-INFJ" value="fix">需改</label>
+      <label><input type="radio" name="r-INFJ" value="hold">存疑</label>
+    </div>
+    <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
+  </div>
+</article>
+<article class="card" data-code="INFP" data-group="NF" data-changed="1" data-issues="0" data-search="INFP 调停者型 莎士比亚 圣埃克苏佩里 卢梭 李白 莎士比亚 梵高 卢梭 李白 莎士比亚">
+  <header>
+    <div class="code" style="color:#2D8A4E">INFP</div>
+    <div class="tname">调停者型</div>
+    <div class="flag">本轮已改</div>
+    <div class="grp" style="background:#2D8A4E">NF 翠绿组</div>
+  </header>
+  <div class="dims"><span class="dim d0">I<i>内向</i></span><span class="dim d1">N<i>直觉</i></span><span class="dim d2">F<i>情感</i></span><span class="dim d3">P<i>感知</i></span></div>
+  <div class="main">
+    <div class="lab">主人物 / 结果页展示</div>
+    <div class="pname">莎士比亚<span>剧作家 / 诗人</span></div>
+    <p class="story">从斯特拉特福来到伦敦，做演员、写剧本、入股剧团。他写喜剧、悲剧和历史剧，用独白把人的犹疑、嫉妒和爱欲变成可被反复引用的语言。</p>
+  </div>
+  <div class="others">
+    <div class="lab">其余代表人物 <b>3</b></div>
+    <div class="chips"><span class="chip new" title="法国作家 / 飞行员">圣埃克苏佩里<b>新</b></span><span class="chip" title="启蒙思想家">卢梭</span><span class="chip" title="唐代诗人">李白</span></div>
+  </div>
+  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">莎士比亚</span><span class="chip del">梵高</span><span class="chip del">卢梭</span><span class="chip del">李白</span></div></div>
+  
+  <div class="review">
+    <div class="opts">
+      <label><input type="radio" name="r-INFP" value="pass">通过</label>
+      <label><input type="radio" name="r-INFP" value="fix">需改</label>
+      <label><input type="radio" name="r-INFP" value="hold">存疑</label>
+    </div>
+    <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
+  </div>
+</article></div>
+  </section></div>
+</div>
+
+<script>
+var KEY='mbti-pro-celebrity-review-v2';
+var state={};
+try{state=JSON.parse(localStorage.getItem(KEY)||'{}')}catch(e){state={}}
+var onlyChanged=false, onlyTodo=false;
+function save(){localStorage.setItem(KEY,JSON.stringify(state))}
+function count(){
+  var n=0;
+  Object.keys(state).forEach(function(k){if(state[k]&&state[k].v)n++});
+  document.getElementById('progress').textContent='已审 '+n+' / 81'+(n===81?' ✓':'');
+}
+function apply(){
+  var q=document.getElementById('q').value.trim().toLowerCase();
+  var g=document.getElementById('group').value;
+  document.querySelectorAll('.card').forEach(function(c){
+    var ok=true;
+    if(g&&c.dataset.group!==g)ok=false;
+    if(onlyChanged&&c.dataset.changed!=='1')ok=false;
+    if(onlyTodo&&state[c.dataset.code]&&state[c.dataset.code].v)ok=false;
+    if(q&&c.dataset.search.toLowerCase().indexOf(q)<0)ok=false;
+    c.classList.toggle('hide',!ok);
+  });
+  document.querySelectorAll('.group').forEach(function(s){
+    var vis=s.querySelectorAll('.card:not(.hide)').length;
+    s.classList.toggle('hide',vis===0);
+  });
+}
+document.getElementById('q').addEventListener('input',apply);
+document.getElementById('group').addEventListener('change',apply);
+document.getElementById('only').addEventListener('click',function(){
+  onlyChanged=!onlyChanged;this.classList.toggle('on',onlyChanged);apply();
+});
+document.getElementById('todo').addEventListener('click',function(){
+  onlyTodo=!onlyTodo;this.classList.toggle('on',onlyTodo);apply();
+});
+document.addEventListener('change',function(e){
+  var r=e.target.closest('input[type=radio]');if(!r)return;
+  var code=r.name.slice(2);
+  state[code]=state[code]||{};state[code].v=r.value;save();count();
+  r.closest('.card').dataset.state=r.value;
+  if(onlyTodo)apply();
+});
+document.addEventListener('input',function(e){
+  if(e.target.tagName!=='TEXTAREA')return;
+  var code=e.target.closest('.card').dataset.code;
+  state[code]=state[code]||{};state[code].note=e.target.value;save();
+});
+document.getElementById('export').addEventListener('click',function(){
+  var out={exportedAt:new Date().toISOString(),stats:{"types":81,"people":307,"slots":307,"dup":0,"dupMains":0,"stories":81,"fields":295,"hand":16,"handDrift":0,"problems":0,"minSlots":3},changed:[{"code":"ABCD","before":["曾国藩","冯道","李沆","吕端"],"after":["曾国藩","亚里士多德","歌德","张謇"]},{"code":"ABCJ","before":["李斯","申不害","田穰苴","赵充国"],"after":["李斯","李鸿章","俾斯麦"]},{"code":"ABFD","before":["马斯洛","米哈伊·契克森米哈伊","川端康成","杨绛"],"after":["马斯洛","林语堂","川端康成","杨绛"]},{"code":"ABTD","before":["亚当·斯密","凯恩斯","管仲","桑弘羊"],"after":["亚当·斯密","凯恩斯","吴敬琏"]},{"code":"ABTJ","before":["司马迁","司马光","荀子","韩非子"],"after":["司马迁","弗朗西斯·培根","荀子","马基雅维利"]},{"code":"ANCP","before":["冯·诺依曼","香农","姚期智","帕斯卡"],"after":["冯·诺依曼","香农","杨振宁","帕斯卡"]},{"code":"ANFD","before":["荣格","维克多·弗兰克尔","梁漱溟","萨特"],"after":["荣格","维克多·弗兰克尔","史铁生","萨特"]},{"code":"ANFJ","before":["林徽因","村上春树","奥黛丽·赫本","泰戈尔"],"after":["林徽因","村上春树","杨澜","泰戈尔"]},{"code":"ANTD","before":["图灵","约翰·纳什","赫伯特·西蒙","郭守敬"],"after":["图灵","约翰·纳什","赫伯特·西蒙","诺伯特·维纳"]},{"code":"ANTJ","before":["迈克尔·波特","德鲁克","钱学森","张良"],"after":["迈克尔·波特","钱学森","张良"]},{"code":"ANTP","before":["霍金","费曼","卡尔·波普尔","史蒂芬·平克"],"after":["霍金","道金斯","卡尔·波普尔","史蒂芬·平克"]},{"code":"ASCD","before":["于谦","文天祥","史可法","李纲"],"after":["于谦","文天祥","史可法","苏武"]},{"code":"ASCP","before":["米开朗基罗","罗丹","卡地亚","王羲之"],"after":["米开朗基罗","罗丹","王羲之"]},{"code":"ASFD","before":["宋慈","况钟","海瑞","徐有功"],"after":["宋慈","钟南山","海瑞"]},{"code":"ASTJ","before":["孔子","包拯","海瑞","司马光"],"after":["孔子","包拯","李光耀"]},{"code":"EBCD","before":["范蠡","刘晏","曾国藩","郑观应"],"after":["范蠡","沈万三","胡雪岩"]},{"code":"EBCJ","before":["吕不韦","子产","张居正","姚崇"],"after":["吕不韦","张仪","基辛格","姚崇"]},{"code":"EBCP","before":["贝尔·格里尔斯","安东尼·波登","弗雷德·阿斯泰尔","埃尔维斯·普雷斯利"],"after":["贝尔·格里尔斯","大张伟","埃尔维斯·普雷斯利"]},{"code":"EBFJ","before":["南丁格尔","晏阳初","陶行知","史怀哲"],"after":["南丁格尔","白求恩","陶行知","史怀哲"]},{"code":"EBFP","before":["沃尔特·惠特曼","舒马赫","三毛","大仲马"],"after":["沃尔特·惠特曼","蔡澜","三毛","大仲马"]},{"code":"EBTD","before":["稻盛和夫","沃伦·巴菲特","安德鲁·卡内基","王永庆"],"after":["稻盛和夫","山姆·沃尔顿","安德鲁·卡内基"]},{"code":"EBTJ","before":["亨利·福特","洛克菲勒","乔治·巴顿","董明珠"],"after":["亨利·福特","洛克菲勒","安迪·格鲁夫","贝索斯"]},{"code":"EBTP","before":["费曼","卡尔·萨根","刘慈欣","迈克尔·克莱顿"],"after":["费曼","卡尔·萨根","刘慈欣","黄渤"]},{"code":"ENCJ","before":["比尔·盖茨","彼得·德鲁克","柳传志","艾森豪威尔"],"after":["比尔·盖茨","彼得·德鲁克","柳传志","孙正义"]},{"code":"ENCP","before":["爱迪生","尼古拉·特斯拉","马化腾","富兰克林"],"after":["爱迪生","马化腾","富兰克林"]},{"code":"ENFD","before":["马丁·路德·金","马拉拉","孟子","特蕾莎修女"],"after":["马丁·路德·金","马拉拉","孟子","罗翔"]},{"code":"ENFP","before":["罗宾·威廉姆斯","宫崎骏","苏轼","汪曾祺"],"after":["罗宾·威廉姆斯","周星驰","苏轼","汪曾祺"]},{"code":"ENTJ","before":["拿破仑","撒切尔夫人","罗斯福","任正非"],"after":["拿破仑","撒切尔夫人","富兰克林·罗斯福","任正非"]},{"code":"IBCD","before":["郑国","李冰","西门豹","召信臣"],"after":["屠呦呦","李冰","西门豹"]},{"code":"IBCJ","before":["管仲","慎到","韩非","商鞅"],"after":["管仲","韩非","商鞅"]},{"code":"IBFJ","before":["赫尔曼·黑塞","契诃夫","沈从文","佩索阿"],"after":["赫尔曼·黑塞","契诃夫","沈从文","余华"]},{"code":"IBTD","before":["约瑟夫·熊彼特","哈耶克","商鞅","吴起"],"after":["约瑟夫·熊彼特","哈耶克","塔勒布"]},{"code":"IBTJ","before":["马可·奥勒留","曾国藩","塞涅卡","左宗棠"],"after":["马可·奥勒留","查理·芒格","塞涅卡"]},{"code":"IBTP","before":["孟德尔","道尔顿","徐霞客","郦道元"],"after":["孟德尔","袁隆平","徐霞客","珍·古道尔"]},{"code":"INCD","before":["哥白尼","伽利略","徐光启","麦克斯韦"],"after":["哥白尼","伽利略","居里夫人","麦克斯韦"]},{"code":"INFJ","before":["柏拉图","陀思妥耶夫斯基","鲁迅","特蕾莎修女"],"after":["柏拉图","陀思妥耶夫斯基","鲁迅","杜甫"]},{"code":"INFP","before":["莎士比亚","梵高","卢梭","李白"],"after":["莎士比亚","圣埃克苏佩里","卢梭","李白"]},{"code":"INTD","before":["康德","叔本华","朱熹","孙武"],"after":["康德","叔本华","朱熹","海德格尔"]},{"code":"INTP","before":["爱因斯坦","达尔文","庄子","亚当·斯密"],"after":["爱因斯坦","尼古拉·特斯拉","老子","庄子"]},{"code":"ISCD","before":["贾思勰","宋应星","李诫","徐光启"],"after":["祖冲之","宋应星","詹天佑","徐光启"]},{"code":"ISCJ","before":["班固","陈寿","司马光","刘知几"],"after":["班固","陈寿","司马光","陈寅恪"]},{"code":"ISCP","before":["蔡伦","李春","沈寿","马钧"],"after":["蔡伦","贝聿铭","沈寿"]},{"code":"ISFJ","before":["特蕾莎修女","凯特王妃","孟母","岳母"],"after":["特蕾莎修女","凯特王妃","林巧稚"]},{"code":"ISFP","before":["梵高","李白","齐白石","张大千"],"after":["梵高","王菲","齐白石","张大千"]},{"code":"ISTJ","before":["巴菲特","乔治·华盛顿","曾参","诸葛亮"],"after":["巴菲特","默克尔","曾参"]},{"code":"ISTP","before":["安藤忠雄","乔布斯","原研哉","乔纳森·艾维"],"after":["安藤忠雄","詹姆斯·戴森","原研哉","乔纳森·艾维"]}],review:state};
+  var blob=new Blob([JSON.stringify(out,null,2)],{type:'application/json'});
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);a.download='mbti-pro-celebrity-review.json';a.click();
+  URL.revokeObjectURL(a.href);
+});
+document.querySelectorAll('.card').forEach(function(c){
+  var s=state[c.dataset.code];
+  if(!s)return;
+  if(s.v){
+    c.dataset.state=s.v;
+    var r=c.querySelector('input[value="'+s.v+'"]');if(r)r.checked=true;
+  }
+  var t=c.querySelector('textarea');if(t&&s.note)t.value=s.note;
+});
+count();
+</script>
+</body>
+</html>
