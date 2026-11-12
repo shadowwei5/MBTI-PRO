@@ -84,3 +84,8 @@ scripts/video-pipeline/**/*.bak.*
 scripts/video-pipeline/**/*.old
 scripts/video-pipeline/.tmp-*
 scripts/video-pipeline/_patch*
+
+# ── 小红书发布包：图片副本 + zip，本地生成物，入手机用 ──────
+# 重生成：node scripts/xhs-daily/build-publish-pack.mjs --note day1 --date YYYY-MM-DD
+docs/xhs-daily/week1/*-发布包-*/
+docs/xhs-daily/week1/*-发布包-*.zip
