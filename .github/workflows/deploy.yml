@@ -16,34 +16,17 @@ jobs:
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1
         with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_KEY }}
-          port: ${{ secrets.SSH_PORT || 22 }}
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_KEY }}
+          port: 22
           command_timeout: 20m
           script: |
             set -e
-            export NVM_DIR="$HOME/.nvm"
-            [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
-            export PATH="$PATH:/root/.nvm/versions/node/$(ls /root/.nvm/versions/node 2>/dev/null | tail -1)/bin"
+            export PATH=/usr/local/bin:/usr/bin:/bin:$PATH
 
             cd /opt/MBTI-PRO
 
-            if [ ! -f .deploy_deps_ready ]; then
-              export DEBIAN_FRONTEND=noninteractive
-              if command -v apt-get >/dev/null 2>&1; then
-                apt-get update || true
-                apt-get install -y libgbm1 libnss3 libatk-bridge2.0-0 libxkbcommon0 libxss1 libgtk-3-0 fontconfig || true
-                apt-get install -y libasound2 || apt-get install -y libasound2t64 || true
-              elif command -v yum >/dev/null 2>&1; then
-                yum install -y mesa-libgbm nss atk at-spi2-atk libxkbcommon libXScrnSaver gtk3 alsa-lib fontconfig freetype || true
-              elif command -v dnf >/dev/null 2>&1; then
-                dnf install -y mesa-libgbm nss atk at-spi2-atk libxkbcommon libXScrnSaver gtk3 alsa-lib fontconfig freetype || true
-              fi
-              touch .deploy_deps_ready
-            fi
-
-            git fetch --unshallow origin 2>/dev/null || true
             git fetch origin master
             git reset --hard origin/master
 
@@ -62,9 +45,6 @@ jobs:
             fi
             npx prisma generate
             npx prisma db push
-            if [ ! -d "$HOME/.cache/ms-playwright" ]; then
-              npx playwright install chromium || true
-            fi
             npx tsx scripts/fix-names.ts
 
             cd ../client
@@ -75,18 +55,13 @@ jobs:
             fi
             npm run build
 
-            cd /opt/MBTI-PRO
-            fuser -k 3001/tcp 2>/dev/null || true
-            sleep 1
-            npx pm2 kill 2>/dev/null || true
-            cd server
-            setsid nohup npx tsx src/index.ts > /tmp/mbti-pro.log 2>&1 < /dev/null &
+            systemctl restart mbti-pro
             for i in $(seq 1 30); do
               curl -fsS http://127.0.0.1:3001/api/health >/dev/null && break
               sleep 1
               if [ "$i" = "30" ]; then
-                tail -n 80 /tmp/mbti-pro.log || true
+                journalctl -u mbti-pro -n 80 --no-pager || true
                 exit 1
               fi
             done
-            echo "Deploy done"
+            curl -fsS -o /dev/null http://127.0.0.1/ && echo "Deploy done"
