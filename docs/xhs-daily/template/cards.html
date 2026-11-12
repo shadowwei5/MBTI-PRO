@@ -30,12 +30,14 @@ body { background:#DDD8CE; padding:40px 0; }
   color:var(--accent); }
 .hl { color:var(--accent); }
 
-/* 主：钩子文案 + 知名人物 + 争议点；次：结论句；注脚：类型码/坐标/公式/九组色 */
-.p1 .cover-title { position:absolute; left:96px; top:300px; font-size:106px; line-height:1.36; font-weight:500; }
-.p1 .person-line { position:absolute; left:96px; top:670px; font-size:52px; color:var(--accent); }
-.p1 .person-line span { font-size:22px; color:var(--muted); letter-spacing:.14em; margin-left:20px;
-  font-family:'DM Mono','Consolas',monospace; }
-.p1 .person-link { position:absolute; left:96px; top:780px; width:820px;
+/* 主：知名人物 + 钩子文案 + 争议点；次：关系句；注脚：类型码/坐标/公式/九组色 */
+/* 封面把「人物名」提到第一位并放到最大：15–35 岁受众先认人，再读钩子 */
+.p1 .name-wrap { position:absolute; left:96px; top:232px; height:206px; display:flex; align-items:flex-end; }
+.p1 .cover-name { line-height:1; color:var(--accent); letter-spacing:.01em; font-weight:500; }
+.p1 .person-work { position:absolute; left:96px; top:468px; font-size:22px; letter-spacing:.14em;
+  color:var(--muted); font-family:'DM Mono','Consolas',monospace; }
+.p1 .cover-title { position:absolute; left:96px; top:518px; font-size:78px; line-height:1.52; font-weight:500; }
+.p1 .person-link { position:absolute; left:96px; top:800px; width:840px;
   font-size:34px; line-height:1.8; color:var(--muted); }
 .p1 .dtag { position:absolute; left:96px; top:1000px; width:560px; padding-top:22px;
   border-top:1px solid var(--rule); font-size:22px; letter-spacing:.1em; color:var(--muted); }
@@ -133,6 +135,7 @@ const NOTE_LIBRARY = {
     "no": 1,
     "person": {
       "name": "鸣人",
+      "coverName": "漩涡鸣人",
       "work": "《火影忍者》",
       "field": "主角",
       "story": "从小被村里孤立，却天天喊着要成为火影；把每个被丢下的人都一个个拉回来。",
@@ -234,7 +237,7 @@ const NOTE_LIBRARY = {
       "link": "想得远，也肯把刚定的方案当场推翻。"
     },
     "coverLines": [
-      "钢铁侠不是 ESTJ",
+      "他不是 ESTJ",
       "是 ENTD"
     ],
     "coverHighlight": "是 ENTD",
@@ -816,12 +819,17 @@ const shell = (inner, n) => `<section class="page">
   <div class="footer mono"><span>81-TYPE PERSONALITY ARCHIVE</span><span>NO.${no2}</span></div>
 </section>`;
 
-const hlLine = t => t.includes(NOTE.coverHighlight)
-  ? '<span class="hl">' + esc(t) + '</span>' : esc(t);
+// 封面人物名优先：名字按字数分档放大，钩子按最长一行自动降档，避免压住下方关系句
+const coverName = NOTE.person.coverName || NOTE.person.name;
+const cnLen = [...coverName].length;
+const namePx = cnLen <= 2 ? 168 : cnLen === 3 ? 140 : 118;
+const maxHook = Math.max(...NOTE.coverLines.map(l => [...l].length));
+const hookPx = maxHook <= 6 ? 78 : maxHook <= 8 ? 70 : 62;
 
 const p1 = `<div class="p1" style="position:absolute;inset:0">
-  <div class="cover-title serif">${NOTE.coverLines.map(hlLine).join('<br>')}</div>
-  <div class="person-line serif">${esc(NOTE.person.name)}<span>${esc(NOTE.person.work || '')} · 流行参照</span></div>
+  <div class="name-wrap"><div class="cover-name serif" style="font-size:${namePx}px">${esc(coverName)}</div></div>
+  <div class="person-work">${esc(NOTE.person.work || '')} · 流行参照</div>
+  <div class="cover-title serif" style="font-size:${hookPx}px">${NOTE.coverLines.map(t => esc(t)).join('<br>')}</div>
   <div class="person-link">${esc(NOTE.person.link)}</div>
   <div class="dtag mono">争议维 · <b>${esc(D.dimNo)} ${esc(D.dimName)}</b> · ${esc(D.scale)}</div>
 </div>`;

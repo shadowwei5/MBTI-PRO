@@ -36,7 +36,7 @@ const pad = n => String(n).padStart(2, '0');
 for (const n of NOTES) {
   const d = n.dispute;
   const rows = [
-    `| P1 | 钩子两行大字（主）｜**朱砂人物名 ${n.person.name} + 流行参照标签**｜下方关系句 ｜ 底部小字：争议维 ${d.dimNo} ${d.dimName} |`,
+    `| P1 | **朱砂大字人物名 ${n.person.coverName || n.person.name}（封面第一视觉）** ｜ 作品 + 流行参照小字 ｜ 下方钩子两行 ｜ 底部小字：争议维 ${d.dimNo} ${d.dimName} |`,
     `| P2 | 争议大字：「${d.claim}」｜${d.note} |`,
     `| P3 | ${d.forA.title}（${d.stanceA} 一侧的证据） |`,
     `| P4 | ${d.forB.title}（${d.stanceB} 一侧的证据） |`,

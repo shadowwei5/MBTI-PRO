@@ -13,7 +13,7 @@ export const NOTES = [
   {
     key: 'day1',
     no: 1,
-    person: { name: '鸣人', work: '《火影忍者》', field: '主角', story: '从小被村里孤立，却天天喊着要成为火影；把每个被丢下的人都一个个拉回来。', link: '不是不靠谱，是把所有人都算进了自己的计划。' },
+    person: { name: '鸣人', coverName: '漩涡鸣人', work: '《火影忍者》', field: '主角', story: '从小被村里孤立，却天天喊着要成为火影；把每个被丢下的人都一个个拉回来。', link: '不是不靠谱，是把所有人都算进了自己的计划。' },
     coverLines: ['吵、冲动', '却从不放弃人'],
     coverHighlight: '却从不放弃人',
     dispute: {
@@ -55,7 +55,7 @@ export const NOTES = [
     key: 'day2',
     no: 2,
     person: { name: '钢铁侠', work: '漫威', field: '复仇者联盟核心成员', story: '从武器商人到造出战甲，想的永远是还没存在的东西；方案一旦不成立，当场推翻重做。', link: '想得远，也肯把刚定的方案当场推翻。' },
-    coverLines: ['钢铁侠不是 ESTJ', '是 ENTD'],
+    coverLines: ['他不是 ESTJ', '是 ENTD'],
     coverHighlight: '是 ENTD',
     dispute: {
       dimNo: '04', dimName: '生活态度', scale: 'J / D / P', stanceA: 'J', stanceB: 'P',

@@ -60,31 +60,39 @@ for (const f of pngs) copyFileSync(resolve(srcDir, f), resolve(outDir, f))
 // 首评：正文里的互动问句 + 自答，保持与 P9 一致
 const bodyText = note.body.join('\n\n')
 const txt = [
-  `# ${note.title}`,
+  `《${note.title}》· 发布包`,
   '',
-  '— 标题（≤20 字，直接粘贴）—',
+  '════ 一、发布步骤（5 步）════',
+  '1. 小红书 App → 底部「+」→ 图文 → 按 01→09 顺序选这 9 张图',
+  '2. 下一步 → 粘贴标题 → 粘贴正文 → 填 7 个话题',
+  '3. 底部「添加商品」→ 选店铺里 0.99 的「81 型人格档案」商品卡',
+  '4. 位置不填（填了会缩小推荐范围）→ 发布',
+  '5. 发布后 10 分钟内：发下面那条作者置顶评论，并回复前 5 条真实评论',
+  '',
+  '════ 二、标题（≤20 字，直接粘贴）════',
   note.title,
   '',
-  '— 正文（直接粘贴，含固定免责尾句）—',
+  '════ 三、正文（直接粘贴，含固定免责尾句）════',
   bodyText,
   '',
-  '— 话题标签（7 个，填进标签栏）—',
+  '════ 四、话题标签（7 个，填进标签栏）════',
   note.tags,
   '',
-  '— 作者置顶评论（发布后 10 分钟内发）—',
+  '════ 五、作者置顶评论（发布后 10 分钟内发）════',
   note.pinned,
   '',
-  '— 图片顺序（9 张，按文件名顺序上传；第 1 张为封面）—',
+  '════ 六、图片顺序（9 张；第 1 张就是封面）════',
   pngs.map((f, i) => `P${i + 1}  ${f}`).join('\n'),
   '',
-  `— 免责（正文尾已含，勿删）—`,
+  '════ 七、免责（正文尾已含，勿删）════',
   DISCLAIMER,
   '',
 ].join('\n')
 
-writeFileSync(resolve(outDir, '文案.txt'), txt, 'utf8')
+const TXT_NAME = '00-发布包（先看这个）.txt'
+writeFileSync(resolve(outDir, TXT_NAME), txt, 'utf8')
 
 console.log(`已生成发布包：${outDir}`)
 console.log(`  图片 ${pngs.length} 张：${pngs[0]} … ${pngs[pngs.length - 1]}`)
-console.log(`  文案.txt  ${txt.replace(/\s/g, '').length} 字`)
+console.log(`  ${TXT_NAME}  ${txt.replace(/\s/g, '').length} 字`)
 console.log(`  标题「${note.title}」${note.title.length} 字 · 正文 ${bodyText.replace(/\s/g, '').length} 字`)
