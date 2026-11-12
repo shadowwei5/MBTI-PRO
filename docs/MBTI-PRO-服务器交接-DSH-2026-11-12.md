@@ -1,52 +1,67 @@
-# 服务器操作交接（移交 DSH）—— 兑换码池 + 上架收尾
+# 服务器操作交接（DSH 专版 · 终版 v2）
 
-> 交接时间：2026-11-12 23:50 ｜ 背景：网站已上线（https://mbti-pro.com 健康检查 200），商品文案与 5 张上架图已备好（`docs/MBTI-PRO-小红书商品上架-2026-11-12.md`），**剩余的服务器侧操作就是"生成兑换码码池"这一件**，外加店铺后台配置与验证。
-> 服务器：腾讯云轻量香港 `43.132.217.70`（root，密钥登录），项目根 `/opt/MBTI-PRO`，后端 systemd 服务名 `mbti-pro`，数据库 SQLite `/opt/MBTI-PRO/server/prisma/dev.db`。
+> 交接时间：2026-11-13 00:10 ｜ 状态：网站已上线（https://mbti-pro.com 健康检查 200）｜ 商品文案/上架图/发货说明已全部定稿
+> **你只剩两件事：①在服务器生成全店统一兑换码；②把码填进发货说明并完成店铺上架。** 全程约 15 分钟。
 
 ---
 
-## 1. 生成全店统一兑换码（必做，商品上架的"货"）
+## 0. 背景速读（30 秒）
 
-**实测：小红书个人店「自动发货」的发货说明是固定文本（≤500 字），不支持按订单填变量 → 采用统一码模式**（对标商家同做法），服务端已配护栏：单码 3000 次额度、单码单日成功兑换 ≤500 次防刷（`DAILY_REDEEM_CAP`）、180 天有效期。
+- 商品：小红书个人店 0.99 元电子测评（40 题 → 81 型人格档案报告），`{{code}}` 变量发货**不可用**（实测发货说明为固定文本 ≤500 字）→ 采用**全店统一码**模式。
+- 统一码服务端护栏已内置：`maxRedemptions=3000` 次额度、**单码单日成功兑换 ≤500 次**（`DAILY_REDEEM_CAP`，防公开分享后脚本刷爆）、180 天有效期、redeem 同 IP 10 分钟 30 次限速。
+- 商品名称/详情/上架图已定稿：`docs/MBTI-PRO-小红书商品上架-2026-11-12.md` 的「零、直接复制区」（发货说明里的码是占位符，等你生成后替换）。
 
-一条命令生成（写进线上 SQLite）：
+## 1. 任务一：生成全店统一兑换码
 
 ```bash
 ssh root@43.132.217.70 "cd /opt/MBTI-PRO/server && npx tsx scripts/generate-access-codes.ts --count 1 --max-redemptions 3000 --days 180 --batch xhs-unified"
 ```
 
-- 输出示例里会打印实际码（5 位数字）；`cat /opt/MBTI-PRO/server/access-codes/xhs-unified-*.csv` 可再查看。
-- **把实际码替换**进发货说明模板（`docs/access-code-fulfillment.md` §2.3，模板里示例码是 82417），整段 ≤500 字直接粘贴到商品「自动发货 → 发货说明」。
-- 监控兑换量：`select redemptions from AccessCode where code='实际码';` 接近 3000 就换新码（生成新的 → 编辑商品发货说明 → disable 旧码）。
+- 输出末尾 `示例: XXXXX` 就是**实际统一码**（5 位数字，永不 0 开头）；码已写入服务器 SQLite（`AccessCode` 表），CSV 同时落在 `/opt/MBTI-PRO/server/access-codes/xhs-unified-*.csv`。
+- 查看确认：`ssh root@43.132.217.70 "cat /opt/MBTI-PRO/server/access-codes/xhs-unified-*.csv"`
+- **把实际码发到对话里**：①用户粘贴进发货说明；②同步到 `docs/MBTI-PRO-小红书商品上架-2026-11-12.md` 零·③ 与 `docs/access-code-fulfillment.md` §2.3（把 82417 示例替换掉）。
 
-## 2. 小红书店铺自动发货配置（网页操作，非服务器）
+> 参数说明：`--count 1` 只要一个码；`--max-redemptions 3000` 全店兑换额度；`--days 180` 有效期。如需调整：`--digits 4|5|6`、`--style alnum`（旧长码格式）。
 
-1. 店铺后台 → 商品 → 自动发货设置，把上面导出的码逐个/批量粘贴进码池；
-2. 发货消息模板直接抄 `docs/access-code-fulfillment.md` §2.3（`{{code}}` 变量由平台按订单填入），模板里含测评链接 `https://mbti-pro.com/?code={{code}}`——**链接只放发货字段（平台允许），不要放商品图/详情/笔记**；
-3. 商品标题/卖点/详情/上架图直接用 `docs/MBTI-PRO-小红书商品上架-2026-11-12.md`，图在 `docs/xhs-shop/商品图-1~5.png`。
+## 2. 任务二：发货说明 + 商品上架（网页操作）
 
-## 3. 上架后验证（10 分钟，按序）
+1. 打开发货说明模板：`docs/MBTI-PRO-小红书商品上架-2026-11-12.md` →「零、③ 自动发货 → 发货说明」，把 `【兑换码】`/`82417` 替换为任务一的实际码，整段（约 300 字）粘贴到商品「自动发货 → 发货说明」（那个 0/500 输入框），点确定。
+2. 商品名称/详情/5 张上架图：按同文档「零、①②」与 `docs/xhs-shop/商品图-1~5.png` 填写上传（标题上限 20 字，已按此拟好）。
+3. 上架前过一遍同文档「六、合规自查」（已预检 ✓，复核即可）。
 
-1. 自己真实下单 1 笔 → 确认自动发货消息到达、`?code=` 链接**一键进入测试**、答完 40 题报告完整解锁；
-2. 再下 1 单 → 订单页「申请售后」走一遍退款，确认原路退回到账；
-3. 换一台手机在小红书 App 内置浏览器打开链接：3 秒内可交互、字体正常（已全本地化，无 googleapis 请求）；
-4. 复核商品描述与图上的码示例是「5 位数字，如 82417」（已同步）。
+## 3. 任务三：上架后验证（10 分钟，按序）
 
-## 4. 顺手建议（可选，10 分钟）
+1. 用户/你真实下单 1 笔 → 自动发货消息到达 → 点 `https://mbti-pro.com/?code=实际码` → 自动兑换进入测试 → 答 40 题出报告 → 分享海报可保存；
+2. 同一订单走「申请售后」退款 → 原路到账确认；
+3. 换手机在小红书 App 内置浏览器打开链接：3 秒内可交互、字体正常（无 googleapis 请求）；
+4. 换个浏览器输入同一码再测一次 → 应正常（统一码允许多人多设备使用）。
 
-- **SQLite 备份**：`ssh root@43.132.217.70 "echo '0 4 * * * sqlite3 /opt/MBTI-PRO/server/prisma/dev.db \".backup /opt/MBTI-PRO/backups/dev-\$(date +\%F).db\"' | crontab -"` 之类的每日备份（目录先 `mkdir -p`）；有真实订单后数据库就是钱。
-- **日志检查**：`journalctl -u mbti-pro -n 50` 看一眼启动日志与 5xx。
-- **兑换监控**：有订单后不定期跑 `ssh root@43.132.217.70 "cd /opt/MBTI-PRO/server && npx tsx -e \"import{PrismaClient}from'@prisma/client';const p=new PrismaClient();p.accessCode.count({where:{redemptions:{gt:0}}}).then(c=>{console.log('已兑换码数:',c);return p.\\\$disconnect()})\""`（或直接查库）。
+## 4. 监控与运维（长期，每天 1 分钟）
 
-## 5. 本轮已完成的关联改动（无需重复做）
+```bash
+# 统一码已用次数 / 剩余额度（把'实际码'换掉）
+ssh root@43.132.217.70 "cd /opt/MBTI-PRO/server && npx tsx -e \"import{PrismaClient}from'@prisma/client';const p=new PrismaClient();p.accessCode.findUnique({where:{code:'实际码'}}).then(c=>{console.log(c.redemptions,'/',c.maxRedemptions);return p.\\\$disconnect()})\""
+```
 
-- 客服邮箱已改为 `mbti_pro@163.com`（`client/src/config/site.ts`），已构建进 LegalView 并随本次 push 部署；
-- 兑换码生成脚本改 5 位纯数字 + 库内查重 + 防前导零，已 push 部署（316f5b29 及后续）；
-- 商品图第 1 张已按用户要求品牌大字化（MBTI-PRO 第一视觉）。
+- `redemptions` 接近 3000 → 生成新码（同命令换 `--batch xhs-unified-2`）→ 编辑商品发货说明换码 → `disabled` 旧码；
+- `redemptions` 单日暴涨异常（远超销量）→ 说明码被外传：禁用旧码 + 换码，并在发货说明更新；
+- **SQLite 每日备份**（建议今天就配）：`mkdir -p /opt/MBTI-PRO/backups` 后加 cron：
+  `0 4 * * * sqlite3 /opt/MBTI-PRO/server/prisma/dev.db ".backup /opt/MBTI-PRO/backups/dev-$(date +\%F).db"`
+- 服务日志：`journalctl -u mbti-pro -n 100`；重启：`systemctl restart mbti-pro`。
 
-## 6. 遇到问题查哪里
+## 5. 红线（不要做）
 
-- 运维交接：`docs/MBTI-PRO-上线完成与运维交接-2026-11-12.md`（DSH 自己写的）
-- 项目记忆/踩坑：`.workbuddy/memory/2026-11-12.md`
-- 兑换/发货口径：`docs/access-code-fulfillment.md`；退款口径：站内 `/refund` 页（LegalView.vue）
-- 兑换接口限速：同 IP 10 分钟 30 次（`server/src/routes/access.ts`），5 位数字码不可被穷举
+- 整批/统一码**不要**发到笔记、评论、公开群、网盘分享页（`server/access-codes/` 已 gitignore）；
+- 发货说明里的测评链接**只放这个字段**——商品图、商品详情、笔记、评论区一律不放链接/二维码；
+- 不要在售后中索要用户的测评结果、身份证或站外联系方式（口径见站内 `/refund`、`/contact`）；
+- 商品标题/详情不加极限词与医疗词（已预检，改动时保持）。
+
+## 6. 出问题查哪里
+
+| 症状 | 查 |
+|---|---|
+| 用户说"兑换码无效" | 查码是否存在 / `disabled` / `redemptions` 是否已达 3000（服务器上进 server 目录用 Prisma 查 `AccessCode`） |
+| 用户说"今日上限" | 当日成功兑换 ≥500 次触发 `DAILY_REDEEM_CAP`（429），次日 0 点自动恢复；若正常销量触顶说明生意好，调大 `DAILY_REDEEM_CAP`（`server/src/routes/access.ts`）后 push |
+| 网站打不开 | `systemctl status mbti-pro`、`journalctl -u mbti-pro -n 100`、`curl -I http://127.0.0.1:3001/api/health` |
+| 部署失败 | GitHub Actions 运行日志（push master 自动部署，DEPLOY_* Secrets） |
+| 其他 | `.workbuddy/memory/2026-11-12.md` 当日日志 + `docs/MBTI-PRO-上线完成与运维交接-2026-11-12.md` |
