@@ -2,6 +2,12 @@
 
 81 型人格测试网站 — Vue 3 + TypeScript + Tailwind CSS 前端，Express.js + Prisma + SQLite 后端，部署于腾讯云。
 
+> **2026-11-12 当前产品口径（优先于下方旧描述）**
+> - 首发测试为 **40 题**：四维各 10 题，约 6-8 分钟；T_F 不再把逻辑推理题计入人格类型。
+> - 商业模式：**小红书店铺 0.99 元购买 → 兑换码 → 一次解锁 40 题测试和全部报告内容**；不再使用邮箱/分享/打赏/二次付费。
+> - 题目选择与评分规则见 `server/src/content/short-form.ts`、`server/src/services/scoring.ts`；题库精简依据见 `docs/MBTI-PRO-题库精简与最短题量评估-2026-11-12.md`。
+> - 兑换码生成：`cd server && npm run access:codes -- --count 100 --batch xhs-2026-11`；输出 `server/access-codes/`（已 gitignore，不入库）。
+
 ## 项目结构
 
 ```
