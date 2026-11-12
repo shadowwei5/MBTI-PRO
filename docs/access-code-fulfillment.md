@@ -83,7 +83,7 @@ ssh root@43.132.217.70 "cd /opt/MBTI-PRO/server && npx tsx scripts/generate-acce
 ```text
 【MBTI-PRO 人格测评 · 自动发货】
 
-兑换码：82417（5 位数字，全店通用）
+兑换码：72227（5 位数字，全店通用）
 
 使用方法：
 ① 打开发货消息里的测评链接，输入上方兑换码
