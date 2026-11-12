@@ -9,100 +9,161 @@ defineEmits<{
   'update:modelValue': [value: string]
 }>()
 
-const poleLeft = '#E8816B'
-const poleRight = '#5C6BC0'
+/**
+ * 选项文案采用「正方 / 反方」这种中性的角色标签：
+ * 1. 不暴露这道题在测哪个维度（外向/内向等），避免用户按自我标签作答；
+ * 2. 不依赖空间位置，桌面端左右排列、手机端上下排列都不会产生歧义。
+ *
+ * key 仍为 A~E 用于计分，但界面上不再显示字母。
+ */
+const scale = [
+  { key: 'A', main: '非常认同', side: '正方', label: '非常认同正方' },
+  { key: 'B', main: '比较认同', side: '正方', label: '比较认同正方' },
+  { key: 'C', main: '中立', side: '', label: '中立' },
+  { key: 'D', main: '比较认同', side: '反方', label: '比较认同反方' },
+  { key: 'E', main: '非常认同', side: '反方', label: '非常认同反方' },
+]
 </script>
 
 <template>
-  <div class="w-full max-w-2xl mx-auto">
-    <!-- Desktop: left-right three-column layout | Mobile: top-bottom stacked -->
-    <div class="flex flex-col md:flex-row md:items-stretch gap-3 md:gap-4">
+  <div class="bipolar">
+    <div class="statements">
+      <div class="statement" :class="{ 'statement--active': modelValue === 'A' || modelValue === 'B' }">
+        <span class="statement-meta">正方</span>
+        <p>{{ textLeft }}</p>
+      </div>
+      <div class="statement" :class="{ 'statement--active': modelValue === 'D' || modelValue === 'E' }">
+        <span class="statement-meta">反方</span>
+        <p>{{ textRight }}</p>
+      </div>
+    </div>
 
-      <!-- Left / Top pole (E外向 / S实感 / T思考 / J判断) - Coral -->
-      <div
-        class="flex-1 flex flex-col rounded-2xl border-2 transition-all duration-300 overflow-hidden"
-        :style="{
-          borderColor: modelValue === 'A' || modelValue === 'B' ? poleLeft : '#E0D8CC',
-          background: modelValue === 'A' || modelValue === 'B' ? poleLeft + '12' : '#ffffff99',
-          boxShadow: modelValue === 'A' || modelValue === 'B' ? '0 4px 24px ' + poleLeft + '18' : 'none',
-        }"
+    <div class="scale" role="radiogroup" aria-label="选择更认同哪一方">
+      <button
+        v-for="option in scale"
+        :key="option.key"
+        type="button"
+        class="scale-option"
+        :class="{ 'scale-option--selected': modelValue === option.key }"
+        role="radio"
+        :aria-checked="modelValue === option.key"
+        :aria-label="option.label"
+        @click="$emit('update:modelValue', option.key)"
       >
-        <!-- Statement -->
-        <div class="p-4 md:p-5 pb-3">
-          <p class="text-base md:text-lg font-semibold text-charcoal leading-relaxed">{{ textLeft }}</p>
-        </div>
-        <!-- Buttons -->
-        <div class="flex gap-2 px-4 md:px-5 pb-4 md:pb-5 mt-auto">
-          <button
-            class="flex-1 px-3 py-3 rounded-xl text-sm font-semibold transition-all duration-300 cursor-pointer min-h-[44px]"
-            :style="modelValue === 'A'
-              ? { background: poleLeft, color: '#fff', boxShadow: '0 2px 12px ' + poleLeft + '40' }
-              : { background: poleLeft + '18', color: poleLeft, border: '1.5px solid ' + poleLeft + '40' }"
-            @click="$emit('update:modelValue', 'A')"
-          >
-            非常认同
-          </button>
-          <button
-            class="flex-1 px-3 py-3 rounded-xl text-sm font-semibold transition-all duration-300 cursor-pointer min-h-[44px]"
-            :style="modelValue === 'B'
-              ? { background: poleLeft, color: '#fff', boxShadow: '0 2px 12px ' + poleLeft + '40' }
-              : { background: poleLeft + '18', color: poleLeft, border: '1.5px solid ' + poleLeft + '40' }"
-            @click="$emit('update:modelValue', 'B')"
-          >
-            认同
-          </button>
-        </div>
-      </div>
-
-      <!-- Neutral column -->
-      <div class="flex md:flex-col items-center justify-center py-2 md:py-0 shrink-0">
-        <button
-          class="px-6 py-3 rounded-xl text-sm font-semibold transition-all duration-300 cursor-pointer border-2 whitespace-nowrap min-h-[44px]"
-          :style="modelValue === 'C'
-            ? { background: '#8A827C', color: '#fff', borderColor: '#8A827C', boxShadow: '0 2px 12px rgba(138,130,124,0.3)' }
-            : { background: '#ffffff99', color: '#9C958E', borderColor: '#E0D8CC' }"
-          @click="$emit('update:modelValue', 'C')"
-        >
-          中立
-        </button>
-      </div>
-
-      <!-- Right / Bottom pole (I内向 / N直觉 / F情感 / P感知) - Indigo -->
-      <div
-        class="flex-1 flex flex-col rounded-2xl border-2 transition-all duration-300 overflow-hidden"
-        :style="{
-          borderColor: modelValue === 'D' || modelValue === 'E' ? poleRight : '#E0D8CC',
-          background: modelValue === 'D' || modelValue === 'E' ? poleRight + '12' : '#ffffff99',
-          boxShadow: modelValue === 'D' || modelValue === 'E' ? '0 4px 24px ' + poleRight + '18' : 'none',
-        }"
-      >
-        <!-- Statement -->
-        <div class="p-4 md:p-5 pb-3">
-          <p class="text-base md:text-lg font-semibold text-charcoal leading-relaxed">{{ textRight }}</p>
-        </div>
-        <!-- Buttons -->
-        <div class="flex gap-2 px-4 md:px-5 pb-4 md:pb-5 mt-auto">
-          <button
-            class="flex-1 px-3 py-3 rounded-xl text-sm font-semibold transition-all duration-300 cursor-pointer min-h-[44px]"
-            :style="modelValue === 'D'
-              ? { background: poleRight, color: '#fff', boxShadow: '0 2px 12px ' + poleRight + '40' }
-              : { background: poleRight + '18', color: poleRight, border: '1.5px solid ' + poleRight + '40' }"
-            @click="$emit('update:modelValue', 'D')"
-          >
-            认同
-          </button>
-          <button
-            class="flex-1 px-3 py-3 rounded-xl text-sm font-semibold transition-all duration-300 cursor-pointer min-h-[44px]"
-            :style="modelValue === 'E'
-              ? { background: poleRight, color: '#fff', boxShadow: '0 2px 12px ' + poleRight + '40' }
-              : { background: poleRight + '18', color: poleRight, border: '1.5px solid ' + poleRight + '40' }"
-            @click="$emit('update:modelValue', 'E')"
-          >
-            非常认同
-          </button>
-        </div>
-      </div>
-
+        <span class="scale-main">{{ option.main }}</span>
+        <span v-if="option.side" class="scale-side">{{ option.side }}</span>
+      </button>
     </div>
   </div>
 </template>
+
+<style scoped>
+.bipolar {
+  --paper: #f2ede3;
+  --paper-light: #f8f4ec;
+  --ink: #1e1d1a;
+  --muted: #6f685d;
+  --rule: #d2c8b8;
+  --accent: #a63d2c;
+  width: 100%;
+}
+
+.statements {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-top: 1px solid var(--ink);
+  border-bottom: 1px solid var(--rule);
+}
+
+.statement {
+  min-height: 150px;
+  padding: 22px 26px 24px 0;
+  transition: background .2s ease;
+}
+.statement + .statement {
+  padding-left: 26px;
+  padding-right: 0;
+  border-left: 1px solid var(--rule);
+}
+.statement--active {
+  background: rgba(166, 61, 44, .055);
+  /* 正方 / 反方使用完全相同的选中特效：同底色 + 同一侧（左）强调条 */
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+
+.statement-meta {
+  display: block;
+  margin-bottom: 14px;
+  color: var(--accent);
+  font-family: "Playfair Display", "Songti SC", "STSong", SimSun, "Noto Serif CJK SC", "Source Han Serif SC", serif;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: .18em;
+}
+
+.statement p {
+  margin: 0;
+  font-family: "Playfair Display", "Songti SC", "STSong", SimSun, "Noto Serif CJK SC", "Source Han Serif SC", serif;
+  font-size: clamp(18px, 2vw, 23px);
+  line-height: 1.65;
+  color: var(--ink);
+}
+
+.scale {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  margin-top: 18px;
+  border: 1px solid var(--rule);
+}
+
+.scale-option {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 56px;
+  padding: 8px 6px;
+  border: 0;
+  border-right: 1px solid var(--rule);
+  border-radius: 0;
+  background: var(--paper-light);
+  color: var(--muted);
+  transition: background .18s ease, color .18s ease;
+}
+.scale-option:last-child { border-right: 0; }
+.scale-option:hover { background: #e9e1d4; color: var(--ink); }
+.scale-option--selected { background: var(--ink); color: var(--paper-light); }
+.scale-option--selected:hover { background: var(--accent); color: var(--paper-light); }
+
+.scale-main { font-size: 13px; font-weight: 600; line-height: 1.35; white-space: nowrap; }
+.scale-side {
+  font-size: 11px;
+  line-height: 1.35;
+  opacity: .72;
+  white-space: nowrap;
+}
+.scale-option--selected .scale-side { opacity: .85; }
+
+@media (max-width: 680px) {
+  .statements { grid-template-columns: 1fr; }
+  .statement { min-height: 0; padding: 18px 0 20px; }
+  .statement + .statement {
+    padding: 18px 0 20px;
+    border-left: 0;
+    border-top: 1px solid var(--rule);
+  }
+  .statement p { font-size: 18px; }
+  .statement-meta { margin-bottom: 10px; font-size: 13px; }
+  .scale { margin-top: 14px; }
+
+  /* 手机端每格约 68px，六个字一行放不下 —— 拆成两行 */
+  .scale-option {
+    flex-direction: column;
+    gap: 2px;
+    min-height: 58px;
+    padding: 8px 2px;
+  }
+  .scale-main { font-size: 11px; }
+  .scale-side { font-size: 10px; }
+}
+</style>

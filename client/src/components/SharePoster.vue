@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import QRCode from 'qrcode'
-import { api } from '../services/api'
 import { typeImageUrl } from '../utils/typeImage'
 
 const props = defineProps<{
@@ -11,159 +10,240 @@ const props = defineProps<{
   recordId?: string
   scores?: { E_I: number; S_N: number; T_F: number; P_J: number }
   chars?: { E_I: string; S_N: string; T_F: string; P_J: string }
+  dimTotals?: { E_I: number; S_N: number; T_F: number; P_J: number }
 }>()
 const emit = defineEmits<{ close: [] }>()
 const qrDataUrl = ref(''); const generatedImageUrl = ref(''); const isGenerating = ref(true)
 const showModal = ref(false); const hasError = ref(false)
 
-const W = 800
-const DIM_COLORS: Record<string, string> = {
-  I: '#3D6FFF', E: '#FF5722', N: '#6A1B9A', S: '#00796B',
-  F: '#0277BD', T: '#E65100', P: '#BF8C00', J: '#1565C0',
-}
-
 async function getShareUrl() {
-  const email = localStorage.getItem('mbti-pro-referral-email') || ''
-  if (props.recordId && email) {
-    try {
-      const reward = await api.createReferral(props.recordId, props.typeCode, email)
-      return `${location.origin}/test?ref=${reward.code}`
-    } catch { /* fallback below */ }
-  }
-  return `${location.origin}/test?utm_source=share_poster&utm_medium=poster&utm_campaign=${props.typeCode}`
+  // 分享给朋友的是落地页；对方需要在小红书店铺购买后再兑换。
+  return `${location.origin}/?utm_source=share_poster&utm_medium=poster&utm_campaign=${props.typeCode}`
 }
 
 async function generateQR() {
-  try { qrDataUrl.value = await QRCode.toDataURL(await getShareUrl(), { width: 110, margin: 0, color: { dark: '#1A1A1A', light: '#FFFFFF' } }) } catch {}
+  try { qrDataUrl.value = await QRCode.toDataURL(await getShareUrl(), { width: 244, margin: 0, color: { dark: '#1A1A1A', light: '#FFFFFF' } }) } catch {}
 }
 function loadImage(s: string): Promise<HTMLImageElement> { return new Promise((rs, rj) => { const i = new Image(); i.crossOrigin = 'anonymous'; i.onload = () => rs(i); i.onerror = rj; i.src = s }) }
-function rRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
-  ctx.beginPath(); ctx.moveTo(x + r, y); ctx.lineTo(x + w - r, y)
-  ctx.arcTo(x + w, y, x + w, y + r, r); ctx.lineTo(x + w, y + h - r)
-  ctx.arcTo(x + w, y + h, x + w - r, y + h, r); ctx.lineTo(x + r, y + h)
-  ctx.arcTo(x, y + h, x, y + h - r, r); ctx.lineTo(x, y + r)
-  ctx.arcTo(x, y, x + r, y, r); ctx.closePath()
+
+function wrapText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string[] {
+  const lines: string[] = []
+  let line = ''
+  for (const ch of text) {
+    const next = line + ch
+    if (ctx.measureText(next).width > maxWidth && line) {
+      lines.push(line)
+      line = ch
+    } else {
+      line = next
+    }
+  }
+  if (line) lines.push(line)
+  return lines
+}
+
+// 自适应字号：保证类型码永远不会越界压到右侧图片
+function fitFontSize(
+  ctx: CanvasRenderingContext2D,
+  text: string,
+  fontTemplate: (size: number) => string,
+  maxWidth: number,
+  startSize: number
+): number {
+  let size = startSize
+  ctx.font = fontTemplate(size)
+  while (size > 40 && ctx.measureText(text).width > maxWidth) {
+    size -= 2
+    ctx.font = fontTemplate(size)
+  }
+  return size
 }
 
 async function drawPoster() {
-  const hasScores = !!(props.scores && props.chars)
-  const imgSz = 480
-  let h = 42 + 30 + imgSz + 28 + 82 + 46 // top + brand + image + code + name
-  if (hasScores) h += 4 * 64 + 32 // 维度条
-  h += 28 + 100 + 24 // divider + QR + footer
-  const H = Math.max(h, 920)
+  // 小红书主推 3:4 竖图
+  const W = 800
+  const H = 1067
+  const cvs = document.createElement('canvas')
+  cvs.width = W * 2
+  cvs.height = H * 2
+  const ctx = cvs.getContext('2d')!
+  ctx.scale(2, 2)
 
-  const cvs = document.createElement('canvas'); cvs.width = W * 2; cvs.height = H * 2
-  const ctx = cvs.getContext('2d')!; ctx.scale(2, 2)
-
-  // 米白背景
-  ctx.fillStyle = '#FAF8F5'; ctx.fillRect(0, 0, W, H)
-
-  // 顶部色条 + 更大渐变光晕
-  ctx.fillStyle = props.typeColor.hex; ctx.fillRect(0, 0, W, 5)
-  const tg = ctx.createLinearGradient(0, 5, 0, 140); tg.addColorStop(0, props.typeColor.hex + '12'); tg.addColorStop(1, 'transparent')
-  ctx.fillStyle = tg; ctx.fillRect(0, 5, W, 140)
-
-  let y = 42
-  // 品牌文字更大
-  ctx.font = '600 13px "Noto Sans SC"'; ctx.fillStyle = '#B5ADA4'; ctx.textAlign = 'center'; ctx.letterSpacing = '0.12em' as any
-  ctx.fillText('MBTI-PRO · 81 型人格深度测试', W / 2, y); y += 30
-
-  // 圆形人格图片 — 480px 更大更突出
+  // 等待字体加载完成，避免 canvas 回退字体导致排版偏移
   try {
-    const avatar = await loadImage(typeImageUrl(props.typeCode))
-    // 阴影更柔和
-    ctx.save()
-    ctx.shadowColor = 'rgba(0,0,0,0.10)'; ctx.shadowBlur = 30; ctx.shadowOffsetY = 6
-    ctx.beginPath(); ctx.arc(W / 2, y + imgSz / 2, imgSz / 2, 0, Math.PI * 2)
-    ctx.fillStyle = '#fff'; ctx.fill()
-    ctx.restore()
-    ctx.save()
-    ctx.beginPath(); ctx.arc(W / 2, y + imgSz / 2, imgSz / 2, 0, Math.PI * 2); ctx.clip()
-    ctx.drawImage(avatar, W / 2 - imgSz / 2, y, imgSz, imgSz)
-    ctx.restore()
-    y += imgSz + 28
-  } catch { y += 16 }
+    await Promise.allSettled([
+      document.fonts.load('600 140px "Playfair Display"'),
+      document.fonts.load('700 140px "Playfair Display"'),
+      document.fonts.load('500 12px "DM Mono"'),
+    ])
+    await document.fonts.ready
+  } catch { /* 忽略字体加载异常 */ }
 
-  // 类型代码 — 加大
-  ctx.font = '900 86px "Playfair Display", serif'; ctx.fillStyle = props.typeColor.hex
-  ctx.fillText(props.typeCode, W / 2, y + 68); y += 82
+  const MONO = '"DM Mono", "SF Mono", Consolas, "Roboto Mono", monospace'
+  const SERIF = '"Playfair Display", "Songti SC", "STSong", SimSun, "Noto Serif CJK SC", serif'
+  const SANS = '"PingFang SC", "HarmonyOS Sans SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif'
 
-  // 类型名称 — 加大
-  ctx.font = '700 28px "Noto Sans SC"'; ctx.fillStyle = '#2D2D2D'
-  ctx.fillText(props.typeName.replace('型', ''), W / 2, y + 24); y += 46
+  // 纸张底与档案边框
+  ctx.fillStyle = '#F2EDE3'
+  ctx.fillRect(0, 0, W, H)
+  ctx.strokeStyle = '#1E1D1A'
+  ctx.lineWidth = 1
+  ctx.strokeRect(40, 40, W - 80, H - 80)
 
-  // 四维状态条
-  if (hasScores) {
-    const dims = [
-      { key: 'E_I' as const, left: 'I', right: 'E' },
-      { key: 'S_N' as const, left: 'N', right: 'S' },
-      { key: 'T_F' as const, left: 'F', right: 'T' },
-      { key: 'P_J' as const, left: 'P', right: 'J' },
-    ]
-    const barW = 580; const barH = 28; const barX = (W - barW) / 2; const dimGap = 64
+  // ── 页眉 ──
+  ctx.textAlign = 'left'
+  ctx.fillStyle = '#1E1D1A'
+  ctx.font = `500 12px ${MONO}`
+  ctx.fillText('MBTI — PRO', 70, 76)
+  ctx.textAlign = 'right'
+  ctx.fillStyle = '#6F685D'
+  ctx.font = `400 9px ${MONO}`
+  ctx.fillText('PERSONALITY ARCHIVE / 81 TYPES', 730, 76)
+  ctx.strokeStyle = '#D2C8B8'
+  ctx.beginPath(); ctx.moveTo(70, 92); ctx.lineTo(730, 92); ctx.stroke()
 
-    dims.forEach((dim, i) => {
-      const dy = y + i * dimGap; const score = props.scores![dim.key]
-      const pos = Math.max(3, Math.min(97, 50 + (score / 50) * 47))
-      const lc = DIM_COLORS[dim.left]; const rc = DIM_COLORS[dim.right]
+  // ── 右上：人格图（保持 340×340 大图，3:4 下不缩水） ──
+  const imgX = 390, imgY = 105, imgSize = 340
+  try {
+    const portrait = await loadImage(typeImageUrl(props.typeCode))
+    ctx.drawImage(portrait, imgX, imgY, imgSize, imgSize)
+    ctx.strokeStyle = '#1E1D1A'
+    ctx.lineWidth = 1
+    ctx.strokeRect(imgX, imgY, imgSize, imgSize)
+    ctx.fillStyle = '#A63D2C'
+    ctx.font = `10px ${MONO}`
+    ctx.textAlign = 'left'
+    ctx.fillText('81', imgX + 10, imgY + 22)
+    ctx.textAlign = 'right'
+    ctx.fillStyle = '#6F685D'
+    ctx.fillText(props.typeCode, imgX + imgSize - 10, imgY + imgSize - 12)
+  } catch { /* 图片加载失败时保留纯排版海报 */ }
 
-      ctx.font = 'bold 18px "Noto Sans SC"'
-      ctx.textAlign = 'left'; ctx.fillStyle = lc; ctx.fillText(dim.left, barX - 56, dy + barH / 2 + 6)
-      ctx.textAlign = 'right'; ctx.fillStyle = rc; ctx.fillText(dim.right, barX + barW + 56, dy + barH / 2 + 6)
+  // ── 左上：档案标签块 ──
+  ctx.textAlign = 'left'
+  ctx.fillStyle = '#A63D2C'
+  ctx.font = `500 10px ${MONO}`
+  ctx.fillText('YOUR ARCHIVE', 70, 138)
 
-      ctx.fillStyle = '#EAE7E0'; rRect(ctx, barX, dy, barW, barH, barH / 2); ctx.fill()
-      ctx.fillStyle = '#D4D0C8'; ctx.fillRect(barX + barW / 2 - 1.5, dy, 3, barH)
-      const lg = ctx.createLinearGradient(barX, 0, barX + barW / 2, 0); lg.addColorStop(0, lc + '45'); lg.addColorStop(1, '#EAE7E0')
-      ctx.fillStyle = lg; ctx.fillRect(barX, dy, barW / 2, barH)
-      const rg = ctx.createLinearGradient(barX + barW / 2, 0, barX + barW, 0); rg.addColorStop(0, '#EAE7E0'); rg.addColorStop(1, rc + '45')
-      ctx.fillStyle = rg; ctx.fillRect(barX + barW / 2, dy, barW / 2, barH)
+  ctx.fillStyle = '#1E1D1A'
+  ctx.font = `600 16px ${SERIF}`
+  ctx.fillText(props.groupColor.name, 70, 166)
 
-      const dotX = barX + (barW * pos) / 100; const dotY = dy + barH / 2; const dotR = 11
-      ctx.beginPath(); ctx.arc(dotX, dotY, dotR, 0, Math.PI * 2)
-      ctx.fillStyle = pos >= 50 ? rc : lc; ctx.fill()
-      ctx.strokeStyle = '#fff'; ctx.lineWidth = 2.5; ctx.stroke()
+  ctx.strokeStyle = '#D2C8B8'
+  ctx.beginPath(); ctx.moveTo(70, 188); ctx.lineTo(330, 188); ctx.stroke()
 
-      ctx.font = 'bold 11px "DM Mono", monospace'; ctx.fillStyle = '#fff'; ctx.textAlign = 'center'
-      ctx.fillText(score > 0 ? `+${score}` : `${score}`, dotX, dotY + 4)
-    })
-    y += dims.length * dimGap + 32
+  ctx.fillStyle = '#6F685D'
+  ctx.font = `400 9px ${MONO}`
+  ctx.fillText('PERSONALITY ARCHIVE', 70, 212)
+  ctx.fillText(`${props.typeCode} / 81 TYPES`, 70, 230)
+
+  ctx.fillStyle = '#1E1D1A'
+  ctx.font = `600 40px ${SERIF}`
+  ctx.fillText(props.typeName.replace('型', ''), 70, 288)
+
+  ctx.fillStyle = '#A63D2C'
+  ctx.font = `500 12px ${MONO}`
+  const coordText = props.chars
+    ? `${props.chars.E_I} · ${props.chars.S_N} · ${props.chars.T_F} · ${props.chars.P_J}`
+    : ''
+  if (coordText) ctx.fillText(coordText, 70, 324)
+
+  ctx.strokeStyle = '#D2C8B8'
+  ctx.beginPath(); ctx.moveTo(70, 350); ctx.lineTo(330, 350); ctx.stroke()
+
+  ctx.fillStyle = '#6F685D'
+  ctx.font = `400 9px ${MONO}`
+  ctx.fillText('40 QUESTIONS / 4 AXES', 70, 374)
+
+  // ── 主标题：类型码（通栏自适应，永不越界） ──
+  ctx.textAlign = 'left'
+  const codeFont = (size: number) => `600 ${size}px ${SERIF}`
+  const codeSize = fitFontSize(ctx, props.typeCode, codeFont, 660, 140)
+  ctx.fillStyle = '#1E1D1A'
+  ctx.font = codeFont(codeSize)
+  ctx.fillText(props.typeCode, 70, 570)
+
+  // ── 一句话 ──
+  if (props.oneLiner) {
+    ctx.fillStyle = '#6F685D'
+    ctx.font = `400 16px ${SERIF}`
+    const lines = wrapText(ctx, props.oneLiner, 660).slice(0, 2)
+    lines.forEach((text, i) => ctx.fillText(text, 70, 620 + i * 24))
   }
 
-  // 分隔线
-  ctx.strokeStyle = '#E0D8CC'; ctx.lineWidth = 1; ctx.beginPath()
-  ctx.moveTo((W - 120) / 2, y); ctx.lineTo((W + 120) / 2, y); ctx.stroke()
-  y += 24
+  // ── 分隔线 ──
+  ctx.strokeStyle = '#D2C8B8'
+  ctx.beginPath(); ctx.moveTo(70, 680); ctx.lineTo(730, 680); ctx.stroke()
 
-  // 底部：左文字 + 二维码
-  const qrS = 96; const qrX = W - qrS - 56
+  // ── 四维坐标：2×2 数据网格 ──
+  // 3:4 画布比原来矮 20%，四行纵排会把底部挤掉；
+  // 改成两列两行，省下的纵向空间留给顶部大图，信息密度也更高。
+  const hasScores = !!(props.scores && props.chars)
+  if (hasScores) {
+    const dims = [
+      { key: 'E_I' as const, left: 'I', right: 'E', label: '能量来源', index: '01' },
+      { key: 'S_N' as const, left: 'N', right: 'S', label: '认知方式', index: '02' },
+      { key: 'T_F' as const, left: 'F', right: 'T', label: '决策方式', index: '03' },
+      { key: 'P_J' as const, left: 'P', right: 'J', label: '生活态度', index: '04' },
+    ]
+    dims.forEach((dim, i) => {
+      const col = i % 2, row = Math.floor(i / 2)
+      const cx = col === 0 ? 70 : 420
+      const y = 752 + row * 100
+      const x1 = cx + 60, x2 = cx + 290
+      const score = props.scores![dim.key]
+      const maxScore = (props.dimTotals?.[dim.key] ?? 10) * 2
+      const pos = Math.max(3, Math.min(97, 50 + (score / maxScore) * 47))
+
+      ctx.textAlign = 'left'
+      ctx.fillStyle = '#A63D2C'
+      ctx.font = `10px ${MONO}`
+      ctx.fillText(dim.index, cx, y - 24)
+      ctx.fillStyle = '#6F685D'
+      ctx.font = `11px ${SANS}`
+      ctx.fillText(dim.label, cx + 26, y - 24)
+
+      ctx.strokeStyle = '#D2C8B8'
+      ctx.beginPath(); ctx.moveTo(x1, y); ctx.lineTo(x2, y); ctx.stroke()
+      ctx.strokeStyle = '#A63D2C'
+      ctx.beginPath(); ctx.moveTo((x1 + x2) / 2, y - 5); ctx.lineTo((x1 + x2) / 2, y + 5); ctx.stroke()
+
+      const dotX = x1 + (x2 - x1) * pos / 100
+      ctx.beginPath(); ctx.arc(dotX, y, 6, 0, Math.PI * 2)
+      ctx.fillStyle = '#A63D2C'; ctx.fill()
+
+      ctx.fillStyle = '#6F685D'
+      ctx.font = `10px ${MONO}`
+      ctx.fillText(dim.left, cx, y + 20)
+      ctx.fillText(dim.right, x2 + 12, y + 20)
+    })
+  }
+
+  // ── 底部 ──
+  ctx.strokeStyle = '#D2C8B8'
+  ctx.beginPath(); ctx.moveTo(70, 910); ctx.lineTo(730, 910); ctx.stroke()
   ctx.textAlign = 'left'
-  ctx.font = '700 16px "Noto Sans SC"'; ctx.fillStyle = '#2D2D2D'
-  ctx.fillText('扫码测测你的人格类型', 56, y + 18)
-  ctx.font = '400 12px "Noto Sans SC"'; ctx.fillStyle = '#9C958E'
-  ctx.fillText('发现你的 81 型专属人格画像', 56, y + 38)
+  ctx.fillStyle = '#1E1D1A'
+  ctx.font = `600 16px ${SERIF}`
+  ctx.fillText('扫码测测你的 81 型坐标', 70, 942)
+  ctx.fillStyle = '#6F685D'
+  ctx.font = `400 11px ${SANS}`
+  ctx.fillText('先量清自己，再决定怎么活。', 70, 964)
 
   try {
     const qrImg = await loadImage(qrDataUrl.value)
-    rRect(ctx, qrX - 4, y - 4, qrS + 8, qrS + 8, 10)
-    ctx.fillStyle = '#fff'; ctx.fill()
-    ctx.drawImage(qrImg, qrX, y, qrS, qrS)
+    ctx.drawImage(qrImg, 636, 915, 84, 84)
   } catch {}
-  y += qrS + 16
 
-  // 免责
-  ctx.textAlign = 'center'; ctx.font = '400 10px "Noto Sans SC"'; ctx.fillStyle = '#B0A89E'
-  ctx.fillText('测试结果仅供个人参考，不构成任何临床诊断依据', W / 2, y + 6)
+  ctx.textAlign = 'center'
+  ctx.fillStyle = '#6F685D'
+  ctx.font = `400 9px ${SANS}`
+  ctx.fillText('结果仅供个人参考，不构成临床诊断或招聘决策依据', 400, 1010)
 
-  generatedImageUrl.value = cvs.toDataURL('image/jpeg', 0.92)
+  generatedImageUrl.value = cvs.toDataURL('image/jpeg', 0.94)
 }
 
-onMounted(async () => {
-  await generateQR()
-  try { await drawPoster() } catch { hasError.value = true }
-  finally { isGenerating.value = false; showModal.value = true }
-})
-
+// 只保留一处挂载钩子：移动端检测与海报生成合并执行，避免重复绘制两次
 const isMobile = ref(false)
 const showLongPressHint = ref(false)
 
@@ -213,41 +293,40 @@ onMounted(async () => {
 
 <template>
   <Transition name="modal">
-    <div v-if="isGenerating" class="fixed inset-0 z-50 flex items-center justify-center">
-      <div class="absolute inset-0 bg-charcoal/40 backdrop-blur-sm" />
-      <div class="relative bg-cream rounded-3xl p-10 flex flex-col items-center shadow-2xl">
-        <div class="w-10 h-10 rounded-full border-4 border-coral-soft border-t-coral animate-spin mb-4" />
-        <p class="text-sm text-text-secondary">正在生成分享海报...</p>
+    <div v-if="isGenerating" class="share-loading">
+      <div class="share-backdrop" />
+      <div class="share-loading-panel">
+        <p class="share-kicker">ARCHIVE / POSTER</p>
+        <p class="share-loading-text">正在生成分享海报…</p>
       </div>
     </div>
   </Transition>
+
   <Transition name="modal">
-    <div v-if="showModal && !isGenerating && !hasError" class="fixed inset-0 z-50 flex items-center justify-center p-5">
-      <div class="absolute inset-0 bg-charcoal/50 backdrop-blur-sm" @click="emit('close')" />
-      <div class="relative bg-cream rounded-3xl p-6 max-w-sm w-full shadow-2xl">
-        <h3 class="text-lg font-bold text-charcoal mb-2 text-center">分享你的人格画像</h3>
-        <p v-if="isMobile" class="text-sm text-text-muted text-center mb-5">长按下方图片即可保存到相册</p>
-        <p v-else class="text-sm text-text-muted text-center mb-5">点击保存图片，分享到朋友圈</p>
-        <div class="rounded-2xl overflow-hidden mb-5 relative" style="box-shadow:0 8px 32px rgba(0,0,0,.1)">
-          <img :src="generatedImageUrl" class="w-full" />
-          <!-- 长按提示浮层 -->
+    <div v-if="showModal && !isGenerating && !hasError" class="share-overlay">
+      <div class="share-backdrop" @click="emit('close')" />
+      <div class="share-panel">
+        <p class="share-kicker">MBTI-PRO / SHARE</p>
+        <h3>分享你的人格坐标</h3>
+        <p class="share-hint">
+          {{ isMobile ? '长按图片保存到相册' : '点击保存图片，分享给朋友' }}
+        </p>
+
+        <div class="share-image-wrap">
+          <img :src="generatedImageUrl" alt="MBTI-PRO 人格分享海报" class="share-image" />
           <Transition name="fade">
-            <div v-if="showLongPressHint" class="absolute inset-0 bg-charcoal/80 flex items-center justify-center rounded-2xl">
-              <div class="text-center text-cream px-6">
-                <p class="text-5xl mb-3">👆</p>
-                <p class="text-lg font-bold mb-1">长按图片</p>
-                <p class="text-sm opacity-80">选择「保存图片」即可存到相册</p>
-              </div>
+            <div v-if="showLongPressHint" class="share-longpress">
+              <p class="longpress-main">长按图片</p>
+              <p class="longpress-sub">选择「保存图片」即可存到相册</p>
             </div>
           </Transition>
         </div>
-        <div class="flex gap-3">
-          <button @click="emit('close')" class="flex-1 px-4 py-3 text-sm font-medium text-text-secondary border border-border rounded-xl">关闭</button>
-          <!-- 移动端：分享按钮（调用系统分享） -->
-          <button v-if="isMobile" @click="sharePoster" class="flex-1 px-4 py-3 text-sm font-semibold text-white rounded-xl" :style="{background:typeColor.hex}">📤 分享给朋友</button>
-          <!-- 桌面端：保存按钮 -->
-          <button v-else @click="downloadPoster" class="flex-1 px-4 py-3 text-sm font-semibold bg-charcoal text-cream rounded-xl">保存图片</button>
-          <button v-if="!isMobile" @click="sharePoster" class="flex-1 px-4 py-3 text-sm font-semibold text-white rounded-xl" :style="{background:typeColor.hex}">📤 分享</button>
+
+        <div class="share-actions">
+          <button type="button" class="share-secondary" @click="emit('close')">关闭</button>
+          <button v-if="isMobile" type="button" class="share-primary" @click="sharePoster">分享给朋友 →</button>
+          <button v-else type="button" class="share-primary" @click="downloadPoster">保存图片 →</button>
+          <button v-if="!isMobile" type="button" class="share-secondary" @click="sharePoster">分享</button>
         </div>
       </div>
     </div>
@@ -255,8 +334,30 @@ onMounted(async () => {
 </template>
 
 <style scoped>
-.modal-enter-active,.modal-leave-active{transition:all .3s ease}
-.modal-enter-from,.modal-leave-to{opacity:0}
-.fade-enter-active,.fade-leave-active{transition:all .25s ease}
-.fade-enter-from,.fade-leave-to{opacity:0}
+.share-overlay, .share-loading { position: fixed; inset: 0; z-index: 50; display: flex; align-items: center; justify-content: center; padding: 20px; }
+.share-backdrop { position: absolute; inset: 0; background: rgba(30, 29, 26, .58); backdrop-filter: blur(4px); }
+.share-panel {
+  position: relative; width: 100%; max-width: 390px; padding: 24px;
+  border: 1px solid #1e1d1a; border-radius: 2px; background: #f8f4ec; color: #1e1d1a;
+  box-shadow: none;
+}
+.share-loading-panel { position: relative; padding: 26px 32px; border: 1px solid #1e1d1a; background: #f8f4ec; }
+.share-kicker { margin: 0 0 10px; color: #a63d2c; font-family: "DM Mono", "SF Mono", Consolas, "Roboto Mono", monospace; font-size: 9px; letter-spacing: .1em; }
+.share-panel h3, .share-loading-text { margin: 0; font-family: "Playfair Display", "Songti SC", "STSong", SimSun, "Noto Serif CJK SC", "Source Han Serif SC", serif; font-size: 23px; font-weight: 600; letter-spacing: -.03em; }
+.share-hint { margin: 8px 0 16px; color: #6f685d; font-size: 12px; }
+.share-image-wrap { position: relative; border: 1px solid #d2c8b8; background: #f2ede3; overflow: hidden; }
+.share-image { display: block; width: 100%; }
+.share-longpress { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(30,29,26,.82); color: #f8f4ec; text-align: center; }
+.longpress-main { margin: 0 0 6px; font-family: "Playfair Display", "Songti SC", "STSong", SimSun, "Noto Serif CJK SC", "Source Han Serif SC", serif; font-size: 24px; }
+.longpress-sub { margin: 0; font-size: 12px; color: #d8d0c1; }
+.share-actions { display: flex; gap: 10px; margin-top: 18px; }
+.share-primary, .share-secondary { flex: 1; min-height: 44px; padding: 10px 12px; border-radius: 0; font-size: 12px; font-weight: 600; }
+.share-primary { border: 1px solid #1e1d1a; background: #1e1d1a; color: #f8f4ec; }
+.share-primary:hover { background: #a63d2c; border-color: #a63d2c; }
+.share-secondary { border: 1px solid #d2c8b8; background: transparent; color: #6f685d; }
+.share-secondary:hover { border-color: #1e1d1a; color: #1e1d1a; }
+.modal-enter-active, .modal-leave-active { transition: opacity .22s ease; }
+.modal-enter-from, .modal-leave-to { opacity: 0; }
+.fade-enter-active, .fade-leave-active { transition: opacity .2s ease; }
+.fade-enter-from, .fade-leave-to { opacity: 0; }
 </style>

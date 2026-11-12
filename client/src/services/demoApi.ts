@@ -5,7 +5,7 @@
  * 评分在浏览器本地完成。用于服务器停用后的零成本静态托管。
  *
  * 数据来源（由 server/scripts/export-demo-data.ts 生成）：
- *   public/demo/questions.json  100 道题
+ *   public/demo/questions.json  40 道题
  *   public/demo/types.json      81 型内容（含四个维度模块）
  *   public/demo/meta.json       统计元信息
  *
@@ -72,6 +72,14 @@ export const demoApi = {
   getQuestions: () => loadQuestions(),
 
   getQuestionCount: async () => ({ count: (await loadQuestions()).length }),
+
+  /** 演示环境不校验真实商品码，输入任意非空码即可预览完整流程。 */
+  redeemAccess: async (code: string) => {
+    if (!code.trim()) throw new Error('请输入兑换码。')
+    return resolve({ accessToken: demoId('access'), expiresAt: null })
+  },
+
+  checkAccess: async (token: string) => resolve({ valid: Boolean(token) }),
 
   /**
    * 演示模式下：只要带了解锁 token（由 createShareUnlock 返回），即视为已解锁。

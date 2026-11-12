@@ -2,13 +2,12 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
 import DimensionSpectrum from '../components/DimensionSpectrum.vue'
-import TypeAvatar from '../components/TypeAvatar.vue'
 import SharePoster from '../components/SharePoster.vue'
-import PaywallSection from '../components/PaywallSection.vue'
-import DonationSection from '../components/DonationSection.vue'
+import AccessGate from '../components/AccessGate.vue'
 import { api, type PersonalityType } from '../services/api'
+import { getAccessToken } from '../services/access'
 import { IS_DEMO } from '../services/demoMode'
-import { getTypeColor, getTemperament, TEMPERAMENT_COLORS, getNineGroupCode, getNineGroupColor } from '../utils/colors'
+import { getTypeColor, getNineGroupCode, getNineGroupColor } from '../utils/colors'
 import { typeImageUrl } from '../utils/typeImage'
 import { useShareMeta } from '../composables/useShareMeta'
 
@@ -25,10 +24,25 @@ const fetchError = ref('')
 const showSharePoster = ref(false)
 const imageLoaded = ref(false)
 const paidReport = ref(false)
+const accessToken = ref(getAccessToken())
 const recordId = computed(() => typeof route.query.recordId === 'string' ? route.query.recordId : '')
 
 // 是否来自真实测试（有分数数据）
 const hasTestData = computed(() => !!route.query.scores)
+
+async function loadTypeData() {
+  typeData.value = await api.getResult(typeCode.value, accessToken.value || undefined, recordId.value || undefined)
+  paidReport.value = IS_DEMO || !!typeData.value.paid
+}
+
+async function onAccessUnlocked(token: string) {
+  accessToken.value = token
+  try {
+    await loadTypeData()
+  } catch {
+    fetchError.value = 'typeData'
+  }
+}
 
 onMounted(async () => {
   try {
@@ -48,8 +62,7 @@ onMounted(async () => {
   }
 
   try {
-    typeData.value = await api.getResult(typeCode.value)
-    paidReport.value = !!typeData.value.paid
+    await loadTypeData()
   } catch {
     fetchError.value = 'typeData'
   }
@@ -60,19 +73,13 @@ onMounted(async () => {
   injectJsonLd()
 })
 
-// Dimension display data
-const dimensionLabels: Record<string, { label: string; left: string; mid: string; right: string; color: string }> = {
-  E_I: { label: '能量来源', left: 'I 内向型', mid: 'A 平衡型', right: 'E 外向型', color: '#82B1FF' },
-  S_N: { label: '认知方式', left: 'N 直觉型', mid: 'B 均衡型', right: 'S 实感型', color: '#B388FF' },
-  T_F: { label: '决策方式', left: 'F 情感型', mid: 'C 复合型', right: 'T 思考型', color: '#40C4FF' },
-  P_J: { label: '生活态度', left: 'P 感知型', mid: 'D 动态型', right: 'J 判断型', color: '#FFD740' },
-}
-
 const typeName = computed(() => {
-  return `${chars.value.E_I === 'A' ? '平衡型' : chars.value.E_I === 'E' ? '外向型' : '内向型'} ·
-    ${chars.value.S_N === 'B' ? '均衡型' : chars.value.S_N === 'N' ? '直觉型' : '实感型'} ·
-    ${chars.value.T_F === 'C' ? '复合型' : chars.value.T_F === 'T' ? '思考型' : '情感型'} ·
-    ${chars.value.P_J === 'D' ? '动态型' : chars.value.P_J === 'J' ? '判断型' : '感知型'}`
+  return [
+    chars.value.E_I === 'A' ? '平衡型' : chars.value.E_I === 'E' ? '外向型' : '内向型',
+    chars.value.S_N === 'B' ? '均衡型' : chars.value.S_N === 'N' ? '直觉型' : '实感型',
+    chars.value.T_F === 'C' ? '复合型' : chars.value.T_F === 'T' ? '思考型' : '情感型',
+    chars.value.P_J === 'D' ? '动态型' : chars.value.P_J === 'J' ? '判断型' : '感知型',
+  ].join(' · ')
 })
 
 const isTraditional = computed(() => {
@@ -83,8 +90,6 @@ const isTraditional = computed(() => {
 const typeColor = computed(() => getTypeColor(typeCode.value))
 const groupCode = computed(() => getNineGroupCode(typeCode.value))
 const groupColor = computed(() => getNineGroupColor(groupCode.value))
-const temperament = computed(() => getTemperament(typeCode.value))
-const temperamentColor = computed(() => temperament.value ? TEMPERAMENT_COLORS[temperament.value] : null)
 
 // 维度别称（用于日常描述）
 const dimNicknames: Record<string, Record<string, string>> = {
@@ -101,6 +106,17 @@ const nicknames = computed(() => ({
   P_J: dimNicknames.P_J[chars.value.P_J] || '',
 }))
 
+const dimensionRows = computed(() => [
+  { key: 'E_I', index: '01', label: '能量来源', char: chars.value.E_I, nickname: nicknames.value.E_I },
+  { key: 'S_N', index: '02', label: '认知方式', char: chars.value.S_N, nickname: nicknames.value.S_N },
+  { key: 'T_F', index: '03', label: '决策方式', char: chars.value.T_F, nickname: nicknames.value.T_F },
+  { key: 'P_J', index: '04', label: '生活态度', char: chars.value.P_J, nickname: nicknames.value.P_J },
+])
+
+const featuredProfile = computed(() =>
+  typeData.value?.celebrityStories?.find(p => p.story) || null,
+)
+
 // 一句话描述（用于分享海报）
 const oneLiner = computed(() => {
   if (typeData.value?.overview) {
@@ -109,15 +125,6 @@ const oneLiner = computed(() => {
   }
   return `${groupColor.value.name} · ${typeName.value}`
 })
-
-async function loadPaidReport(unlockToken: string) {
-  try {
-    typeData.value = await api.getResult(typeCode.value, unlockToken, recordId.value || undefined)
-    paidReport.value = !!typeData.value.paid
-  } catch {
-    fetchError.value = 'typeData'
-  }
-}
 
 // 动态更新分享元标签 + SEO
 useShareMeta(
@@ -154,307 +161,144 @@ function injectJsonLd() {
 }
 onUnmounted(() => { jsonLdScript?.remove() })
 
-// Fallback defaults
-const defaultItems = {
-  strengths: [
-    '在多个维度上保持平衡，具备出色的情境适应能力',
-    '能够从多角度看待问题，不局限于单一思维模式',
-    '在不同社交和工作环境下都能找到适合自己的节奏',
-  ],
-  growthAreas: [
-    '偶尔可能因选择过多而感到犹豫不决',
-    '在需要坚定立场时，需要有意识地做出明确选择',
-    '建议定期进行自我反思，明确自己的核心需求',
-  ],
-}
 </script>
 
 <template>
-  <div class="min-h-screen">
-    <!-- Loading -->
-    <div v-if="!isLoaded" class="min-h-screen flex items-center justify-center">
-      <div class="w-10 h-10 rounded-full border-4 border-coral-soft border-t-coral animate-spin" />
+  <div class="result-page">
+    <header class="result-header">
+      <button class="result-brand" type="button" @click="$router.push('/')">
+        MBTI <span>—</span> PRO
+      </button>
+      <p class="result-caption">RESULT / {{ isTraditional ? '16-TYPE' : '81-TYPE' }}</p>
+      <button v-if="hasTestData" type="button" class="header-share" @click="showSharePoster = true">
+        分享结果 <span aria-hidden="true">↗</span>
+      </button>
+    </header>
+
+    <div v-if="!isLoaded" class="result-state">
+      <span>◌</span>
+      <p>正在整理你的档案…</p>
     </div>
 
-    <!-- Result content -->
-    <div v-else class="max-w-2xl mx-auto px-5 py-12 md:py-20">
-      <div class="stagger">
-        <!-- ====== 免费区域：图片 + 名称 + 四维状态条 + 分享海报 ====== -->
-
-        <!-- Type Badge -->
-        <div class="text-center mb-10">
-          <!-- Badges row -->
-          <div class="flex flex-wrap items-center justify-center gap-2 mb-6">
-            <!-- 四色系标记 -->
-            <div
-              class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border"
-              :style="{ background: typeColor.hex + '18', color: typeColor.hex, borderColor: typeColor.hex + '40' }"
-            >
-              <span class="w-1.5 h-1.5 rounded-full" :style="{ background: typeColor.hex }" />
-              {{ groupColor.name }}
-            </div>
-            <!-- 传统四气质徽章（纯端值16型） -->
-            <div
-              v-if="temperamentColor"
-              class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border"
-              :style="{ background: temperamentColor.hex + '18', color: temperamentColor.text, borderColor: temperamentColor.hex + '40' }"
-            >
-              <span class="w-1.5 h-1.5 rounded-full" :style="{ background: temperamentColor.hex }" />
-              {{ temperamentColor.name }} · {{ temperament }}
-            </div>
-            <!-- 81型独有 -->
-            <div
-              v-if="!isTraditional"
-              class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-coral/10 text-coral border border-coral/30"
-            >
-              MBTI-PRO 独有
-            </div>
+    <main v-else class="result-main">
+      <section class="result-hero">
+        <div class="result-identity">
+          <p class="result-kicker"><span>YOUR ARCHIVE</span><span>{{ groupColor.name }}</span></p>
+          <h1 class="result-code">{{ typeCode }}</h1>
+          <div class="result-name-row">
+            <h2>{{ typeData?.name?.replace('型', '') || '人格坐标' }}</h2>
+            <span class="result-dot" :style="{ background: typeColor.hex }" />
           </div>
-
-          <!-- Geometric Avatar -->
-          <div class="mb-6 flex justify-center">
-            <TypeAvatar :type-code="typeCode" :size="96" />
-          </div>
-
-          <!-- AI-Generated Personality Image -->
-          <div class="mb-8 flex justify-center">
-            <div class="relative w-56 h-56 sm:w-72 sm:h-72 md:w-96 md:h-96 rounded-3xl overflow-hidden shadow-xl border-2 border-border/20 bg-surface-alt/30">
-              <img
-                :src="typeImageUrl(typeCode)"
-                :alt="`${typeCode} 人格类型画像`"
-                class="w-full h-full object-contain object-center transition-opacity duration-700"
-                :class="{ 'opacity-0': !imageLoaded }"
-                loading="eager"
-                @load="imageLoaded = true"
-                @error="imageLoaded = true; ($event.target as HTMLImageElement).style.display = 'none'"
-              />
-              <div v-if="!imageLoaded" class="absolute inset-0 flex items-center justify-center bg-surface-alt/30">
-                <div class="w-8 h-8 rounded-full border-3 border-coral-soft border-t-coral animate-spin" />
-              </div>
-            </div>
-          </div>
-
-          <!-- Type Code -->
-          <div
-            class="relative inline-block mb-4 px-8 py-4 rounded-3xl"
-            :style="{ background: `linear-gradient(135deg, ${typeColor.hex}12, ${typeColor.hex}08)` }"
-          >
-            <h1 class="text-5xl md:text-7xl font-display font-black tracking-widest">
-              <span
-                v-for="(ch, i) in typeCode.split('')"
-                :key="i"
-                class="pop-char inline-block"
-                :style="{ color: typeColor.hex, animationDelay: `${0.3 + i * 0.1}s` }"
-              >{{ ch }}</span>
-            </h1>
-          </div>
-          <p v-if="typeData?.name" class="text-xl md:text-2xl font-display font-bold text-charcoal mb-3">
-            {{ typeData.name.replace('型', '') }}
+          <p class="result-axis">{{ typeName }}</p>
+          <blockquote v-if="typeData?.summary" class="result-quote">“{{ typeData.summary }}”</blockquote>
+          <p class="result-footnote">
+            {{ isTraditional ? '传统 16 型组合' : '81 型中间型组合' }} · 结果仅供自我探索
           </p>
-          <p class="text-lg text-text-secondary leading-relaxed max-w-md mx-auto">
-            {{ typeName }}
-          </p>
+        </div>
 
-          <!-- 人格总结（免费可见） -->
-          <div v-if="typeData?.summary" class="mt-6 bg-cream/80 rounded-2xl px-6 py-4 border border-border/30 max-w-lg mx-auto">
-            <p class="text-sm text-text-secondary leading-relaxed italic">
-              "{{ typeData.summary }}"
-            </p>
+        <aside class="result-portrait">
+          <div class="portrait-frame">
+            <span class="portrait-index">81</span>
+            <img
+              :src="typeImageUrl(typeCode)"
+              :alt="`${typeCode} 人格画像`"
+              :class="{ 'portrait-image--loaded': imageLoaded }"
+              @load="imageLoaded = true"
+              @error="imageLoaded = true; ($event.target as HTMLImageElement).style.display = 'none'"
+            />
+            <span class="portrait-code">{{ typeCode }}</span>
+          </div>
+          <div class="portrait-caption">
+            <span>{{ groupColor.name }}</span>
+            <span>PERSONALITY ARCHIVE</span>
+          </div>
+        </aside>
+      </section>
+
+      <section v-if="hasTestData" class="result-section">
+        <div class="section-head"><span>01 / COORDINATE + PORTRAIT</span><h2>四维坐标与日常画像</h2></div>
+        <DimensionSpectrum
+          :typeCode="typeCode"
+          :typeName="typeName"
+          :scores="scores"
+          :chars="chars"
+          :dimTotals="dimTotals"
+          :dimAnswered="dimAnswered"
+        />
+        <div class="dimension-grid">
+          <div v-for="dim in dimensionRows" :key="dim.key" class="dimension-item">
+            <span class="dim-index">{{ dim.index }}</span>
+            <span class="dim-label">{{ dim.label }}</span>
+            <span class="dim-char">{{ dim.char }}</span>
+            <span class="dim-nick">{{ dim.nickname }}</span>
           </div>
         </div>
+      </section>
 
-        <!-- Dimension Spectrum (仅测试后显示) -->
-        <div v-if="hasTestData" class="bg-white/70 backdrop-blur-sm rounded-3xl p-6 md:p-8 border border-border shadow-sm mb-8">
-          <h2 class="text-sm font-semibold text-text-muted uppercase tracking-widest mb-6 text-center">
-            四维度分析
-            <span
-              class="inline-flex items-center gap-1 ml-2 px-2 py-0.5 rounded-full text-[10px] font-medium align-middle"
-              :style="{ background: typeColor.hex + '18', color: typeColor.hex }"
-            >
-              <span class="w-1.5 h-1.5 rounded-full" :style="{ background: typeColor.hex }" />
-              {{ groupColor.name }}
-            </span>
-          </h2>
-          <DimensionSpectrum
-            :typeCode="typeCode"
-            :typeName="typeName"
-            :scores="scores"
-            :chars="chars"
-            :dimTotals="dimTotals"
-            :dimAnswered="dimAnswered"
-          />
-        </div>
+      <AccessGate
+        v-if="hasTestData && typeData && !paidReport"
+        compact
+        title="解锁完整 81 型报告"
+        description="在小红书店铺购买 0.99 元商品后，输入订单里的兑换码。兑换成功后，本页全部内容立即解锁，不再需要邮箱、分享或二次付费。"
+        @unlocked="onAccessUnlocked"
+      />
 
-        <!-- ====== 🔒 付费解锁：所有文字内容 ====== -->
-        <PaywallSection
-          v-if="hasTestData && typeData"
-          :type-code="typeData.code"
-          :type-name="typeData.name"
-          :type-color="typeColor.hex"
-          :record-id="recordId"
-          @unlocked="loadPaidReport"
-          @request-share-poster="showSharePoster = true"
-        >
-          <div v-if="paidReport" class="deep-content space-y-6 mt-2">
+      <div v-if="paidReport" class="report-content">
+        <section class="result-section">
+          <div class="section-head"><span>02 / PORTRAIT</span><h2>人格概览</h2></div>
+          <div class="long-copy">{{ typeData?.overview }}</div>
+        </section>
 
-            <!-- 人格概览 -->
-            <div class="bg-white/70 backdrop-blur-sm rounded-3xl p-6 md:p-8 border border-border shadow-sm">
-              <h2 class="text-lg font-display font-bold text-charcoal mb-4">人格概览</h2>
-              <div v-if="typeData" class="text-text-secondary leading-relaxed whitespace-pre-line">
-                {{ typeData.overview }}
-              </div>
-              <p v-else class="text-text-secondary leading-relaxed">
-                {{ typeCode }} 型人格{{ isTraditional ? '属于经典的MBTI 16型之一。' : '是MBTI-PRO 81型分类体系中的独特类型。' }}
-                你在四个核心维度上展现出独特的偏好组合。
-              </p>
+        <section v-if="typeData?.celebrityStories?.length" class="result-section">
+          <div class="section-head"><span>03 / REFERENCES</span><h2>代表人物</h2></div>
+          <div class="person-strip">
+            <div v-for="(person, i) in typeData.celebrityStories" :key="person.name" class="person-row">
+              <span class="person-index">{{ ('0' + (i + 1)).slice(-2) }}</span>
+              <span class="person-name">{{ person.name }}</span>
+              <span class="person-field">{{ person.field }}</span>
             </div>
-
-            <!-- 四维度日常画像 -->
-            <div class="bg-white/70 backdrop-blur-sm rounded-3xl p-6 md:p-8 border border-border shadow-sm">
-              <h2 class="text-lg font-display font-bold text-charcoal mb-5">你的日常画像</h2>
-              <div class="grid md:grid-cols-2 gap-4">
-                <div
-                  v-for="dim in [
-                    { key: 'E_I', icon: 'energy', label: '能量来源', dLabel: dimensionLabels.E_I, accent: '#82B1FF' },
-                    { key: 'S_N', icon: 'cognition', label: '认知方式', dLabel: dimensionLabels.S_N, accent: '#B388FF' },
-                    { key: 'T_F', icon: 'decision', label: '决策方式', dLabel: dimensionLabels.T_F, accent: '#40C4FF' },
-                    { key: 'P_J', icon: 'lifestyle', label: '生活态度', dLabel: dimensionLabels.P_J, accent: '#FFD740' },
-                  ]"
-                  :key="dim.key"
-                  class="flex items-start gap-4 p-4 rounded-2xl bg-surface-alt/50 group hover:bg-surface-alt/80 transition-colors duration-300"
-                >
-                  <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" :style="{ background: dim.accent + '18' }">
-                    <svg v-if="dim.icon === 'energy'" class="w-5 h-5" viewBox="0 0 20 20" fill="none">
-                      <circle cx="10" cy="10" r="2.5" :stroke="dim.accent" stroke-width="1.8" />
-                      <circle cx="10" cy="10" r="6.5" :stroke="dim.accent" stroke-width="1.2" opacity="0.5" />
-                    </svg>
-                    <svg v-if="dim.icon === 'cognition'" class="w-5 h-5" viewBox="0 0 20 20" fill="none">
-                      <path d="M10 2L17.5 6.5V15.5L10 20L2.5 15.5V6.5L10 2Z" :stroke="dim.accent" stroke-width="1.5" stroke-linejoin="round" />
-                      <circle cx="10" cy="11" r="3" :stroke="dim.accent" stroke-width="1.2" opacity="0.5" />
-                    </svg>
-                    <svg v-if="dim.icon === 'decision'" class="w-5 h-5" viewBox="0 0 20 20" fill="none">
-                      <path d="M10 3v14M5 8l-3 2 3 2M15 8l3 2-3 2" :stroke="dim.accent" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-                      <circle cx="10" cy="8" r="1.5" :fill="dim.accent" opacity="0.3" />
-                    </svg>
-                    <svg v-if="dim.icon === 'lifestyle'" class="w-5 h-5" viewBox="0 0 20 20" fill="none">
-                      <circle cx="10" cy="10" r="7.5" :stroke="dim.accent" stroke-width="1.5" />
-                      <path d="M10 2.5v15M2.5 10h15" :stroke="dim.accent" stroke-width="1" opacity="0.4" />
-                      <circle cx="10" cy="10" r="2" :stroke="dim.accent" stroke-width="1.5" />
-                      <path d="M10 4l2 6-2 6" :stroke="dim.accent" stroke-width="1.2" opacity="0.6" />
-                    </svg>
-                  </div>
-                  <div>
-                    <p class="text-xs text-text-muted mb-0.5">{{ dim.label }}</p>
-                    <p class="text-sm font-semibold text-charcoal">
-                      {{ dim.dLabel[['A','B','C','D'].includes(chars[dim.key]) ? 'mid' : ['E','S','T','J'].includes(chars[dim.key]) ? 'right' : 'left'] }}
-                    </p>
-                    <p class="text-xs text-text-secondary mt-0.5">{{ nicknames[dim.key] }}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Celebrities (仅有人物数据时显示) -->
-            <div v-if="typeData?.celebrities?.length" class="bg-white/70 backdrop-blur-sm rounded-3xl p-6 border border-sage/30 shadow-sm">
-              <h3 class="text-sm font-semibold text-sage uppercase tracking-widest mb-3 flex items-center gap-2">
-                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-                代表人物
-              </h3>
-              <div class="flex flex-wrap gap-2">
-                <span
-                  v-for="(name, i) in typeData.celebrities"
-                  :key="i"
-                  class="px-3 py-1 rounded-full text-sm bg-surface-alt text-text-secondary border border-border"
-                >{{ name }}</span>
-              </div>
-            </div>
-
-            <!-- Strengths & Growth -->
-            <div class="grid md:grid-cols-2 gap-6">
-              <div class="bg-white/70 backdrop-blur-sm rounded-3xl p-6 border border-sage/30 shadow-sm">
-                <h3 class="text-sm font-semibold text-sage uppercase tracking-widest mb-3 flex items-center gap-2">
-                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
-                  核心优势
-                </h3>
-                <ul class="space-y-2 text-sm text-text-secondary">
-                  <li v-for="(s, i) in (typeData?.strengths ?? defaultItems.strengths)" :key="i" class="flex items-start gap-2">
-                    <span class="w-1.5 h-1.5 rounded-full bg-sage mt-1.5 shrink-0" />
-                    {{ s }}
-                  </li>
-                </ul>
-              </div>
-              <div class="bg-white/70 backdrop-blur-sm rounded-3xl p-6 border border-coral-soft/30 shadow-sm">
-                <h3 class="text-sm font-semibold text-coral uppercase tracking-widest mb-3 flex items-center gap-2">
-                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
-                  成长空间
-                </h3>
-                <ul class="space-y-2 text-sm text-text-secondary">
-                  <li v-for="(g, i) in (typeData?.growthAreas ?? defaultItems.growthAreas)" :key="i" class="flex items-start gap-2">
-                    <span class="w-1.5 h-1.5 rounded-full bg-coral mt-1.5 shrink-0" />
-                    {{ g }}
-                  </li>
-                </ul>
-              </div>
-            </div>
-
-            <!-- 四维深度解析 -->
-            <div v-if="typeData.eiModule || typeData.snModule || typeData.tfModule || typeData.pjModule" class="bg-white/70 backdrop-blur-sm rounded-3xl p-6 md:p-8 border border-border shadow-sm">
-              <h2 class="text-lg font-display font-bold text-charcoal mb-5">四维深度解析</h2>
-              <div class="space-y-4">
-                <div v-if="typeData.eiModule" class="text-text-secondary text-sm leading-relaxed">
-                  <strong class="text-charcoal">能量来源：</strong>{{ typeData.eiModule }}
-                </div>
-                <div v-if="typeData.snModule" class="text-text-secondary text-sm leading-relaxed">
-                  <strong class="text-charcoal">认知方式：</strong>{{ typeData.snModule }}
-                </div>
-                <div v-if="typeData.tfModule" class="text-text-secondary text-sm leading-relaxed">
-                  <strong class="text-charcoal">决策方式：</strong>{{ typeData.tfModule }}
-                </div>
-                <div v-if="typeData.pjModule" class="text-text-secondary text-sm leading-relaxed">
-                  <strong class="text-charcoal">生活态度：</strong>{{ typeData.pjModule }}
-                </div>
-              </div>
-            </div>
-
           </div>
-        </PaywallSection>
+        </section>
 
-        <!-- Actions -->
-        <div class="flex flex-col sm:flex-row gap-4 justify-center mt-8">
-          <button
-            @click="$router.push('/')"
-            class="px-8 py-4 min-h-[52px] bg-charcoal text-cream font-semibold rounded-2xl hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
-          >
-            {{ hasTestData ? '重新测试' : '开始测试' }}
-          </button>
-          <button
-            v-if="hasTestData"
-            @click="showSharePoster = true"
-            class="px-8 py-4 min-h-[52px] bg-coral text-white font-semibold rounded-2xl hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
-          >
-            分享结果
-          </button>
-          <button
-            v-else
-            @click="$router.push('/')"
-            class="px-8 py-4 min-h-[52px] bg-coral text-white font-semibold rounded-2xl hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
-          >
-            返回首页
-          </button>
-        </div>
-
-        <!-- 打赏作者（始终显示） -->
-        <DonationSection v-if="!IS_DEMO" :typeColor="typeColor.hex" />
-
-        <!-- Disclaimer -->
-        <p class="text-center text-xs text-text-muted mt-8">
-          测试结果仅供个人参考，不构成任何临床诊断或招聘决策依据。<br />
-          人格具有可塑性，建议每 6-12 个月重新测试。
-        </p>
+        <section v-if="typeData?.eiModule || typeData?.snModule || typeData?.tfModule || typeData?.pjModule" class="result-section">
+          <div class="section-head"><span>04 / DEPTH</span><h2>四维深度解析</h2></div>
+          <div v-if="featuredProfile" class="depth-person">
+            <p class="depth-person-kicker">PERSON IN CONTEXT / {{ featuredProfile.name }} · {{ featuredProfile.field }}</p>
+            <p class="depth-person-story">下面四条建议，都来自这位人物公开可查的经历：精力投向、判断方式、关键抉择，以及代价最后落在哪里。</p>
+            <blockquote v-if="featuredProfile.quote">“{{ featuredProfile.quote }}”</blockquote>
+          </div>
+          <div class="depth-list">
+            <div v-if="typeData?.eiModule" class="depth-row">
+              <span>能量来源</span><p>{{ typeData.eiModule }}</p>
+            </div>
+            <div v-if="typeData?.snModule" class="depth-row">
+              <span>认知方式</span><p>{{ typeData.snModule }}</p>
+            </div>
+            <div v-if="typeData?.tfModule" class="depth-row">
+              <span>决策方式</span><p>{{ typeData.tfModule }}</p>
+            </div>
+            <div v-if="typeData?.pjModule" class="depth-row">
+              <span>生活态度</span><p>{{ typeData.pjModule }}</p>
+            </div>
+          </div>
+        </section>
       </div>
-    </div>
 
-    <!-- Share Poster Modal -->
+      <div class="result-actions">
+        <button v-if="hasTestData" type="button" class="primary-action" @click="showSharePoster = true">
+          分享结果 <span aria-hidden="true">↗</span>
+        </button>
+        <button type="button" class="text-action" @click="$router.push('/')">
+          再测一次
+        </button>
+      </div>
+
+      <footer class="result-disclaimer">
+        <span>MBTI-PRO / 81-TYPE PERSONALITY ARCHIVE</span>
+        <span>结果仅供个人参考，不构成临床诊断或招聘决策依据</span>
+      </footer>
+    </main>
+
     <SharePoster
       v-if="showSharePoster"
       :typeCode="typeCode"
@@ -466,7 +310,225 @@ const defaultItems = {
       :recordId="recordId"
       :scores="hasTestData ? scores : undefined"
       :chars="hasTestData ? chars : undefined"
+      :dimTotals="dimTotals"
       @close="showSharePoster = false"
     />
   </div>
 </template>
+
+
+<style scoped>
+.result-page {
+  --paper: #f2ede3;
+  --paper-light: #f8f4ec;
+  --ink: #1e1d1a;
+  --muted: #6f685d;
+  --rule: #d2c8b8;
+  --accent: #a63d2c;
+  --moss: #2f4037;
+  min-height: 100vh;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "PingFang SC", "HarmonyOS Sans SC", "Microsoft YaHei", "Noto Sans CJK SC", "Source Han Sans SC", system-ui, sans-serif;
+}
+
+.result-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 22px 40px;
+  border-bottom: 1px solid var(--rule);
+}
+.result-brand {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  font-family: "DM Mono", "SF Mono", Consolas, "Roboto Mono", monospace;
+  font-size: 14px;
+  letter-spacing: .08em;
+}
+.result-brand span { color: var(--accent); }
+.result-caption {
+  margin: 0;
+  color: var(--muted);
+  font-family: "DM Mono", "SF Mono", Consolas, "Roboto Mono", monospace;
+  font-size: 10px;
+  letter-spacing: .12em;
+}
+.header-share {
+  padding: 8px 0;
+  border: 0;
+  border-bottom: 1px solid var(--ink);
+  background: none;
+  color: var(--ink);
+  font-size: 12px;
+}
+.header-share span { color: var(--accent); margin-left: 6px; }
+.result-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  color: var(--muted);
+  font-family: "DM Mono", "SF Mono", Consolas, "Roboto Mono", monospace;
+  font-size: 11px;
+}
+.result-state span { color: var(--accent); font-size: 28px; margin-bottom: 14px; }
+
+.result-main { max-width: 1120px; margin: 0 auto; padding: 66px 40px 34px; }
+.result-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, .82fr);
+  gap: clamp(40px, 8vw, 110px);
+  align-items: center;
+  min-height: 430px;
+  padding-bottom: 60px;
+}
+.result-kicker {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  margin: 0 0 20px;
+  color: var(--muted);
+  font-family: "DM Mono", "SF Mono", Consolas, "Roboto Mono", monospace;
+  font-size: 10px;
+  letter-spacing: .1em;
+}
+.result-kicker span:first-child { color: var(--accent); }
+.result-code {
+  margin: 0;
+  font-family: "Playfair Display", "Songti SC", "STSong", SimSun, "Noto Serif CJK SC", "Source Han Serif SC", serif;
+  font-size: clamp(96px, 14vw, 172px);
+  font-weight: 600;
+  line-height: .88;
+  letter-spacing: -.07em;
+}
+.result-name-row { display: flex; align-items: center; gap: 12px; margin-top: 24px; }
+.result-name-row h2 {
+  margin: 0;
+  font-family: "Playfair Display", "Songti SC", "STSong", SimSun, "Noto Serif CJK SC", "Source Han Serif SC", serif;
+  font-size: clamp(26px, 3vw, 38px);
+  font-weight: 600;
+  letter-spacing: -.04em;
+}
+.result-dot { width: 9px; height: 9px; display: inline-block; }
+.result-axis { margin: 8px 0 0; color: var(--muted); font-size: 13px; }
+.result-quote {
+  max-width: 660px;
+  margin: 28px 0 0;
+  padding-left: 18px;
+  border-left: 2px solid var(--accent);
+  color: var(--ink);
+  font-family: "Playfair Display", "Songti SC", "STSong", SimSun, "Noto Serif CJK SC", "Source Han Serif SC", serif;
+  font-size: 20px;
+  line-height: 1.8;
+}
+.result-footnote { margin: 26px 0 0; color: var(--muted); font-family: "DM Mono", "SF Mono", Consolas, "Roboto Mono", monospace; font-size: 10px; letter-spacing: .04em; }
+.result-portrait {
+  width: min(100%, 380px);
+  justify-self: end;
+}
+.portrait-frame {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  border: 1px solid var(--ink);
+  background: var(--paper-light);
+}
+.portrait-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity .45s ease;
+}
+.portrait-frame img.portrait-image--loaded { opacity: 1; }
+.portrait-index, .portrait-code {
+  position: absolute;
+  z-index: 1;
+  padding: 3px 6px;
+  background: var(--paper);
+  color: var(--accent);
+  font-family: "DM Mono", "SF Mono", Consolas, "Roboto Mono", monospace;
+  font-size: 10px;
+  letter-spacing: .08em;
+}
+.portrait-index { top: 10px; left: 10px; }
+.portrait-code { right: 10px; bottom: 10px; color: var(--ink); }
+.portrait-caption {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 9px;
+  color: var(--muted);
+  font-family: "DM Mono", "SF Mono", Consolas, "Roboto Mono", monospace;
+  font-size: 9px;
+  letter-spacing: .05em;
+}
+
+.result-section { padding: 48px 0 52px; border-top: 1px solid var(--rule); }
+.section-head { display: flex; align-items: baseline; gap: 26px; margin-bottom: 30px; }
+.section-head span { color: var(--accent); font-family: "DM Mono", "SF Mono", Consolas, "Roboto Mono", monospace; font-size: 10px; letter-spacing: .08em; white-space: nowrap; }
+.section-head h2 { margin: 0; font-family: "Playfair Display", "Songti SC", "STSong", SimSun, "Noto Serif CJK SC", "Source Han Serif SC", serif; font-size: clamp(30px, 3.4vw, 40px); font-weight: 600; letter-spacing: -.04em; }
+.long-copy { max-width: 860px; color: var(--muted); font-size: 16px; line-height: 2.05; white-space: pre-line; }
+
+.dimension-grid { display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid var(--ink); }
+.dimension-item { display: grid; grid-template-columns: 36px 1fr auto; column-gap: 12px; padding: 20px 0; border-bottom: 1px solid var(--rule); }
+.dimension-item:nth-child(odd) { padding-right: 32px; }
+.dimension-item:nth-child(even) { padding-left: 32px; border-left: 1px solid var(--rule); }
+.dim-index { color: var(--accent); font-family: "DM Mono", "SF Mono", Consolas, "Roboto Mono", monospace; font-size: 10px; }
+.dim-label { color: var(--muted); font-size: 12px; }
+.dim-char { grid-row: span 2; grid-column: 3; font-family: "DM Mono", "SF Mono", Consolas, "Roboto Mono", monospace; font-size: 28px; line-height: 1; }
+.dim-nick { grid-column: 2; color: var(--ink); font-family: "Playfair Display", "Songti SC", "STSong", SimSun, "Noto Serif CJK SC", "Source Han Serif SC", serif; font-size: 17px; margin-top: 5px; }
+
+.person-strip { border-top: 1px solid var(--ink); }
+.person-row { display: grid; grid-template-columns: 36px 1fr 1.2fr; gap: 18px; align-items: baseline; padding: 15px 0; border-bottom: 1px solid var(--rule); }
+.person-index { color: var(--accent); font-family: "DM Mono", "SF Mono", Consolas, "Roboto Mono", monospace; font-size: 10px; }
+.person-name { font-family: "Playfair Display", "Songti SC", "STSong", SimSun, "Noto Serif CJK SC", "Source Han Serif SC", serif; font-size: 18px; font-weight: 600; }
+.person-field { color: var(--muted); font-size: 12px; text-align: right; }
+
+.depth-person { margin-bottom: 28px; padding: 22px 24px; border-left: 2px solid var(--accent); background: rgba(166, 61, 44, .045); }
+.depth-person-kicker { margin: 0 0 10px; color: var(--accent); font-family: "DM Mono", "SF Mono", Consolas, "Roboto Mono", monospace; font-size: 9px; letter-spacing: .08em; }
+.depth-person-story { max-width: 850px; margin: 0; color: var(--muted); font-family: "Playfair Display", "Songti SC", "STSong", SimSun, "Noto Serif CJK SC", "Source Han Serif SC", serif; font-size: 16px; line-height: 1.95; }
+.depth-person blockquote { margin: 14px 0 0; color: var(--ink); font-family: "Playfair Display", "Songti SC", "STSong", SimSun, "Noto Serif CJK SC", "Source Han Serif SC", serif; font-size: 18px; line-height: 1.7; }
+.depth-list { border-top: 1px solid var(--ink); }
+.depth-row { display: grid; grid-template-columns: 120px 1fr; gap: 24px; padding: 20px 0; border-bottom: 1px solid var(--rule); }
+.depth-row > span { color: var(--accent); font-family: "DM Mono", "SF Mono", Consolas, "Roboto Mono", monospace; font-size: 10px; letter-spacing: .05em; padding-top: 4px; }
+.depth-row p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.9; }
+
+.result-actions { display: flex; align-items: center; gap: 22px; padding: 38px 0 20px; border-top: 1px solid var(--rule); }
+.primary-action {
+  display: inline-flex; align-items: center; justify-content: space-between; gap: 30px;
+  min-width: 160px; padding: 14px 18px; border: 1px solid var(--ink); border-radius: 0;
+  background: var(--ink); color: var(--paper-light); font-size: 13px; font-weight: 600;
+}
+.primary-action:hover { background: var(--accent); border-color: var(--accent); }
+.text-action { padding: 8px 0; border: 0; border-bottom: 1px solid transparent; background: none; color: var(--muted); font-size: 13px; }
+.text-action:hover { color: var(--ink); border-color: var(--ink); }
+.result-disclaimer { display: flex; justify-content: space-between; gap: 24px; padding: 24px 0 0; border-top: 1px solid var(--rule); color: var(--muted); font-family: "DM Mono", "SF Mono", Consolas, "Roboto Mono", monospace; font-size: 9px; letter-spacing: .03em; }
+
+@media (max-width: 760px) {
+  .result-header { padding: 18px 22px; }
+  .result-caption { display: none; }
+  .result-main { padding: 44px 22px 26px; }
+  .result-hero { grid-template-columns: 1fr; gap: 34px; min-height: 0; padding-bottom: 42px; }
+  .result-code { font-size: 92px; }
+  .result-quote { font-size: 18px; }
+  .result-portrait { width: 280px; justify-self: start; }
+  .result-section { padding: 36px 0 40px; }
+  .section-head { display: block; margin-bottom: 22px; }
+  .section-head span { display: block; margin-bottom: 10px; }
+  .dimension-grid { grid-template-columns: 1fr; }
+  .dimension-item:nth-child(odd), .dimension-item:nth-child(even) { padding-left: 0; padding-right: 0; border-left: 0; }
+  .depth-row { grid-template-columns: 92px 1fr; gap: 14px; }
+  .result-disclaimer { flex-direction: column; gap: 8px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .primary-action { transition: none; }
+}
+</style>

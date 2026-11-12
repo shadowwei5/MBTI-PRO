@@ -1,9 +1,48 @@
 @import "tailwindcss";
 
+/* ============================================================
+   本地字体（拉丁字符子集，约 107KB）
+   - Playfair Display：仅用于纯拉丁的大字标题（ESTJ / ARCHIVE 等）
+   - DM Mono：仅用于小号等宽标签
+   中文一律走系统衬线 / 系统无衬线，避免依赖 Google Fonts（国内不可达）
+   ============================================================ */
+@font-face {
+  font-family: 'Playfair Display';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fonts/playfair-600-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Playfair Display';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/playfair-700-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'DM Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/dmmono-400-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'DM Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/dmmono-500-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2215, U+FEFF, U+FFFD;
+}
+
 @theme {
-  --font-display: 'Playfair Display', 'Noto Sans SC', serif;
-  --font-body: 'Noto Sans SC', system-ui, sans-serif;
-  --font-mono: 'DM Mono', 'Consolas', monospace;
+  --font-display: 'Playfair Display', 'Songti SC', 'STSong', SimSun, 'Noto Serif CJK SC', 'Source Han Serif SC', serif;
+  --font-body: 'PingFang SC', 'HarmonyOS Sans SC', 'Microsoft YaHei', 'Noto Sans CJK SC', 'Source Han Sans SC', system-ui, sans-serif;
+  --font-mono: 'DM Mono', 'SF Mono', Consolas, 'Roboto Mono', monospace;
 
   --color-cream: #FDF8F0;
   --color-charcoal: #2D2A26;
@@ -48,9 +87,7 @@
 
   body {
     font-family: var(--font-body);
-    background: linear-gradient(135deg, #FDF8F0 0%, #F5F0E8 25%, #EDE6D8 50%, #F5F0E8 75%, #FDF8F0 100%);
-    background-size: 400% 400%;
-    animation: bg-drift 20s ease infinite;
+    background: #F2EDE3;
     color: var(--color-text-primary);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;

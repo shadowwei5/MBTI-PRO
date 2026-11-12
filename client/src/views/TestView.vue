@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import ProgressBar from '../components/ProgressBar.vue'
 import OptionGroup from '../components/OptionGroup.vue'
 import OptionGroupBipolar from '../components/OptionGroupBipolar.vue'
-import FeedbackCollector from '../components/FeedbackCollector.vue'
 import { api } from '../services/api'
+import { getAccessToken } from '../services/access'
+import { IS_DEMO } from '../services/demoMode'
 
 const router = useRouter()
 const REFERRAL_KEY = 'mbti-pro-referral-code'
@@ -25,8 +25,11 @@ const questions = ref<Question[]>([])
 const loading = ref(true)
 const loadError = ref('')
 const currentIndex = ref(0)
+// 通过「上一题」回看已答题目时不自动跳走，改完由用户自己决定去哪
+const isReviewingHistory = ref(false)
 const answers = ref<Record<number, string>>({})
 const showSubmitConfirm = ref(false)
+const submitError = ref('')
 const submitting = ref(false)
 const startTime = ref(Date.now())
 // 每道题的进入时间与答题耗时（用于后台分析题目卡点）
@@ -34,37 +37,7 @@ const questionEnterAt = ref<Record<number, number>>({})
 const questionTimings = ref<Record<number, number>>({})
 const questionActiveMs = ref<Record<number, number>>({})
 
-// 反馈收集（答题完成后、展示结果前 — 必须完成反馈才能查看结果）
-const showFeedbackAfterTest = ref(false)
-const pendingResult = ref<{
-  typeCode: string
-  scores: Record<string, number>
-  chars: Record<string, string>
-  confidence: number
-  dimTotals: Record<string, number>
-  dimAnswered: Record<string, number>
-  recordId?: string
-} | null>(null)
-
-function onFeedbackSubmitted() {
-  showFeedbackAfterTest.value = false
-  if (!pendingResult.value) return
-  const r = pendingResult.value
-  router.push({
-    name: 'result',
-    params: { type: r.typeCode },
-    query: {
-      scores: JSON.stringify(r.scores),
-      chars: JSON.stringify(r.chars),
-      confidence: String(r.confidence),
-      dimTotals: JSON.stringify(r.dimTotals),
-      dimAnswered: JSON.stringify(r.dimAnswered),
-      recordId: r.recordId,
-    },
-  })
-}
-
-// 客观题相关状态
+// 客观题相关状态（40 题首发版没有客观题，保留代码以兼容旧题库）
 const objectiveIntroShown = ref(false)
 const showObjectiveIntro = ref(false)
 const objectiveSeconds = ref(20)
@@ -76,6 +49,8 @@ const firstObjectiveIndex = computed(() => {
   const idx = questions.value.findIndex(q => q.type === 'objective')
   return idx === -1 ? Infinity : idx
 })
+
+const objectiveCount = computed(() => questions.value.filter(q => q.type === 'objective').length)
 
 // 当前是否在客观题答题中（已确认开始）
 const isInObjectiveMode = computed(() => {
@@ -90,27 +65,14 @@ const isObjectiveLocked = computed(() => {
 })
 
 // Fetch questions from API & restore saved progress
+//
+// 关键：题目列表永远以 API 为准（题库可能从 100 题改成 40 题）。
+// localStorage 里的进度只有在题目 id 集合完全一致时才恢复，
+// 否则直接丢弃 —— 否则旧题库缓存会让 dimTotals 变成 25/25/25/25，
+// 阈值被放大到 ±17，几乎所有得分都落进中间档，结果永远是 ABCD。
 async function fetchQuestions() {
   loading.value = true
   loadError.value = ''
-
-  const saved = localStorage.getItem('mbti-pro-test')
-  if (saved) {
-    try {
-      const parsed = JSON.parse(saved)
-      if (parsed.questions && parsed.questions.length > 0) {
-        questions.value = parsed.questions
-        answers.value = parsed.answers || {}
-        currentIndex.value = parsed.currentIndex || 0
-        objectiveIntroShown.value = parsed.objectiveIntroShown || false
-        timerRemaining.value = parsed.timerRemaining || {}
-        questionTimings.value = parsed.questionTimings || {}
-        questionActiveMs.value = parsed.questionActiveMs || {}
-        loading.value = false
-        return
-      }
-    } catch { /* ignore */ }
-  }
 
   try {
     const data = await api.getQuestions()
@@ -118,17 +80,48 @@ async function fetchQuestions() {
       ...q,
       options: Array.isArray(q.options) ? q.options : JSON.parse(q.options as unknown as string),
     }))
-    const likert = parsed.filter(q => q.type === 'likert')
-    const objective = parsed.filter(q => q.type === 'objective')
-    questions.value = [...likert, ...objective]
+    // 40 题版按 API 给定的 E/S/T/P 交叉顺序展示，不再把客观题全部挪到末尾
+    questions.value = parsed
   } catch {
     loadError.value = '题目加载失败，请检查网络后刷新重试。'
-  } finally {
+    questions.value = []
     loading.value = false
+    return
   }
+
+  // 题目已就绪，再尝试恢复进度
+  const saved = localStorage.getItem('mbti-pro-test')
+  if (saved) {
+    try {
+      const parsed = JSON.parse(saved)
+      const savedIds: number[] = Array.isArray(parsed.questionIds) ? parsed.questionIds : []
+      const currentIds = questions.value.map(q => q.id)
+      const sameBank = savedIds.length === currentIds.length && savedIds.every((id, i) => id === currentIds[i])
+
+      if (sameBank && parsed.answers && Object.keys(parsed.answers).length > 0) {
+        answers.value = parsed.answers || {}
+        currentIndex.value = Math.min(parsed.currentIndex || 0, questions.value.length - 1)
+        objectiveIntroShown.value = parsed.objectiveIntroShown || false
+        timerRemaining.value = parsed.timerRemaining || {}
+        questionTimings.value = parsed.questionTimings || {}
+        questionActiveMs.value = parsed.questionActiveMs || {}
+      } else {
+        // 题库版本不一致（旧题库残留），清掉旧进度
+        localStorage.removeItem('mbti-pro-test')
+      }
+    } catch {
+      localStorage.removeItem('mbti-pro-test')
+    }
+  }
+
+  loading.value = false
 }
 
 onMounted(() => {
+  if (!IS_DEMO && !getAccessToken()) {
+    router.replace('/')
+    return
+  }
   const params = new URLSearchParams(window.location.search)
   const referralCode = params.get('ref')
   if (referralCode) {
@@ -163,9 +156,11 @@ function finalizeQuestionTiming(questionId: number) {
 }
 
 // Save progress
+// 只存题目 id 指纹 + 答案，不再把整份题目列表塞进 localStorage
 watch([answers, currentIndex, objectiveIntroShown, timerRemaining], () => {
+  if (questions.value.length === 0) return
   localStorage.setItem('mbti-pro-test', JSON.stringify({
-    questions: questions.value,
+    questionIds: questions.value.map(q => q.id),
     answers: answers.value,
     currentIndex: currentIndex.value,
     objectiveIntroShown: objectiveIntroShown.value,
@@ -179,6 +174,16 @@ const currentQuestion = computed(() => questions.value[currentIndex.value])
 const progress = computed(() => Object.keys(answers.value).length)
 const totalQuestions = computed(() => questions.value.length)
 const canGoNext = computed(() => !!answers.value[currentQuestion.value?.id])
+
+const dimensionNames: Record<string, string> = {
+  E_I: '能量来源',
+  S_N: '认知方式',
+  T_F: '决策方式',
+  P_J: '生活态度',
+}
+const currentDimension = computed(() => dimensionNames[currentQuestion.value?.dimension || ''] || '')
+const progressPct = computed(() => totalQuestions.value ? Math.round((progress.value / totalQuestions.value) * 100) : 0)
+function pad(n: number) { return String(n).padStart(2, '0') }
 const isLastQuestion = computed(() => currentIndex.value >= questions.value.length - 1)
 
 let autoAdvanceTimer: ReturnType<typeof setTimeout> | null = null
@@ -239,9 +244,10 @@ function selectOption(key: string) {
     stopObjectiveTimer()
   }
   if (autoAdvanceTimer) clearTimeout(autoAdvanceTimer)
+  // 回看模式下改完答案同样自动前进 —— goNext 在回看模式里只单步前进一题
   autoAdvanceTimer = setTimeout(() => {
     goNext()
-  }, 150)
+  }, 320)
 }
 
 // 找到下一道未答的题目
@@ -257,7 +263,15 @@ function goNext() {
   saveTimerRemaining()
   stopObjectiveTimer()
 
+  // 回看模式：一次只前进一题，不再跳到「下一道未答题」
+  if (isReviewingHistory.value) {
+    if (!isLastQuestion.value) currentIndex.value++
+    else { submitError.value = ''; showSubmitConfirm.value = true }
+    return
+  }
+
   if (isLastQuestion.value) {
+    submitError.value = ''
     showSubmitConfirm.value = true
     return
   }
@@ -290,25 +304,26 @@ function cancelObjectiveIntro() {
   }
 }
 
-// 找到上一道未答的题目
-function findPrevUnanswered(): number {
-  for (let i = currentIndex.value - 1; i >= 0; i--) {
-    if (!answers.value[questions.value[i].id]) return i
-  }
-  return -1 // 没有未答的，回到第一题
-}
-
+// 「上一题」= 真正的上一道（按展示顺序回退一格），不是「上一道未答题」。
+// 旧实现会跳过所有已答题，正常作答时前面全答过 → 直接落到第 1 题。
 function goPrev() {
   if (isInObjectiveMode.value) return
+  if (currentIndex.value <= 0) return
   if (autoAdvanceTimer) { clearTimeout(autoAdvanceTimer); autoAdvanceTimer = null }
   saveTimerRemaining()
   stopObjectiveTimer()
-  const prev = findPrevUnanswered()
-  currentIndex.value = prev >= 0 ? prev : 0
+  isReviewingHistory.value = true
+  currentIndex.value = currentIndex.value - 1
 }
 
 async function submitTest() {
   flushCurrentQuestionTiming()
+
+  if (Object.keys(answers.value).length === 0) {
+    showSubmitConfirm.value = false
+    submitError.value = '还没有作答任何题目，请先完成至少一道题再提交。'
+    return
+  }
 
   submitting.value = true
   showSubmitConfirm.value = false
@@ -325,7 +340,8 @@ async function submitTest() {
   })
 
   try {
-    const presentedIds = questions.value.map(q => q.id)
+    // 只上报真正作答过的题：后端据此计算实际计分题数与阈值
+    const presentedIds = questions.value.filter(q => answers.value[q.id]).map(q => q.id)
     const timedOut: Record<number, boolean> = {}
     for (const q of questions.value) {
       if (q.type === 'objective') {
@@ -371,32 +387,23 @@ async function submitTest() {
         .catch(() => {})
     }
 
-    // 保存评分结果，携带 recordId 用于关联反馈
-    pendingResult.value = {
-      typeCode: recordRes?.typeCode || score.typeCode,
-      scores: score.scores,
-      chars: score.chars,
-      confidence: score.confidence,
-      dimTotals,
-      dimAnswered,
-      recordId: recordRes?.id,
-    }
-    showFeedbackAfterTest.value = true
+    // 答案已落库，直接进入结果页；不再插入强制反馈步骤
+    router.push({
+      name: 'result',
+      params: { type: recordRes?.typeCode || score.typeCode },
+      query: {
+        scores: JSON.stringify(score.scores),
+        chars: JSON.stringify(score.chars),
+        confidence: String(score.confidence),
+        dimTotals: JSON.stringify(dimTotals),
+        dimAnswered: JSON.stringify(dimAnswered),
+        recordId: recordRes?.id,
+      },
+    })
     submitting.value = false
   } catch (err) {
     submitting.value = false
     loadError.value = (err instanceof Error ? err.message : '评分失败') + '，请稍后重试。'
-  }
-}
-
-function jumpTo(index: number) {
-  if (isInObjectiveMode.value) return
-  if (autoAdvanceTimer) { clearTimeout(autoAdvanceTimer); autoAdvanceTimer = null }
-  flushCurrentQuestionTiming()
-  saveTimerRemaining()
-  stopObjectiveTimer()
-  if (index >= 0 && index <= questions.value.length - 1) {
-    currentIndex.value = index
   }
 }
 
@@ -419,7 +426,7 @@ watch(currentIndex, () => {
 
 // Keyboard navigation
 function onKeydown(e: KeyboardEvent) {
-  if (showSubmitConfirm.value || showObjectiveIntro.value || showFeedbackAfterTest.value) return
+  if (showSubmitConfirm.value || showObjectiveIntro.value) return
   const q = currentQuestion.value
   if (!q) return
 
@@ -456,71 +463,51 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="min-h-screen flex flex-col" @keydown="onKeydown">
-    <!-- Header -->
-    <header class="sticky top-0 z-10 bg-cream/80 backdrop-blur-sm border-b border-border">
-      <div class="max-w-2xl mx-auto px-5 py-4">
-        <ProgressBar :modelValue="currentIndex" :max="totalQuestions - 1" @update:modelValue="jumpTo" />
+  <div class="test-page" @keydown="onKeydown">
+    <header class="test-header">
+      <button class="test-brand" type="button" @click="router.push('/')">
+        MBTI <span>—</span> PRO
+      </button>
+      <div class="test-meta">
+        <span>PERSONALITY ARCHIVE / 40 QUESTIONS</span>
+        <span>{{ pad(currentIndex + 1) }} / {{ pad(totalQuestions) }}</span>
       </div>
     </header>
 
-    <!-- Question Area -->
-    <main class="flex-1 flex flex-col items-center justify-center px-5 py-12">
-      <!-- Loading -->
-      <div v-if="loading" class="text-center">
-        <div class="w-10 h-10 mx-auto mb-4 rounded-full border-4 border-coral-soft border-t-coral animate-spin" />
-        <p class="text-text-muted text-sm">正在加载题目...</p>
+    <div class="test-progress">
+      <span :style="{ width: `${progressPct}%` }" />
+    </div>
+
+    <main class="test-main">
+      <div v-if="loading" class="test-state">
+        <span class="state-mark">◌</span>
+        <p>正在整理题目…</p>
       </div>
 
-      <!-- Error -->
-      <div v-else-if="loadError" class="text-center">
-        <p class="text-coral mb-4">{{ loadError }}</p>
-        <button @click="fetchQuestions()"
-          class="px-6 py-2 bg-charcoal text-cream rounded-xl text-sm">刷新重试</button>
+      <div v-else-if="loadError" class="test-state">
+        <p>{{ loadError }}</p>
+        <button type="button" class="text-action" @click="fetchQuestions()">重新加载</button>
       </div>
 
-      <!-- Questions -->
-      <Transition v-else name="question" mode="out-in">
-        <div
-          v-if="currentQuestion"
-          :key="currentQuestion.id"
-          class="w-full max-w-2xl mx-auto stagger"
-        >
-          <!-- Question type badge + timer -->
-          <div class="flex items-center gap-3 mb-8">
-            <span
-              class="text-xs font-semibold px-3 py-1 rounded-full tracking-wide"
-              :class="currentQuestion.type === 'objective'
-                ? 'bg-gold/10 text-gold border border-gold/30'
-                : 'bg-sage/10 text-sage border border-sage/30'"
-            >
-              {{ currentQuestion.type === 'objective' ? '客观推理题' : '主观选择题' }}
-            </span>
-            <span class="text-xs text-text-muted">第 {{ currentIndex + 1 }} 题 / 共 {{ totalQuestions }} 题</span>
+      <div v-else-if="currentQuestion" class="question-shell">
+        <div class="question-meta">
+          <span>QUESTION {{ pad(currentIndex + 1) }}</span>
+          <span>{{ currentDimension }}</span>
+          <span v-if="isInObjectiveMode" class="timer">{{ objectiveSeconds }}s</span>
+        </div>
 
-            <!-- 客观题倒计时 -->
-            <span
-              v-if="isInObjectiveMode"
-              class="ml-auto text-sm font-mono font-bold tabular-nums"
-              :class="objectiveSeconds <= 5 ? 'text-coral animate-pulse' : 'text-charcoal'"
-            >
-              <svg class="w-4 h-4 inline-block mr-1 -mt-0.5" :class="objectiveSeconds <= 5 ? 'text-coral' : 'text-gold'" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="10" />
-                <path stroke-linecap="round" d="M12 6v6l4 2" />
-              </svg>
-              {{ objectiveSeconds }}s
-            </span>
-          </div>
+        <h1 v-if="currentQuestion.type === 'likert'" class="question-headline">
+          哪一种更像平时的你？
+        </h1>
+        <h1 v-else class="question-headline">
+          {{ currentQuestion.text }}
+        </h1>
 
-          <!-- Question text (objective) -->
-          <h2
-            v-if="currentQuestion.type === 'objective'"
-            class="text-xl md:text-2xl font-display font-bold text-charcoal leading-relaxed mb-10 whitespace-pre-line"
-          >
-            {{ currentQuestion.text }}
-          </h2>
+        <p v-if="currentQuestion.type === 'likert'" class="question-sub">
+          读完两段描述，选更像你的一段。没有标准答案。
+        </p>
 
-          <!-- Bipolar layout (likert) -->
+        <div class="question-body">
           <OptionGroupBipolar
             v-if="currentQuestion.type === 'likert' && currentQuestion.textLeft && currentQuestion.textRight"
             :textLeft="currentQuestion.textLeft"
@@ -528,176 +515,249 @@ onUnmounted(() => {
             :modelValue="answers[currentQuestion.id] ?? null"
             @update:modelValue="selectOption"
           />
-
-          <!-- Options (objective) -->
           <OptionGroup
-            v-if="currentQuestion.type === 'objective' || (currentQuestion.type === 'likert' && (!currentQuestion.textLeft || !currentQuestion.textRight))"
+            v-else
             :options="currentQuestion.options"
             :modelValue="answers[currentQuestion.id] ?? null"
             :disabled="isObjectiveLocked"
             @update:modelValue="selectOption"
           />
-
-          <!-- Keyboard hint -->
-          <p class="mt-6 text-xs text-text-muted text-center">
-            方向键切换题目
-          </p>
         </div>
-      </Transition>
+      </div>
     </main>
 
-    <!-- Bottom Navigation -->
-    <footer class="sticky bottom-0 bg-cream/80 backdrop-blur-sm border-t border-border">
-      <div class="max-w-2xl mx-auto px-5 py-4 flex items-center justify-between">
-        <button
-          @click="goPrev"
-          :disabled="currentIndex === 0 || isInObjectiveMode"
-          class="px-5 py-3 min-h-[44px] text-sm font-medium text-text-secondary rounded-xl transition-all duration-300 hover:bg-surface-alt disabled:opacity-30 disabled:cursor-not-allowed"
-        >
-          ← 上道未答
-        </button>
-
-        <div class="hidden md:flex items-center gap-1.5">
-          <button
-            v-for="(_, idx) in questions"
-            :key="idx"
-            @click="jumpTo(idx)"
-            class="w-2 h-2 rounded-full transition-all duration-300"
-            :class="idx === currentIndex
-              ? 'bg-coral w-6'
-              : answers[questions[idx].id] ? 'bg-sage' : 'bg-border'"
-          />
-        </div>
-
-        <button
-          @click="goNext"
-          class="px-6 py-3 min-h-[44px] text-sm font-semibold rounded-xl transition-all duration-300 bg-charcoal text-cream hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0"
-        >
-          {{ isLastQuestion ? '提交结果' : '下道未答 →' }}
-        </button>
-      </div>
+    <footer class="test-footer">
+      <button
+        type="button"
+        class="text-action"
+        :disabled="currentIndex === 0 || isInObjectiveMode"
+        @click="goPrev"
+      >
+        ← 上一题
+      </button>
+      <span class="auto-save">{{ isReviewingHistory ? '回看中 · 作答或点「下一题」继续' : '答案自动保存 · 可中断' }}</span>
+      <button type="button" class="next-action" @click="goNext">
+        {{ isLastQuestion ? '提交结果' : '下一题' }}
+        <span aria-hidden="true">→</span>
+      </button>
     </footer>
 
-    <!-- 客观题介绍弹窗 -->
     <Transition name="modal">
-      <div v-if="showObjectiveIntro" class="fixed inset-0 z-50 flex items-center justify-center p-5">
-        <div class="absolute inset-0 bg-charcoal/50 backdrop-blur-sm" />
-        <div class="relative bg-cream rounded-3xl p-8 max-w-sm w-full shadow-2xl animate-scale-in">
-          <div class="w-12 h-12 mx-auto mb-4 rounded-2xl bg-gold/10 flex items-center justify-center">
-            <svg class="w-6 h-6 text-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-            </svg>
+      <div v-if="showObjectiveIntro" class="modal-overlay">
+        <div class="modal-backdrop" />
+        <div class="modal-panel">
+          <p class="modal-kicker">SECTION 05 / REASONING</p>
+          <h2>接下来是 {{ objectiveCount }} 道客观推理题</h2>
+          <div class="modal-copy">
+            <p>每题限时 20 秒，超时自动跳过。</p>
+            <p>选择后自动进入下一题，不可返回修改。</p>
           </div>
-          <h3 class="text-xl font-display font-bold text-charcoal mb-3 text-center">即将进入逻辑推理挑战</h3>
-          <div class="text-sm text-text-secondary leading-relaxed mb-6 space-y-2">
-            <p>接下来是 <span class="font-bold text-charcoal">10 道客观推理题</span>，请注意以下规则：</p>
-            <ul class="space-y-1.5 text-text-secondary">
-              <li class="flex items-start gap-2">
-                <span class="w-1.5 h-1.5 rounded-full bg-gold mt-1.5 shrink-0" />
-                <span>每题限时 <span class="font-bold text-coral">20 秒</span>，超时自动跳过</span>
-              </li>
-              <li class="flex items-start gap-2">
-                <span class="w-1.5 h-1.5 rounded-full bg-[#82B1FF] mt-1.5 shrink-0" />
-                <span>选择后自动跳转下一题，不可返回修改</span>
-              </li>
-            </ul>
-          </div>
-          <div class="flex gap-3">
-            <button
-              @click="cancelObjectiveIntro"
-              class="flex-1 px-4 py-3 text-sm font-medium text-text-secondary border border-border rounded-xl hover:bg-surface-alt transition-all duration-300"
-            >
-              返回上道未答
-            </button>
-            <button
-              @click="confirmObjectiveIntro"
-              class="flex-1 px-4 py-3 text-sm font-semibold bg-gold text-white rounded-xl hover:brightness-110 transition-all duration-300"
-            >
-              准备好了
-            </button>
+          <div class="modal-actions">
+            <button type="button" class="text-action" @click="cancelObjectiveIntro">返回</button>
+            <button type="button" class="next-action" @click="confirmObjectiveIntro">准备好了 →</button>
           </div>
         </div>
       </div>
     </Transition>
 
-    <!-- Submit Confirm Modal -->
     <Transition name="modal">
-      <div v-if="showSubmitConfirm" class="fixed inset-0 z-50 flex items-center justify-center p-5">
-        <div class="absolute inset-0 bg-charcoal/40 backdrop-blur-sm" @click="showSubmitConfirm = false" />
-        <div class="relative bg-cream rounded-3xl p-8 max-w-sm w-full shadow-2xl animate-scale-in">
-          <h3 class="text-xl font-display font-bold text-charcoal mb-3">确认提交？</h3>
-          <p class="text-text-secondary mb-2">
-            你已完成 <span class="font-bold text-charcoal">{{ progress }}</span> / {{ totalQuestions }} 道题。
-          </p>
-          <p v-if="progress < totalQuestions" class="text-sm text-coral mb-6">
-            还有 {{ totalQuestions - progress }} 道题未作答，提交后将无法修改。
-          </p>
-          <div class="flex gap-3">
-            <button
-              @click="showSubmitConfirm = false"
-              class="flex-1 px-4 py-3 text-sm font-medium text-text-secondary border border-border rounded-xl hover:bg-surface-alt transition-all duration-300"
-            >
-              继续答题
-            </button>
-            <button
-              @click="submitTest" :disabled="submitting"
-              class="flex-1 px-4 py-3 text-sm font-semibold bg-coral text-white rounded-xl hover:bg-clay transition-all duration-300"
-            >
-              {{ submitting ? '提交中...' : '确认提交' }}
+      <div v-if="showSubmitConfirm" class="modal-overlay">
+        <div class="modal-backdrop" @click="showSubmitConfirm = false" />
+        <div class="modal-panel">
+          <p class="modal-kicker">FINAL CHECK</p>
+          <h2>确认提交？</h2>
+          <div class="modal-copy">
+            <p>你已完成 <strong>{{ progress }}</strong> / {{ totalQuestions }} 道题。</p>
+            <p v-if="progress < totalQuestions">还有 {{ totalQuestions - progress }} 道题未作答，提交后将无法修改。</p>
+            <p v-if="submitError" class="modal-error">{{ submitError }}</p>
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="text-action" @click="showSubmitConfirm = false">继续答题</button>
+            <button type="button" class="next-action" :disabled="submitting" @click="submitTest">
+              {{ submitting ? '提交中…' : '确认提交 →' }}
             </button>
           </div>
-        </div>
-      </div>
-    </Transition>
-
-    <!-- 反馈收集弹窗（答题完成后必须填写才能查看结果） -->
-    <Transition name="modal">
-      <div v-if="showFeedbackAfterTest" class="fixed inset-0 z-50 flex items-center justify-center p-5">
-        <div class="absolute inset-0 bg-charcoal/50 backdrop-blur-sm" />
-        <div class="relative bg-cream rounded-3xl p-6 md:p-8 max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl animate-scale-in">
-          <div class="text-center mb-5">
-            <div class="w-14 h-14 mx-auto mb-3 rounded-2xl bg-coral/10 flex items-center justify-center">
-              <svg class="w-7 h-7 text-coral" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-              </svg>
-            </div>
-            <h3 class="text-xl font-display font-bold text-charcoal mb-2">最后一步！</h3>
-            <p class="text-sm text-text-secondary leading-relaxed">
-              答题已完成 ✨ 请先帮助我们完成下面两项选择，<br />即可<strong class="text-charcoal">免费查看</strong>你的测试结果。
-            </p>
-          </div>
-          <FeedbackCollector
-            :user-type="pendingResult?.typeCode || ''"
-            :record-id="pendingResult?.recordId"
-            :low-confidence="(pendingResult?.confidence ?? 100) < 92"
-            @submitted="onFeedbackSubmitted"
-          />
         </div>
       </div>
     </Transition>
   </div>
 </template>
 
-<style>
-.question-enter-active,
-.question-leave-active {
-  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-}
-.question-enter-from {
-  opacity: 0;
-  transform: translateX(40px);
-}
-.question-leave-to {
-  opacity: 0;
-  transform: translateX(-40px);
+<style scoped>
+.test-page {
+  --paper: #f2ede3;
+  --paper-light: #f8f4ec;
+  --ink: #1e1d1a;
+  --muted: #6f685d;
+  --rule: #d2c8b8;
+  --accent: #a63d2c;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "PingFang SC", "HarmonyOS Sans SC", "Microsoft YaHei", "Noto Sans CJK SC", "Source Han Sans SC", system-ui, sans-serif;
 }
 
-.modal-enter-active,
-.modal-leave-active {
-  transition: all 0.3s ease;
+.test-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 22px 40px;
+  border-bottom: 1px solid var(--rule);
 }
-.modal-enter-from,
-.modal-leave-to {
-  opacity: 0;
+.test-brand {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  font-family: "DM Mono", "SF Mono", Consolas, "Roboto Mono", monospace;
+  font-size: 14px;
+  letter-spacing: .08em;
+}
+.test-brand span { color: var(--accent); }
+.test-meta {
+  display: flex;
+  align-items: center;
+  gap: 26px;
+  color: var(--muted);
+  font-family: "DM Mono", "SF Mono", Consolas, "Roboto Mono", monospace;
+  font-size: 10px;
+  letter-spacing: .08em;
+}
+.test-meta span:last-child { color: var(--ink); }
+.test-progress { height: 1px; background: var(--rule); }
+.test-progress span { display: block; height: 100%; background: var(--accent); transition: width .25s ease; }
+
+.test-main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 64px 40px 52px;
+}
+.test-state {
+  align-self: center;
+  text-align: center;
+  color: var(--muted);
+  font-family: "DM Mono", "SF Mono", Consolas, "Roboto Mono", monospace;
+  font-size: 12px;
+}
+.state-mark { display: block; margin-bottom: 14px; color: var(--accent); font-size: 28px; }
+.question-shell { width: 100%; }
+.question-meta {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  margin-bottom: 26px;
+  color: var(--muted);
+  font-family: "DM Mono", "SF Mono", Consolas, "Roboto Mono", monospace;
+  font-size: 10px;
+  letter-spacing: .1em;
+}
+.question-meta span:first-child { color: var(--accent); }
+.question-meta .timer { margin-left: auto; color: var(--accent); font-size: 12px; }
+.question-headline {
+  max-width: 840px;
+  margin: 0;
+  font-family: "Playfair Display", "Songti SC", "STSong", SimSun, "Noto Serif CJK SC", "Source Han Serif SC", serif;
+  font-size: clamp(38px, 5.2vw, 64px);
+  font-weight: 600;
+  line-height: 1.32;
+  letter-spacing: -.045em;
+  text-wrap: balance;
+}
+.question-sub { margin: 18px 0 0; color: var(--muted); font-size: 13px; line-height: 1.8; }
+.question-body { margin-top: 44px; }
+
+.test-footer {
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 18px 40px;
+  border-top: 1px solid var(--rule);
+  background: rgba(242, 237, 227, .94);
+  backdrop-filter: blur(8px);
+}
+.text-action {
+  padding: 8px 0;
+  border: 0;
+  border-bottom: 1px solid transparent;
+  background: none;
+  color: var(--muted);
+  font-size: 13px;
+  transition: color .2s ease, border-color .2s ease;
+}
+.text-action:hover:not(:disabled) { color: var(--ink); border-color: var(--ink); }
+.text-action:disabled { opacity: .3; cursor: not-allowed; }
+.auto-save { color: var(--muted); font-family: "DM Mono", "SF Mono", Consolas, "Roboto Mono", monospace; font-size: 10px; letter-spacing: .04em; }
+.next-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 22px;
+  min-width: 142px;
+  justify-content: space-between;
+  padding: 13px 18px;
+  border: 1px solid var(--ink);
+  border-radius: 0;
+  background: var(--ink);
+  color: var(--paper-light);
+  font-size: 13px;
+  font-weight: 600;
+  transition: background .2s ease, border-color .2s ease;
+}
+.next-action:hover:not(:disabled) { background: var(--accent); border-color: var(--accent); }
+.next-action:disabled { opacity: .45; cursor: not-allowed; }
+
+.modal-overlay { position: fixed; inset: 0; z-index: 20; display: flex; align-items: center; justify-content: center; padding: 16px; }
+.modal-backdrop { position: absolute; inset: 0; background: rgba(30, 29, 26, .55); backdrop-filter: blur(4px); }
+.modal-panel {
+  position: relative;
+  width: 100%;
+  max-width: 520px;
+  padding: 30px;
+  border: 1px solid var(--ink);
+  border-radius: 2px;
+  background: var(--paper-light);
+  color: var(--ink);
+}
+.modal-kicker { margin: 0 0 14px; color: var(--accent); font-family: "DM Mono", "SF Mono", Consolas, "Roboto Mono", monospace; font-size: 10px; letter-spacing: .1em; }
+.modal-panel h2 { margin: 0; font-family: "Playfair Display", "Songti SC", "STSong", SimSun, "Noto Serif CJK SC", "Source Han Serif SC", serif; font-size: 27px; font-weight: 600; letter-spacing: -.03em; }
+.modal-copy { margin-top: 16px; color: var(--muted); font-size: 13px; line-height: 1.8; }
+.modal-copy p { margin: 0 0 6px; }
+.modal-copy strong { color: var(--ink); }
+.modal-copy .modal-error { color: var(--accent); font-weight: 600; }
+.modal-actions { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin-top: 26px; }
+.modal-actions .next-action { min-width: 120px; }
+
+.modal-enter-active, .modal-leave-active { transition: opacity .22s ease; }
+.modal-enter-from, .modal-leave-to { opacity: 0; }
+
+@media (max-width: 700px) {
+  .test-header { padding: 18px 22px; }
+  .test-meta span:first-child { display: none; }
+  .test-main { padding: 42px 22px 36px; }
+  .question-headline { font-size: 34px; line-height: 1.36; }
+  .question-body { margin-top: 30px; }
+  .test-footer { padding: 14px 22px; gap: 10px; }
+  .auto-save { display: none; }
+  .next-action { min-width: 122px; padding: 12px 14px; gap: 12px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .test-progress span, .next-action, .text-action { transition: none; }
 }
 </style>

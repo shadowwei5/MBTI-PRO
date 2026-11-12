@@ -1,41 +1,21 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { api } from '../services/api'
-import { getTypeHex, getNineGroupCode } from '../utils/colors'
-import { typeImageUrl } from '../utils/typeImage'
-import TypeAvatar from '../components/TypeAvatar.vue'
+import { getAccessToken, redeemAccessCode } from '../services/access'
+import { IS_DEMO } from '../services/demoMode'
+import AccessGate from '../components/AccessGate.vue'
 
 const router = useRouter()
-const loaded = ref(false)
-const allTypes = ref<{ code: string; name: string; isTraditional: boolean; population?: string | null; celebrities?: string[] | null; imageUrl?: string }[]>([])
-const fetchError = ref(false)
+const showAccessGate = ref(false)
+const accessError = ref('')
 
-// 9组颜色分类：严格按 81型人格颜色分类.xlsx 定义
-const NINE_GROUP_META: Record<string, { name: string; hex: string; description: string }> = {
-  SP: { name: 'SP 暖金组', hex: '#C8963E', description: 'S 系 + 灵活感知 P → 工匠/表演者气质' },
-  SD: { name: 'SD 琥珀组', hex: '#C87D3E', description: 'S 系 + 动态平衡 D → 秩序与灵活兼备' },
-  SJ: { name: 'SJ 藏蓝组', hex: '#2C5F8A', description: 'S 系 + 秩序判断 J → 护卫者气质' },
-  BT: { name: 'BT 深炭灰组', hex: '#4A4A4A', description: 'B 系 + 理性思考 T → 实务技术/管理' },
-  BC: { name: 'BC 月光银灰组', hex: '#8B95A0', description: 'B 系 + 复合决策 C → 终极中间态' },
-  BF: { name: 'BF 暖燕麦组', hex: '#B8956A', description: 'B 系 + 情感共情 F → 治愈型支持者' },
-  NT: { name: 'NT 深紫组', hex: '#6B3FA0', description: 'N 系 + 理性思考 T → 理性者/战略家' },
-  NC: { name: 'NC 靛青组', hex: '#3D7B8A', description: 'N 系 + 复合决策 C → 高阶认知统筹' },
-  NF: { name: 'NF 翠绿组', hex: '#2D8A4E', description: 'N 系 + 情感共情 F → 理想主义者/外交家' },
-}
-
-const NINE_GROUP_ORDER = ['SP', 'SD', 'SJ', 'BT', 'BC', 'BF', 'NT', 'NC', 'NF']
-
-// 按9组归类
-const groupedTypes = computed(() => {
-  const groups: Record<string, typeof allTypes.value> = {}
-  for (const t of allTypes.value) {
-    const key = getNineGroupCode(t.code)
-    if (!groups[key]) groups[key] = []
-    groups[key].push(t)
-  }
-  return groups
-})
+const dimensions = [
+  { index: '01', label: '能量来源', left: 'E', mid: 'A', right: 'I', note: '外向 / 平衡 / 内向' },
+  { index: '02', label: '认知方式', left: 'S', mid: 'B', right: 'N', note: '实感 / 均衡 / 直觉' },
+  { index: '03', label: '决策方式', left: 'T', mid: 'C', right: 'F', note: '思考 / 复合 / 情感' },
+  { index: '04', label: '生活态度', left: 'J', mid: 'D', right: 'P', note: '判断 / 动态 / 感知' },
+]
 
 onMounted(async () => {
   window.scrollTo({ top: 0, behavior: 'instant' })
@@ -45,494 +25,449 @@ onMounted(async () => {
     localStorage.setItem('mbti-pro-referral-code', referralCode)
     api.trackReferralClick(referralCode).catch(() => {})
   }
-  setTimeout(() => { loaded.value = true }, 100)
-  try {
-    allTypes.value = await api.getAllTypes()
-  } catch {
-    fetchError.value = true
+
+  // 小红书 AI 客服可直接发送 https://mbti-pro.com/?code=XXXX 实现一键解锁
+  const accessCode = params.get('code') || params.get('access')
+  if (accessCode && !IS_DEMO) {
+    if (getAccessToken()) {
+      router.replace('/test')
+      return
+    }
+    try {
+      await redeemAccessCode(accessCode)
+      router.replace('/test')
+      return
+    } catch (err) {
+      accessError.value = err instanceof Error ? err.message : '兑换码无效，请重新输入。'
+      showAccessGate.value = true
+    }
   }
 })
 
 function startTest() {
-  router.push('/test')
+  accessError.value = ''
+  if (IS_DEMO || getAccessToken()) {
+    router.push('/test')
+    return
+  }
+  showAccessGate.value = true
 }
 
-function goToType(code: string) {
-  router.push({ name: 'result', params: { type: code } })
+function onAccessUnlocked() {
+  showAccessGate.value = false
+  router.push('/test')
 }
 </script>
 
 <template>
-  <div class="min-h-screen flex flex-col">
-    <!-- Hero Section -->
-    <main class="flex-1 flex flex-col items-center justify-center px-5 py-16 md:py-24">
-      <div class="w-full max-w-2xl mx-auto text-center stagger">
-        <!-- Brand Badge -->
-        <div class="inline-flex items-center px-6 py-3 rounded-full bg-charcoal border border-coral/30 mb-8 shadow-lg">
-          <span class="text-xl md:text-2xl text-cream font-bold tracking-wider">
-            MBTI-PRO：全新 81 型人格分类体系
-          </span>
+  <div class="home-page">
+    <header class="site-header">
+      <button class="brand" type="button" @click="router.push('/')">
+        <span class="brand-mark">MBTI</span>
+        <span class="brand-dash">—</span>
+        <span class="brand-mark">PRO</span>
+      </button>
+      <p class="header-caption">81-TYPE PERSONALITY ARCHIVE</p>
+      <button type="button" class="header-action" @click="startTest">
+        开始测试
+        <span aria-hidden="true">↗</span>
+      </button>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow"><span>ARCHIVE 001</span><span>荣格类型学 · 81 型</span></p>
+          <h1>
+            你不是不够外向。<br />
+            <em>你只是卡在中间。</em>
+          </h1>
+          <p class="hero-lede">
+            16 型让你在两端选一个。81 型承认中间也有位置。<br />
+            40 道情境题，给你一张能解释自己的坐标图。
+          </p>
+          <div class="hero-actions">
+            <button type="button" class="primary-action" @click="startTest">
+              开始 40 题测试
+              <span aria-hidden="true">→</span>
+            </button>
+            <span class="action-note">6–8 分钟 · 可中断续答</span>
+          </div>
+          <p class="price-note">小红书店铺 0.99 元 · 一次兑换解锁全部内容</p>
         </div>
 
-        <!-- Hero Headline -->
-        <h1 class="text-4xl md:text-6xl lg:text-7xl font-display font-black leading-[1.08] mb-6 tracking-tight">
-          <span class="shimmer-text" style="--tw-shimmer-from: #2D2A26; --tw-shimmer-via: #E8816B;">发现</span>
-          <span class="text-coral italic">真实的</span><br />
-          <span class="shimmer-text" style="--tw-shimmer-from: #2D2A26; --tw-shimmer-via: #E8816B;">自己</span>
-        </h1>
-
-        <!-- Subheadline -->
-        <p class="text-lg md:text-xl text-text-secondary leading-relaxed max-w-lg mx-auto mb-10">
-          基于荣格心理类型学，突破传统二分法局限。<br />
-          <span class="text-charcoal font-medium">81 型人格</span>精细分类，比传统 MBTI 精准
-          <span class="text-coral font-bold">5 倍</span>。
-        </p>
-
-        <!-- CTA Button -->
-        <button
-          @click="startTest"
-          class="group relative inline-flex items-center gap-3 px-10 py-5 bg-charcoal text-cream text-lg font-semibold rounded-2xl transition-all duration-500 hover:shadow-2xl hover:shadow-coral/20 hover:-translate-y-0.5 active:translate-y-0"
-        >
-          <span>开始免费测试</span>
-          <svg class="w-5 h-5 transition-transform duration-500 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-          </svg>
-        </button>
-
-        <!-- Meta info -->
-        <div class="flex flex-wrap items-center justify-center gap-6 mt-8 text-sm text-text-muted">
-          <div class="flex items-center gap-2">
-            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-            <span>100 道精选题目</span>
+        <aside class="coordinate" aria-label="MBTI-PRO 四维坐标">
+          <div class="coordinate-head">
+            <span>YOUR COORDINATE</span>
+            <span>81 TYPES</span>
           </div>
-          <div class="flex items-center gap-2">
-            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10" /><path stroke-linecap="round" d="M12 6v6l4 2" /></svg>
-            <span>20-30 分钟</span>
+          <div class="coordinate-body">
+            <div v-for="dim in dimensions" :key="dim.index" class="axis-row">
+              <span class="axis-index">{{ dim.index }}</span>
+              <div class="axis-main">
+                <div class="axis-label">
+                  <span>{{ dim.label }}</span>
+                  <span>{{ dim.note }}</span>
+                </div>
+                <div class="axis-line">
+                  <b>{{ dim.left }}</b>
+                  <i />
+                  <b class="axis-mid">{{ dim.mid }}</b>
+                  <i />
+                  <b>{{ dim.right }}</b>
+                </div>
+              </div>
+            </div>
           </div>
-          <div class="flex items-center gap-2">
-            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
-            <span>无需注册</span>
+          <div class="coordinate-foot">
+            <span>不是二选一</span>
+            <span>3 × 3 × 3 × 3</span>
+          </div>
+        </aside>
+      </section>
+
+      <section class="section section-gap">
+        <div class="section-kicker"><span>01</span><span>THE GAP</span></div>
+        <div class="section-grid">
+          <h2>16 型，<br /><em>漏掉了中间的人。</em></h2>
+          <div class="prose">
+            <p>你可能在聚会上很自在，回家却需要一整晚恢复。</p>
+            <p>你可能既讲逻辑，也会在深夜被一句话击中。</p>
+            <p>传统测试要求你选一边；81 型把中间也当作答案。</p>
           </div>
         </div>
+      </section>
 
-        <!-- Decorative blob shapes -->
-        <div class="relative mt-12 hidden md:block" aria-hidden="true">
-          <div class="absolute -top-8 left-1/4 w-16 h-16 rounded-full bg-coral-soft/30 blur-xl animate-breathe" style="animation-delay: 0s;" />
-          <div class="absolute top-0 right-1/4 w-12 h-12 rounded-full bg-sage-soft/30 blur-xl animate-breathe" style="animation-delay: 1s;" />
-          <div class="absolute -top-4 left-1/2 -translate-x-1/2 w-20 h-20 rounded-full bg-gold/20 blur-xl animate-breathe" style="animation-delay: 2s;" />
+      <section class="section">
+        <div class="section-kicker"><span>02</span><span>THE SYSTEM</span></div>
+        <div class="section-grid section-grid--system">
+          <h2>四个维度，<br /><em>每个都有第三个位置。</em></h2>
+          <div class="formula">
+            <span>3</span><i>×</i><span>3</span><i>×</i><span>3</span><i>×</i><span>3</span><b>= 81</b>
+          </div>
         </div>
-      </div>
+        <div class="dimension-list">
+          <div v-for="dim in dimensions" :key="dim.index" class="dimension-row">
+            <span class="dimension-index">{{ dim.index }}</span>
+            <span class="dimension-name">{{ dim.label }}</span>
+            <span class="dimension-code">{{ dim.left }} <i>/</i> {{ dim.mid }} <i>/</i> {{ dim.right }}</span>
+            <span class="dimension-note">{{ dim.note }}</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-kicker"><span>03</span><span>THE TEST</span></div>
+        <div class="section-grid">
+          <h2>40 道题，<br /><em>把模糊的部分问清楚。</em></h2>
+          <div class="prose">
+            <p>不是 100 道题的疲劳战，也不是一分钟的娱乐标签。</p>
+            <p>每道题都在问一个具体情境：你会怎么选，而不是你“应该”怎么选。</p>
+            <p>完成后你会得到主类型、相邻候选，以及四个维度的连续坐标。</p>
+          </div>
+        </div>
+        <div class="test-facts">
+          <div class="fact"><strong>40</strong><span>道情境题</span></div>
+          <div class="fact"><strong>6–8</strong><span>分钟完成</span></div>
+          <div class="fact"><strong>81</strong><span>种人格坐标</span></div>
+          <div class="fact"><strong>0.99</strong><span>元解锁全部</span></div>
+        </div>
+      </section>
+
     </main>
 
-    <!-- What is MBTI -->
-    <section class="py-16 md:py-24 border-t border-border/50">
-      <div class="max-w-4xl mx-auto px-5">
-        <div class="text-center mb-12">
-          <h2 class="text-2xl md:text-3xl font-display font-bold text-charcoal mb-4">什么是 MBTI？</h2>
-          <p class="text-text-secondary max-w-2xl mx-auto leading-relaxed">
-            MBTI（Myers-Briggs Type Indicator）是目前全球最广泛应用的人格分类工具之一，每年超过200万人使用。
-            它基于瑞士心理学家卡尔·荣格的心理类型理论，由伊莎贝尔·迈尔斯和凯瑟琳·布里格斯母女于二战期间发展完善。
-          </p>
-        </div>
-
-        <!-- 4 Dimensions Intro -->
-        <div class="grid md:grid-cols-2 gap-6">
-          <div class="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-border/50 shadow-sm">
-            <div class="flex items-center gap-3 mb-3">
-              <span class="w-8 h-8 rounded-lg bg-[#82B1FF]/15 flex items-center justify-center text-sm font-bold text-[#5C8DFF]">E/I</span>
-              <h3 class="font-semibold text-charcoal">能量来源：外向 vs 内向</h3>
-            </div>
-            <p class="text-sm text-text-secondary leading-relaxed">你从哪里获取能量？外向型（E）从人际交往和外部活动中获得动力；内向型（I）则通过独处和内省恢复精力。</p>
-          </div>
-          <div class="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-border/50 shadow-sm">
-            <div class="flex items-center gap-3 mb-3">
-              <span class="w-8 h-8 rounded-lg bg-[#B388FF]/15 flex items-center justify-center text-sm font-bold text-[#9C6FFF]">S/N</span>
-              <h3 class="font-semibold text-charcoal">认知方式：实感 vs 直觉</h3>
-            </div>
-            <p class="text-sm text-text-secondary leading-relaxed">你如何获取和处理信息？实感型（S）信赖具体事实和亲身经验；直觉型（N）关注抽象模式和未来可能性。</p>
-          </div>
-          <div class="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-border/50 shadow-sm">
-            <div class="flex items-center gap-3 mb-3">
-              <span class="w-8 h-8 rounded-lg bg-[#40C4FF]/15 flex items-center justify-center text-sm font-bold text-[#1DA8FF]">T/F</span>
-              <h3 class="font-semibold text-charcoal">决策方式：思考 vs 情感</h3>
-            </div>
-            <p class="text-sm text-text-secondary leading-relaxed">你做决定的主要依据是什么？思考型（T）优先考虑逻辑和客观分析；情感型（F）更重视价值观和人际和谐。</p>
-          </div>
-          <div class="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-border/50 shadow-sm">
-            <div class="flex items-center gap-3 mb-3">
-              <span class="w-8 h-8 rounded-lg bg-[#FFD740]/15 flex items-center justify-center text-sm font-bold text-[#E6B800]">J/P</span>
-              <h3 class="font-semibold text-charcoal">生活态度：判断 vs 感知</h3>
-            </div>
-            <p class="text-sm text-text-secondary leading-relaxed">你喜欢怎样的生活方式？判断型（J）偏好有计划和条理的生活；感知型（P）享受灵活开放、随性而为的节奏。</p>
-          </div>
-        </div>
-
-        <p class="text-center text-sm text-text-muted mt-8 max-w-2xl mx-auto leading-relaxed">
-          以上四个维度各取一个偏好字母，组合成 4 个字母的人格类型代码——这就是传统 MBTI 的 16 型人格分类逻辑。
-        </p>
-      </div>
-    </section>
-
-    <!-- 81型由来 -->
-    <section class="py-16 md:py-24 bg-surface-alt/30 border-t border-border/50">
-      <div class="max-w-4xl mx-auto px-5">
-        <div class="text-center mb-12">
-          <h2 class="text-2xl md:text-3xl font-display font-bold text-charcoal mb-4">什么是 MBTI-PRO 的全新 81 型人格分类体系？</h2>
-          <p class="text-text-secondary max-w-2xl mx-auto leading-relaxed">
-            传统 MBTI 将每个维度一分为二（如 E 或 I），组合出 16 种人格类型。但真实的人性格分布更接近连续光谱——
-            每个人在四个维度上都有自己独特的位置，而非简单的"非此即彼"。
-          </p>
-        </div>
-
-        <div class="grid md:grid-cols-2 gap-6 mb-8">
-          <div class="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-border/50 shadow-sm">
-            <h3 class="font-semibold text-charcoal mb-3">从二分到三分</h3>
-            <p class="text-sm text-text-secondary leading-relaxed">
-              在每个维度上，除了两个极端倾向之外，MBTI-PRO 新增了<strong>中间均衡型</strong>。
-              例如，能量来源维度不仅有 E（外向）和 I（内向），还有 A（平衡型）；决策方式维度在 T（思考）和 F（情感）之间加入了 C（复合型）。
-              这使得每个维度从 2 种选择扩展为 3 种。
-            </p>
-          </div>
-          <div class="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-border/50 shadow-sm">
-            <h3 class="font-semibold text-charcoal mb-3">3 × 3 × 3 × 3 = 81</h3>
-            <p class="text-sm text-text-secondary leading-relaxed">
-              四个维度各自有三种可能的位置，组合起来就是 3×3×3×3 = <strong>81 种人格类型</strong>。
-              这比传统 16 型精细了整整 5 倍——能够更准确地捕捉到那些"介于两者之间"的真实人格特征，
-              让测试结果不再是非黑即白的粗暴分类。
-            </p>
-          </div>
-        </div>
-
-        <!-- 12 维度位置详解 -->
-        <div class="bg-white/70 backdrop-blur-sm rounded-3xl p-6 md:p-8 border border-border shadow-sm">
-          <h3 class="text-lg font-display font-bold text-charcoal mb-6 text-center">12 个维度位置</h3>
-          <div class="grid grid-cols-2 md:grid-cols-4 gap-5">
-            <!-- E_I 维度 -->
-            <div class="text-center p-4 rounded-xl bg-surface-alt/50">
-              <p class="text-sm font-semibold text-charcoal mb-3">能量来源</p>
-              <div class="flex justify-center gap-3">
-                <div class="flex flex-col items-center gap-0.5">
-                  <span class="text-lg font-bold text-[#5C8DFF] leading-tight">I</span>
-                  <span class="text-xs text-text-muted">内向</span>
-                </div>
-                <div class="flex flex-col items-center gap-0.5">
-                  <span class="text-lg font-bold text-sage leading-tight">A</span>
-                  <span class="text-xs text-text-muted">平衡</span>
-                </div>
-                <div class="flex flex-col items-center gap-0.5">
-                  <span class="text-lg font-bold text-[#5C8DFF] leading-tight">E</span>
-                  <span class="text-xs text-text-muted">外向</span>
-                </div>
-              </div>
-            </div>
-            <!-- S_N 维度 -->
-            <div class="text-center p-4 rounded-xl bg-surface-alt/50">
-              <p class="text-sm font-semibold text-charcoal mb-3">认知方式</p>
-              <div class="flex justify-center gap-3">
-                <div class="flex flex-col items-center gap-0.5">
-                  <span class="text-lg font-bold text-[#9C6FFF] leading-tight">N</span>
-                  <span class="text-xs text-text-muted">直觉</span>
-                </div>
-                <div class="flex flex-col items-center gap-0.5">
-                  <span class="text-lg font-bold text-sage leading-tight">B</span>
-                  <span class="text-xs text-text-muted">均衡</span>
-                </div>
-                <div class="flex flex-col items-center gap-0.5">
-                  <span class="text-lg font-bold text-[#9C6FFF] leading-tight">S</span>
-                  <span class="text-xs text-text-muted">实感</span>
-                </div>
-              </div>
-            </div>
-            <!-- T_F 维度 -->
-            <div class="text-center p-4 rounded-xl bg-surface-alt/50">
-              <p class="text-sm font-semibold text-charcoal mb-3">决策方式</p>
-              <div class="flex justify-center gap-3">
-                <div class="flex flex-col items-center gap-0.5">
-                  <span class="text-lg font-bold text-[#1DA8FF] leading-tight">F</span>
-                  <span class="text-xs text-text-muted">情感</span>
-                </div>
-                <div class="flex flex-col items-center gap-0.5">
-                  <span class="text-lg font-bold text-sage leading-tight">C</span>
-                  <span class="text-xs text-text-muted">复合</span>
-                </div>
-                <div class="flex flex-col items-center gap-0.5">
-                  <span class="text-lg font-bold text-[#1DA8FF] leading-tight">T</span>
-                  <span class="text-xs text-text-muted">思考</span>
-                </div>
-              </div>
-            </div>
-            <!-- P_J 维度 -->
-            <div class="text-center p-4 rounded-xl bg-surface-alt/50">
-              <p class="text-sm font-semibold text-charcoal mb-3">生活态度</p>
-              <div class="flex justify-center gap-3">
-                <div class="flex flex-col items-center gap-0.5">
-                  <span class="text-lg font-bold text-[#E6B800] leading-tight">P</span>
-                  <span class="text-xs text-text-muted">感知</span>
-                </div>
-                <div class="flex flex-col items-center gap-0.5">
-                  <span class="text-lg font-bold text-sage leading-tight">D</span>
-                  <span class="text-xs text-text-muted">动态</span>
-                </div>
-                <div class="flex flex-col items-center gap-0.5">
-                  <span class="text-lg font-bold text-[#E6B800] leading-tight">J</span>
-                  <span class="text-xs text-text-muted">判断</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <p class="text-center text-sm text-text-muted mt-8 max-w-2xl mx-auto leading-relaxed">
-          你的四个维度位置共同构成一个唯一的四字母代码——这就是你在 MBTI-PRO 中的专属人格类型。
-          无论你是偏传统的纯端值类型，还是带有中间维度的独特组合，81 种类型中总有一种最接近真实的你。
-        </p>
-      </div>
-    </section>
-
-    <!-- MBTI-PRO Advantages -->
-    <section class="py-16 md:py-24 bg-surface-alt/50 border-t border-border/50">
-      <div class="max-w-4xl mx-auto px-5">
-        <div class="text-center mb-12">
-          <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-coral/10 border border-coral/20 mb-6">
-            <span class="text-sm text-coral font-semibold tracking-wide">MBTI-PRO 优势</span>
-          </div>
-          <h2 class="text-2xl md:text-3xl font-display font-bold text-charcoal mb-4">为什么选择 MBTI-PRO？</h2>
-          <p class="text-text-secondary max-w-2xl mx-auto leading-relaxed">
-            传统 MBTI 用二分法将人简单分为两类（如：你要么是外向 E，要么是内向 I），但真实的人格分布并非如此绝对。
-            MBTI-PRO 在每个维度增加了<strong>中间型</strong>，让分类更贴近真实的你。
-          </p>
-        </div>
-
-        <!-- Comparison Table — Responsive: 桌面表格 / 手机卡片 -->
-        <div class="hidden sm:block bg-white/70 backdrop-blur-sm rounded-3xl border border-border shadow-sm overflow-hidden mb-8">
-          <table class="w-full text-sm">
-            <thead>
-              <tr class="border-b border-border">
-                <th class="text-left px-4 py-3 font-semibold text-charcoal">对比维度</th>
-                <th class="text-left px-4 py-3 font-semibold text-text-muted border-l border-border/50">传统 MBTI</th>
-                <th class="text-left px-4 py-3 font-semibold text-coral border-l border-border/50">MBTI-PRO</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-border/50">
-              <tr><td class="px-4 py-3 font-medium text-charcoal">类型数量</td><td class="px-4 py-3 text-text-secondary border-l border-border/50">16 型（4×2）</td><td class="px-4 py-3 text-coral font-medium border-l border-border/50">81 型（4×3）</td></tr>
-              <tr><td class="px-4 py-3 font-medium text-charcoal">分类方式</td><td class="px-4 py-3 text-text-secondary border-l border-border/50">非此即彼二分法</td><td class="px-4 py-3 text-coral font-medium border-l border-border/50">三分法含中间均衡型</td></tr>
-              <tr><td class="px-4 py-3 font-medium text-charcoal">中间状态</td><td class="px-4 py-3 text-text-secondary border-l border-border/50">无法识别强制选边</td><td class="px-4 py-3 text-coral font-medium border-l border-border/50">A/B/C/D 四种中间态</td></tr>
-              <tr><td class="px-4 py-3 font-medium text-charcoal">精度提升</td><td class="px-4 py-3 text-text-secondary border-l border-border/50">—</td><td class="px-4 py-3 text-coral font-medium border-l border-border/50">5 倍于传统 MBTI</td></tr>
-              <tr><td class="px-4 py-3 font-medium text-charcoal">测评方法</td><td class="px-4 py-3 text-text-secondary border-l border-border/50">纯主观自评量表</td><td class="px-4 py-3 text-coral font-medium border-l border-border/50">自评 + 客观逻辑推理题</td></tr>
-              <tr><td class="px-4 py-3 font-medium text-charcoal">题目数量</td><td class="px-4 py-3 text-text-secondary border-l border-border/50">通常 60-93 题</td><td class="px-4 py-3 text-coral font-medium border-l border-border/50">100 题(含10道推理)</td></tr>
-              <tr><td class="px-4 py-3 font-medium text-charcoal">题目设计</td><td class="px-4 py-3 text-text-secondary border-l border-border/50">单极量表某端更"正面"</td><td class="px-4 py-3 text-coral font-medium border-l border-border/50">双极正面两端同等认可</td></tr>
-            </tbody>
-          </table>
-        </div>
-        <!-- 手机端：卡片式对比 -->
-        <div class="sm:hidden mb-8">
-          <!-- 列标题 -->
-          <div class="flex items-center gap-3 px-1 mb-2">
-            <span class="text-xs font-bold text-charcoal w-16 shrink-0 text-center">维度</span>
-            <span class="text-xs font-semibold text-text-muted flex-1 text-center">传统MBTI</span>
-            <span class="text-xs font-semibold text-coral flex-1 text-center">MBTI-PRO</span>
-          </div>
-          <div class="space-y-2">
-          <div v-for="item in [
-            {label:'类型数量',old:'16 型（4×2）',pro:'81 型（4×3）'},
-            {label:'分类方式',old:'非此即彼二分法',pro:'三分法含中间均衡型'},
-            {label:'中间状态',old:'无法识别强制选边',pro:'A/B/C/D 四种中间态'},
-            {label:'精度提升',old:'—',pro:'5 倍于传统 MBTI'},
-            {label:'测评方法',old:'纯主观自评量表',pro:'自评+客观逻辑推理题'},
-            {label:'题目数量',old:'通常 60-93 题',pro:'100 题(含10道推理)'},
-            {label:'题目设计',old:'单极量表某端更正面',pro:'双极正面两端同等认可'},
-          ]" :key="item.label" class="bg-white/70 backdrop-blur-sm rounded-2xl border border-border/50 p-4 flex items-center gap-3">
-            <span class="text-xs font-bold text-charcoal bg-surface-alt rounded-lg px-2 py-1 shrink-0 w-16 text-center">{{item.label}}</span>
-            <span class="text-xs text-text-muted flex-1 text-right">{{item.old}}</span>
-            <span class="text-xs text-coral font-semibold flex-1 text-right">{{item.pro}}</span>
-          </div>
-          </div>
-        </div>
-
-        <!-- Key differentiators -->
-        <div class="grid md:grid-cols-4 gap-6">
-          <div class="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-sage/30 shadow-sm text-center">
-            <div class="w-10 h-10 mx-auto mb-3 rounded-xl bg-sage/10 flex items-center justify-center">
-              <svg class="w-5 h-5 text-sage" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-            </div>
-            <h3 class="font-semibold text-charcoal mb-2">中间型识别</h3>
-            <p class="text-sm text-text-secondary leading-relaxed">不再被迫"二选一"。A/B/C/D 四种中间型让结果更贴近真实的你。</p>
-          </div>
-          <div class="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-gold/30 shadow-sm text-center">
-            <div class="w-10 h-10 mx-auto mb-3 rounded-xl bg-gold/10 flex items-center justify-center">
-              <svg class="w-5 h-5 text-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
-            </div>
-            <h3 class="font-semibold text-charcoal mb-2">科学测评</h3>
-            <p class="text-sm text-text-secondary leading-relaxed">引入 20 道逻辑推理题，将客观能力与主观倾向相结合，提升测试效度。</p>
-          </div>
-          <div class="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-coral-soft/30 shadow-sm text-center">
-            <div class="w-10 h-10 mx-auto mb-3 rounded-xl bg-coral-soft/10 flex items-center justify-center">
-              <svg class="w-5 h-5 text-coral" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
-            </div>
-            <h3 class="font-semibold text-charcoal mb-2">深度内容</h3>
-            <p class="text-sm text-text-secondary leading-relaxed">每种人格含 8 项优势 + 4 项成长建议 + 代表人物参考。</p>
-          </div>
-          <div class="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-[#88619A]/30 shadow-sm text-center">
-            <div class="w-10 h-10 mx-auto mb-3 rounded-xl bg-[#88619A]/10 flex items-center justify-center">
-              <svg class="w-5 h-5 text-[#88619A]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 4h1m-1 4h1m5-4v1m0 3v1m5-5h1m-1 4h1M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2zm6-4l4-4-4-4" /></svg>
-            </div>
-            <h3 class="font-semibold text-charcoal mb-2">双极正面描述</h3>
-            <p class="text-sm text-text-secondary leading-relaxed">每题两端均为积极描述，避免某一方被"先入为主"地认为是正确答案。</p>
-          </div>
-        </div>
-
-        <div class="text-center mt-10">
-          <button
-            @click="startTest"
-            class="group inline-flex items-center gap-3 px-10 py-5 bg-charcoal text-cream text-lg font-semibold rounded-2xl transition-all duration-500 hover:shadow-2xl hover:shadow-coral/20 hover:-translate-y-0.5 active:translate-y-0"
-          >
-            <span>免费开始测试，了解真实的自己</span>
-            <svg class="w-5 h-5 transition-transform duration-500 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-            </svg>
-          </button>
-        </div>
-      </div>
-    </section>
-
-    <!-- 81-Type Grid -->
-    <section class="py-16 md:py-24 border-t border-border/50">
-      <div class="max-w-6xl mx-auto px-5">
-        <div class="text-center mb-14">
-          <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-sage/10 border border-sage/20 mb-6">
-            <span class="text-sm text-sage font-semibold tracking-wide">81 型人格全览</span>
-          </div>
-          <h2 class="text-2xl md:text-3xl font-display font-bold text-charcoal mb-4">探索全部 81 种人格类型</h2>
-          <p class="text-text-secondary max-w-2xl mx-auto leading-relaxed">
-            按9组颜色分类严格着色：<span class="text-[#6B3FA0] font-semibold">NT深紫</span> ·
-            <span class="text-[#3D7B8A] font-semibold">NC靛青</span> ·
-            <span class="text-[#2D8A4E] font-semibold">NF翠绿</span> ·
-            <span class="text-[#4A4A4A] font-semibold">BT深炭灰</span> ·
-            <span class="text-[#8B95A0] font-semibold">BC月光银灰</span> ·
-            <span class="text-[#B8956A] font-semibold">BF暖燕麦</span><br />
-            <span class="text-[#C8963E] font-semibold">SP暖金</span> ·
-            <span class="text-[#C87D3E] font-semibold">SD琥珀</span> ·
-            <span class="text-[#2C5F8A] font-semibold">SJ藏蓝</span><br />
-            点击任意类型即可查看详细人格描述。
-          </p>
-        </div>
-
-        <!-- Loading state -->
-        <div v-if="!allTypes.length && !fetchError" class="text-center py-12">
-          <div class="w-10 h-10 mx-auto mb-4 rounded-full border-4 border-coral-soft border-t-coral animate-spin" />
-          <p class="text-text-muted text-sm">加载人格类型数据...</p>
-        </div>
-
-        <!-- Error state -->
-        <div v-else-if="fetchError" class="text-center py-12">
-          <p class="text-text-muted">人格类型数据加载失败，请刷新页面重试。</p>
-        </div>
-
-        <!-- 9 Groups (按81型人格颜色分类) -->
-        <div v-else class="space-y-12">
-          <div v-for="groupCode in NINE_GROUP_ORDER" :key="groupCode">
-            <!-- Group Header -->
-            <div class="flex items-center gap-3 mb-4">
-              <span
-                class="w-3 h-3 rounded-full shrink-0"
-                :style="{ background: NINE_GROUP_META[groupCode].hex }"
-              />
-              <span class="text-sm font-semibold tracking-wider shrink-0"
-                :style="{ color: NINE_GROUP_META[groupCode].hex }"
-              >
-                {{ NINE_GROUP_META[groupCode].name }}
-              </span>
-              <span class="text-xs text-text-muted/60 hidden sm:inline">
-                {{ groupedTypes[groupCode]?.length || 0 }} 型
-              </span>
-              <span class="text-xs text-text-muted/50 hidden md:inline">
-                &middot; {{ NINE_GROUP_META[groupCode].description }}
-              </span>
-              <div
-                class="h-px flex-1 ml-3"
-                :style="{ background: `linear-gradient(to right, ${NINE_GROUP_META[groupCode].hex}30, transparent)` }"
-              />
-            </div>
-
-            <!-- Type Cards Grid -->
-            <div class="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
-              <button
-                v-for="t in groupedTypes[groupCode]"
-                :key="t.code"
-                v-magnet="6"
-                @click="goToType(t.code)"
-                class="group relative bg-white/70 backdrop-blur-sm rounded-2xl border border-border/40 shadow-sm text-left transition-shadow duration-300 hover:shadow-lg overflow-hidden"
-                style="content-visibility: auto; contain-intrinsic-size: auto 280px"
-                :style="{ borderColor: NINE_GROUP_META[groupCode].hex + '20' }"
-              >
-                <!-- Image thumbnail -->
-                <div class="relative w-full aspect-[3/4] overflow-hidden bg-surface-alt/30">
-                  <img
-                    :src="typeImageUrl(t.code)"
-                    :alt="`${t.code}`"
-                    class="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
-                    loading="lazy"
-                    decoding="async"
-                    fetchpriority="low"
-                    @error="($event.target as HTMLImageElement).style.display = 'none'"
-                  />
-                  <!-- Gradient overlay -->
-                  <div class="absolute inset-0 bg-gradient-to-t from-white/60 to-transparent" />
-                </div>
-                <!-- Type info -->
-                <div class="p-3 md:p-4 relative">
-                  <!-- Accent bar at top -->
-                  <div
-                    class="absolute top-0 left-4 right-4 h-0.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                    :style="{ background: NINE_GROUP_META[groupCode].hex }"
-                  />
-                  <div class="flex items-center gap-3">
-                    <div class="shrink-0 transition-transform duration-300 group-hover:scale-110">
-                      <TypeAvatar :type-code="t.code" :size="36" />
-                    </div>
-                    <div class="min-w-0">
-                      <p
-                        class="text-sm md:text-base font-display font-bold tracking-wide"
-                        :style="{ color: getTypeHex(t.code) }"
-                      >
-                        {{ t.code }}
-                      </p>
-                      <p class="text-xs text-text-muted truncate">{{ t.name?.replace('型', '') }}</p>
-                    </div>
-                    <!-- Hover: right arrow -->
-                    <div class="ml-auto opacity-0 group-hover:opacity-100 transition-opacity duration-300 shrink-0">
-                      <svg class="w-4 h-4" :style="{ color: NINE_GROUP_META[groupCode].hex }" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-                      </svg>
-                    </div>
-                  </div>
-                </div>
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div class="text-center mt-16">
-          <button
-            @click="startTest"
-            class="group inline-flex items-center gap-3 px-10 py-5 bg-charcoal text-cream text-lg font-semibold rounded-2xl transition-all duration-500 hover:shadow-2xl hover:shadow-coral/20 hover:-translate-y-0.5 active:translate-y-0"
-          >
-            <span>开始测试，发现你的专属类型</span>
-            <svg class="w-5 h-5 transition-transform duration-500 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-            </svg>
-          </button>
-        </div>
-      </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="text-center py-8 text-xs text-text-muted space-x-4">
-      <span>测试结果仅供个人参考</span>
-      <span>&middot;</span>
-      <span>不用于临床诊断或招聘决策</span>
-      <span>&middot;</span>
-      <a href="/admin" class="hover:text-coral transition-colors duration-200">管理后台</a>
+    <footer class="site-footer">
+      <span>MBTI-PRO / 81-TYPE PERSONALITY ARCHIVE</span>
+      <nav class="site-footer-links">
+        <RouterLink to="/privacy">隐私政策</RouterLink>
+        <RouterLink to="/terms">用户协议</RouterLink>
+        <RouterLink to="/refund">退款说明</RouterLink>
+        <RouterLink to="/contact">联系我们</RouterLink>
+      </nav>
+      <span>结果仅供自我探索，不用于临床诊断或招聘决策</span>
     </footer>
+
+    <Transition name="modal">
+      <div v-if="showAccessGate" class="gate-overlay">
+        <div class="gate-backdrop" @click="showAccessGate = false" />
+        <div class="gate-dialog">
+          <button type="button" class="gate-close" aria-label="关闭" @click="showAccessGate = false">×</button>
+          <AccessGate
+            :description="accessError
+              ? `${accessError} 请检查兑换码后重试。`
+              : '在小红书店铺购买 0.99 元商品后，复制订单里的兑换码。一次兑换，40 题测试与完整报告全部解锁。'"
+            @unlocked="onAccessUnlocked"
+          />
+        </div>
+      </div>
+    </Transition>
   </div>
 </template>
+
+<style scoped>
+.home-page {
+  --paper: #f2ede3;
+  --paper-light: #f8f4ec;
+  --ink: #1e1d1a;
+  --muted: #6f685d;
+  --rule: #d2c8b8;
+  --accent: #a63d2c;
+  min-height: 100vh;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "PingFang SC", "HarmonyOS Sans SC", "Microsoft YaHei", "Noto Sans CJK SC", "Source Han Sans SC", system-ui, sans-serif;
+  overflow: hidden;
+}
+
+.site-header {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 24px;
+  max-width: 1380px;
+  margin: 0 auto;
+  padding: 22px 40px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.brand {
+  justify-self: start;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  background: none;
+  color: var(--ink);
+  font-family: "DM Mono", "SF Mono", Consolas, "Roboto Mono", monospace;
+  font-size: 15px;
+  letter-spacing: .08em;
+}
+
+.brand-dash { color: var(--accent); }
+.brand-mark { font-weight: 500; }
+
+.header-caption {
+  margin: 0;
+  color: var(--muted);
+  font-family: "DM Mono", "SF Mono", Consolas, "Roboto Mono", monospace;
+  font-size: 10px;
+  letter-spacing: .12em;
+  white-space: nowrap;
+}
+
+.header-action {
+  justify-self: end;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: none;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--ink);
+}
+
+.header-action span { color: var(--accent); font-size: 16px; }
+
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(360px, .85fr);
+  gap: clamp(40px, 8vw, 140px);
+  align-items: center;
+  max-width: 1380px;
+  min-height: 650px;
+  margin: 0 auto;
+  padding: 100px 40px 110px;
+}
+
+.hero-copy { max-width: 760px; }
+
+.eyebrow {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  margin: 0 0 30px;
+  color: var(--muted);
+  font-family: "DM Mono", "SF Mono", Consolas, "Roboto Mono", monospace;
+  font-size: 10px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.eyebrow span:first-child { color: var(--accent); }
+
+h1, h2 {
+  margin: 0;
+  font-family: "Playfair Display", "Songti SC", "STSong", SimSun, "Noto Serif CJK SC", "Source Han Serif SC", serif;
+  font-weight: 600;
+  letter-spacing: -.055em;
+  text-wrap: balance;
+}
+
+h1 {
+  font-size: clamp(48px, 6.2vw, 94px);
+  line-height: 1.1;
+}
+
+h1 em, h2 em {
+  color: var(--accent);
+  font-style: normal;
+}
+
+.hero-lede {
+  max-width: 570px;
+  margin: 32px 0 0;
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 1.95;
+}
+
+.hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-top: 36px;
+}
+
+.primary-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+  min-width: 210px;
+  padding: 16px 20px;
+  border: 1px solid var(--ink);
+  border-radius: 2px;
+  background: var(--ink);
+  color: var(--paper-light);
+  font-size: 14px;
+  font-weight: 600;
+  transition: transform .2s ease, background .2s ease;
+}
+
+.primary-action:hover { background: var(--accent); border-color: var(--accent); transform: translateY(-2px); }
+.primary-action span { font-size: 18px; font-weight: 400; }
+.action-note { color: var(--muted); font-family: "DM Mono", "SF Mono", Consolas, "Roboto Mono", monospace; font-size: 11px; }
+.price-note { margin: 18px 0 0; color: var(--muted); font-size: 12px; }
+
+.coordinate {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 430px;
+  padding: 24px 0 18px;
+  border-top: 1px solid var(--ink);
+  border-bottom: 1px solid var(--rule);
+}
+
+.coordinate-head, .coordinate-foot {
+  display: flex;
+  justify-content: space-between;
+  color: var(--muted);
+  font-family: "DM Mono", "SF Mono", Consolas, "Roboto Mono", monospace;
+  font-size: 10px;
+  letter-spacing: .1em;
+}
+
+.coordinate-body { padding: 30px 0; }
+.axis-row { display: grid; grid-template-columns: 30px 1fr; gap: 12px; padding: 16px 0; border-top: 1px solid var(--rule); }
+.axis-row:first-child { border-top: 0; }
+.axis-index { color: var(--accent); font-family: "DM Mono", "SF Mono", Consolas, "Roboto Mono", monospace; font-size: 11px; }
+.axis-label { display: flex; justify-content: space-between; margin-bottom: 14px; font-size: 12px; }
+.axis-label span:last-child { color: var(--muted); font-size: 11px; }
+.axis-line { display: flex; align-items: center; gap: 8px; color: var(--ink); font-family: "DM Mono", "SF Mono", Consolas, "Roboto Mono", monospace; font-size: 18px; }
+.axis-line i { flex: 1; height: 1px; background: var(--rule); }
+.axis-line b { font-weight: 500; }
+.axis-line .axis-mid { color: var(--accent); font-size: 15px; }
+.coordinate-foot span:last-child { color: var(--ink); }
+
+.section {
+  max-width: 1380px;
+  margin: 0 auto;
+  padding: 72px 40px;
+  border-top: 1px solid var(--rule);
+}
+.section-gap { padding-top: 96px; }
+.section-kicker {
+  display: flex;
+  gap: 18px;
+  margin-bottom: 34px;
+  color: var(--muted);
+  font-family: "DM Mono", "SF Mono", Consolas, "Roboto Mono", monospace;
+  font-size: 10px;
+  letter-spacing: .1em;
+}
+.section-kicker span:first-child { color: var(--accent); }
+.section-grid { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); gap: clamp(40px, 9vw, 140px); align-items: start; }
+h2 { font-size: clamp(36px, 4.4vw, 64px); line-height: 1.18; }
+.prose { max-width: 570px; padding-top: 8px; }
+.prose p { margin: 0 0 18px; color: var(--muted); font-size: 16px; line-height: 1.95; }
+.prose p:last-child { margin-bottom: 0; color: var(--ink); }
+.section-grid--system { align-items: end; }
+.formula { display: flex; align-items: baseline; justify-content: flex-end; gap: 14px; padding-bottom: 6px; font-family: "DM Mono", "SF Mono", Consolas, "Roboto Mono", monospace; }
+.formula span { font-size: clamp(34px, 4vw, 56px); font-weight: 400; }
+.formula i { color: var(--muted); font-size: 24px; font-style: normal; }
+.formula b { margin-left: 8px; color: var(--accent); font-size: 22px; font-weight: 400; white-space: nowrap; }
+.dimension-list { margin-top: 56px; border-top: 1px solid var(--ink); }
+.dimension-row { display: grid; grid-template-columns: 44px 1.1fr 1fr 1.2fr; gap: 20px; align-items: center; padding: 20px 0; border-bottom: 1px solid var(--rule); font-size: 13px; }
+.dimension-index { color: var(--accent); font-family: "DM Mono", "SF Mono", Consolas, "Roboto Mono", monospace; font-size: 11px; }
+.dimension-name { font-family: "Playfair Display", "Songti SC", "STSong", SimSun, "Noto Serif CJK SC", "Source Han Serif SC", serif; font-size: 18px; font-weight: 600; }
+.dimension-code { font-family: "DM Mono", "SF Mono", Consolas, "Roboto Mono", monospace; font-size: 15px; }
+.dimension-code i { color: var(--muted); font-style: normal; }
+.dimension-note { color: var(--muted); text-align: right; font-size: 12px; }
+
+.test-facts { display: grid; grid-template-columns: repeat(4, 1fr); margin-top: 58px; border-top: 1px solid var(--ink); border-bottom: 1px solid var(--rule); }
+.fact { display: flex; flex-direction: column; gap: 8px; padding: 22px 22px 24px 0; border-right: 1px solid var(--rule); }
+.fact + .fact { padding-left: 22px; }
+.fact:last-child { border-right: 0; }
+.fact strong { font-family: "Playfair Display", "Songti SC", "STSong", SimSun, "Noto Serif CJK SC", "Source Han Serif SC", serif; font-size: 34px; font-weight: 600; }
+.fact span { color: var(--muted); font-size: 12px; }
+
+.site-footer { display: flex; justify-content: space-between; gap: 24px; max-width: 1380px; margin: 0 auto; padding: 22px 40px 30px; color: var(--muted); font-family: "DM Mono", "SF Mono", Consolas, "Roboto Mono", monospace; font-size: 10px; letter-spacing: .04em; }
+.site-footer-links { display: flex; flex-wrap: wrap; gap: 8px 20px; }
+.site-footer-links a { color: var(--muted); text-decoration: none; border-bottom: 1px solid transparent; }
+.site-footer-links a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+
+.gate-overlay { position: fixed; inset: 0; z-index: 50; display: flex; align-items: center; justify-content: center; padding: 16px; }
+.gate-backdrop { position: absolute; inset: 0; background: rgba(30, 29, 26, .55); backdrop-filter: blur(4px); }
+.gate-dialog { position: relative; width: 100%; max-width: 560px; }
+.gate-close { position: absolute; top: -12px; right: 8px; z-index: 2; display: flex; align-items: center; justify-content: center; width: 34px; height: 34px; border: 1px solid var(--rule); border-radius: 50%; background: var(--paper-light); color: var(--ink); font-size: 22px; line-height: 1; }
+
+.modal-enter-active, .modal-leave-active { transition: opacity .25s ease; }
+.modal-enter-from, .modal-leave-to { opacity: 0; }
+
+@media (max-width: 900px) {
+  .site-header { grid-template-columns: 1fr auto; padding: 18px 22px; }
+  .header-caption { display: none; }
+  .hero { grid-template-columns: 1fr; gap: 54px; min-height: 0; padding: 64px 22px 72px; }
+  .coordinate { min-height: 360px; }
+  .section { padding: 64px 22px; }
+  .section-gap { padding-top: 72px; }
+  .section-grid { grid-template-columns: 1fr; gap: 26px; }
+  .section-grid--system { align-items: start; }
+  .formula { justify-content: flex-start; }
+  .dimension-row { grid-template-columns: 32px 1fr auto; gap: 12px; }
+  .dimension-note { display: none; }
+  .test-facts { grid-template-columns: repeat(2, 1fr); }
+  .fact:nth-child(2) { border-right: 0; }
+  .fact:nth-child(n+3) { border-top: 1px solid var(--rule); }
+  .site-footer { padding: 20px 22px 26px; flex-direction: column; gap: 8px; }
+}
+
+@media (max-width: 480px) {
+  h1 { font-size: 43px; }
+  h2 { font-size: 34px; }
+  .eyebrow { font-size: 9px; }
+  .hero-lede { font-size: 15px; }
+  .hero-actions { align-items: flex-start; flex-direction: column; gap: 12px; }
+  .primary-action { width: 100%; }
+  .test-facts { margin-top: 42px; }
+  .fact { padding: 18px 12px 20px 0; }
+  .fact strong { font-size: 28px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .primary-action { transition: none; }
+}
+</style>

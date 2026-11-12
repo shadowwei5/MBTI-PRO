@@ -24,12 +24,22 @@ const loading = ref(true)
 const error = ref('')
 const emails = ref<{ email: string; typeCode: string; source: string; createdAt: string }[]>([])
 const showEmails = ref(false)
+const adminKey = (() => {
+  const fromUrl = new URLSearchParams(window.location.search).get('key') || ''
+  if (fromUrl) {
+    try { localStorage.setItem('mbti-admin-key', fromUrl) } catch { /* ignore */ }
+    return fromUrl
+  }
+  try { return localStorage.getItem('mbti-admin-key') || '' } catch { return '' }
+})()
 onMounted(async () => {
   try {
+    if (!adminKey) throw new Error('缺少后台访问 key，请使用 /admin?key=... 打开')
     const API_BASE = import.meta.env.VITE_API_BASE || '/api'
+    const encodedKey = encodeURIComponent(adminKey)
     const [statsRes, emailsRes] = await Promise.all([
-      fetch(`${API_BASE}/admin/stats`),
-      fetch(`${API_BASE}/admin/emails?key=mbti-pro-admin-2026`),
+      fetch(`${API_BASE}/admin/stats?key=${encodedKey}`),
+      fetch(`${API_BASE}/admin/emails?key=${encodedKey}`),
     ])
     if (!statsRes.ok) throw new Error('Stats failed')
     const statsJson = await statsRes.json()

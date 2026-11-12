@@ -23,6 +23,30 @@ const router = createRouter({
       name: 'admin',
       component: () => import('../views/AdminView.vue'),
     },
+    {
+      path: '/privacy',
+      name: 'privacy',
+      component: () => import('../views/LegalView.vue'),
+      meta: { doc: 'privacy' },
+    },
+    {
+      path: '/terms',
+      name: 'terms',
+      component: () => import('../views/LegalView.vue'),
+      meta: { doc: 'terms' },
+    },
+    {
+      path: '/refund',
+      name: 'refund',
+      component: () => import('../views/LegalView.vue'),
+      meta: { doc: 'refund' },
+    },
+    {
+      path: '/contact',
+      name: 'contact',
+      component: () => import('../views/LegalView.vue'),
+      meta: { doc: 'contact' },
+    },
   ],
 })
 

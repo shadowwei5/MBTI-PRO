@@ -5,6 +5,14 @@ import { IS_DEMO } from './demoMode'
 
 const API_BASE = import.meta.env.VITE_API_BASE || '/api'
 
+function adminKey(): string {
+  try {
+    return localStorage.getItem('mbti-admin-key') || ''
+  } catch {
+    return ''
+  }
+}
+
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
   const res = await fetch(`${API_BASE}${path}`, {
     headers: { 'Content-Type': 'application/json' },
@@ -28,6 +36,13 @@ export interface ApiQuestion {
   correctAnswer?: string
 }
 
+export interface CelebrityProfile {
+  name: string
+  field: string
+  story: string
+  quote?: string
+}
+
 export interface PersonalityType {
   code: string
   name: string
@@ -40,6 +55,7 @@ export interface PersonalityType {
   suitableFields: string[]
   population?: string | null
   celebrities?: string[] | null
+  celebrityStories?: CelebrityProfile[]
   eiModule?: string | null
   snModule?: string | null
   tfModule?: string | null
@@ -113,6 +129,15 @@ export const realApi = {
   getQuestions: () => request<ApiQuestion[]>('/questions'),
 
   getQuestionCount: () => request<{ count: number }>('/questions/count'),
+
+  redeemAccess: (code: string) =>
+    request<{ accessToken: string; expiresAt: string | null }>('/access/redeem', {
+      method: 'POST',
+      body: JSON.stringify({ code }),
+    }),
+
+  checkAccess: (token: string) =>
+    request<{ valid: boolean }>(`/access/check?token=${encodeURIComponent(token)}`),
 
   getResult: (typeCode: string, unlockToken?: string, recordId?: string) => {
     const params = new URLSearchParams()
@@ -212,13 +237,13 @@ export const realApi = {
     }),
 
   getSocialUnlocks: (status = 'pending') =>
-    request<SocialUnlockRequest[]>(`/social-unlocks/admin?key=mbti-pro-admin-2026&status=${encodeURIComponent(status)}`),
+    request<SocialUnlockRequest[]>(`/social-unlocks/admin?key=${encodeURIComponent(adminKey())}&status=${encodeURIComponent(status)}`),
 
   approveSocialUnlock: (id: string) =>
-    request<{ id: string; sent: boolean; email: string; typeCode: string }>(`/social-unlocks/admin/${id}/approve?key=mbti-pro-admin-2026`, { method: 'POST' }),
+    request<{ id: string; sent: boolean; email: string; typeCode: string }>(`/social-unlocks/admin/${id}/approve?key=${encodeURIComponent(adminKey())}`, { method: 'POST' }),
 
   rejectSocialUnlock: (id: string, note?: string) =>
-    request<{ id: string; status: string }>(`/social-unlocks/admin/${id}/reject?key=mbti-pro-admin-2026`, {
+    request<{ id: string; status: string }>(`/social-unlocks/admin/${id}/reject?key=${encodeURIComponent(adminKey())}`, {
       method: 'POST',
       body: JSON.stringify({ note }),
     }),
