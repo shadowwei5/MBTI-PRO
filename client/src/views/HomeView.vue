@@ -2,7 +2,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { api } from '../services/api'
-import { clearAccessToken, getAccessToken, redeemAccessCode } from '../services/access'
+import { clearAccessToken, getAccessToken, redeemAccessCode, resumeDeviceUnlock } from '../services/access'
 import { IS_DEMO } from '../services/demoMode'
 import AccessGate from '../components/AccessGate.vue'
 
@@ -34,6 +34,11 @@ onMounted(async () => {
   const accessCode = params.get('code') || params.get('access')
   if (accessCode && !IS_DEMO) {
     if (getAccessToken()) {
+      router.replace('/test')
+      return
+    }
+    // 本机曾兑换过：静默恢复会话解锁，不重复消耗兑换码额度
+    if (await resumeDeviceUnlock()) {
       router.replace('/test')
       return
     }
