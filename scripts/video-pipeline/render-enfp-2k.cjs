@@ -1,0 +1,149 @@
+﻿const fs = require('node:fs')
+const path = require('node:path')
+const { spawnSync } = require('node:child_process')
+const { chromium } = require('playwright')
+
+const ROOT = 'H:/ccwork/MBTI-PRO'
+const PIPELINE = `${ROOT}/scripts/video-pipeline`
+const FFMPEG = `${PIPELINE}/node_modules/@ffmpeg-installer/win32-x64/ffmpeg.exe`
+const CODE = 'ENFP'
+const WIDTH = 1440
+const HEIGHT = 2560
+const FPS = 30
+const STEP = 1 / FPS
+const SOURCE_WIDTH = 1080
+const SOURCE_HEIGHT = 1920
+const DURATION = 51.1
+const OUT_DIR = `${ROOT}/video/output`
+const WORK_DIR = `${ROOT}/video/work/${CODE}`
+const FRAME_DIR = `${WORK_DIR}/frames_2k`
+const QA_DIR = `${OUT_DIR}/daily_qa/${CODE}_2k`
+const TEMPLATE = `${PIPELINE}/templates/story-video.html`
+const DATA_FILE = `${WORK_DIR}/${CODE}.json`
+const IMAGE_FILE = `${ROOT}/video/81_image/${CODE}.jpg`
+const AUDIO = `${WORK_DIR}/audio/${CODE}.mp3`
+const SRT = `${WORK_DIR}/audio/${CODE}.srt`
+const VIDEO_NO_SUB = `${OUT_DIR}/${CODE}_daily_2k_nosub.mp4`
+const VIDEO_SUB = `${OUT_DIR}/${CODE}_daily_2k.mp4`
+const VIDEO_FINAL = `${OUT_DIR}/${CODE}_daily_2k_review.mp4`
+const QA_JSON = `${QA_DIR}/${CODE}_daily_2k_qa.json`
+
+function ensureDir(dir) { fs.mkdirSync(dir, { recursive: true }) }
+function fileToDataUrl(file) {
+  const ext = file.toLowerCase().endsWith('.png') ? 'png' : file.toLowerCase().endsWith('.webp') ? 'webp' : 'jpeg'
+  return `data:image/${ext};base64,${fs.readFileSync(file).toString('base64')}`
+}
+function svgToDataUrl(svg) { return `data:image/svg+xml;base64,${Buffer.from(svg, 'utf8').toString('base64')}` }
+function buildQrSvg() {
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="210" height="210" viewBox="0 0 210 210"><rect width="210" height="210" fill="#fff"/><text x="105" y="92" text-anchor="middle" font-family="Arial" font-size="20" font-weight="800" fill="#2F261B">MBTI-PRO</text><text x="105" y="124" text-anchor="middle" font-family="Arial" font-size="16" font-weight="700" fill="#2F261B">mbti-pro.com</text></svg>`
+}
+function run(args, label) {
+  console.log(`\n[ffmpeg] ${label}`)
+  const result = spawnSync(FFMPEG, args, { stdio: 'inherit' })
+  if (result.status !== 0) throw new Error(`${label} failed: ${result.status}`)
+}
+function ffmpegText(args) {
+  const result = spawnSync(FFMPEG, args, { encoding: 'utf8' })
+  return `${result.stdout || ''}${result.stderr || ''}`
+}
+function durationOf(file) {
+  const text = ffmpegText(['-i', file])
+  const match = text.match(/Duration:\s*(\d+):(\d+):(\d+)\.(\d+)/)
+  if (!match) return 0
+  return Number(match[1]) * 3600 + Number(match[2]) * 60 + Number(match[3]) + Number(`0.${match[4]}`)
+}
+function srtToAss2k(srt) {
+  const blocks = srt.replace(/\r/g, '').split(/\n\s*\n/).map(x => x.trim()).filter(Boolean)
+  const dialogues = blocks.flatMap(block => {
+    const lines = block.split('\n')
+    const idx = lines.findIndex(line => line.includes('-->'))
+    if (idx < 0) return []
+    const [startRaw, endRaw] = lines[idx].split('-->').map(x => x.trim())
+    const text = lines.slice(idx + 1).join('\\N').trim()
+    if (!text) return []
+    return `Dialogue: 0,${toAss(startRaw)},${toAss(endRaw)},Default,,0,0,0,,${escapeAss(text)}`
+  })
+  return `[Script Info]
+ScriptType: v4.00+
+PlayResX: ${WIDTH}
+PlayResY: ${HEIGHT}
+ScaledBorderAndShadow: yes
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Default,Microsoft YaHei UI,88,&H00FFFFFF,&H00FFFFFF,&H00000000,&HA6000000,-1,0,0,0,100,100,0,0,1,8,1,2,62,62,280,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+${dialogues.join('\n')}
+`
+}
+function toAss(value) {
+  const m = value.match(/(\d+):(\d+):(\d+),(\d+)/)
+  if (!m) return '0:00:00.00'
+  return `${Number(m[1])}:${m[2]}:${m[3]}.${m[4].slice(0, 2).padEnd(2, '0')}`
+}
+function escapeAss(value) { return value.replace(/[{}]/g, '').replace(/\n/g, '\\N') }
+
+async function renderFrames() {
+  ensureDir(FRAME_DIR)
+  const data = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'))
+  const template = fs.readFileSync(TEMPLATE, 'utf8')
+  const htmlPath = `${WORK_DIR}/_template_2k.html`
+  fs.writeFileSync(htmlPath, template, 'utf8')
+  const browser = await chromium.launch({ headless: true })
+  const page = await browser.newPage({ viewport: { width: SOURCE_WIDTH, height: SOURCE_HEIGHT }, deviceScaleFactor: WIDTH / SOURCE_WIDTH })
+  await page.goto(`file:///${htmlPath.replace(/\\/g, '/')}`, { waitUntil: 'networkidle' })
+  await page.evaluate((payload) => {
+    window.__refill(payload)
+  }, {
+    ...data,
+    imageDataUrl: fileToDataUrl(IMAGE_FILE),
+    imageUrl: fileToDataUrl(IMAGE_FILE),
+    qrDataUrl: svgToDataUrl(buildQrSvg()),
+    chars: { E_I: CODE[0], S_N: CODE[1], T_F: CODE[2], P_J: CODE[3] },
+    _groupName: 'NF 翠绿组',
+  })
+  await page.waitForFunction(() => {
+    const img = document.getElementById('typeImage')
+    return img && img.complete && img.naturalWidth > 0
+  }, null, { timeout: 10000 })
+  const total = Math.ceil(DURATION * FPS)
+  for (let i = 0; i < total; i++) {
+    const time = i * STEP
+    await page.evaluate(t => {
+      const animations = document.getAnimations({ subtree: true })
+      for (const animation of animations) animation.currentTime = t * 1000
+    }, time)
+    const frame = path.join(FRAME_DIR, `frame_${String(i + 1).padStart(5, '0')}.png`)
+    await page.screenshot({ path: frame, type: 'png', fullPage: false })
+    if ((i + 1) % 150 === 0) console.log(`[frames] ${i + 1}/${total}`)
+  }
+  await browser.close()
+  console.log(`[frames] done ${total}`)
+}
+
+async function main() {
+  ensureDir(OUT_DIR)
+  ensureDir(QA_DIR)
+  await renderFrames()
+  run(['-y', '-framerate', String(FPS), '-i', `${FRAME_DIR}/frame_%05d.png`, '-c:v', 'libx264', '-preset', 'slow', '-crf', '16', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', VIDEO_NO_SUB], 'frames to 2k mp4')
+  const ass = `${OUT_DIR}/_temp_enfp_2k.ass`
+  fs.writeFileSync(ass, srtToAss2k(fs.readFileSync(SRT, 'utf8')), 'utf8')
+  const safeAss = ass.replace(/\\/g, '/').replace(/^([A-Za-z]):/, '$1\\:')
+  run(['-y', '-i', VIDEO_NO_SUB, '-i', AUDIO, '-map', '0:v:0', '-map', '1:a:0', '-vf', `ass='${safeAss}'`, '-c:v', 'libx264', '-preset', 'slow', '-crf', '16', '-pix_fmt', 'yuv420p', '-c:a', 'aac', '-b:a', '160k', '-movflags', '+faststart', VIDEO_SUB], 'mux subtitles and audio')
+  const audioDuration = durationOf(AUDIO)
+  const target = Math.min(durationOf(VIDEO_SUB), audioDuration + 0.55)
+  run(['-y', '-i', VIDEO_SUB, '-t', target.toFixed(2), '-c', 'copy', VIDEO_FINAL], 'trim final')
+  const frameTimes = [2, 8, 12, 25, 36, 42, Math.max(1, target - 1.5)]
+  const framePaths = []
+  for (const time of frameTimes) {
+    const out = `${QA_DIR}/${CODE}_daily_2k_${String(Math.round(time * 10)).padStart(4, '0')}.png`
+    run(['-y', '-ss', Math.min(time, Math.max(0, target - 0.2)).toFixed(2), '-i', VIDEO_FINAL, '-vframes', '1', out], `qa frame ${time}`)
+    framePaths.push(out)
+  }
+  fs.writeFileSync(QA_JSON, JSON.stringify({ code: CODE, width: WIDTH, height: HEIGHT, fps: FPS, video: VIDEO_FINAL, noSubtitleVideo: VIDEO_NO_SUB, withSubtitleVideo: VIDEO_SUB, audio: AUDIO, finalDuration: durationOf(VIDEO_FINAL), framePaths }, null, 2), 'utf8')
+  console.log(`\nDONE ${VIDEO_FINAL}`)
+  console.log(`QA ${QA_JSON}`)
+}
+main().catch(error => { console.error(error); process.exit(1) })

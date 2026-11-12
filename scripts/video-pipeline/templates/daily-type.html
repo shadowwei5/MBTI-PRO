@@ -1,21 +1,20 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <style>
 /* ============================================================
-   MBTI-PRO 81型日常视频模板 v2 — 1080×1920
-   修复: 增大内容占比 / 提升字体大小 / 优化移动端观感
-   ============================================================ */
+   MBTI-PRO 81鍨嬫棩甯歌棰戞ā鏉?v2 鈥?1080脳1920
+   淇: 澧炲ぇ鍐呭鍗犳瘮 / 鎻愬崌瀛椾綋澶у皬 / 浼樺寲绉诲姩绔鎰?   ============================================================ */
 * { margin:0; padding:0; box-sizing:border-box; }
-:root { --canvas-w:1080px; --canvas-h:1920px; }
+:root { --canvas-w:1440px; --canvas-h:2560px; }
 body { background:#0D0D0D; overflow:hidden; }
 #canvas {
   width:var(--canvas-w); height:var(--canvas-h); position:relative; overflow:hidden;
   font-family:'Noto Sans SC','PingFang SC','Microsoft YaHei',sans-serif; color:#FFF;
 }
 
-/* 背景图片 + Ken Burns */
+/* 鑳屾櫙鍥剧墖 + Ken Burns */
 .bg-layer { position:absolute; inset:0; z-index:1; }
 .bg-layer img { width:100%; height:100%; object-fit:cover; animation:kenburns 30s ease-in-out infinite; }
 @keyframes kenburns {
@@ -30,7 +29,7 @@ body { background:#0D0D0D; overflow:hidden; }
     rgba(0,0,0,.55) 78%, rgba(0,0,0,.88) 100%);
 }
 
-/* 品牌徽章 0-2s */
+/* 鍝佺墝寰界珷 0-2s */
 .brand-badge {
   position:absolute; top:60px; left:50%; transform:translateX(-50%); z-index:10;
   display:flex; align-items:center; gap:14px;
@@ -44,7 +43,7 @@ body { background:#0D0D0D; overflow:hidden; }
 @keyframes breathe { 0%,100%{ opacity:.35; transform:scale(.8); } 50%{ opacity:1; transform:scale(1.2); } }
 @keyframes fadeInDown { from{ opacity:0; transform:translateX(-50%) translateY(-24px); } to{ opacity:1; transform:translateX(-50%) translateY(0); } }
 
-/* 9组颜色标签 2-3s */
+/* 9缁勯鑹叉爣绛?2-3s */
 .group-tag {
   position:absolute; top:200px; left:50%; transform:translateX(-50%); z-index:10;
   padding:14px 36px; border-radius:30px; font-size:30px; font-weight:600; letter-spacing:.04em;
@@ -52,14 +51,14 @@ body { background:#0D0D0D; overflow:hidden; }
 }
 @keyframes fadeInScale { from{ opacity:0; transform:translateX(-50%) scale(.8); } to{ opacity:1; transform:translateX(-50%) scale(1); } }
 
-/* 类型代码 3-8s */
+/* 绫诲瀷浠ｇ爜 3-8s */
 .type-code {
   position:absolute; top:540px; left:50%; transform:translateX(-50%); z-index:10;
   font-size:240px; font-weight:900; letter-spacing:.08em; line-height:1;
   opacity:0; animation:fadeInUp .7s 3s ease-out forwards;
   text-shadow:0 4px 40px rgba(0,0,0,.5);
 }
-/* 类型名称 4-8s */
+/* 绫诲瀷鍚嶇О 4-8s */
 .type-name {
   position:absolute; top:840px; left:50%; transform:translateX(-50%); z-index:10;
   font-size:56px; font-weight:700; letter-spacing:.08em;
@@ -67,7 +66,7 @@ body { background:#0D0D0D; overflow:hidden; }
 }
 @keyframes fadeInUp { from{ opacity:0; transform:translateX(-50%) translateY(36px); } to{ opacity:1; transform:translateX(-50%) translateY(0); } }
 
-/* 金句 8-15s */
+/* 閲戝彞 8-15s */
 .quote-block {
   position:absolute; bottom:620px; left:80px; right:80px; z-index:10; text-align:center;
   opacity:0; animation:fadeInUp .7s 8s ease-out forwards;
@@ -76,14 +75,14 @@ body { background:#0D0D0D; overflow:hidden; }
 .quote-text { font-size:44px; font-weight:500; line-height:1.5; color:rgba(255,255,255,.9); margin-top:-10px; }
 .quote-author { font-size:30px; color:var(--accent-color,#E8816B); margin-top:24px; font-weight:500; }
 
-/* 概览 15-23s */
+/* 姒傝 15-23s */
 .overview-block {
   position:absolute; bottom:400px; left:80px; right:80px; z-index:10; text-align:center;
   opacity:0; animation:fadeInUp .7s 15s ease-out forwards;
 }
 .overview-text { font-size:36px; line-height:1.7; color:rgba(255,255,255,.85); font-weight:400; }
 
-/* 光谱 20-26s */
+/* 鍏夎氨 20-26s */
 .spectrum-block {
   position:absolute; bottom:240px; left:100px; right:100px; z-index:10;
   display:flex; flex-direction:column; gap:22px;
@@ -100,7 +99,7 @@ body { background:#0D0D0D; overflow:hidden; }
 }
 .spec-char { width:60px; font-size:38px; font-weight:800; color:var(--accent-color,#E8816B); text-align:center; }
 
-/* CTA 尾帧 27-30s */
+/* CTA 灏惧抚 27-30s */
 .cta-block {
   position:absolute; bottom:80px; left:50%; transform:translateX(-50%); z-index:10; text-align:center;
   opacity:0; animation:fadeInUp .6s 27s ease-out forwards;
@@ -117,42 +116,43 @@ body { background:#0D0D0D; overflow:hidden; }
 
   <div class="brand-badge">
     <span class="dot" style="background:var(--accent-color)"></span>
-    <span class="text">MBTI-PRO · 81 型人格</span>
+    <span class="text">MBTI-PRO 路 81 鍨嬩汉鏍?/span>
   </div>
 
-  <div class="group-tag" id="groupTag">NF 翠绿组</div>
+  <div class="group-tag" id="groupTag">NF 缈犵豢缁?/div>
 
   <div class="type-code" id="typeCode" style="color:var(--accent-color)">ENFJ</div>
-  <div class="type-name" id="typeName">主人公型</div>
+  <div class="type-name" id="typeName">涓讳汉鍏瀷</div>
 
   <div class="quote-block">
     <div class="quote-mark">"</div>
-    <div class="quote-text" id="quoteText">领导力是你的核心优势之一</div>
-    <div class="quote-author" id="quoteAuthor">—— 纳尔逊·曼德拉</div>
+    <div class="quote-text" id="quoteText">棰嗗鍔涙槸浣犵殑鏍稿績浼樺娍涔嬩竴</div>
+    <div class="quote-author" id="quoteAuthor">鈥斺€?绾冲皵閫娐锋浖寰锋媺</div>
   </div>
 
   <div class="overview-block">
-    <div class="overview-text" id="overviewText">你是天生的领导者和沟通者...</div>
+    <div class="overview-text" id="overviewText">浣犳槸澶╃敓鐨勯瀵艰€呭拰娌熼€氳€?..</div>
   </div>
 
   <div class="spectrum-block" id="spectrumBlock"></div>
 
   <div class="cta-block">
-    <div class="cta-text">测测你是什么人格类型</div>
-    <div class="cta-sub">MBTI-PRO · 81 型精细分类</div>
-    <img class="qr-code" id="qrCode" src="" alt="扫码测试" />
+    <div class="cta-text">娴嬫祴浣犳槸浠€涔堜汉鏍肩被鍨?/div>
+    <div class="cta-sub">MBTI-PRO 路 81 鍨嬬簿缁嗗垎绫?/div>
+    <img class="qr-code" id="qrCode" src="" alt="鎵爜娴嬭瘯" />
   </div>
 </div>
 
 <script>
 window.typeData = window.typeData || {
-  code:'ENFJ',name:'主人公型',overview:'你是天生的领导者和沟通者...',
-  celebrities:['纳尔逊·曼德拉','奥普拉·温弗瑞'],
+  code:'ENFJ',name:'涓讳汉鍏瀷',overview:'浣犳槸澶╃敓鐨勯瀵艰€呭拰娌熼€氳€?..',
+  celebrities:['绾冲皵閫娐锋浖寰锋媺','濂ユ櫘鎷壜锋俯寮楃憺'],
   _colorHex:'#2D8A4E',_colorTextHex:'#1F6E3A',_groupCode:'NF',
-  strengths:['领导力','共情力'],chars:{E_I:'E',S_N:'N',T_F:'F',P_J:'J'},
+  strengths:['棰嗗鍔?,'鍏辨儏鍔?],chars:{E_I:'E',S_N:'N',T_F:'F',P_J:'J'},
 };
 
-(function fill(){
+function fill(data){
+  if(data) window.typeData=data;
   var d=window.typeData;
   var accent=d._colorHex||'#E8816B';
   document.documentElement.style.setProperty('--accent-color',accent);
@@ -164,7 +164,7 @@ window.typeData = window.typeData || {
   }
 
   var gc=d._groupCode;
-  var gNames={SP:'SP 暖金组',SD:'SD 琥珀组',SJ:'SJ 藏蓝组',BT:'BT 深炭灰组',BC:'BC 月光银灰组',BF:'BF 暖燕麦组',NT:'NT 深紫组',NC:'NC 靛青组',NF:'NF 翠绿组'};
+  var gNames={SP:'SP 鏆栭噾缁?,SD:'SD 鐞ョ弨缁?,SJ:'SJ 钘忚摑缁?,BT:'BT 娣辩偔鐏扮粍',BC:'BC 鏈堝厜閾剁伆缁?,BF:'BF 鏆栫嚂楹︾粍',NT:'NT 娣辩传缁?,NC:'NC 闈涢潚缁?,NF:'NF 缈犵豢缁?};
   var gColors={SP:'#C8963E',SD:'#D4782F',SJ:'#2C5F8A',BT:'#4A4A4A',BC:'#8B95A0',BF:'#B8956A',NT:'#6B3FA0',NC:'#3D7B8A',NF:'#2D8A4E'};
   var gt=document.getElementById('groupTag');
   gt.textContent=gNames[gc]||gc;
@@ -177,15 +177,15 @@ window.typeData = window.typeData || {
   document.getElementById('typeName').textContent=d.name;
 
   var celebs=d.celebrities||[];
-  document.getElementById('quoteAuthor').textContent=celebs.length?'—— '+celebs[0]:'';
+  document.getElementById('quoteAuthor').textContent=celebs.length?'鈥斺€?'+celebs[0]:'';
   var strengths=d.strengths||[];
-  var quotes=[strengths[0]+'是你的核心优势之一','你天生擅长'+strengths[0]+'与'+(strengths[1]||'创新思维'),'在'+strengths[0]+'方面，你有着超越常人的天赋'];
+  var quotes=[strengths[0]+'鏄綘鐨勬牳蹇冧紭鍔夸箣涓€','浣犲ぉ鐢熸搮闀?+strengths[0]+'涓?+(strengths[1]||'鍒涙柊鎬濈淮'),'鍦?+strengths[0]+'鏂归潰锛屼綘鏈夌潃瓒呰秺甯镐汉鐨勫ぉ璧?];
   document.getElementById('quoteText').textContent=quotes[0];
 
   var ov=d.overview||'';
-  document.getElementById('overviewText').textContent=ov.length>80?ov.substring(0,80)+'…':ov;
+  document.getElementById('overviewText').textContent=ov.length>80?ov.substring(0,80)+'鈥?:ov;
 
-  // 光谱
+  // 鍏夎氨
   var chars=d.chars||{E_I:'E',S_N:'N',T_F:'T',P_J:'J'};
   var dims=[
     {key:'E_I',left:'I',right:'E',lc:'#6B8FBF',rc:'#E8A860'},
@@ -210,8 +210,11 @@ window.typeData = window.typeData || {
 
   var qr=document.getElementById('qrCode');
   if(qr) qr.src='data:image/svg+xml,'+encodeURIComponent(
-    '<svg xmlns="http://www.w3.org/2000/svg" width="104" height="104"><rect width="104" height="104" fill="white"/><text x="52" y="46" text-anchor="middle" font-size="18" fill="black">扫码</text><text x="52" y="72" text-anchor="middle" font-size="18" fill="black">测MBTI</text></svg>');
-})();
+    '<svg xmlns="http://www.w3.org/2000/svg" width="104" height="104"><rect width="104" height="104" fill="white"/><text x="52" y="46" text-anchor="middle" font-size="18" fill="black">鎵爜</text><text x="52" y="72" text-anchor="middle" font-size="18" fill="black">娴婱BTI</text></svg>');
+}
+window.__refill=fill;
+fill(window.typeData);
 </script>
 </body>
 </html>
+

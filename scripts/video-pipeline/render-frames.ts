@@ -1,21 +1,57 @@
 // ============================================================
-// MBTI-PRO Video Pipeline — Playwright 视频渲染引擎
-// 支持两种模式:
-//   1. 录屏模式 (renderVideo): Playwright 内置录屏，CSS动画完美捕获
-//   2. 截图模式 (renderFrames): 关键帧截图 → FFmpeg 合成
+// MBTI-PRO Video Pipeline 鈥?Playwright 瑙嗛娓叉煋寮曟搸
+// 鏀寔涓ょ妯″紡:
+//   1. 褰曞睆妯″紡 (renderVideo): Playwright 鍐呯疆褰曞睆锛孋SS鍔ㄧ敾瀹岀編鎹曡幏
+//   2. 鎴浘妯″紡 (renderFrames): 鍏抽敭甯ф埅鍥?鈫?FFmpeg 鍚堟垚
 // ============================================================
 
 import { chromium } from 'playwright'
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, readFileSync, writeFileSync, readdirSync, unlinkSync } from 'node:fs'
 import { join, resolve, dirname } from 'node:path'
+import { createRequire } from 'node:module'
 import type { FrameRenderConfig, PersonalityTypeData } from './types.js'
 import { getTypeColor, getNineGroupCode } from './utils/colors.js'
 
 const TEMPLATES_DIR = resolve(import.meta.dirname, 'templates')
+const PROJECT_ROOT = resolve(import.meta.dirname, '..', '..')
+const LOCAL_IMAGE_DIR = join(PROJECT_ROOT, 'video', '81_image')
+const QR_URL = 'https://mbti-pro.com/?utm_source=douyin&utm_medium=video&utm_campaign=personality_daily'
+const requireFromClient = createRequire(join(PROJECT_ROOT, 'client', 'package.json'))
+let QRCode: any
+try { QRCode = requireFromClient('qrcode') } catch {}
+
+function imageToDataUrl(filePath: string): string {
+  if (!existsSync(filePath)) return ''
+  const ext = filePath.toLowerCase().endsWith('.webp') ? 'webp' : 'jpeg'
+  return `data:image/${ext};base64,${readFileSync(filePath).toString('base64')}`
+}
+
+function svgToDataUrl(svg: string): string {
+  return `data:image/svg+xml;base64,${Buffer.from(svg, 'utf8').toString('base64')}`
+}
+
+function buildQrSvg(url: string): string {
+  if (!QRCode) {
+    return '<svg xmlns="http://www.w3.org/2000/svg" width="210" height="210" viewBox="0 0 210 210"><rect width="100%" height="100%" fill="#fff"/><text x="50%" y="50%" text-anchor="middle" font-family="Arial" font-size="18" font-weight="700" fill="#2F261B">mbti-pro.com</text></svg>'
+  }
+  const qr = QRCode.create(url, { errorCorrectionLevel: 'M' })
+  const modules = qr.modules.size
+  const margin = 4
+  const cell = 8
+  const size = (modules + margin * 2) * cell
+  const rects: string[] = []
+  for (let y = 0; y < modules; y++) {
+    for (let x = 0; x < modules; x++) {
+      if (qr.modules.get(x, y)) {
+        rects.push(`<rect x="${(x + margin) * cell}" y="${(y + margin) * cell}" width="${cell}" height="${cell}"/>`)
+      }
+    }
+  }
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}"><rect width="100%" height="100%" fill="#fff"/><g fill="#2F261B">${rects.join('')}</g></svg>`
+}
 
 /**
- * 将 HTML 模板写入临时文件（解决 data: URI 的 CORS 限制）
- * file:// 协议可自由加载 localhost 图片资源
+ * 灏?HTML 妯℃澘鍐欏叆涓存椂鏂囦欢锛堣В鍐?data: URI 鐨?CORS 闄愬埗锛? * file:// 鍗忚鍙嚜鐢卞姞杞?localhost 鍥剧墖璧勬簮
  */
 function writeTempHtml(html: string, workDir: string): string {
   if (!existsSync(workDir)) mkdirSync(workDir, { recursive: true })
@@ -25,24 +61,23 @@ function writeTempHtml(html: string, workDir: string): string {
 }
 
 /**
- * 加载 HTML 模板文件
+ * 鍔犺浇 HTML 妯℃澘鏂囦欢
  */
 function loadTemplate(name: string): string {
   const filePath = join(TEMPLATES_DIR, `${name}.html`)
   if (!existsSync(filePath)) {
-    throw new Error(`模板文件不存在: ${filePath}`)
+    throw new Error(`妯℃澘鏂囦欢涓嶅瓨鍦? ${filePath}`)
   }
   return readFileSync(filePath, 'utf-8')
 }
 
 /**
- * 构建注入到浏览器页面的数据对象
- */
-function buildInjectData(typeData: PersonalityTypeData) {
+ * 鏋勫缓娉ㄥ叆鍒版祻瑙堝櫒椤甸潰鐨勬暟鎹璞? */
+export function buildInjectData(typeData: PersonalityTypeData) {
   const colorInfo = getTypeColor(typeData.code)
   const groupCode = getNineGroupCode(typeData.code)
 
-  // 从 overview 提取维度字符
+  // 浠?overview 鎻愬彇缁村害瀛楃
   const chars = {
     E_I: typeData.code[0] as 'E' | 'A' | 'I',
     S_N: typeData.code[1] as 'N' | 'B' | 'S',
@@ -60,13 +95,18 @@ function buildInjectData(typeData: PersonalityTypeData) {
     careers: typeData.careers ?? [],
     isTraditional: typeData.isTraditional,
     population: typeData.population ?? '',
+    imageDataUrl: imageToDataUrl(join(LOCAL_IMAGE_DIR, `${typeData.code}.jpg`)),
+    imageUrl: imageToDataUrl(join(LOCAL_IMAGE_DIR, `${typeData.code}.jpg`)),
+    fallbackImageUrl: `http://localhost:3001/api/images/${typeData.code}`,
+    qrDataUrl: svgToDataUrl(buildQrSvg(QR_URL)),
+    marketing: (typeData as any).marketing ?? {},
     chars,
-    // 颜色信息
+    // 棰滆壊淇℃伅
     _colorHex: colorInfo.hex,
     _colorTextHex: colorInfo.text,
     _groupCode: groupCode,
     _groupName: colorInfo.name,
-    // 维度模块
+    // 缁村害妯″潡
     eiModule: typeData.eiModule ?? '',
     snModule: typeData.snModule ?? '',
     tfModule: typeData.tfModule ?? '',
@@ -75,9 +115,7 @@ function buildInjectData(typeData: PersonalityTypeData) {
 }
 
 /**
- * 渲染视频帧序列
- * 使用关键帧策略 + FFmpeg 补间：只截取关键时间点的帧
- */
+ * 娓叉煋瑙嗛甯у簭鍒? * 浣跨敤鍏抽敭甯х瓥鐣?+ FFmpeg 琛ラ棿锛氬彧鎴彇鍏抽敭鏃堕棿鐐圭殑甯? */
 export async function renderFrames(
   config: FrameRenderConfig,
   typeData: PersonalityTypeData,
@@ -92,7 +130,7 @@ export async function renderFrames(
     keyframeInterval = 3,
   } = config
 
-  // 确保输出目录存在
+  // 纭繚杈撳嚭鐩綍瀛樺湪
   if (!existsSync(outputDir)) {
     mkdirSync(outputDir, { recursive: true })
   }
@@ -101,11 +139,11 @@ export async function renderFrames(
   const html = templateHtml ?? loadTemplate(templateName)
   const injectData = buildInjectData(typeData)
 
-  console.log(`[render] 启动 Chromium...`)
+  console.log(`[render] 鍚姩 Chromium...`)
   const browser = await chromium.launch({ headless: true })
   const context = await browser.newContext({
     viewport: { width, height },
-    deviceScaleFactor: 2, // 2x 超采样，确保文字清晰
+    deviceScaleFactor: 2, // 2x 瓒呴噰鏍凤紝纭繚鏂囧瓧娓呮櫚
   })
   const page = await context.newPage()
 
@@ -113,38 +151,45 @@ export async function renderFrames(
   const htmlPath = writeTempHtml(html, outputDir)
   await page.goto(`file://${htmlPath}`, { waitUntil: 'networkidle' })
 
-  // 注入数据
+  // 娉ㄥ叆鏁版嵁
   await page.evaluate((data) => {
     (window as any).typeData = data
-    // 重新触发填充
+    // 閲嶆柊瑙﹀彂濉厖
     const fillFn = (window as any).__refill
     if (typeof fillFn === 'function') fillFn(data)
   }, injectData)
 
   // 等待字体和图片加载
-  await page.waitForTimeout(1500)
+  await page.waitForTimeout(500)
+  await page.waitForFunction(() => {
+    const img = document.getElementById('typeImage') as HTMLImageElement | null
+    return !img || (img.complete && img.naturalWidth > 0)
+  }, undefined, { timeout: 5000 }).catch(() => {
+    console.warn('[render] 人格图片未确认加载完成，将继续渲染')
+  })
+
 
   const frames: string[] = []
   const keyframeTimes: number[] = []
 
-  // 生成关键帧时间点列表
+  // 鐢熸垚鍏抽敭甯ф椂闂寸偣鍒楄〃
   for (let t = 0; t <= durationSeconds; t += keyframeInterval) {
     keyframeTimes.push(t)
   }
-  // 确保最后一帧被截取
+  // 纭繚鏈€鍚庝竴甯ц鎴彇
   if (keyframeTimes[keyframeTimes.length - 1] < durationSeconds) {
     keyframeTimes.push(durationSeconds)
   }
 
-  console.log(`[render] 截取 ${keyframeTimes.length} 个关键帧 (${keyframeTimes.join(', ')}s)`)
+  console.log(`[render] 鎴彇 ${keyframeTimes.length} 涓叧閿抚 (${keyframeTimes.join(', ')}s)`)
 
   for (let i = 0; i < keyframeTimes.length; i++) {
     const t = keyframeTimes[i]
     const frameNum = Math.round(t * 30) // 30fps
 
-    // 快进 CSS 动画到指定时间点
+    // 蹇繘 CSS 鍔ㄧ敾鍒版寚瀹氭椂闂寸偣
     await page.evaluate((time) => {
-      // 设置所有动画的负延迟来快进
+      // 璁剧疆鎵€鏈夊姩鐢荤殑璐熷欢杩熸潵蹇繘
       const allElements = document.querySelectorAll('*')
       allElements.forEach((el) => {
         const style = (el as HTMLElement).style
@@ -156,7 +201,7 @@ export async function renderFrames(
       })
     }, t)
 
-    // 等待渲染稳定
+    // 绛夊緟娓叉煋绋冲畾
     await page.waitForTimeout(100)
 
     const framePath = join(outputDir, `frame_${String(frameNum).padStart(4, '0')}.png`)
@@ -164,18 +209,113 @@ export async function renderFrames(
     frames.push(framePath)
 
     if (i % 3 === 0 || i === keyframeTimes.length - 1) {
-      console.log(`[render]  帧 ${frameNum} (${t}s) → ${framePath}`)
+      console.log(`[render]  甯?${frameNum} (${t}s) 鈫?${framePath}`)
     }
   }
 
   await browser.close()
-  console.log(`[render] ✅ 完成: ${frames.length} 帧 → ${outputDir}`)
+  console.log(`[render] 鉁?瀹屾垚: ${frames.length} 甯?鈫?${outputDir}`)
   return frames
 }
 
 /**
- * 仅渲染单帧（用于封面图、预览等）
+ * 浠呮覆鏌撳崟甯э紙鐢ㄤ簬灏侀潰鍥俱€侀瑙堢瓑锛? */
+function clearFrameSequence(outputDir: string) {
+  if (!existsSync(outputDir)) return
+  for (const file of readdirSync(outputDir)) {
+    if (/^frame_\d+\.png$/.test(file)) {
+      try { unlinkSync(join(outputDir, file)) } catch {}
+    }
+  }
+}
+
+async function waitForTemplateImages(page: any, label: string) {
+  await page.evaluate(() => (document as any).fonts?.ready).catch(() => {})
+  await page.waitForFunction(() => {
+    const ids = ['typeImage', 'cornerQr', 'endQr']
+    return ids.every((id) => {
+      const img = document.getElementById(id) as HTMLImageElement | null
+      if (!img) return true
+      const src = img.getAttribute('src') || ''
+      return !src || (img.complete && img.naturalWidth > 0)
+    })
+  }, undefined, { timeout: 10000 }).catch(() => {
+    console.warn(`[render:frames] ${label} 图片/二维码未全部确认加载，将继续渲染`)
+  })
+}
+
+/**
+ * 逐帧渲染完整视频帧序列。
+ * 用于 2K/高清终版：避免 Playwright WebM 录屏低码率导致的模糊。
  */
+export async function renderFullFrameSequence(
+  config: FrameRenderConfig,
+  typeData: PersonalityTypeData,
+  templateHtml?: string,
+): Promise<string[]> {
+  const {
+    typeCode,
+    outputDir,
+    width = 1440,
+    height = 2560,
+    fps = 30,
+    durationSeconds = 30,
+  } = config
+
+  if (!existsSync(outputDir)) mkdirSync(outputDir, { recursive: true })
+  clearFrameSequence(outputDir)
+
+  const sourceWidth = 1080
+  const sourceHeight = 1920
+  const scale = width / sourceWidth
+  if (Math.abs(height / sourceHeight - scale) > 0.01) {
+    throw new Error(`逐帧渲染仅支持 9:16 等比输出，收到 ${width}x${height}`)
+  }
+
+  const templateName = config.template || 'daily-type'
+  const html = templateHtml ?? loadTemplate(templateName)
+  const injectData = buildInjectData(typeData)
+  const totalFrames = Math.ceil(durationSeconds * fps)
+
+  console.log(`[render:frames] 启动 Chromium 逐帧渲染：${typeCode} ${width}x${height} @ ${fps}fps，共 ${totalFrames} 帧`)
+  const browser = await chromium.launch({ headless: true })
+  try {
+    const context = await browser.newContext({
+      viewport: { width: sourceWidth, height: sourceHeight },
+      deviceScaleFactor: scale,
+    })
+    const page = await context.newPage()
+    const htmlPath = writeTempHtml(html, outputDir)
+    await page.goto(`file://${htmlPath}`, { waitUntil: 'networkidle' })
+    await page.evaluate((data) => {
+      ;(window as any).typeData = data
+      const fillFn = (window as any).__refill
+      if (typeof fillFn === 'function') fillFn(data)
+    }, injectData)
+    await waitForTemplateImages(page, typeCode)
+
+    const frames: string[] = []
+    for (let index = 0; index < totalFrames; index += 1) {
+      const timeSeconds = index / fps
+      await page.evaluate((time) => {
+        const animations = document.getAnimations()
+        for (const animation of animations) animation.currentTime = time * 1000
+      }, timeSeconds)
+      const framePath = join(outputDir, `frame_${String(index + 1).padStart(5, '0')}.png`)
+      await page.screenshot({ path: framePath, type: 'png', fullPage: false })
+      frames.push(framePath)
+      if ((index + 1) % 150 === 0 || index + 1 === totalFrames) {
+        console.log(`[render:frames]  ${index + 1}/${totalFrames}`)
+      }
+    }
+
+    await context.close()
+    console.log(`[render:frames] ✅ 完成：${frames.length} 帧 → ${outputDir}`)
+    return frames
+  } finally {
+    await browser.close()
+  }
+}
 export async function renderSingleFrame(
   templateName: string,
   typeData: PersonalityTypeData,
@@ -201,6 +341,8 @@ export async function renderSingleFrame(
 
   await page.evaluate((data) => {
     (window as any).typeData = data
+    const fillFn = (window as any).__refill
+    if (typeof fillFn === 'function') fillFn(data)
   }, injectData)
 
   // 快进到指定时间
@@ -218,15 +360,13 @@ export async function renderSingleFrame(
   await page.screenshot({ path: outputPath, type: 'png' })
   await browser.close()
 
-  console.log(`[render] 单帧: ${outputPath}`)
+  console.log(`[render] 鍗曞抚: ${outputPath}`)
   return outputPath
 }
 
 /**
- * 使用 Playwright 内置录屏功能生成视频（推荐模式）
- * 优势：CSS 动画完美捕获、音频支持、实时帧率
- * 输出：WebM 格式（可后续 FFmpeg 转 MP4）
- */
+ * 浣跨敤 Playwright 鍐呯疆褰曞睆鍔熻兘鐢熸垚瑙嗛锛堟帹鑽愭ā寮忥級
+ * 浼樺娍锛欳SS 鍔ㄧ敾瀹岀編鎹曡幏銆侀煶棰戞敮鎸併€佸疄鏃跺抚鐜? * 杈撳嚭锛歐ebM 鏍煎紡锛堝彲鍚庣画 FFmpeg 杞?MP4锛? */
 export async function renderVideo(
   config: FrameRenderConfig,
   typeData: PersonalityTypeData,
@@ -248,7 +388,7 @@ export async function renderVideo(
   const html = templateHtml ?? loadTemplate(templateName)
   const injectData = buildInjectData(typeData)
 
-  console.log(`[render:video] 启动 Chromium (录屏模式)...`)
+  console.log(`[render:video] 鍚姩 Chromium (褰曞睆妯″紡)...`)
 
   // 清理旧 WebM 文件，避免重名冲突
   const { readdirSync: rd, unlinkSync, renameSync } = await import('node:fs')
@@ -261,7 +401,7 @@ export async function renderVideo(
 
   const context = await browser.newContext({
     viewport: { width, height },
-    deviceScaleFactor: 1, // 录屏模式用 1x 确保性能
+    deviceScaleFactor: 1, // 褰曞睆妯″紡鐢?1x 纭繚鎬ц兘
     recordVideo: {
       dir: outputDir,
       size: { width, height },
@@ -270,34 +410,45 @@ export async function renderVideo(
 
   const page = await context.newPage()
 
-  // 写入临时文件并加载（file:// 协议避免 CORS，可加载 localhost 图片）
+  // 写入临时文件并加载（file:// 协议避免 CORS）
   const htmlPath = writeTempHtml(html, outputDir)
   await page.goto(`file://${htmlPath}`, { waitUntil: 'networkidle' })
 
-  // 注入数据
+  // 娉ㄥ叆鏁版嵁
   await page.evaluate((data) => {
     (window as any).typeData = data
+    const fillFn = (window as any).__refill
+    if (typeof fillFn === 'function') fillFn(data)
   }, injectData)
 
-  // 等待 CSS 动画播放
-  console.log(`[render:video] 录制中... ${durationSeconds}s`)
+  await page.waitForFunction(() => {
+    const img = document.getElementById('typeImage') as HTMLImageElement | null
+    return !img || (img.complete && img.naturalWidth > 0)
+  }, undefined, { timeout: 5000 }).catch(() => {
+    console.warn('[render:video] 人格图片未确认加载完成，将继续录制')
+  })
+
+  // 绛夊緟 CSS 鍔ㄧ敾鎾斁
+  console.log(`[render:video] 褰曞埗涓?.. ${durationSeconds}s`)
   await page.waitForTimeout(durationSeconds * 1000)
 
-  // 关闭页面以保存视频
-  await page.close()
+  // 鍏抽棴椤甸潰浠ヤ繚瀛樿棰?  await page.close()
   await context.close()
   await browser.close()
 
-  // Playwright 生成的视频文件名是随机的，找到并重命名它
+  // Playwright 鐢熸垚鐨勮棰戞枃浠跺悕鏄殢鏈虹殑锛屾壘鍒板苟閲嶅懡鍚嶅畠
   const files = rd(outputDir).filter(f => f.endsWith('.webm'))
   if (files.length === 0) {
-    throw new Error('录屏失败：未生成 .webm 文件')
+    throw new Error('褰曞睆澶辫触锛氭湭鐢熸垚 .webm 鏂囦欢')
   }
 
   const sourcePath = join(outputDir, files[0])
   const targetPath = join(outputDir, `${typeCode}_raw.webm`)
   renameSync(sourcePath, targetPath)
 
-  console.log(`[render:video] ✅ 录屏完成: ${targetPath}`)
+  console.log(`[render:video] 鉁?褰曞睆瀹屾垚: ${targetPath}`)
   return targetPath
 }
+
+
+

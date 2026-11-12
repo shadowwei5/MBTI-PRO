@@ -12,7 +12,7 @@ import { join } from 'node:path'
 import { fetchTypeData, saveTypeData, getDailyTypeCode } from './fetch-type-data.js'
 import { renderVideo } from './render-frames.js'
 import { convertWebmToMp4, muxAudioAndSubtitles } from './compose-video.js'
-import { generateVoiceover, getIntroVideoScript, getDailyTypeScript } from './generate-audio.js'
+import { generateVoiceover, getIntroVideoScript, getDailyTypeScript, getStoryTypeScript } from './generate-audio.js'
 import { generateDefaultCover, generateTypeCover } from './generate-cover.js'
 import type { FrameRenderConfig, Platform } from './types.js'
 
@@ -32,8 +32,10 @@ interface CliOptions {
   count: number
   publish?: Platform[]
   dryRun: boolean
-  template: 'daily-type' | 'intro-video'
+  template: 'daily-type' | 'intro-video' | 'story-video'
   duration: number
+  bgmPath?: string
+  bgmVolumeDb: number
 }
 
 function parseArgs(args: string[]): CliOptions {
@@ -43,6 +45,8 @@ function parseArgs(args: string[]): CliOptions {
     dryRun: false,
     template: 'daily-type',
     duration: 30,
+    bgmPath: process.env.MBTIPRO_BGM_PATH,
+    bgmVolumeDb: Number(process.env.MBTIPRO_BGM_VOLUME_DB || -22),
   }
 
   for (let i = 0; i < args.length; i++) {
@@ -52,8 +56,10 @@ function parseArgs(args: string[]): CliOptions {
       case '--count': opts.count = parseInt(args[++i], 10); break
       case '--publish': opts.publish = args[++i]?.split(',') as Platform[]; break
       case '--dry-run': opts.dryRun = true; break
-      case '--template': opts.template = args[++i] as 'daily-type' | 'intro-video'; break
+      case '--template': opts.template = args[++i] as 'daily-type' | 'intro-video' | 'story-video'; break
       case '--duration': opts.duration = parseInt(args[++i], 10); break
+      case '--bgm': opts.bgmPath = args[++i]; break
+      case '--bgm-volume-db': opts.bgmVolumeDb = Number(args[++i]); break
     }
   }
 
@@ -97,7 +103,9 @@ async function generateForType(typeCode: string, opts: CliOptions): Promise<stri
   // 配音脚本
   const voiceScript = opts.template === 'intro-video'
     ? getIntroVideoScript()
-    : getDailyTypeScript(data)
+    : opts.template === 'story-video'
+      ? getStoryTypeScript(data)
+      : getDailyTypeScript(data)
 
   console.log(`  [2/4] Playwright 录屏 (${opts.duration}s)...`)
   const webmPath = await renderVideo(frameConfig, data)
@@ -114,7 +122,10 @@ async function generateForType(typeCode: string, opts: CliOptions): Promise<stri
   const coverPath = join(OUTPUT_DIR, `cover_${code}.png`)
   console.log(`  [4/5] 合成: 视频+音频...`)
   await convertWebmToMp4(webmPath, tempMp4, 1080, 1920)
-  await muxAudioAndSubtitles(tempMp4, audioPath, '', outputPath)
+  await muxAudioAndSubtitles(tempMp4, audioPath, subtitlePath, outputPath, {
+    bgmPath: opts.bgmPath,
+    bgmVolumeDb: opts.bgmVolumeDb,
+  })
   try { unlinkSync(tempMp4) } catch {}
   try { unlinkSync(subtitlePath) } catch {}
   console.log(`  [5/5] 生成封面: ${code}...`)
@@ -138,6 +149,7 @@ async function main() {
     console.log('  npx tsx index.ts --type ENFJ                 生成单个类型视频')
     console.log('  npx tsx index.ts --batch --count 7           批量生成7个')
     console.log('  npx tsx index.ts --type ENFJ --template intro-video  生成介绍视频')
+    console.log('  npx tsx index.ts --type ENFJ --template story-video  生成故事视频')
     console.log('  npx tsx index.ts --type ENFJ --publish douyin  生成并发布到抖音')
     console.log('')
     console.log('可用选项:')
@@ -145,9 +157,11 @@ async function main() {
     console.log('  --batch           批量模式')
     console.log('  --count <N>       批量数量 (默认7)')
     console.log('  --duration <S>    视频时长秒数 (默认30)')
+    console.log('  --bgm <PATH>      添加背景音乐（建议使用自有/可商用授权音频）')
+    console.log('  --bgm-volume-db   BGM 音量，默认 -22dB')
     console.log('  --publish <P>     发布平台 (douyin,bilibili,xiaohongshu,wechat)')
     console.log('  --dry-run         模拟运行，不实际生成')
-    console.log('  --template <T>    模板 (daily-type | intro-video)')
+    console.log('  --template <T>    模板 (daily-type | intro-video | story-video)')
     process.exit(0)
   }
 

@@ -35,6 +35,26 @@ export interface PersonalityTypeData {
   tfModule: string | null
   pjModule: string | null
   imageUrl?: string
+  fallbackImageUrl?: string
+  marketing?: {
+    version?: string
+    title?: string
+    coverTitle?: string
+    coverHook?: string
+    coverSubtitle?: string
+    hookTitle?: string
+    hookBody?: string
+    storyTitle?: string
+    storyBody?: string
+    personaTitle?: string
+    personaBody?: string
+    growthTitle?: string
+    growthBody?: string
+    ctaMain?: string
+    ctaSub?: string
+    voiceSegments?: string[]
+    subtitleLines?: string[]
+  }
 }
 
 /** 9 组颜色信息 */
@@ -65,7 +85,7 @@ export interface FrameRenderConfig {
   fps: number
   durationSeconds: number
   keyframeInterval: number // 每隔多少秒截一帧
-  template: 'daily-type' | 'intro-video'
+  template: 'daily-type' | 'intro-video' | 'story-video'
 }
 
 /** 视频合成配置 */

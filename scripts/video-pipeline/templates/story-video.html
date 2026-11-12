@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--accent:#31CB68;--accent-soft:rgba(49,203,104,.15);--accent-glow:rgba(49,203,104,.4);--ink:#2F261B;--muted:#7B6A54;--subtitle-safe:573px}
+html,body{width:1440px;height:2560px;overflow:hidden;background:#F8EEDC;font-family:"PingFang SC","Noto Sans SC","Microsoft YaHei",sans-serif;color:var(--ink)}
+#canvas{width:1440px;height:2560px;position:relative;overflow:hidden;background:radial-gradient(circle at 82% 10%,#fff8 0 14%,transparent 34%),radial-gradient(circle at 12% 84%,var(--accent-soft),transparent 34%),linear-gradient(180deg,#FFF8EC,#F4DFBB)}
+#canvas:before{content:"";position:absolute;inset:42px;border:1px solid #E7D4B7;border-radius:54px}
+.brand{position:absolute;top:64px;left:74px;right:74px;display:flex;align-items:flex-start;justify-content:space-between;color:#8B5E2E;font-weight:900;font-size:28px;letter-spacing:.08em}
+.right{display:flex;gap:14px;align-items:flex-start}
+.pill{border:1px solid #E7D4B7;background:#fff9;border-radius:999px;padding:12px 20px;font-size:22px;white-space:nowrap}
+.qr{width:88px;height:88px;border-radius:18px;background:#fff;padding:7px;border:1px solid #E7D4B7}
+.hero-code{position:absolute;top:142px;left:72px;font-family:Georgia,serif;font-size:172px;line-height:.9;font-weight:900;letter-spacing:.04em;color:var(--accent);text-shadow:0 22px 60px var(--accent-glow);animation:heroIn 1s ease-out both}
+.type-name{position:absolute;top:306px;left:82px;font-size:36px;font-weight:800;color:var(--muted);letter-spacing:.06em;animation:fadeUp .8s .2s ease-out both}
+.portrait-card{position:absolute;z-index:6;top:390px;left:270px;width:900px;height:1080px;border-radius:60px;overflow:hidden;background:#fff;border:1px solid #E7D4B7;box-shadow:0 36px 110px rgba(122,88,44,.20);animation:portraitFloat 8s ease-in-out infinite}
+.portrait-card img{width:100%;height:100%;object-fit:cover;object-position:center center;display:block}
+.scene{position:absolute;z-index:12;left:72px;right:72px;bottom:calc(var(--subtitle-safe) + 60px);opacity:0;text-align:center}
+.scene-title{font-size:82px;line-height:1.04;font-weight:950;letter-spacing:-.055em;color:var(--ink)}
+.scene-body{margin-top:18px;font-size:44px;line-height:1.45;color:var(--muted)}
+.highlight{color:var(--accent)}
+@keyframes sceneIn{0%{opacity:0;transform:translateY(36px)}9%,82%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-24px)}}
+.s1{animation:sceneIn 7.4s .3s ease-in-out forwards}
+.s2{animation:sceneIn 12s 7.5s ease-in-out forwards}
+.s3{animation:sceneIn 12.2s 19.3s ease-in-out forwards}
+.s4{animation:sceneIn 11.6s 31.3s ease-in-out forwards}
+.s5{display:none}
+.subtitle-reserved{position:absolute;z-index:3;left:0;right:0;bottom:0;height:var(--subtitle-safe);pointer-events:none}
+@keyframes heroIn{0%{opacity:0;transform:translateY(-30px) scale(.95)}100%{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes fadeUp{0%{opacity:0;transform:translateY(20px)}100%{opacity:1;transform:translateY(0)}}
+@keyframes portraitFloat{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-14px) scale(1.015)}}
+
+/* CTA Ending Scene - Full screen white card */
+.cta-ending{position:absolute;z-index:30;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;padding-bottom:calc(var(--subtitle-safe) + 40px);background:radial-gradient(circle at 82% 10%,#fff8 0 14%,transparent 34%),radial-gradient(circle at 12% 84%,var(--accent-soft),transparent 34%),linear-gradient(180deg,#FFF8EC,#F4DFBB);animation:ctaFadeIn 10s 42.9s ease-out forwards}
+.cta-card{width:1200px;height:1500px;background:#FFFCF8;border-radius:60px;border:1px solid #E7D4B7;box-shadow:0 40px 120px rgba(122,88,44,.15);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 60px}
+.cta-top-text{font-size:44px;font-weight:800;color:#8B5E2E;margin-bottom:32px;text-align:center}
+.cta-main-text{font-size:96px;line-height:1.15;font-weight:950;color:var(--ink);text-align:center;margin-bottom:48px}
+.cta-qr{width:360px;height:360px;border-radius:32px;background:#fff;padding:20px;border:2px solid #E7D4B7;box-shadow:0 20px 60px rgba(122,88,44,.12);margin-bottom:32px}
+.cta-qr img{width:100%;height:100%;object-fit:cover}
+.cta-url{font-size:48px;font-weight:800;color:var(--accent);margin-bottom:20px}
+.cta-bottom-text{font-size:36px;font-weight:700;color:var(--muted);text-align:center}
+@keyframes ctaFadeIn{0%{opacity:0;transform:scale(.96) translateY(20px)}18%{opacity:1;transform:scale(1) translateY(0)}97%{opacity:1;transform:scale(1) translateY(0)}100%{opacity:1;transform:scale(1) translateY(0)}}
+</style>
+</head>
+<body>
+<div id="canvas">
+  <div class="brand"><div><span style="width:28px;height:28px;border-radius:10px;background:linear-gradient(135deg,var(--accent),#D8B66F);display:inline-block;margin-right:12px;vertical-align:-5px"></span>MBTI-PRO</div><div class="right"><div class="pill">81 型人格 · 免费测</div><img class="qr" src="" id="qrCode"></div></div>
+  <div class="hero-code" id="typeCode">INTP</div>
+  <div class="type-name" id="typeName">逻辑学家型</div>
+  <div class="portrait-card" id="portraitCard">
+    <img id="typeImage" src="" alt="人格画像">
+  </div>
+  <section class="scene s1"><div class="scene-title" id="hookTitle">INTP 沉默不代表冷漠</div><div class="scene-body" id="hookBody">他只是在心里重装了一遍。</div></section>
+  <section class="scene s2"><div class="scene-title" id="storyTitle">脑子已经跑到另一个宇宙</div><div class="scene-body" id="storyBody">表面回你嗯，其实在推演漏洞。</div></section>
+  <section class="scene s3"><div class="scene-title" id="personaTitle">越催，越卡壳</div><div class="scene-body" id="personaBody">让他想好，比让他快更管用。</div></section>
+  <section class="scene s4"><div class="scene-title" id="growthTitle">16 型太粗</div><div class="scene-body" id="growthBody">你可能落在 65 种中间型里。</div></section>
+  <section class="scene s5"><div class="scene-title" id="ctaMainInline">主页免费测 81 型人格</div><div class="scene-body" id="ctaSubInline">看看你到底是哪一种。</div></section>
+  
+  <!-- CTA Ending - Full screen white card with QR -->
+  <div class="cta-ending">
+    <div class="cta-card">
+      <div class="cta-top-text">别再只用 16 型猜自己</div>
+      <div class="cta-main-text">测测你的<br>81 型人格</div>
+      <div class="cta-qr"><img id="qrBig" src="" alt="扫码测试"></div>
+      <div class="cta-url">mbti-pro.com</div>
+      <div class="cta-bottom-text">扫码或进主页，看看你到底是哪一种</div>
+    </div>
+  </div>
+  
+  <div class="subtitle-reserved"></div>
+</div>
+<script>
+try{window.typeData=JSON.parse('__TYPE_DATA__');}catch(e){window.typeData={code:'INTP',name:'逻辑学家型',_colorHex:'#31CB68',imageUrl:'',qrSvg:''};}
+function setText(id,value){var el=document.getElementById(id); if(el&&value) el.textContent=value;}
+function setImage(img,src){ if(!img||!src) return; img.src=src; }
+function fallbackScene(code){return {hookTitle:code+' 沉默不代表冷漠',hookBody:'他只是在心里重装了一遍。',storyTitle:'脑子已经跑到另一个宇宙',storyBody:'表面回你嗯，其实在推演漏洞。',personaTitle:'越催，越卡壳',personaBody:'让他想好，比让他快更管用。',growthTitle:'16 型太粗',growthBody:'如果你像 '+code+'，可能在 65 种中间型里。',ctaMain:'主页免费测 81 型人格',ctaSub:'看看你到底是哪一种'};}
+function refill(data){
+  var d=data||window.typeData; window.typeData=d;
+  var code=d.code||'INTP';
+  var m=Object.assign(fallbackScene(code),d.marketing||{});
+  var accent=d._colorHex||'#31CB68';
+  document.documentElement.style.setProperty('--accent',accent);
+  document.documentElement.style.setProperty('--accent-soft',accent+'26');
+  document.documentElement.style.setProperty('--accent-glow',accent+'55');
+  setText('typeCode',code);
+  setText('typeName',d.name||'');
+  ['hookTitle','hookBody','storyTitle','storyBody','personaTitle','personaBody','growthTitle','growthBody','ctaMain'].forEach(function(id){setText(id,m[id]);});
+  setText('ctaSubInline',m.ctaSub);
+  setImage(document.getElementById('typeImage'),d.imageDataUrl||d.imageUrl||d.fallbackImageUrl);
+  setImage(document.getElementById('qrCode'),d.qrDataUrl||'');
+  setImage(document.getElementById('qrBig'),d.qrDataUrl||'');
+}
+window.__refill=refill; refill(window.typeData);
+</script>
+</body>
+</html>
