@@ -49,6 +49,9 @@ code{font-family:'DM Mono',monospace;background:#F3EEE4;padding:1px 5px;border-r
 .chip b{color:var(--new);font-weight:600;margin-left:5px;font-size:11px}
 .chip.new{border-color:#BFDCCB;background:#F4FAF6}
 .chip.del{color:#8A7F73;background:#F6F2EA;text-decoration:line-through;text-decoration-color:#C9B9A4}
+.chip.pop{border-color:#CBB6E0;background:#F7F2FD}
+.chip.pop b.popb{color:#6B3FA0}
+.popmark{font-style:normal;font-size:10px;color:#6B3FA0;border:1px solid #CBB6E0;background:#F7F2FD;border-radius:9px;padding:1px 7px;margin-left:8px;vertical-align:middle}
 .check{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px}
 .chk{border:1px solid var(--rule);border-radius:6px;padding:10px 12px;background:#FDFBF7}
 .chk.ok{border-left:3px solid var(--ok)}
@@ -105,7 +108,7 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
     <div class="sp"></div>
     <input type="search" id="q" placeholder="搜类型码 / 中文名 / 人物名…">
     <select id="group"><option value="">全部 9 组</option><option value="SP">SP 暖金组</option><option value="SD">SD 琥珀组</option><option value="SJ">SJ 藏蓝组</option><option value="BT">BT 深炭灰组</option><option value="BC">BC 月光银灰组</option><option value="BF">BF 暖燕麦组</option><option value="NT">NT 深紫组</option><option value="NC">NC 靛青组</option><option value="NF">NF 翠绿组</option></select>
-    <button id="only">只看本轮改过的</button>
+    <button id="only">只看改过的</button>
     <button id="todo">只看没审的</button>
     <button id="export">导出审核结果</button>
   </div>
@@ -114,8 +117,8 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
 <div class="wrap">
   <div class="hero">
     <h1>81 型代表人物已按三条准则全库改完，这是改动清单与审核入口</h1>
-    <p>准则一「一眼认出」：换掉只在小圈子里有名的人（教科书人物、地方史人物、冷门学者）；准则二「四维无硬伤」：人选要能自圆其说地落在该坐标上；准则三「不与其它型共用」：同一个人只在一个型里出现。下方 81 张卡就是<b>产品里会显示的全部内容</b>，标「本轮已改」的卡片底部附了改动前的名单。</p>
-    <div class="meta">数据源 server/src/content/types.ts · 生成时间 2026/11/12 23:31:31 · 由 node scripts/build-celebrity-review.mjs 生成，改代码后重跑即可刷新</div>
+    <p>准则一「一眼认出」：换掉只在小圈子里有名的人（教科书人物、地方史人物、冷门学者）；准则二「四维无硬伤」：人选要能自圆其说地落在该坐标上；准则三「不与其它型共用」：同一个人只在一个型里出现。下方 81 张卡就是<b>产品里会显示的全部内容</b>，标「已修正」的卡片底部附了改动前的名单。</p>
+    <div class="meta">数据源 server/src/content/types.ts · 生成时间 2026/11/12 23:47:57 · 由 node scripts/build-celebrity-review.mjs 生成，改代码后重跑即可刷新</div>
   </div>
 
   <div class="summary">
@@ -123,9 +126,10 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
     <div class="kpi"><b>307</b><span>代表人物位次</span></div>
     <div class="kpi good"><b>307</b><span>去重人数（=位次，无共用）</span></div>
     <div class="kpi good"><b>0</b><span>跨型共用的人</span></div>
-    <div class="kpi acc"><b>46</b><span>本轮改过名单的型</span></div>
-    <div class="kpi acc"><b>69</b><span>本轮变动位次</span></div>
-    <div class="kpi"><b>51 / 43</b><span>新进入 / 移出人数</span></div>
+    <div class="kpi acc"><b>51</b><span>改过名单的型</span></div>
+    <div class="kpi acc"><b>80</b><span>变动位次</span></div>
+    <div class="kpi"><b>62 / 54</b><span>新进入 / 移出人数</span></div>
+    <div class="kpi"><b>12</b><span>流行角色（12 型有）</span></div>
     <div class="kpi good"><b>0</b><span>自动校验硬伤</span></div>
   </div>
 
@@ -140,7 +144,7 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
       
   <div class="chk ok">
     <div class="chk-h"><span class="badge">通过</span><b>身份字典缺字段</b><em>0</em></div>
-    <p>307 个位次都有可显示身份（295 条字典记录 + 主人物自带的领域），结果页与 PDF 报告不会出现「相关人物」兜底。</p>
+    <p>307 个位次都有可显示身份（307 条字典记录 + 主人物自带的领域），结果页与 PDF 报告不会出现「相关人物」兜底。</p>
   </div>
       
   <div class="chk ok">
@@ -168,7 +172,15 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
   </div>
 
   <div class="panel">
-    <h3>本轮换人明细 <em>46 个型 · 69 个位次 · 删除线为移出、绿底为新增</em></h3>
+    <h3>流行角色覆盖 <em>12 位 · 分布在 12 / 81 型 · 每型只放一位，排在第 2 位（紧跟主人物）</em></h3>
+    <div class="lv-list">
+      <div class="lv-row"><div class="k"><code>ENFP</code>竞选者型</div><div class="v"><b>漩涡鸣人</b> · 《火影忍者》</div></div><div class="lv-row"><div class="k"><code>ENTD</code>战略家型</div><div class="v"><b>钢铁侠</b> · 漫威《钢铁侠》</div></div><div class="lv-row"><div class="k"><code>ENTJ</code>指挥官型</div><div class="v"><b>江户川柯南</b> · 《名侦探柯南》</div></div><div class="lv-row"><div class="k"><code>ENTP</code>辩论家型</div><div class="v"><b>五条悟</b> · 《咒术回战》</div></div><div class="lv-row"><div class="k"><code>ESFJ</code>执政官型</div><div class="v"><b>灶门炭治郎</b> · 《鬼灭之刃》</div></div><div class="lv-row"><div class="k"><code>ESFP</code>表演者型</div><div class="v"><b>蒙奇·D·路飞</b> · 《海贼王》</div></div><div class="lv-row"><div class="k"><code>ESTJ</code>总经理型</div><div class="v"><b>赫敏·格兰杰</b> · 《哈利·波特》</div></div><div class="lv-row"><div class="k"><code>INFJ</code>提倡者型</div><div class="v"><b>宇智波鼬</b> · 《火影忍者》</div></div><div class="lv-row"><div class="k"><code>INTP</code>逻辑学家型</div><div class="v"><b>L</b> · 《死亡笔记》</div></div><div class="lv-row"><div class="k"><code>ISFJ</code>守卫者型</div><div class="v"><b>哆啦A梦</b> · 《哆啦A梦》</div></div><div class="lv-row"><div class="k"><code>ISTJ</code>物流师型</div><div class="v"><b>利威尔·阿克曼</b> · 《进击的巨人》</div></div><div class="lv-row"><div class="k"><code>ISTP</code>鉴赏家型</div><div class="v"><b>流川枫</b> · 《灌篮高手》</div></div>
+    </div>
+    <p class="story" style="margin-top:10px">只加「明显对应」的：角色本身的四维要能说清楚，不为覆盖而硬凑。所以 81 型里还有 69 型没有流行角色——其中 27 个「均衡组」（A / B / C / D 中间档）几乎是空白，因为热门角色多是端值性格，中间档很难找到公认对应的人，这部分要继续找。</p>
+  </div>
+
+  <div class="panel">
+    <h3>换人明细 <em>51 个型 · 80 个位次 · 删除线为移出、绿底为新增</em></h3>
     <table>
       <thead><tr><th style="width:150px">类型</th><th style="width:130px">组</th><th style="width:36%">移出</th><th>新增（附身份）</th></tr></thead>
       <tbody><tr>
@@ -304,13 +316,38 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
   </tr><tr>
     <td><code>ENFP</code><span class="tname-sm">竞选者型</span></td>
     <td><span class="grp-inline" style="background:#2D8A4E">NF 翠绿组</span></td>
-    <td class="old"><span class="chip del">宫崎骏</span></td>
-    <td><span class="chip new">周星驰<b>演员 / 导演</b></span></td>
+    <td class="old"><span class="chip del">宫崎骏</span><span class="chip del">汪曾祺</span></td>
+    <td><span class="chip new">漩涡鸣人<b>《火影忍者》主角 / 忍者</b></span><span class="chip new">周星驰<b>演员 / 导演</b></span></td>
+  </tr><tr>
+    <td><code>ENTD</code><span class="tname-sm">战略家型</span></td>
+    <td><span class="grp-inline" style="background:#6B3FA0">NT 深紫组</span></td>
+    <td class="old"><span class="chip del">杰克·韦尔奇</span></td>
+    <td><span class="chip new">钢铁侠<b>漫威《钢铁侠》/ 复仇者联盟成员</b></span></td>
   </tr><tr>
     <td><code>ENTJ</code><span class="tname-sm">指挥官型</span></td>
     <td><span class="grp-inline" style="background:#6B3FA0">NT 深紫组</span></td>
-    <td class="old"><span class="chip del">罗斯福</span></td>
-    <td><span class="chip new">富兰克林·罗斯福<b>美国第 32 任总统</b></span></td>
+    <td class="old"><span class="chip del">撒切尔夫人</span><span class="chip del">罗斯福</span></td>
+    <td><span class="chip new">江户川柯南<b>《名侦探柯南》主角 / 侦探</b></span><span class="chip new">富兰克林·罗斯福<b>美国第 32 任总统</b></span></td>
+  </tr><tr>
+    <td><code>ENTP</code><span class="tname-sm">辩论家型</span></td>
+    <td><span class="grp-inline" style="background:#6B3FA0">NT 深紫组</span></td>
+    <td class="old"><span class="chip del">马克·吐温</span></td>
+    <td><span class="chip new">五条悟<b>《咒术回战》咒术师</b></span></td>
+  </tr><tr>
+    <td><code>ESFJ</code><span class="tname-sm">执政官型</span></td>
+    <td><span class="grp-inline" style="background:#2C5F8A">SJ 藏蓝组</span></td>
+    <td class="old"><span class="chip del">雷锋</span></td>
+    <td><span class="chip new">灶门炭治郎<b>《鬼灭之刃》主角 / 鬼杀队剑士</b></span></td>
+  </tr><tr>
+    <td><code>ESFP</code><span class="tname-sm">表演者型</span></td>
+    <td><span class="grp-inline" style="background:#C8963E">SP 暖金组</span></td>
+    <td class="old"><span class="chip del">埃尔顿·约翰</span></td>
+    <td><span class="chip new">蒙奇·D·路飞<b>《海贼王》主角 / 草帽海贼团船长</b></span></td>
+  </tr><tr>
+    <td><code>ESTJ</code><span class="tname-sm">总经理型</span></td>
+    <td><span class="grp-inline" style="background:#2C5F8A">SJ 藏蓝组</span></td>
+    <td class="old"><span class="chip del">伊丽莎白二世</span></td>
+    <td><span class="chip new">赫敏·格兰杰<b>《哈利·波特》格兰芬多学生</b></span></td>
   </tr><tr>
     <td><code>IBCD</code><span class="tname-sm">内省者型</span></td>
     <td><span class="grp-inline" style="background:#8B95A0">BC 月光银灰组</span></td>
@@ -349,8 +386,8 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
   </tr><tr>
     <td><code>INFJ</code><span class="tname-sm">提倡者型</span></td>
     <td><span class="grp-inline" style="background:#2D8A4E">NF 翠绿组</span></td>
-    <td class="old"><span class="chip del">特蕾莎修女</span></td>
-    <td><span class="chip new">杜甫<b>唐代诗人</b></span></td>
+    <td class="old"><span class="chip del">陀思妥耶夫斯基</span><span class="chip del">特蕾莎修女</span></td>
+    <td><span class="chip new">宇智波鼬<b>《火影忍者》宇智波一族</b></span><span class="chip new">杜甫<b>唐代诗人</b></span></td>
   </tr><tr>
     <td><code>INFP</code><span class="tname-sm">调停者型</span></td>
     <td><span class="grp-inline" style="background:#2D8A4E">NF 翠绿组</span></td>
@@ -364,8 +401,8 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
   </tr><tr>
     <td><code>INTP</code><span class="tname-sm">逻辑学家型</span></td>
     <td><span class="grp-inline" style="background:#6B3FA0">NT 深紫组</span></td>
-    <td class="old"><span class="chip del">达尔文</span><span class="chip del">亚当·斯密</span></td>
-    <td><span class="chip new">尼古拉·特斯拉<b>发明家 / 电气工程师</b></span><span class="chip new">老子<b>道家思想家</b></span></td>
+    <td class="old"><span class="chip del">达尔文</span><span class="chip del">庄子</span><span class="chip del">亚当·斯密</span></td>
+    <td><span class="chip new">L<b>《死亡笔记》天才侦探</b></span><span class="chip new">尼古拉·特斯拉<b>发明家 / 电气工程师</b></span><span class="chip new">老子<b>道家思想家</b></span></td>
   </tr><tr>
     <td><code>ISCD</code><span class="tname-sm">精工者型</span></td>
     <td><span class="grp-inline" style="background:#D4782F">SD 琥珀组</span></td>
@@ -385,7 +422,7 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
     <td><code>ISFJ</code><span class="tname-sm">守卫者型</span></td>
     <td><span class="grp-inline" style="background:#2C5F8A">SJ 藏蓝组</span></td>
     <td class="old"><span class="chip del">孟母</span><span class="chip del">岳母</span></td>
-    <td><span class="chip new">林巧稚<b>妇产科医学家</b></span></td>
+    <td><span class="chip new">哆啦A梦<b>《哆啦A梦》来自 22 世纪的猫型机器人</b></span></td>
   </tr><tr>
     <td><code>ISFP</code><span class="tname-sm">探险家型</span></td>
     <td><span class="grp-inline" style="background:#C8963E">SP 暖金组</span></td>
@@ -394,46 +431,46 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
   </tr><tr>
     <td><code>ISTJ</code><span class="tname-sm">物流师型</span></td>
     <td><span class="grp-inline" style="background:#2C5F8A">SJ 藏蓝组</span></td>
-    <td class="old"><span class="chip del">乔治·华盛顿</span><span class="chip del">诸葛亮</span></td>
-    <td><span class="chip new">默克尔<b>德国前总理</b></span></td>
+    <td class="old"><span class="chip del">乔治·华盛顿</span><span class="chip del">曾参</span><span class="chip del">诸葛亮</span></td>
+    <td><span class="chip new">利威尔·阿克曼<b>《进击的巨人》调查兵团兵长</b></span><span class="chip new">默克尔<b>德国前总理</b></span></td>
   </tr><tr>
     <td><code>ISTP</code><span class="tname-sm">鉴赏家型</span></td>
     <td><span class="grp-inline" style="background:#C8963E">SP 暖金组</span></td>
-    <td class="old"><span class="chip del">乔布斯</span></td>
-    <td><span class="chip new">詹姆斯·戴森<b>发明家 / 戴森创始人</b></span></td>
+    <td class="old"><span class="chip del">乔布斯</span><span class="chip del">原研哉</span></td>
+    <td><span class="chip new">流川枫<b>《灌篮高手》湘北高中篮球队王牌</b></span><span class="chip new">詹姆斯·戴森<b>发明家 / 戴森创始人</b></span></td>
   </tr></tbody>
     </table>
     
   </div>
 
   <div class="panel">
-    <h3>进出人员全名单 <em>新进入 51 人 / 移出 43 人（移出者多数只是换了写法，人还在该型里）</em></h3>
+    <h3>进出人员全名单 <em>新进入 62 人 / 移出 54 人（移出者多数只是换了写法，人还在该型里）</em></h3>
     <div class="lv-row" style="border-top:none;padding-top:0">
       <div class="k" style="color:var(--new)">新进入</div>
-      <div class="v"><div class="chips"><span class="chip new" title="美国第 32 任总统">富兰克林·罗斯福</span><span class="chip new" title="投资家 / 软银创始人">孙正义</span><span class="chip new" title="英特尔前 CEO">安迪·格鲁夫</span><span class="chip new" title="亚马逊创始人">贝索斯</span><span class="chip new" title="沃尔玛创始人">山姆·沃尔顿</span><span class="chip new" title="演员 / 导演">黄渤</span><span class="chip new" title="数学家 / 控制论创始人">诺伯特·维纳</span><span class="chip new" title="演化生物学家">道金斯</span><span class="chip new" title="理论物理学家 / 诺贝尔物理学奖得主">杨振宁</span><span class="chip new" title="哲学家">弗朗西斯·培根</span><span class="chip new" title="政治思想家">马基雅维利</span><span class="chip new" title="经济学家">吴敬琏</span><span class="chip new" title="哲学家">海德格尔</span><span class="chip new" title="道家思想家">老子</span><span class="chip new" title="物理学家 / 化学家">居里夫人</span><span class="chip new" title="投资家 / 伯克希尔副董事长">查理·芒格</span><span class="chip new" title="风险管理学者 / 作家">塔勒布</span><span class="chip new" title="农学家">袁隆平</span><span class="chip new" title="灵长类动物学家">珍·古道尔</span><span class="chip new" title="法学教授">罗翔</span><span class="chip new" title="演员 / 导演">周星驰</span><span class="chip new" title="外科医生 / 国际主义战士">白求恩</span><span class="chip new" title="作家 / 美食家">蔡澜</span><span class="chip new" title="主持人 / 媒体人">杨澜</span><span class="chip new" title="作家">史铁生</span><span class="chip new" title="作家 / 学者">林语堂</span><span class="chip new" title="唐代诗人">杜甫</span><span class="chip new" title="法国作家 / 飞行员">圣埃克苏佩里</span><span class="chip new" title="作家">余华</span><span class="chip new" title="战国纵横家">张仪</span><span class="chip new" title="美国前国务卿">基辛格</span><span class="chip new" title="元末明初商人">沈万三</span><span class="chip new" title="晚清商人">胡雪岩</span><span class="chip new" title="政治家 / 新加坡首任总理">李光耀</span><span class="chip new" title="西汉使节">苏武</span><span class="chip new" title="呼吸病学专家">钟南山</span><span class="chip new" title="晚清重臣">李鸿章</span><span class="chip new" title="德意志帝国首任宰相">俾斯麦</span><span class="chip new" title="哲学家 / 博物学家">亚里士多德</span><span class="chip new" title="作家 / 思想家">歌德</span><span class="chip new" title="实业家 / 教育家">张謇</span><span class="chip new" title="德国前总理">默克尔</span><span class="chip new" title="历史学家">陈寅恪</span><span class="chip new" title="数学家 / 天文学家">祖冲之</span><span class="chip new" title="铁路工程师">詹天佑</span><span class="chip new" title="妇产科医学家">林巧稚</span><span class="chip new" title="药学家 / 诺贝尔生理学或医学奖得主">屠呦呦</span><span class="chip new" title="歌手 / 主持人">大张伟</span><span class="chip new" title="发明家 / 戴森创始人">詹姆斯·戴森</span><span class="chip new" title="建筑师">贝聿铭</span><span class="chip new" title="歌手">王菲</span></div></div>
+      <div class="v"><div class="chips"><span class="chip new" title="《名侦探柯南》主角 / 侦探">江户川柯南</span><span class="chip new" title="美国第 32 任总统">富兰克林·罗斯福</span><span class="chip new" title="漫威《钢铁侠》/ 复仇者联盟成员">钢铁侠</span><span class="chip new" title="《咒术回战》咒术师">五条悟</span><span class="chip new" title="投资家 / 软银创始人">孙正义</span><span class="chip new" title="英特尔前 CEO">安迪·格鲁夫</span><span class="chip new" title="亚马逊创始人">贝索斯</span><span class="chip new" title="沃尔玛创始人">山姆·沃尔顿</span><span class="chip new" title="演员 / 导演">黄渤</span><span class="chip new" title="数学家 / 控制论创始人">诺伯特·维纳</span><span class="chip new" title="演化生物学家">道金斯</span><span class="chip new" title="理论物理学家 / 诺贝尔物理学奖得主">杨振宁</span><span class="chip new" title="哲学家">弗朗西斯·培根</span><span class="chip new" title="政治思想家">马基雅维利</span><span class="chip new" title="经济学家">吴敬琏</span><span class="chip new" title="哲学家">海德格尔</span><span class="chip new" title="《死亡笔记》天才侦探">L</span><span class="chip new" title="道家思想家">老子</span><span class="chip new" title="物理学家 / 化学家">居里夫人</span><span class="chip new" title="投资家 / 伯克希尔副董事长">查理·芒格</span><span class="chip new" title="风险管理学者 / 作家">塔勒布</span><span class="chip new" title="农学家">袁隆平</span><span class="chip new" title="灵长类动物学家">珍·古道尔</span><span class="chip new" title="法学教授">罗翔</span><span class="chip new" title="《火影忍者》主角 / 忍者">漩涡鸣人</span><span class="chip new" title="演员 / 导演">周星驰</span><span class="chip new" title="外科医生 / 国际主义战士">白求恩</span><span class="chip new" title="作家 / 美食家">蔡澜</span><span class="chip new" title="主持人 / 媒体人">杨澜</span><span class="chip new" title="作家">史铁生</span><span class="chip new" title="作家 / 学者">林语堂</span><span class="chip new" title="《火影忍者》宇智波一族">宇智波鼬</span><span class="chip new" title="唐代诗人">杜甫</span><span class="chip new" title="法国作家 / 飞行员">圣埃克苏佩里</span><span class="chip new" title="作家">余华</span><span class="chip new" title="《哈利·波特》格兰芬多学生">赫敏·格兰杰</span><span class="chip new" title="《鬼灭之刃》主角 / 鬼杀队剑士">灶门炭治郎</span><span class="chip new" title="战国纵横家">张仪</span><span class="chip new" title="美国前国务卿">基辛格</span><span class="chip new" title="元末明初商人">沈万三</span><span class="chip new" title="晚清商人">胡雪岩</span><span class="chip new" title="政治家 / 新加坡首任总理">李光耀</span><span class="chip new" title="西汉使节">苏武</span><span class="chip new" title="呼吸病学专家">钟南山</span><span class="chip new" title="晚清重臣">李鸿章</span><span class="chip new" title="德意志帝国首任宰相">俾斯麦</span><span class="chip new" title="哲学家 / 博物学家">亚里士多德</span><span class="chip new" title="作家 / 思想家">歌德</span><span class="chip new" title="实业家 / 教育家">张謇</span><span class="chip new" title="《进击的巨人》调查兵团兵长">利威尔·阿克曼</span><span class="chip new" title="德国前总理">默克尔</span><span class="chip new" title="历史学家">陈寅恪</span><span class="chip new" title="数学家 / 天文学家">祖冲之</span><span class="chip new" title="铁路工程师">詹天佑</span><span class="chip new" title="《哆啦A梦》来自 22 世纪的猫型机器人">哆啦A梦</span><span class="chip new" title="药学家 / 诺贝尔生理学或医学奖得主">屠呦呦</span><span class="chip new" title="《海贼王》主角 / 草帽海贼团船长">蒙奇·D·路飞</span><span class="chip new" title="歌手 / 主持人">大张伟</span><span class="chip new" title="《灌篮高手》湘北高中篮球队王牌">流川枫</span><span class="chip new" title="发明家 / 戴森创始人">詹姆斯·戴森</span><span class="chip new" title="建筑师">贝聿铭</span><span class="chip new" title="歌手">王菲</span></div></div>
     </div>
     <div class="lv-row">
       <div class="k">移出</div>
-      <div class="v"><div class="chips"><span class="chip del" title="不再出现在任何型">罗斯福</span><span class="chip del" title="不再出现在任何型">乔治·巴顿</span><span class="chip del" title="不再出现在任何型">沃伦·巴菲特</span><span class="chip del" title="不再出现在任何型">王永庆</span><span class="chip del" title="不再出现在任何型">迈克尔·克莱顿</span><span class="chip del" title="不再出现在任何型">德鲁克</span><span class="chip del" title="不再出现在任何型">郭守敬</span><span class="chip del" title="不再出现在任何型">姚期智</span><span class="chip del" title="不再出现在任何型">韩非子</span><span class="chip del" title="不再出现在任何型">桑弘羊</span><span class="chip del" title="不再出现在任何型">孙武</span><span class="chip del" title="不再出现在任何型">道尔顿</span><span class="chip del" title="不再出现在任何型">郦道元</span><span class="chip del" title="不再出现在任何型">晏阳初</span><span class="chip del" title="不再出现在任何型">舒马赫</span><span class="chip del" title="不再出现在任何型">梁漱溟</span><span class="chip del" title="不再出现在任何型">米哈伊·契克森米哈伊</span><span class="chip del" title="不再出现在任何型">佩索阿</span><span class="chip del" title="不再出现在任何型">子产</span><span class="chip del" title="不再出现在任何型">刘晏</span><span class="chip del" title="不再出现在任何型">郑观应</span><span class="chip del" title="不再出现在任何型">李纲</span><span class="chip del" title="不再出现在任何型">况钟</span><span class="chip del" title="不再出现在任何型">徐有功</span><span class="chip del" title="不再出现在任何型">申不害</span><span class="chip del" title="不再出现在任何型">田穰苴</span><span class="chip del" title="不再出现在任何型">赵充国</span><span class="chip del" title="不再出现在任何型">冯道</span><span class="chip del" title="不再出现在任何型">李沆</span><span class="chip del" title="不再出现在任何型">吕端</span><span class="chip del" title="不再出现在任何型">刘知几</span><span class="chip del" title="不再出现在任何型">贾思勰</span><span class="chip del" title="不再出现在任何型">李诫</span><span class="chip del" title="不再出现在任何型">孟母</span><span class="chip del" title="不再出现在任何型">岳母</span><span class="chip del" title="不再出现在任何型">慎到</span><span class="chip del" title="不再出现在任何型">郑国</span><span class="chip del" title="不再出现在任何型">召信臣</span><span class="chip del" title="不再出现在任何型">安东尼·波登</span><span class="chip del" title="不再出现在任何型">弗雷德·阿斯泰尔</span><span class="chip del" title="不再出现在任何型">卡地亚</span><span class="chip del" title="不再出现在任何型">李春</span><span class="chip del" title="不再出现在任何型">马钧</span></div></div>
+      <div class="v"><div class="chips"><span class="chip del" title="不再出现在任何型">撒切尔夫人</span><span class="chip del" title="不再出现在任何型">罗斯福</span><span class="chip del" title="不再出现在任何型">杰克·韦尔奇</span><span class="chip del" title="不再出现在任何型">马克·吐温</span><span class="chip del" title="不再出现在任何型">乔治·巴顿</span><span class="chip del" title="不再出现在任何型">沃伦·巴菲特</span><span class="chip del" title="不再出现在任何型">王永庆</span><span class="chip del" title="不再出现在任何型">迈克尔·克莱顿</span><span class="chip del" title="不再出现在任何型">德鲁克</span><span class="chip del" title="不再出现在任何型">郭守敬</span><span class="chip del" title="不再出现在任何型">姚期智</span><span class="chip del" title="不再出现在任何型">韩非子</span><span class="chip del" title="不再出现在任何型">桑弘羊</span><span class="chip del" title="不再出现在任何型">孙武</span><span class="chip del" title="不再出现在任何型">庄子</span><span class="chip del" title="不再出现在任何型">道尔顿</span><span class="chip del" title="不再出现在任何型">郦道元</span><span class="chip del" title="不再出现在任何型">汪曾祺</span><span class="chip del" title="不再出现在任何型">晏阳初</span><span class="chip del" title="不再出现在任何型">舒马赫</span><span class="chip del" title="不再出现在任何型">梁漱溟</span><span class="chip del" title="不再出现在任何型">米哈伊·契克森米哈伊</span><span class="chip del" title="不再出现在任何型">陀思妥耶夫斯基</span><span class="chip del" title="不再出现在任何型">佩索阿</span><span class="chip del" title="不再出现在任何型">伊丽莎白二世</span><span class="chip del" title="不再出现在任何型">雷锋</span><span class="chip del" title="不再出现在任何型">子产</span><span class="chip del" title="不再出现在任何型">刘晏</span><span class="chip del" title="不再出现在任何型">郑观应</span><span class="chip del" title="不再出现在任何型">李纲</span><span class="chip del" title="不再出现在任何型">况钟</span><span class="chip del" title="不再出现在任何型">徐有功</span><span class="chip del" title="不再出现在任何型">申不害</span><span class="chip del" title="不再出现在任何型">田穰苴</span><span class="chip del" title="不再出现在任何型">赵充国</span><span class="chip del" title="不再出现在任何型">冯道</span><span class="chip del" title="不再出现在任何型">李沆</span><span class="chip del" title="不再出现在任何型">吕端</span><span class="chip del" title="不再出现在任何型">曾参</span><span class="chip del" title="不再出现在任何型">刘知几</span><span class="chip del" title="不再出现在任何型">贾思勰</span><span class="chip del" title="不再出现在任何型">李诫</span><span class="chip del" title="不再出现在任何型">孟母</span><span class="chip del" title="不再出现在任何型">岳母</span><span class="chip del" title="不再出现在任何型">慎到</span><span class="chip del" title="不再出现在任何型">郑国</span><span class="chip del" title="不再出现在任何型">召信臣</span><span class="chip del" title="不再出现在任何型">埃尔顿·约翰</span><span class="chip del" title="不再出现在任何型">安东尼·波登</span><span class="chip del" title="不再出现在任何型">弗雷德·阿斯泰尔</span><span class="chip del" title="不再出现在任何型">卡地亚</span><span class="chip del" title="不再出现在任何型">原研哉</span><span class="chip del" title="不再出现在任何型">李春</span><span class="chip del" title="不再出现在任何型">马钧</span></div></div>
     </div>
   </div>
 
   <div class="panel">
     <h3>怎么审 <em>这次要你判断的只有一件事：这 81 组人，认不认得出、说不说得通</em></h3>
-    <p class="story">① 点右上「只看本轮改过的」，只看 46 张改过的卡，重点看绿标「新」与卡底灰掉的改前名单。
+    <p class="story">① 点右上「只看改过的」，只看 51 张改过的卡，重点看绿标「新」与卡底灰掉的改前名单。
     ② 每张卡自问三句：主人物一眼能认出吗？其余三位有凑数的吗？这四个人放在这个坐标上说得通吗？
     ③ 逐张点「通过 / 需改 / 存疑」并写一句意见，点「导出审核结果」把 JSON 发我，我按你的标记再改一轮。</p>
   </div>
 
   <div id="sections"><section class="group" data-group="SP">
     <h2><span class="swatch" style="background:#C8963E"></span>SP 暖金组
-      <em>实感 · 感知 P · 9 型 · 本轮改 4</em></h2>
+      <em>实感 · 感知 P · 9 型 · 已改 5</em></h2>
     <div class="grid">
 <article class="card" data-code="ASCP" data-group="SP" data-changed="1" data-issues="0" data-search="ASCP 技艺者型 米开朗基罗 罗丹 王羲之 米开朗基罗 罗丹 卡地亚 王羲之 米开朗基罗">
   <header>
     <div class="code" style="color:#C8963E">ASCP</div>
     <div class="tname">技艺者型</div>
-    <div class="flag">本轮已改</div>
+    <div class="flag">已修正</div>
     <div class="grp" style="background:#C8963E">SP 暖金组</div>
   </header>
   <div class="dims"><span class="dim d0">A<i>平衡</i></span><span class="dim d1">S<i>实感</i></span><span class="dim d2">C<i>复合</i></span><span class="dim d3">P<i>感知</i></span></div>
@@ -446,7 +483,7 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
     <div class="lab">其余代表人物 <b>2</b></div>
     <div class="chips"><span class="chip" title="法国雕塑家">罗丹</span><span class="chip" title="东晋书法家">王羲之</span></div>
   </div>
-  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">米开朗基罗</span><span class="chip del">罗丹</span><span class="chip del">卡地亚</span><span class="chip del">王羲之</span></div></div>
+  <div class="was"><span class="lab">改前名单 <b>4</b> 位</span><div class="chips"><span class="chip del">米开朗基罗</span><span class="chip del">罗丹</span><span class="chip del">卡地亚</span><span class="chip del">王羲之</span></div></div>
   
   <div class="review">
     <div class="opts">
@@ -541,11 +578,11 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
     <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
   </div>
 </article>
-<article class="card" data-code="ESFP" data-group="SP" data-changed="0" data-issues="0" data-search="ESFP 表演者型 玛丽莲·梦露 埃尔顿·约翰 邓丽君 碧梨  玛丽莲·梦露">
+<article class="card" data-code="ESFP" data-group="SP" data-changed="1" data-issues="0" data-search="ESFP 表演者型 玛丽莲·梦露 蒙奇·D·路飞 邓丽君 碧梨 玛丽莲·梦露 埃尔顿·约翰 邓丽君 碧梨 玛丽莲·梦露">
   <header>
     <div class="code" style="color:#C8963E">ESFP</div>
     <div class="tname">表演者型</div>
-    
+    <div class="flag">已修正</div>
     <div class="grp" style="background:#C8963E">SP 暖金组</div>
   </header>
   <div class="dims"><span class="dim d0">E<i>外向</i></span><span class="dim d1">S<i>实感</i></span><span class="dim d2">F<i>情感</i></span><span class="dim d3">P<i>感知</i></span></div>
@@ -556,9 +593,9 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
   </div>
   <div class="others">
     <div class="lab">其余代表人物 <b>3</b></div>
-    <div class="chips"><span class="chip" title="歌手 / 作曲家">埃尔顿·约翰</span><span class="chip" title="中国台湾歌手">邓丽君</span><span class="chip" title="美国歌手 / 词曲作者">碧梨</span></div>
+    <div class="chips"><span class="chip new pop" title="《海贼王》">蒙奇·D·路飞<b class="popb">流行</b></span><span class="chip" title="中国台湾歌手">邓丽君</span><span class="chip" title="美国歌手 / 词曲作者">碧梨</span></div>
   </div>
-  
+  <div class="was"><span class="lab">改前名单 <b>4</b> 位</span><div class="chips"><span class="chip del">玛丽莲·梦露</span><span class="chip del">埃尔顿·约翰</span><span class="chip del">邓丽君</span><span class="chip del">碧梨</span></div></div>
   
   <div class="review">
     <div class="opts">
@@ -601,7 +638,7 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
   <header>
     <div class="code" style="color:#C8963E">ISCP</div>
     <div class="tname">巧手型</div>
-    <div class="flag">本轮已改</div>
+    <div class="flag">已修正</div>
     <div class="grp" style="background:#C8963E">SP 暖金组</div>
   </header>
   <div class="dims"><span class="dim d0">I<i>内向</i></span><span class="dim d1">S<i>实感</i></span><span class="dim d2">C<i>复合</i></span><span class="dim d3">P<i>感知</i></span></div>
@@ -614,7 +651,7 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
     <div class="lab">其余代表人物 <b>2</b></div>
     <div class="chips"><span class="chip new" title="建筑师">贝聿铭<b>新</b></span><span class="chip" title="清末刺绣艺术家">沈寿</span></div>
   </div>
-  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">蔡伦</span><span class="chip del">李春</span><span class="chip del">沈寿</span><span class="chip del">马钧</span></div></div>
+  <div class="was"><span class="lab">改前名单 <b>4</b> 位</span><div class="chips"><span class="chip del">蔡伦</span><span class="chip del">李春</span><span class="chip del">沈寿</span><span class="chip del">马钧</span></div></div>
   
   <div class="review">
     <div class="opts">
@@ -629,7 +666,7 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
   <header>
     <div class="code" style="color:#C8963E">ISFP</div>
     <div class="tname">探险家型</div>
-    <div class="flag">本轮已改</div>
+    <div class="flag">已修正</div>
     <div class="grp" style="background:#C8963E">SP 暖金组</div>
   </header>
   <div class="dims"><span class="dim d0">I<i>内向</i></span><span class="dim d1">S<i>实感</i></span><span class="dim d2">F<i>情感</i></span><span class="dim d3">P<i>感知</i></span></div>
@@ -642,7 +679,7 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
     <div class="lab">其余代表人物 <b>3</b></div>
     <div class="chips"><span class="chip new" title="歌手">王菲<b>新</b></span><span class="chip" title="画家">齐白石</span><span class="chip" title="画家">张大千</span></div>
   </div>
-  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">梵高</span><span class="chip del">李白</span><span class="chip del">齐白石</span><span class="chip del">张大千</span></div></div>
+  <div class="was"><span class="lab">改前名单 <b>4</b> 位</span><div class="chips"><span class="chip del">梵高</span><span class="chip del">李白</span><span class="chip del">齐白石</span><span class="chip del">张大千</span></div></div>
   
   <div class="review">
     <div class="opts">
@@ -653,11 +690,11 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
     <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
   </div>
 </article>
-<article class="card" data-code="ISTP" data-group="SP" data-changed="1" data-issues="0" data-search="ISTP 鉴赏家型 安藤忠雄 詹姆斯·戴森 原研哉 乔纳森·艾维 安藤忠雄 乔布斯 原研哉 乔纳森·艾维 安藤忠雄">
+<article class="card" data-code="ISTP" data-group="SP" data-changed="1" data-issues="0" data-search="ISTP 鉴赏家型 安藤忠雄 流川枫 詹姆斯·戴森 乔纳森·艾维 安藤忠雄 乔布斯 原研哉 乔纳森·艾维 安藤忠雄">
   <header>
     <div class="code" style="color:#C8963E">ISTP</div>
     <div class="tname">鉴赏家型</div>
-    <div class="flag">本轮已改</div>
+    <div class="flag">已修正</div>
     <div class="grp" style="background:#C8963E">SP 暖金组</div>
   </header>
   <div class="dims"><span class="dim d0">I<i>内向</i></span><span class="dim d1">S<i>实感</i></span><span class="dim d2">T<i>思考</i></span><span class="dim d3">P<i>感知</i></span></div>
@@ -668,9 +705,9 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
   </div>
   <div class="others">
     <div class="lab">其余代表人物 <b>3</b></div>
-    <div class="chips"><span class="chip new" title="发明家 / 戴森创始人">詹姆斯·戴森<b>新</b></span><span class="chip" title="平面设计师">原研哉</span><span class="chip" title="工业设计师 / 苹果前设计主管">乔纳森·艾维</span></div>
+    <div class="chips"><span class="chip new pop" title="《灌篮高手》">流川枫<b class="popb">流行</b></span><span class="chip new" title="发明家 / 戴森创始人">詹姆斯·戴森<b>新</b></span><span class="chip" title="工业设计师 / 苹果前设计主管">乔纳森·艾维</span></div>
   </div>
-  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">安藤忠雄</span><span class="chip del">乔布斯</span><span class="chip del">原研哉</span><span class="chip del">乔纳森·艾维</span></div></div>
+  <div class="was"><span class="lab">改前名单 <b>4</b> 位</span><div class="chips"><span class="chip del">安藤忠雄</span><span class="chip del">乔布斯</span><span class="chip del">原研哉</span><span class="chip del">乔纳森·艾维</span></div></div>
   
   <div class="review">
     <div class="opts">
@@ -684,13 +721,13 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
   </section>
 <section class="group" data-group="SD">
     <h2><span class="swatch" style="background:#D4782F"></span>SD 琥珀组
-      <em>实感 · 动态 D · 9 型 · 本轮改 3</em></h2>
+      <em>实感 · 动态 D · 9 型 · 已改 3</em></h2>
     <div class="grid">
 <article class="card" data-code="ASCD" data-group="SD" data-changed="1" data-issues="0" data-search="ASCD 稳健者型 于谦 文天祥 史可法 苏武 于谦 文天祥 史可法 李纲 于谦">
   <header>
     <div class="code" style="color:#D4782F">ASCD</div>
     <div class="tname">稳健者型</div>
-    <div class="flag">本轮已改</div>
+    <div class="flag">已修正</div>
     <div class="grp" style="background:#D4782F">SD 琥珀组</div>
   </header>
   <div class="dims"><span class="dim d0">A<i>平衡</i></span><span class="dim d1">S<i>实感</i></span><span class="dim d2">C<i>复合</i></span><span class="dim d3">D<i>动态</i></span></div>
@@ -703,7 +740,7 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
     <div class="lab">其余代表人物 <b>3</b></div>
     <div class="chips"><span class="chip" title="南宋名臣 / 诗人">文天祥</span><span class="chip" title="明末抗清名臣">史可法</span><span class="chip new" title="西汉使节">苏武<b>新</b></span></div>
   </div>
-  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">于谦</span><span class="chip del">文天祥</span><span class="chip del">史可法</span><span class="chip del">李纲</span></div></div>
+  <div class="was"><span class="lab">改前名单 <b>4</b> 位</span><div class="chips"><span class="chip del">于谦</span><span class="chip del">文天祥</span><span class="chip del">史可法</span><span class="chip del">李纲</span></div></div>
   
   <div class="review">
     <div class="opts">
@@ -718,7 +755,7 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
   <header>
     <div class="code" style="color:#D4782F">ASFD</div>
     <div class="tname">援助者型</div>
-    <div class="flag">本轮已改</div>
+    <div class="flag">已修正</div>
     <div class="grp" style="background:#D4782F">SD 琥珀组</div>
   </header>
   <div class="dims"><span class="dim d0">A<i>平衡</i></span><span class="dim d1">S<i>实感</i></span><span class="dim d2">F<i>情感</i></span><span class="dim d3">D<i>动态</i></span></div>
@@ -731,7 +768,7 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
     <div class="lab">其余代表人物 <b>2</b></div>
     <div class="chips"><span class="chip new" title="呼吸病学专家">钟南山<b>新</b></span><span class="chip" title="明代名臣">海瑞</span></div>
   </div>
-  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">宋慈</span><span class="chip del">况钟</span><span class="chip del">海瑞</span><span class="chip del">徐有功</span></div></div>
+  <div class="was"><span class="lab">改前名单 <b>4</b> 位</span><div class="chips"><span class="chip del">宋慈</span><span class="chip del">况钟</span><span class="chip del">海瑞</span><span class="chip del">徐有功</span></div></div>
   
   <div class="review">
     <div class="opts">
@@ -858,7 +895,7 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
   <header>
     <div class="code" style="color:#D4782F">ISCD</div>
     <div class="tname">精工者型</div>
-    <div class="flag">本轮已改</div>
+    <div class="flag">已修正</div>
     <div class="grp" style="background:#D4782F">SD 琥珀组</div>
   </header>
   <div class="dims"><span class="dim d0">I<i>内向</i></span><span class="dim d1">S<i>实感</i></span><span class="dim d2">C<i>复合</i></span><span class="dim d3">D<i>动态</i></span></div>
@@ -871,7 +908,7 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
     <div class="lab">其余代表人物 <b>3</b></div>
     <div class="chips"><span class="chip new" title="数学家 / 天文学家">祖冲之<b>新</b></span><span class="chip new" title="铁路工程师">詹天佑<b>新</b></span><span class="chip" title="明代科学家">徐光启</span></div>
   </div>
-  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">贾思勰</span><span class="chip del">宋应星</span><span class="chip del">李诫</span><span class="chip del">徐光启</span></div></div>
+  <div class="was"><span class="lab">改前名单 <b>4</b> 位</span><div class="chips"><span class="chip del">贾思勰</span><span class="chip del">宋应星</span><span class="chip del">李诫</span><span class="chip del">徐光启</span></div></div>
   
   <div class="review">
     <div class="opts">
@@ -941,7 +978,7 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
   </section>
 <section class="group" data-group="SJ">
     <h2><span class="swatch" style="background:#2C5F8A"></span>SJ 藏蓝组
-      <em>实感 · 判断 J · 9 型 · 本轮改 4</em></h2>
+      <em>实感 · 判断 J · 9 型 · 已改 6</em></h2>
     <div class="grid">
 <article class="card" data-code="ASCJ" data-group="SJ" data-changed="0" data-issues="0" data-search="ASCJ 维护者型 萧何 狄仁杰 寇准 杜如晦  萧何">
   <header>
@@ -1003,7 +1040,7 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
   <header>
     <div class="code" style="color:#2C5F8A">ASTJ</div>
     <div class="tname">管理者型</div>
-    <div class="flag">本轮已改</div>
+    <div class="flag">已修正</div>
     <div class="grp" style="background:#2C5F8A">SJ 藏蓝组</div>
   </header>
   <div class="dims"><span class="dim d0">A<i>平衡</i></span><span class="dim d1">S<i>实感</i></span><span class="dim d2">T<i>思考</i></span><span class="dim d3">J<i>判断</i></span></div>
@@ -1016,7 +1053,7 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
     <div class="lab">其余代表人物 <b>2</b></div>
     <div class="chips"><span class="chip" title="北宋名臣">包拯</span><span class="chip new" title="政治家 / 新加坡首任总理">李光耀<b>新</b></span></div>
   </div>
-  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">孔子</span><span class="chip del">包拯</span><span class="chip del">海瑞</span><span class="chip del">司马光</span></div></div>
+  <div class="was"><span class="lab">改前名单 <b>4</b> 位</span><div class="chips"><span class="chip del">孔子</span><span class="chip del">包拯</span><span class="chip del">海瑞</span><span class="chip del">司马光</span></div></div>
   
   <div class="review">
     <div class="opts">
@@ -1055,11 +1092,11 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
     <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
   </div>
 </article>
-<article class="card" data-code="ESFJ" data-group="SJ" data-changed="0" data-issues="0" data-search="ESFJ 执政官型 比尔·克林顿 泰勒·斯威夫特 周恩来 雷锋  比尔·克林顿">
+<article class="card" data-code="ESFJ" data-group="SJ" data-changed="1" data-issues="0" data-search="ESFJ 执政官型 比尔·克林顿 灶门炭治郎 泰勒·斯威夫特 周恩来 比尔·克林顿 泰勒·斯威夫特 周恩来 雷锋 比尔·克林顿">
   <header>
     <div class="code" style="color:#2C5F8A">ESFJ</div>
     <div class="tname">执政官型</div>
-    
+    <div class="flag">已修正</div>
     <div class="grp" style="background:#2C5F8A">SJ 藏蓝组</div>
   </header>
   <div class="dims"><span class="dim d0">E<i>外向</i></span><span class="dim d1">S<i>实感</i></span><span class="dim d2">F<i>情感</i></span><span class="dim d3">J<i>判断</i></span></div>
@@ -1070,9 +1107,9 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
   </div>
   <div class="others">
     <div class="lab">其余代表人物 <b>3</b></div>
-    <div class="chips"><span class="chip" title="美国歌手 / 词曲作者">泰勒·斯威夫特</span><span class="chip" title="中华人民共和国国务院总理">周恩来</span><span class="chip" title="解放军战士 / 模范人物">雷锋</span></div>
+    <div class="chips"><span class="chip new pop" title="《鬼灭之刃》">灶门炭治郎<b class="popb">流行</b></span><span class="chip" title="美国歌手 / 词曲作者">泰勒·斯威夫特</span><span class="chip" title="中华人民共和国国务院总理">周恩来</span></div>
   </div>
-  
+  <div class="was"><span class="lab">改前名单 <b>4</b> 位</span><div class="chips"><span class="chip del">比尔·克林顿</span><span class="chip del">泰勒·斯威夫特</span><span class="chip del">周恩来</span><span class="chip del">雷锋</span></div></div>
   
   <div class="review">
     <div class="opts">
@@ -1083,11 +1120,11 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
     <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
   </div>
 </article>
-<article class="card" data-code="ESTJ" data-group="SJ" data-changed="0" data-issues="0" data-search="ESTJ 总经理型 乔治·华盛顿 伊丽莎白二世 李嘉诚 董明珠  乔治·华盛顿">
+<article class="card" data-code="ESTJ" data-group="SJ" data-changed="1" data-issues="0" data-search="ESTJ 总经理型 乔治·华盛顿 赫敏·格兰杰 李嘉诚 董明珠 乔治·华盛顿 伊丽莎白二世 李嘉诚 董明珠 乔治·华盛顿">
   <header>
     <div class="code" style="color:#2C5F8A">ESTJ</div>
     <div class="tname">总经理型</div>
-    
+    <div class="flag">已修正</div>
     <div class="grp" style="background:#2C5F8A">SJ 藏蓝组</div>
   </header>
   <div class="dims"><span class="dim d0">E<i>外向</i></span><span class="dim d1">S<i>实感</i></span><span class="dim d2">T<i>思考</i></span><span class="dim d3">J<i>判断</i></span></div>
@@ -1098,9 +1135,9 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
   </div>
   <div class="others">
     <div class="lab">其余代表人物 <b>3</b></div>
-    <div class="chips"><span class="chip" title="英国女王">伊丽莎白二世</span><span class="chip" title="中国香港企业家">李嘉诚</span><span class="chip" title="企业家 / 格力电器董事长">董明珠</span></div>
+    <div class="chips"><span class="chip new pop" title="《哈利·波特》">赫敏·格兰杰<b class="popb">流行</b></span><span class="chip" title="中国香港企业家">李嘉诚</span><span class="chip" title="企业家 / 格力电器董事长">董明珠</span></div>
   </div>
-  
+  <div class="was"><span class="lab">改前名单 <b>4</b> 位</span><div class="chips"><span class="chip del">乔治·华盛顿</span><span class="chip del">伊丽莎白二世</span><span class="chip del">李嘉诚</span><span class="chip del">董明珠</span></div></div>
   
   <div class="review">
     <div class="opts">
@@ -1115,7 +1152,7 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
   <header>
     <div class="code" style="color:#2C5F8A">ISCJ</div>
     <div class="tname">慎行者型</div>
-    <div class="flag">本轮已改</div>
+    <div class="flag">已修正</div>
     <div class="grp" style="background:#2C5F8A">SJ 藏蓝组</div>
   </header>
   <div class="dims"><span class="dim d0">I<i>内向</i></span><span class="dim d1">S<i>实感</i></span><span class="dim d2">C<i>复合</i></span><span class="dim d3">J<i>判断</i></span></div>
@@ -1128,7 +1165,7 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
     <div class="lab">其余代表人物 <b>3</b></div>
     <div class="chips"><span class="chip" title="西晋史学家">陈寿</span><span class="chip" title="北宋史学家 / 政治家">司马光</span><span class="chip new" title="历史学家">陈寅恪<b>新</b></span></div>
   </div>
-  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">班固</span><span class="chip del">陈寿</span><span class="chip del">司马光</span><span class="chip del">刘知几</span></div></div>
+  <div class="was"><span class="lab">改前名单 <b>4</b> 位</span><div class="chips"><span class="chip del">班固</span><span class="chip del">陈寿</span><span class="chip del">司马光</span><span class="chip del">刘知几</span></div></div>
   
   <div class="review">
     <div class="opts">
@@ -1139,11 +1176,11 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
     <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
   </div>
 </article>
-<article class="card" data-code="ISFJ" data-group="SJ" data-changed="1" data-issues="0" data-search="ISFJ 守卫者型 特蕾莎修女 凯特王妃 林巧稚 特蕾莎修女 凯特王妃 孟母 岳母 特蕾莎修女">
+<article class="card" data-code="ISFJ" data-group="SJ" data-changed="1" data-issues="0" data-search="ISFJ 守卫者型 特蕾莎修女 哆啦A梦 凯特王妃 特蕾莎修女 凯特王妃 孟母 岳母 特蕾莎修女">
   <header>
     <div class="code" style="color:#2C5F8A">ISFJ</div>
     <div class="tname">守卫者型</div>
-    <div class="flag">本轮已改</div>
+    <div class="flag">已修正</div>
     <div class="grp" style="background:#2C5F8A">SJ 藏蓝组</div>
   </header>
   <div class="dims"><span class="dim d0">I<i>内向</i></span><span class="dim d1">S<i>实感</i></span><span class="dim d2">F<i>情感</i></span><span class="dim d3">J<i>判断</i></span></div>
@@ -1154,9 +1191,9 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
   </div>
   <div class="others">
     <div class="lab">其余代表人物 <b>2</b></div>
-    <div class="chips"><span class="chip" title="英国王室成员">凯特王妃</span><span class="chip new" title="妇产科医学家">林巧稚<b>新</b></span></div>
+    <div class="chips"><span class="chip new pop" title="《哆啦A梦》">哆啦A梦<b class="popb">流行</b></span><span class="chip" title="英国王室成员">凯特王妃</span></div>
   </div>
-  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">特蕾莎修女</span><span class="chip del">凯特王妃</span><span class="chip del">孟母</span><span class="chip del">岳母</span></div></div>
+  <div class="was"><span class="lab">改前名单 <b>4</b> 位</span><div class="chips"><span class="chip del">特蕾莎修女</span><span class="chip del">凯特王妃</span><span class="chip del">孟母</span><span class="chip del">岳母</span></div></div>
   
   <div class="review">
     <div class="opts">
@@ -1167,11 +1204,11 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
     <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
   </div>
 </article>
-<article class="card" data-code="ISTJ" data-group="SJ" data-changed="1" data-issues="0" data-search="ISTJ 物流师型 巴菲特 默克尔 曾参 巴菲特 乔治·华盛顿 曾参 诸葛亮 巴菲特">
+<article class="card" data-code="ISTJ" data-group="SJ" data-changed="1" data-issues="0" data-search="ISTJ 物流师型 巴菲特 利威尔·阿克曼 默克尔 巴菲特 乔治·华盛顿 曾参 诸葛亮 巴菲特">
   <header>
     <div class="code" style="color:#2C5F8A">ISTJ</div>
     <div class="tname">物流师型</div>
-    <div class="flag">本轮已改</div>
+    <div class="flag">已修正</div>
     <div class="grp" style="background:#2C5F8A">SJ 藏蓝组</div>
   </header>
   <div class="dims"><span class="dim d0">I<i>内向</i></span><span class="dim d1">S<i>实感</i></span><span class="dim d2">T<i>思考</i></span><span class="dim d3">J<i>判断</i></span></div>
@@ -1182,9 +1219,9 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
   </div>
   <div class="others">
     <div class="lab">其余代表人物 <b>2</b></div>
-    <div class="chips"><span class="chip new" title="德国前总理">默克尔<b>新</b></span><span class="chip" title="孔子弟子 / 儒家学者">曾参</span></div>
+    <div class="chips"><span class="chip new pop" title="《进击的巨人》">利威尔·阿克曼<b class="popb">流行</b></span><span class="chip new" title="德国前总理">默克尔<b>新</b></span></div>
   </div>
-  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">巴菲特</span><span class="chip del">乔治·华盛顿</span><span class="chip del">曾参</span><span class="chip del">诸葛亮</span></div></div>
+  <div class="was"><span class="lab">改前名单 <b>4</b> 位</span><div class="chips"><span class="chip del">巴菲特</span><span class="chip del">乔治·华盛顿</span><span class="chip del">曾参</span><span class="chip del">诸葛亮</span></div></div>
   
   <div class="review">
     <div class="opts">
@@ -1198,13 +1235,13 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
   </section>
 <section class="group" data-group="BT">
     <h2><span class="swatch" style="background:#4A4A4A"></span>BT 深炭灰组
-      <em>均衡 · 思考 T · 9 型 · 本轮改 8</em></h2>
+      <em>均衡 · 思考 T · 9 型 · 已改 8</em></h2>
     <div class="grid">
 <article class="card" data-code="ABTD" data-group="BT" data-changed="1" data-issues="0" data-search="ABTD 适应者型 亚当·斯密 凯恩斯 吴敬琏 亚当·斯密 凯恩斯 管仲 桑弘羊 亚当·斯密">
   <header>
     <div class="code" style="color:#4A4A4A">ABTD</div>
     <div class="tname">适应者型</div>
-    <div class="flag">本轮已改</div>
+    <div class="flag">已修正</div>
     <div class="grp" style="background:#4A4A4A">BT 深炭灰组</div>
   </header>
   <div class="dims"><span class="dim d0">A<i>平衡</i></span><span class="dim d1">B<i>均衡</i></span><span class="dim d2">T<i>思考</i></span><span class="dim d3">D<i>动态</i></span></div>
@@ -1217,7 +1254,7 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
     <div class="lab">其余代表人物 <b>2</b></div>
     <div class="chips"><span class="chip" title="经济学家">凯恩斯</span><span class="chip new" title="经济学家">吴敬琏<b>新</b></span></div>
   </div>
-  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">亚当·斯密</span><span class="chip del">凯恩斯</span><span class="chip del">管仲</span><span class="chip del">桑弘羊</span></div></div>
+  <div class="was"><span class="lab">改前名单 <b>4</b> 位</span><div class="chips"><span class="chip del">亚当·斯密</span><span class="chip del">凯恩斯</span><span class="chip del">管仲</span><span class="chip del">桑弘羊</span></div></div>
   
   <div class="review">
     <div class="opts">
@@ -1232,7 +1269,7 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
   <header>
     <div class="code" style="color:#4A4A4A">ABTJ</div>
     <div class="tname">执行师型</div>
-    <div class="flag">本轮已改</div>
+    <div class="flag">已修正</div>
     <div class="grp" style="background:#4A4A4A">BT 深炭灰组</div>
   </header>
   <div class="dims"><span class="dim d0">A<i>平衡</i></span><span class="dim d1">B<i>均衡</i></span><span class="dim d2">T<i>思考</i></span><span class="dim d3">J<i>判断</i></span></div>
@@ -1245,7 +1282,7 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
     <div class="lab">其余代表人物 <b>3</b></div>
     <div class="chips"><span class="chip new" title="哲学家">弗朗西斯·培根<b>新</b></span><span class="chip" title="儒家思想家">荀子</span><span class="chip new" title="政治思想家">马基雅维利<b>新</b></span></div>
   </div>
-  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">司马迁</span><span class="chip del">司马光</span><span class="chip del">荀子</span><span class="chip del">韩非子</span></div></div>
+  <div class="was"><span class="lab">改前名单 <b>4</b> 位</span><div class="chips"><span class="chip del">司马迁</span><span class="chip del">司马光</span><span class="chip del">荀子</span><span class="chip del">韩非子</span></div></div>
   
   <div class="review">
     <div class="opts">
@@ -1288,7 +1325,7 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
   <header>
     <div class="code" style="color:#4A4A4A">EBTD</div>
     <div class="tname">践行者型</div>
-    <div class="flag">本轮已改</div>
+    <div class="flag">已修正</div>
     <div class="grp" style="background:#4A4A4A">BT 深炭灰组</div>
   </header>
   <div class="dims"><span class="dim d0">E<i>外向</i></span><span class="dim d1">B<i>均衡</i></span><span class="dim d2">T<i>思考</i></span><span class="dim d3">D<i>动态</i></span></div>
@@ -1301,7 +1338,7 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
     <div class="lab">其余代表人物 <b>2</b></div>
     <div class="chips"><span class="chip new" title="沃尔玛创始人">山姆·沃尔顿<b>新</b></span><span class="chip" title="美国钢铁企业家 / 慈善家">安德鲁·卡内基</span></div>
   </div>
-  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">稻盛和夫</span><span class="chip del">沃伦·巴菲特</span><span class="chip del">安德鲁·卡内基</span><span class="chip del">王永庆</span></div></div>
+  <div class="was"><span class="lab">改前名单 <b>4</b> 位</span><div class="chips"><span class="chip del">稻盛和夫</span><span class="chip del">沃伦·巴菲特</span><span class="chip del">安德鲁·卡内基</span><span class="chip del">王永庆</span></div></div>
   
   <div class="review">
     <div class="opts">
@@ -1316,7 +1353,7 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
   <header>
     <div class="code" style="color:#4A4A4A">EBTJ</div>
     <div class="tname">推行者型</div>
-    <div class="flag">本轮已改</div>
+    <div class="flag">已修正</div>
     <div class="grp" style="background:#4A4A4A">BT 深炭灰组</div>
   </header>
   <div class="dims"><span class="dim d0">E<i>外向</i></span><span class="dim d1">B<i>均衡</i></span><span class="dim d2">T<i>思考</i></span><span class="dim d3">J<i>判断</i></span></div>
@@ -1329,7 +1366,7 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
     <div class="lab">其余代表人物 <b>3</b></div>
     <div class="chips"><span class="chip" title="美国石油企业家 / 慈善家">洛克菲勒</span><span class="chip new" title="英特尔前 CEO">安迪·格鲁夫<b>新</b></span><span class="chip new" title="亚马逊创始人">贝索斯<b>新</b></span></div>
   </div>
-  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">亨利·福特</span><span class="chip del">洛克菲勒</span><span class="chip del">乔治·巴顿</span><span class="chip del">董明珠</span></div></div>
+  <div class="was"><span class="lab">改前名单 <b>4</b> 位</span><div class="chips"><span class="chip del">亨利·福特</span><span class="chip del">洛克菲勒</span><span class="chip del">乔治·巴顿</span><span class="chip del">董明珠</span></div></div>
   
   <div class="review">
     <div class="opts">
@@ -1344,7 +1381,7 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
   <header>
     <div class="code" style="color:#4A4A4A">EBTP</div>
     <div class="tname">机变者型</div>
-    <div class="flag">本轮已改</div>
+    <div class="flag">已修正</div>
     <div class="grp" style="background:#4A4A4A">BT 深炭灰组</div>
   </header>
   <div class="dims"><span class="dim d0">E<i>外向</i></span><span class="dim d1">B<i>均衡</i></span><span class="dim d2">T<i>思考</i></span><span class="dim d3">P<i>感知</i></span></div>
@@ -1357,7 +1394,7 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
     <div class="lab">其余代表人物 <b>3</b></div>
     <div class="chips"><span class="chip" title="天文学家 / 科普作家">卡尔·萨根</span><span class="chip" title="科幻作家">刘慈欣</span><span class="chip new" title="演员 / 导演">黄渤<b>新</b></span></div>
   </div>
-  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">费曼</span><span class="chip del">卡尔·萨根</span><span class="chip del">刘慈欣</span><span class="chip del">迈克尔·克莱顿</span></div></div>
+  <div class="was"><span class="lab">改前名单 <b>4</b> 位</span><div class="chips"><span class="chip del">费曼</span><span class="chip del">卡尔·萨根</span><span class="chip del">刘慈欣</span><span class="chip del">迈克尔·克莱顿</span></div></div>
   
   <div class="review">
     <div class="opts">
@@ -1372,7 +1409,7 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
   <header>
     <div class="code" style="color:#4A4A4A">IBTD</div>
     <div class="tname">审慎者型</div>
-    <div class="flag">本轮已改</div>
+    <div class="flag">已修正</div>
     <div class="grp" style="background:#4A4A4A">BT 深炭灰组</div>
   </header>
   <div class="dims"><span class="dim d0">I<i>内向</i></span><span class="dim d1">B<i>均衡</i></span><span class="dim d2">T<i>思考</i></span><span class="dim d3">D<i>动态</i></span></div>
@@ -1385,7 +1422,7 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
     <div class="lab">其余代表人物 <b>2</b></div>
     <div class="chips"><span class="chip" title="经济学家 / 政治哲学家">哈耶克</span><span class="chip new" title="风险管理学者 / 作家">塔勒布<b>新</b></span></div>
   </div>
-  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">约瑟夫·熊彼特</span><span class="chip del">哈耶克</span><span class="chip del">商鞅</span><span class="chip del">吴起</span></div></div>
+  <div class="was"><span class="lab">改前名单 <b>4</b> 位</span><div class="chips"><span class="chip del">约瑟夫·熊彼特</span><span class="chip del">哈耶克</span><span class="chip del">商鞅</span><span class="chip del">吴起</span></div></div>
   
   <div class="review">
     <div class="opts">
@@ -1400,7 +1437,7 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
   <header>
     <div class="code" style="color:#4A4A4A">IBTJ</div>
     <div class="tname">规划者型</div>
-    <div class="flag">本轮已改</div>
+    <div class="flag">已修正</div>
     <div class="grp" style="background:#4A4A4A">BT 深炭灰组</div>
   </header>
   <div class="dims"><span class="dim d0">I<i>内向</i></span><span class="dim d1">B<i>均衡</i></span><span class="dim d2">T<i>思考</i></span><span class="dim d3">J<i>判断</i></span></div>
@@ -1413,7 +1450,7 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
     <div class="lab">其余代表人物 <b>2</b></div>
     <div class="chips"><span class="chip new" title="投资家 / 伯克希尔副董事长">查理·芒格<b>新</b></span><span class="chip" title="古罗马哲学家">塞涅卡</span></div>
   </div>
-  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">马可·奥勒留</span><span class="chip del">曾国藩</span><span class="chip del">塞涅卡</span><span class="chip del">左宗棠</span></div></div>
+  <div class="was"><span class="lab">改前名单 <b>4</b> 位</span><div class="chips"><span class="chip del">马可·奥勒留</span><span class="chip del">曾国藩</span><span class="chip del">塞涅卡</span><span class="chip del">左宗棠</span></div></div>
   
   <div class="review">
     <div class="opts">
@@ -1428,7 +1465,7 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
   <header>
     <div class="code" style="color:#4A4A4A">IBTP</div>
     <div class="tname">钻研者型</div>
-    <div class="flag">本轮已改</div>
+    <div class="flag">已修正</div>
     <div class="grp" style="background:#4A4A4A">BT 深炭灰组</div>
   </header>
   <div class="dims"><span class="dim d0">I<i>内向</i></span><span class="dim d1">B<i>均衡</i></span><span class="dim d2">T<i>思考</i></span><span class="dim d3">P<i>感知</i></span></div>
@@ -1441,7 +1478,7 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
     <div class="lab">其余代表人物 <b>3</b></div>
     <div class="chips"><span class="chip new" title="农学家">袁隆平<b>新</b></span><span class="chip" title="明代地理学家 / 旅行家">徐霞客</span><span class="chip new" title="灵长类动物学家">珍·古道尔<b>新</b></span></div>
   </div>
-  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">孟德尔</span><span class="chip del">道尔顿</span><span class="chip del">徐霞客</span><span class="chip del">郦道元</span></div></div>
+  <div class="was"><span class="lab">改前名单 <b>4</b> 位</span><div class="chips"><span class="chip del">孟德尔</span><span class="chip del">道尔顿</span><span class="chip del">徐霞客</span><span class="chip del">郦道元</span></div></div>
   
   <div class="review">
     <div class="opts">
@@ -1455,13 +1492,13 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
   </section>
 <section class="group" data-group="BC">
     <h2><span class="swatch" style="background:#8B95A0"></span>BC 月光银灰组
-      <em>均衡 · 复合 C · 9 型 · 本轮改 7</em></h2>
+      <em>均衡 · 复合 C · 9 型 · 已改 7</em></h2>
     <div class="grid">
 <article class="card" data-code="ABCD" data-group="BC" data-changed="1" data-issues="0" data-search="ABCD 全能者型 曾国藩 亚里士多德 歌德 张謇 曾国藩 冯道 李沆 吕端 曾国藩">
   <header>
     <div class="code" style="color:#8B95A0">ABCD</div>
     <div class="tname">全能者型</div>
-    <div class="flag">本轮已改</div>
+    <div class="flag">已修正</div>
     <div class="grp" style="background:#8B95A0">BC 月光银灰组</div>
   </header>
   <div class="dims"><span class="dim d0">A<i>平衡</i></span><span class="dim d1">B<i>均衡</i></span><span class="dim d2">C<i>复合</i></span><span class="dim d3">D<i>动态</i></span></div>
@@ -1474,7 +1511,7 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
     <div class="lab">其余代表人物 <b>3</b></div>
     <div class="chips"><span class="chip new" title="哲学家 / 博物学家">亚里士多德<b>新</b></span><span class="chip new" title="作家 / 思想家">歌德<b>新</b></span><span class="chip new" title="实业家 / 教育家">张謇<b>新</b></span></div>
   </div>
-  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">曾国藩</span><span class="chip del">冯道</span><span class="chip del">李沆</span><span class="chip del">吕端</span></div></div>
+  <div class="was"><span class="lab">改前名单 <b>4</b> 位</span><div class="chips"><span class="chip del">曾国藩</span><span class="chip del">冯道</span><span class="chip del">李沆</span><span class="chip del">吕端</span></div></div>
   
   <div class="review">
     <div class="opts">
@@ -1489,7 +1526,7 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
   <header>
     <div class="code" style="color:#8B95A0">ABCJ</div>
     <div class="tname">平衡者型</div>
-    <div class="flag">本轮已改</div>
+    <div class="flag">已修正</div>
     <div class="grp" style="background:#8B95A0">BC 月光银灰组</div>
   </header>
   <div class="dims"><span class="dim d0">A<i>平衡</i></span><span class="dim d1">B<i>均衡</i></span><span class="dim d2">C<i>复合</i></span><span class="dim d3">J<i>判断</i></span></div>
@@ -1502,7 +1539,7 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
     <div class="lab">其余代表人物 <b>2</b></div>
     <div class="chips"><span class="chip new" title="晚清重臣">李鸿章<b>新</b></span><span class="chip new" title="德意志帝国首任宰相">俾斯麦<b>新</b></span></div>
   </div>
-  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">李斯</span><span class="chip del">申不害</span><span class="chip del">田穰苴</span><span class="chip del">赵充国</span></div></div>
+  <div class="was"><span class="lab">改前名单 <b>4</b> 位</span><div class="chips"><span class="chip del">李斯</span><span class="chip del">申不害</span><span class="chip del">田穰苴</span><span class="chip del">赵充国</span></div></div>
   
   <div class="review">
     <div class="opts">
@@ -1545,7 +1582,7 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
   <header>
     <div class="code" style="color:#8B95A0">EBCD</div>
     <div class="tname">多面手型</div>
-    <div class="flag">本轮已改</div>
+    <div class="flag">已修正</div>
     <div class="grp" style="background:#8B95A0">BC 月光银灰组</div>
   </header>
   <div class="dims"><span class="dim d0">E<i>外向</i></span><span class="dim d1">B<i>均衡</i></span><span class="dim d2">C<i>复合</i></span><span class="dim d3">D<i>动态</i></span></div>
@@ -1558,7 +1595,7 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
     <div class="lab">其余代表人物 <b>2</b></div>
     <div class="chips"><span class="chip new" title="元末明初商人">沈万三<b>新</b></span><span class="chip new" title="晚清商人">胡雪岩<b>新</b></span></div>
   </div>
-  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">范蠡</span><span class="chip del">刘晏</span><span class="chip del">曾国藩</span><span class="chip del">郑观应</span></div></div>
+  <div class="was"><span class="lab">改前名单 <b>4</b> 位</span><div class="chips"><span class="chip del">范蠡</span><span class="chip del">刘晏</span><span class="chip del">曾国藩</span><span class="chip del">郑观应</span></div></div>
   
   <div class="review">
     <div class="opts">
@@ -1573,7 +1610,7 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
   <header>
     <div class="code" style="color:#8B95A0">EBCJ</div>
     <div class="tname">协调者型</div>
-    <div class="flag">本轮已改</div>
+    <div class="flag">已修正</div>
     <div class="grp" style="background:#8B95A0">BC 月光银灰组</div>
   </header>
   <div class="dims"><span class="dim d0">E<i>外向</i></span><span class="dim d1">B<i>均衡</i></span><span class="dim d2">C<i>复合</i></span><span class="dim d3">J<i>判断</i></span></div>
@@ -1586,7 +1623,7 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
     <div class="lab">其余代表人物 <b>3</b></div>
     <div class="chips"><span class="chip new" title="战国纵横家">张仪<b>新</b></span><span class="chip new" title="美国前国务卿">基辛格<b>新</b></span><span class="chip" title="唐代宰相">姚崇</span></div>
   </div>
-  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">吕不韦</span><span class="chip del">子产</span><span class="chip del">张居正</span><span class="chip del">姚崇</span></div></div>
+  <div class="was"><span class="lab">改前名单 <b>4</b> 位</span><div class="chips"><span class="chip del">吕不韦</span><span class="chip del">子产</span><span class="chip del">张居正</span><span class="chip del">姚崇</span></div></div>
   
   <div class="review">
     <div class="opts">
@@ -1601,7 +1638,7 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
   <header>
     <div class="code" style="color:#8B95A0">EBCP</div>
     <div class="tname">自由人型</div>
-    <div class="flag">本轮已改</div>
+    <div class="flag">已修正</div>
     <div class="grp" style="background:#8B95A0">BC 月光银灰组</div>
   </header>
   <div class="dims"><span class="dim d0">E<i>外向</i></span><span class="dim d1">B<i>均衡</i></span><span class="dim d2">C<i>复合</i></span><span class="dim d3">P<i>感知</i></span></div>
@@ -1614,7 +1651,7 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
     <div class="lab">其余代表人物 <b>2</b></div>
     <div class="chips"><span class="chip new" title="歌手 / 主持人">大张伟<b>新</b></span><span class="chip" title="歌手 / 演员">埃尔维斯·普雷斯利</span></div>
   </div>
-  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">贝尔·格里尔斯</span><span class="chip del">安东尼·波登</span><span class="chip del">弗雷德·阿斯泰尔</span><span class="chip del">埃尔维斯·普雷斯利</span></div></div>
+  <div class="was"><span class="lab">改前名单 <b>4</b> 位</span><div class="chips"><span class="chip del">贝尔·格里尔斯</span><span class="chip del">安东尼·波登</span><span class="chip del">弗雷德·阿斯泰尔</span><span class="chip del">埃尔维斯·普雷斯利</span></div></div>
   
   <div class="review">
     <div class="opts">
@@ -1629,7 +1666,7 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
   <header>
     <div class="code" style="color:#8B95A0">IBCD</div>
     <div class="tname">内省者型</div>
-    <div class="flag">本轮已改</div>
+    <div class="flag">已修正</div>
     <div class="grp" style="background:#8B95A0">BC 月光银灰组</div>
   </header>
   <div class="dims"><span class="dim d0">I<i>内向</i></span><span class="dim d1">B<i>均衡</i></span><span class="dim d2">C<i>复合</i></span><span class="dim d3">D<i>动态</i></span></div>
@@ -1642,7 +1679,7 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
     <div class="lab">其余代表人物 <b>2</b></div>
     <div class="chips"><span class="chip new" title="药学家 / 诺贝尔生理学或医学奖得主">屠呦呦<b>新</b></span><span class="chip" title="战国魏国地方官">西门豹</span></div>
   </div>
-  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">郑国</span><span class="chip del">李冰</span><span class="chip del">西门豹</span><span class="chip del">召信臣</span></div></div>
+  <div class="was"><span class="lab">改前名单 <b>4</b> 位</span><div class="chips"><span class="chip del">郑国</span><span class="chip del">李冰</span><span class="chip del">西门豹</span><span class="chip del">召信臣</span></div></div>
   
   <div class="review">
     <div class="opts">
@@ -1657,7 +1694,7 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
   <header>
     <div class="code" style="color:#8B95A0">IBCJ</div>
     <div class="tname">权衡者型</div>
-    <div class="flag">本轮已改</div>
+    <div class="flag">已修正</div>
     <div class="grp" style="background:#8B95A0">BC 月光银灰组</div>
   </header>
   <div class="dims"><span class="dim d0">I<i>内向</i></span><span class="dim d1">B<i>均衡</i></span><span class="dim d2">C<i>复合</i></span><span class="dim d3">J<i>判断</i></span></div>
@@ -1670,7 +1707,7 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
     <div class="lab">其余代表人物 <b>2</b></div>
     <div class="chips"><span class="chip" title="春秋齐国政治家">管仲</span><span class="chip" title="战国改革家">商鞅</span></div>
   </div>
-  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">管仲</span><span class="chip del">慎到</span><span class="chip del">韩非</span><span class="chip del">商鞅</span></div></div>
+  <div class="was"><span class="lab">改前名单 <b>4</b> 位</span><div class="chips"><span class="chip del">管仲</span><span class="chip del">慎到</span><span class="chip del">韩非</span><span class="chip del">商鞅</span></div></div>
   
   <div class="review">
     <div class="opts">
@@ -1712,13 +1749,13 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
   </section>
 <section class="group" data-group="BF">
     <h2><span class="swatch" style="background:#B8956A"></span>BF 暖燕麦组
-      <em>均衡 · 情感 F · 9 型 · 本轮改 4</em></h2>
+      <em>均衡 · 情感 F · 9 型 · 已改 4</em></h2>
     <div class="grid">
 <article class="card" data-code="ABFD" data-group="BF" data-changed="1" data-issues="0" data-search="ABFD 温润者型 马斯洛 林语堂 川端康成 杨绛 马斯洛 米哈伊·契克森米哈伊 川端康成 杨绛 马斯洛">
   <header>
     <div class="code" style="color:#B8956A">ABFD</div>
     <div class="tname">温润者型</div>
-    <div class="flag">本轮已改</div>
+    <div class="flag">已修正</div>
     <div class="grp" style="background:#B8956A">BF 暖燕麦组</div>
   </header>
   <div class="dims"><span class="dim d0">A<i>平衡</i></span><span class="dim d1">B<i>均衡</i></span><span class="dim d2">F<i>情感</i></span><span class="dim d3">D<i>动态</i></span></div>
@@ -1731,7 +1768,7 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
     <div class="lab">其余代表人物 <b>3</b></div>
     <div class="chips"><span class="chip new" title="作家 / 学者">林语堂<b>新</b></span><span class="chip" title="日本作家">川端康成</span><span class="chip" title="作家 / 翻译家">杨绛</span></div>
   </div>
-  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">马斯洛</span><span class="chip del">米哈伊·契克森米哈伊</span><span class="chip del">川端康成</span><span class="chip del">杨绛</span></div></div>
+  <div class="was"><span class="lab">改前名单 <b>4</b> 位</span><div class="chips"><span class="chip del">马斯洛</span><span class="chip del">米哈伊·契克森米哈伊</span><span class="chip del">川端康成</span><span class="chip del">杨绛</span></div></div>
   
   <div class="review">
     <div class="opts">
@@ -1830,7 +1867,7 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
   <header>
     <div class="code" style="color:#B8956A">EBFJ</div>
     <div class="tname">凝聚者型</div>
-    <div class="flag">本轮已改</div>
+    <div class="flag">已修正</div>
     <div class="grp" style="background:#B8956A">BF 暖燕麦组</div>
   </header>
   <div class="dims"><span class="dim d0">E<i>外向</i></span><span class="dim d1">B<i>均衡</i></span><span class="dim d2">F<i>情感</i></span><span class="dim d3">J<i>判断</i></span></div>
@@ -1843,7 +1880,7 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
     <div class="lab">其余代表人物 <b>3</b></div>
     <div class="chips"><span class="chip new" title="外科医生 / 国际主义战士">白求恩<b>新</b></span><span class="chip" title="教育家">陶行知</span><span class="chip" title="医生 / 人道主义者">史怀哲</span></div>
   </div>
-  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">南丁格尔</span><span class="chip del">晏阳初</span><span class="chip del">陶行知</span><span class="chip del">史怀哲</span></div></div>
+  <div class="was"><span class="lab">改前名单 <b>4</b> 位</span><div class="chips"><span class="chip del">南丁格尔</span><span class="chip del">晏阳初</span><span class="chip del">陶行知</span><span class="chip del">史怀哲</span></div></div>
   
   <div class="review">
     <div class="opts">
@@ -1858,7 +1895,7 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
   <header>
     <div class="code" style="color:#B8956A">EBFP</div>
     <div class="tname">乐天派型</div>
-    <div class="flag">本轮已改</div>
+    <div class="flag">已修正</div>
     <div class="grp" style="background:#B8956A">BF 暖燕麦组</div>
   </header>
   <div class="dims"><span class="dim d0">E<i>外向</i></span><span class="dim d1">B<i>均衡</i></span><span class="dim d2">F<i>情感</i></span><span class="dim d3">P<i>感知</i></span></div>
@@ -1871,7 +1908,7 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
     <div class="lab">其余代表人物 <b>3</b></div>
     <div class="chips"><span class="chip new" title="作家 / 美食家">蔡澜<b>新</b></span><span class="chip" title="作家 / 旅行文学作者">三毛</span><span class="chip" title="法国小说家">大仲马</span></div>
   </div>
-  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">沃尔特·惠特曼</span><span class="chip del">舒马赫</span><span class="chip del">三毛</span><span class="chip del">大仲马</span></div></div>
+  <div class="was"><span class="lab">改前名单 <b>4</b> 位</span><div class="chips"><span class="chip del">沃尔特·惠特曼</span><span class="chip del">舒马赫</span><span class="chip del">三毛</span><span class="chip del">大仲马</span></div></div>
   
   <div class="review">
     <div class="opts">
@@ -1914,7 +1951,7 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
   <header>
     <div class="code" style="color:#B8956A">IBFJ</div>
     <div class="tname">体恤者型</div>
-    <div class="flag">本轮已改</div>
+    <div class="flag">已修正</div>
     <div class="grp" style="background:#B8956A">BF 暖燕麦组</div>
   </header>
   <div class="dims"><span class="dim d0">I<i>内向</i></span><span class="dim d1">B<i>均衡</i></span><span class="dim d2">F<i>情感</i></span><span class="dim d3">J<i>判断</i></span></div>
@@ -1927,7 +1964,7 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
     <div class="lab">其余代表人物 <b>3</b></div>
     <div class="chips"><span class="chip" title="俄国剧作家">契诃夫</span><span class="chip" title="作家">沈从文</span><span class="chip new" title="作家">余华<b>新</b></span></div>
   </div>
-  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">赫尔曼·黑塞</span><span class="chip del">契诃夫</span><span class="chip del">沈从文</span><span class="chip del">佩索阿</span></div></div>
+  <div class="was"><span class="lab">改前名单 <b>4</b> 位</span><div class="chips"><span class="chip del">赫尔曼·黑塞</span><span class="chip del">契诃夫</span><span class="chip del">沈从文</span><span class="chip del">佩索阿</span></div></div>
   
   <div class="review">
     <div class="opts">
@@ -1969,13 +2006,13 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
   </section>
 <section class="group" data-group="NT">
     <h2><span class="swatch" style="background:#6B3FA0"></span>NT 深紫组
-      <em>直觉 · 思考 T · 9 型 · 本轮改 6</em></h2>
+      <em>直觉 · 思考 T · 9 型 · 已改 8</em></h2>
     <div class="grid">
 <article class="card" data-code="ANTD" data-group="NT" data-changed="1" data-issues="0" data-search="ANTD 构想家型 图灵 约翰·纳什 赫伯特·西蒙 诺伯特·维纳 图灵 约翰·纳什 赫伯特·西蒙 郭守敬 图灵">
   <header>
     <div class="code" style="color:#6B3FA0">ANTD</div>
     <div class="tname">构想家型</div>
-    <div class="flag">本轮已改</div>
+    <div class="flag">已修正</div>
     <div class="grp" style="background:#6B3FA0">NT 深紫组</div>
   </header>
   <div class="dims"><span class="dim d0">A<i>平衡</i></span><span class="dim d1">N<i>直觉</i></span><span class="dim d2">T<i>思考</i></span><span class="dim d3">D<i>动态</i></span></div>
@@ -1988,7 +2025,7 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
     <div class="lab">其余代表人物 <b>3</b></div>
     <div class="chips"><span class="chip" title="数学家 / 经济学家">约翰·纳什</span><span class="chip" title="经济学家 / 人工智能先驱">赫伯特·西蒙</span><span class="chip new" title="数学家 / 控制论创始人">诺伯特·维纳<b>新</b></span></div>
   </div>
-  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">图灵</span><span class="chip del">约翰·纳什</span><span class="chip del">赫伯特·西蒙</span><span class="chip del">郭守敬</span></div></div>
+  <div class="was"><span class="lab">改前名单 <b>4</b> 位</span><div class="chips"><span class="chip del">图灵</span><span class="chip del">约翰·纳什</span><span class="chip del">赫伯特·西蒙</span><span class="chip del">郭守敬</span></div></div>
   
   <div class="review">
     <div class="opts">
@@ -2003,7 +2040,7 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
   <header>
     <div class="code" style="color:#6B3FA0">ANTJ</div>
     <div class="tname">策划者型</div>
-    <div class="flag">本轮已改</div>
+    <div class="flag">已修正</div>
     <div class="grp" style="background:#6B3FA0">NT 深紫组</div>
   </header>
   <div class="dims"><span class="dim d0">A<i>平衡</i></span><span class="dim d1">N<i>直觉</i></span><span class="dim d2">T<i>思考</i></span><span class="dim d3">J<i>判断</i></span></div>
@@ -2016,7 +2053,7 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
     <div class="lab">其余代表人物 <b>2</b></div>
     <div class="chips"><span class="chip" title="空气动力学家 / 航天科学家">钱学森</span><span class="chip" title="西汉开国谋臣">张良</span></div>
   </div>
-  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">迈克尔·波特</span><span class="chip del">德鲁克</span><span class="chip del">钱学森</span><span class="chip del">张良</span></div></div>
+  <div class="was"><span class="lab">改前名单 <b>4</b> 位</span><div class="chips"><span class="chip del">迈克尔·波特</span><span class="chip del">德鲁克</span><span class="chip del">钱学森</span><span class="chip del">张良</span></div></div>
   
   <div class="review">
     <div class="opts">
@@ -2031,7 +2068,7 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
   <header>
     <div class="code" style="color:#6B3FA0">ANTP</div>
     <div class="tname">思辨者型</div>
-    <div class="flag">本轮已改</div>
+    <div class="flag">已修正</div>
     <div class="grp" style="background:#6B3FA0">NT 深紫组</div>
   </header>
   <div class="dims"><span class="dim d0">A<i>平衡</i></span><span class="dim d1">N<i>直觉</i></span><span class="dim d2">T<i>思考</i></span><span class="dim d3">P<i>感知</i></span></div>
@@ -2044,7 +2081,7 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
     <div class="lab">其余代表人物 <b>3</b></div>
     <div class="chips"><span class="chip new" title="演化生物学家">道金斯<b>新</b></span><span class="chip" title="科学哲学家">卡尔·波普尔</span><span class="chip" title="认知心理学家 / 语言学家">史蒂芬·平克</span></div>
   </div>
-  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">霍金</span><span class="chip del">费曼</span><span class="chip del">卡尔·波普尔</span><span class="chip del">史蒂芬·平克</span></div></div>
+  <div class="was"><span class="lab">改前名单 <b>4</b> 位</span><div class="chips"><span class="chip del">霍金</span><span class="chip del">费曼</span><span class="chip del">卡尔·波普尔</span><span class="chip del">史蒂芬·平克</span></div></div>
   
   <div class="review">
     <div class="opts">
@@ -2055,11 +2092,11 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
     <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
   </div>
 </article>
-<article class="card" data-code="ENTD" data-group="NT" data-changed="0" data-issues="0" data-search="ENTD 战略家型 亚历山大大帝 杰克·韦尔奇 张一鸣 凯撒  亚历山大大帝">
+<article class="card" data-code="ENTD" data-group="NT" data-changed="1" data-issues="0" data-search="ENTD 战略家型 亚历山大大帝 钢铁侠 张一鸣 凯撒 亚历山大大帝 杰克·韦尔奇 张一鸣 凯撒 亚历山大大帝">
   <header>
     <div class="code" style="color:#6B3FA0">ENTD</div>
     <div class="tname">战略家型</div>
-    
+    <div class="flag">已修正</div>
     <div class="grp" style="background:#6B3FA0">NT 深紫组</div>
   </header>
   <div class="dims"><span class="dim d0">E<i>外向</i></span><span class="dim d1">N<i>直觉</i></span><span class="dim d2">T<i>思考</i></span><span class="dim d3">D<i>动态</i></span></div>
@@ -2070,9 +2107,9 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
   </div>
   <div class="others">
     <div class="lab">其余代表人物 <b>3</b></div>
-    <div class="chips"><span class="chip" title="通用电气前首席执行官">杰克·韦尔奇</span><span class="chip" title="字节跳动创始人">张一鸣</span><span class="chip" title="古罗马统帅 / 政治家">凯撒</span></div>
+    <div class="chips"><span class="chip new pop" title="漫威《钢铁侠》">钢铁侠<b class="popb">流行</b></span><span class="chip" title="字节跳动创始人">张一鸣</span><span class="chip" title="古罗马统帅 / 政治家">凯撒</span></div>
   </div>
-  
+  <div class="was"><span class="lab">改前名单 <b>4</b> 位</span><div class="chips"><span class="chip del">亚历山大大帝</span><span class="chip del">杰克·韦尔奇</span><span class="chip del">张一鸣</span><span class="chip del">凯撒</span></div></div>
   
   <div class="review">
     <div class="opts">
@@ -2083,11 +2120,11 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
     <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
   </div>
 </article>
-<article class="card" data-code="ENTJ" data-group="NT" data-changed="1" data-issues="0" data-search="ENTJ 指挥官型 拿破仑 撒切尔夫人 富兰克林·罗斯福 任正非 拿破仑 撒切尔夫人 罗斯福 任正非 拿破仑">
+<article class="card" data-code="ENTJ" data-group="NT" data-changed="1" data-issues="0" data-search="ENTJ 指挥官型 拿破仑 江户川柯南 富兰克林·罗斯福 任正非 拿破仑 撒切尔夫人 罗斯福 任正非 拿破仑">
   <header>
     <div class="code" style="color:#6B3FA0">ENTJ</div>
     <div class="tname">指挥官型</div>
-    <div class="flag">本轮已改</div>
+    <div class="flag">已修正</div>
     <div class="grp" style="background:#6B3FA0">NT 深紫组</div>
   </header>
   <div class="dims"><span class="dim d0">E<i>外向</i></span><span class="dim d1">N<i>直觉</i></span><span class="dim d2">T<i>思考</i></span><span class="dim d3">J<i>判断</i></span></div>
@@ -2098,9 +2135,9 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
   </div>
   <div class="others">
     <div class="lab">其余代表人物 <b>3</b></div>
-    <div class="chips"><span class="chip" title="英国前首相">撒切尔夫人</span><span class="chip new" title="美国第 32 任总统">富兰克林·罗斯福<b>新</b></span><span class="chip" title="华为创始人">任正非</span></div>
+    <div class="chips"><span class="chip new pop" title="《名侦探柯南》">江户川柯南<b class="popb">流行</b></span><span class="chip new" title="美国第 32 任总统">富兰克林·罗斯福<b>新</b></span><span class="chip" title="华为创始人">任正非</span></div>
   </div>
-  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">拿破仑</span><span class="chip del">撒切尔夫人</span><span class="chip del">罗斯福</span><span class="chip del">任正非</span></div></div>
+  <div class="was"><span class="lab">改前名单 <b>4</b> 位</span><div class="chips"><span class="chip del">拿破仑</span><span class="chip del">撒切尔夫人</span><span class="chip del">罗斯福</span><span class="chip del">任正非</span></div></div>
   
   <div class="review">
     <div class="opts">
@@ -2111,11 +2148,11 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
     <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
   </div>
 </article>
-<article class="card" data-code="ENTP" data-group="NT" data-changed="0" data-issues="0" data-search="ENTP 辩论家型 丘吉尔 达·芬奇 马克·吐温 马云  丘吉尔">
+<article class="card" data-code="ENTP" data-group="NT" data-changed="1" data-issues="0" data-search="ENTP 辩论家型 丘吉尔 五条悟 达·芬奇 马云 丘吉尔 达·芬奇 马克·吐温 马云 丘吉尔">
   <header>
     <div class="code" style="color:#6B3FA0">ENTP</div>
     <div class="tname">辩论家型</div>
-    
+    <div class="flag">已修正</div>
     <div class="grp" style="background:#6B3FA0">NT 深紫组</div>
   </header>
   <div class="dims"><span class="dim d0">E<i>外向</i></span><span class="dim d1">N<i>直觉</i></span><span class="dim d2">T<i>思考</i></span><span class="dim d3">P<i>感知</i></span></div>
@@ -2126,9 +2163,9 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
   </div>
   <div class="others">
     <div class="lab">其余代表人物 <b>3</b></div>
-    <div class="chips"><span class="chip" title="文艺复兴画家 / 工程师">达·芬奇</span><span class="chip" title="美国作家">马克·吐温</span><span class="chip" title="阿里巴巴创始人">马云</span></div>
+    <div class="chips"><span class="chip new pop" title="《咒术回战》">五条悟<b class="popb">流行</b></span><span class="chip" title="文艺复兴画家 / 工程师">达·芬奇</span><span class="chip" title="阿里巴巴创始人">马云</span></div>
   </div>
-  
+  <div class="was"><span class="lab">改前名单 <b>4</b> 位</span><div class="chips"><span class="chip del">丘吉尔</span><span class="chip del">达·芬奇</span><span class="chip del">马克·吐温</span><span class="chip del">马云</span></div></div>
   
   <div class="review">
     <div class="opts">
@@ -2143,7 +2180,7 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
   <header>
     <div class="code" style="color:#6B3FA0">INTD</div>
     <div class="tname">蓝图家型</div>
-    <div class="flag">本轮已改</div>
+    <div class="flag">已修正</div>
     <div class="grp" style="background:#6B3FA0">NT 深紫组</div>
   </header>
   <div class="dims"><span class="dim d0">I<i>内向</i></span><span class="dim d1">N<i>直觉</i></span><span class="dim d2">T<i>思考</i></span><span class="dim d3">D<i>动态</i></span></div>
@@ -2156,7 +2193,7 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
     <div class="lab">其余代表人物 <b>3</b></div>
     <div class="chips"><span class="chip" title="哲学家">叔本华</span><span class="chip" title="南宋理学家">朱熹</span><span class="chip new" title="哲学家">海德格尔<b>新</b></span></div>
   </div>
-  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">康德</span><span class="chip del">叔本华</span><span class="chip del">朱熹</span><span class="chip del">孙武</span></div></div>
+  <div class="was"><span class="lab">改前名单 <b>4</b> 位</span><div class="chips"><span class="chip del">康德</span><span class="chip del">叔本华</span><span class="chip del">朱熹</span><span class="chip del">孙武</span></div></div>
   
   <div class="review">
     <div class="opts">
@@ -2195,11 +2232,11 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
     <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
   </div>
 </article>
-<article class="card" data-code="INTP" data-group="NT" data-changed="1" data-issues="0" data-search="INTP 逻辑学家型 爱因斯坦 尼古拉·特斯拉 老子 庄子 爱因斯坦 达尔文 庄子 亚当·斯密 爱因斯坦">
+<article class="card" data-code="INTP" data-group="NT" data-changed="1" data-issues="0" data-search="INTP 逻辑学家型 爱因斯坦 L 尼古拉·特斯拉 老子 爱因斯坦 达尔文 庄子 亚当·斯密 爱因斯坦">
   <header>
     <div class="code" style="color:#6B3FA0">INTP</div>
     <div class="tname">逻辑学家型</div>
-    <div class="flag">本轮已改</div>
+    <div class="flag">已修正</div>
     <div class="grp" style="background:#6B3FA0">NT 深紫组</div>
   </header>
   <div class="dims"><span class="dim d0">I<i>内向</i></span><span class="dim d1">N<i>直觉</i></span><span class="dim d2">T<i>思考</i></span><span class="dim d3">P<i>感知</i></span></div>
@@ -2210,9 +2247,9 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
   </div>
   <div class="others">
     <div class="lab">其余代表人物 <b>3</b></div>
-    <div class="chips"><span class="chip new" title="发明家 / 电气工程师">尼古拉·特斯拉<b>新</b></span><span class="chip new" title="道家思想家">老子<b>新</b></span><span class="chip" title="道家思想家">庄子</span></div>
+    <div class="chips"><span class="chip new pop" title="《死亡笔记》">L<b class="popb">流行</b></span><span class="chip new" title="发明家 / 电气工程师">尼古拉·特斯拉<b>新</b></span><span class="chip new" title="道家思想家">老子<b>新</b></span></div>
   </div>
-  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">爱因斯坦</span><span class="chip del">达尔文</span><span class="chip del">庄子</span><span class="chip del">亚当·斯密</span></div></div>
+  <div class="was"><span class="lab">改前名单 <b>4</b> 位</span><div class="chips"><span class="chip del">爱因斯坦</span><span class="chip del">达尔文</span><span class="chip del">庄子</span><span class="chip del">亚当·斯密</span></div></div>
   
   <div class="review">
     <div class="opts">
@@ -2226,7 +2263,7 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
   </section>
 <section class="group" data-group="NC">
     <h2><span class="swatch" style="background:#3D7B8A"></span>NC 靛青组
-      <em>直觉 · 复合 C · 9 型 · 本轮改 4</em></h2>
+      <em>直觉 · 复合 C · 9 型 · 已改 4</em></h2>
     <div class="grid">
 <article class="card" data-code="ANCD" data-group="NC" data-changed="0" data-issues="0" data-search="ANCD 哲思者型 哥德尔 维特根斯坦 陈省身 莱布尼茨  哥德尔">
   <header>
@@ -2288,7 +2325,7 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
   <header>
     <div class="code" style="color:#3D7B8A">ANCP</div>
     <div class="tname">创意家型</div>
-    <div class="flag">本轮已改</div>
+    <div class="flag">已修正</div>
     <div class="grp" style="background:#3D7B8A">NC 靛青组</div>
   </header>
   <div class="dims"><span class="dim d0">A<i>平衡</i></span><span class="dim d1">N<i>直觉</i></span><span class="dim d2">C<i>复合</i></span><span class="dim d3">P<i>感知</i></span></div>
@@ -2301,7 +2338,7 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
     <div class="lab">其余代表人物 <b>3</b></div>
     <div class="chips"><span class="chip" title="数学家 / 信息论创始人">香农</span><span class="chip new" title="理论物理学家 / 诺贝尔物理学奖得主">杨振宁<b>新</b></span><span class="chip" title="数学家 / 哲学家">帕斯卡</span></div>
   </div>
-  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">冯·诺依曼</span><span class="chip del">香农</span><span class="chip del">姚期智</span><span class="chip del">帕斯卡</span></div></div>
+  <div class="was"><span class="lab">改前名单 <b>4</b> 位</span><div class="chips"><span class="chip del">冯·诺依曼</span><span class="chip del">香农</span><span class="chip del">姚期智</span><span class="chip del">帕斯卡</span></div></div>
   
   <div class="review">
     <div class="opts">
@@ -2344,7 +2381,7 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
   <header>
     <div class="code" style="color:#3D7B8A">ENCJ</div>
     <div class="tname">开拓者型</div>
-    <div class="flag">本轮已改</div>
+    <div class="flag">已修正</div>
     <div class="grp" style="background:#3D7B8A">NC 靛青组</div>
   </header>
   <div class="dims"><span class="dim d0">E<i>外向</i></span><span class="dim d1">N<i>直觉</i></span><span class="dim d2">C<i>复合</i></span><span class="dim d3">J<i>判断</i></span></div>
@@ -2357,7 +2394,7 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
     <div class="lab">其余代表人物 <b>3</b></div>
     <div class="chips"><span class="chip" title="管理学家">彼得·德鲁克</span><span class="chip" title="联想创始人">柳传志</span><span class="chip new" title="投资家 / 软银创始人">孙正义<b>新</b></span></div>
   </div>
-  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">比尔·盖茨</span><span class="chip del">彼得·德鲁克</span><span class="chip del">柳传志</span><span class="chip del">艾森豪威尔</span></div></div>
+  <div class="was"><span class="lab">改前名单 <b>4</b> 位</span><div class="chips"><span class="chip del">比尔·盖茨</span><span class="chip del">彼得·德鲁克</span><span class="chip del">柳传志</span><span class="chip del">艾森豪威尔</span></div></div>
   
   <div class="review">
     <div class="opts">
@@ -2372,7 +2409,7 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
   <header>
     <div class="code" style="color:#3D7B8A">ENCP</div>
     <div class="tname">先驱者型</div>
-    <div class="flag">本轮已改</div>
+    <div class="flag">已修正</div>
     <div class="grp" style="background:#3D7B8A">NC 靛青组</div>
   </header>
   <div class="dims"><span class="dim d0">E<i>外向</i></span><span class="dim d1">N<i>直觉</i></span><span class="dim d2">C<i>复合</i></span><span class="dim d3">P<i>感知</i></span></div>
@@ -2385,7 +2422,7 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
     <div class="lab">其余代表人物 <b>2</b></div>
     <div class="chips"><span class="chip" title="腾讯创始人">马化腾</span><span class="chip" title="美国开国元勋 / 科学家">富兰克林</span></div>
   </div>
-  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">爱迪生</span><span class="chip del">尼古拉·特斯拉</span><span class="chip del">马化腾</span><span class="chip del">富兰克林</span></div></div>
+  <div class="was"><span class="lab">改前名单 <b>4</b> 位</span><div class="chips"><span class="chip del">爱迪生</span><span class="chip del">尼古拉·特斯拉</span><span class="chip del">马化腾</span><span class="chip del">富兰克林</span></div></div>
   
   <div class="review">
     <div class="opts">
@@ -2400,7 +2437,7 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
   <header>
     <div class="code" style="color:#3D7B8A">INCD</div>
     <div class="tname">洞见者型</div>
-    <div class="flag">本轮已改</div>
+    <div class="flag">已修正</div>
     <div class="grp" style="background:#3D7B8A">NC 靛青组</div>
   </header>
   <div class="dims"><span class="dim d0">I<i>内向</i></span><span class="dim d1">N<i>直觉</i></span><span class="dim d2">C<i>复合</i></span><span class="dim d3">D<i>动态</i></span></div>
@@ -2413,7 +2450,7 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
     <div class="lab">其余代表人物 <b>3</b></div>
     <div class="chips"><span class="chip" title="物理学家 / 天文学家">伽利略</span><span class="chip new" title="物理学家 / 化学家">居里夫人<b>新</b></span><span class="chip" title="物理学家">麦克斯韦</span></div>
   </div>
-  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">哥白尼</span><span class="chip del">伽利略</span><span class="chip del">徐光启</span><span class="chip del">麦克斯韦</span></div></div>
+  <div class="was"><span class="lab">改前名单 <b>4</b> 位</span><div class="chips"><span class="chip del">哥白尼</span><span class="chip del">伽利略</span><span class="chip del">徐光启</span><span class="chip del">麦克斯韦</span></div></div>
   
   <div class="review">
     <div class="opts">
@@ -2483,13 +2520,13 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
   </section>
 <section class="group" data-group="NF">
     <h2><span class="swatch" style="background:#2D8A4E"></span>NF 翠绿组
-      <em>直觉 · 情感 F · 9 型 · 本轮改 6</em></h2>
+      <em>直觉 · 情感 F · 9 型 · 已改 6</em></h2>
     <div class="grid">
 <article class="card" data-code="ANFD" data-group="NF" data-changed="1" data-issues="0" data-search="ANFD 理想家型 荣格 维克多·弗兰克尔 史铁生 萨特 荣格 维克多·弗兰克尔 梁漱溟 萨特 荣格">
   <header>
     <div class="code" style="color:#2D8A4E">ANFD</div>
     <div class="tname">理想家型</div>
-    <div class="flag">本轮已改</div>
+    <div class="flag">已修正</div>
     <div class="grp" style="background:#2D8A4E">NF 翠绿组</div>
   </header>
   <div class="dims"><span class="dim d0">A<i>平衡</i></span><span class="dim d1">N<i>直觉</i></span><span class="dim d2">F<i>情感</i></span><span class="dim d3">D<i>动态</i></span></div>
@@ -2502,7 +2539,7 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
     <div class="lab">其余代表人物 <b>3</b></div>
     <div class="chips"><span class="chip" title="精神病学家 / 意义治疗创始人">维克多·弗兰克尔</span><span class="chip new" title="作家">史铁生<b>新</b></span><span class="chip" title="法国哲学家 / 作家">萨特</span></div>
   </div>
-  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">荣格</span><span class="chip del">维克多·弗兰克尔</span><span class="chip del">梁漱溟</span><span class="chip del">萨特</span></div></div>
+  <div class="was"><span class="lab">改前名单 <b>4</b> 位</span><div class="chips"><span class="chip del">荣格</span><span class="chip del">维克多·弗兰克尔</span><span class="chip del">梁漱溟</span><span class="chip del">萨特</span></div></div>
   
   <div class="review">
     <div class="opts">
@@ -2517,7 +2554,7 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
   <header>
     <div class="code" style="color:#2D8A4E">ANFJ</div>
     <div class="tname">引导者型</div>
-    <div class="flag">本轮已改</div>
+    <div class="flag">已修正</div>
     <div class="grp" style="background:#2D8A4E">NF 翠绿组</div>
   </header>
   <div class="dims"><span class="dim d0">A<i>平衡</i></span><span class="dim d1">N<i>直觉</i></span><span class="dim d2">F<i>情感</i></span><span class="dim d3">J<i>判断</i></span></div>
@@ -2530,7 +2567,7 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
     <div class="lab">其余代表人物 <b>3</b></div>
     <div class="chips"><span class="chip" title="日本作家">村上春树</span><span class="chip new" title="主持人 / 媒体人">杨澜<b>新</b></span><span class="chip" title="印度诗人">泰戈尔</span></div>
   </div>
-  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">林徽因</span><span class="chip del">村上春树</span><span class="chip del">奥黛丽·赫本</span><span class="chip del">泰戈尔</span></div></div>
+  <div class="was"><span class="lab">改前名单 <b>4</b> 位</span><div class="chips"><span class="chip del">林徽因</span><span class="chip del">村上春树</span><span class="chip del">奥黛丽·赫本</span><span class="chip del">泰戈尔</span></div></div>
   
   <div class="review">
     <div class="opts">
@@ -2573,7 +2610,7 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
   <header>
     <div class="code" style="color:#2D8A4E">ENFD</div>
     <div class="tname">鼓舞者型</div>
-    <div class="flag">本轮已改</div>
+    <div class="flag">已修正</div>
     <div class="grp" style="background:#2D8A4E">NF 翠绿组</div>
   </header>
   <div class="dims"><span class="dim d0">E<i>外向</i></span><span class="dim d1">N<i>直觉</i></span><span class="dim d2">F<i>情感</i></span><span class="dim d3">D<i>动态</i></span></div>
@@ -2586,7 +2623,7 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
     <div class="lab">其余代表人物 <b>3</b></div>
     <div class="chips"><span class="chip" title="巴基斯坦教育活动家">马拉拉</span><span class="chip" title="思想家 / 儒家代表">孟子</span><span class="chip new" title="法学教授">罗翔<b>新</b></span></div>
   </div>
-  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">马丁·路德·金</span><span class="chip del">马拉拉</span><span class="chip del">孟子</span><span class="chip del">特蕾莎修女</span></div></div>
+  <div class="was"><span class="lab">改前名单 <b>4</b> 位</span><div class="chips"><span class="chip del">马丁·路德·金</span><span class="chip del">马拉拉</span><span class="chip del">孟子</span><span class="chip del">特蕾莎修女</span></div></div>
   
   <div class="review">
     <div class="opts">
@@ -2625,11 +2662,11 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
     <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
   </div>
 </article>
-<article class="card" data-code="ENFP" data-group="NF" data-changed="1" data-issues="0" data-search="ENFP 竞选者型 罗宾·威廉姆斯 周星驰 苏轼 汪曾祺 罗宾·威廉姆斯 宫崎骏 苏轼 汪曾祺 罗宾·威廉姆斯">
+<article class="card" data-code="ENFP" data-group="NF" data-changed="1" data-issues="0" data-search="ENFP 竞选者型 罗宾·威廉姆斯 漩涡鸣人 周星驰 苏轼 罗宾·威廉姆斯 宫崎骏 苏轼 汪曾祺 罗宾·威廉姆斯">
   <header>
     <div class="code" style="color:#2D8A4E">ENFP</div>
     <div class="tname">竞选者型</div>
-    <div class="flag">本轮已改</div>
+    <div class="flag">已修正</div>
     <div class="grp" style="background:#2D8A4E">NF 翠绿组</div>
   </header>
   <div class="dims"><span class="dim d0">E<i>外向</i></span><span class="dim d1">N<i>直觉</i></span><span class="dim d2">F<i>情感</i></span><span class="dim d3">P<i>感知</i></span></div>
@@ -2640,9 +2677,9 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
   </div>
   <div class="others">
     <div class="lab">其余代表人物 <b>3</b></div>
-    <div class="chips"><span class="chip new" title="演员 / 导演">周星驰<b>新</b></span><span class="chip" title="北宋文学家 / 书画家">苏轼</span><span class="chip" title="作家">汪曾祺</span></div>
+    <div class="chips"><span class="chip new pop" title="《火影忍者》">漩涡鸣人<b class="popb">流行</b></span><span class="chip new" title="演员 / 导演">周星驰<b>新</b></span><span class="chip" title="北宋文学家 / 书画家">苏轼</span></div>
   </div>
-  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">罗宾·威廉姆斯</span><span class="chip del">宫崎骏</span><span class="chip del">苏轼</span><span class="chip del">汪曾祺</span></div></div>
+  <div class="was"><span class="lab">改前名单 <b>4</b> 位</span><div class="chips"><span class="chip del">罗宾·威廉姆斯</span><span class="chip del">宫崎骏</span><span class="chip del">苏轼</span><span class="chip del">汪曾祺</span></div></div>
   
   <div class="review">
     <div class="opts">
@@ -2681,11 +2718,11 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
     <textarea rows="2" placeholder="意见（例如：主人物换成 XX；第 2 位太冷门）"></textarea>
   </div>
 </article>
-<article class="card" data-code="INFJ" data-group="NF" data-changed="1" data-issues="0" data-search="INFJ 提倡者型 柏拉图 陀思妥耶夫斯基 鲁迅 杜甫 柏拉图 陀思妥耶夫斯基 鲁迅 特蕾莎修女 柏拉图">
+<article class="card" data-code="INFJ" data-group="NF" data-changed="1" data-issues="0" data-search="INFJ 提倡者型 柏拉图 宇智波鼬 鲁迅 杜甫 柏拉图 陀思妥耶夫斯基 鲁迅 特蕾莎修女 柏拉图">
   <header>
     <div class="code" style="color:#2D8A4E">INFJ</div>
     <div class="tname">提倡者型</div>
-    <div class="flag">本轮已改</div>
+    <div class="flag">已修正</div>
     <div class="grp" style="background:#2D8A4E">NF 翠绿组</div>
   </header>
   <div class="dims"><span class="dim d0">I<i>内向</i></span><span class="dim d1">N<i>直觉</i></span><span class="dim d2">F<i>情感</i></span><span class="dim d3">J<i>判断</i></span></div>
@@ -2696,9 +2733,9 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
   </div>
   <div class="others">
     <div class="lab">其余代表人物 <b>3</b></div>
-    <div class="chips"><span class="chip" title="俄国作家">陀思妥耶夫斯基</span><span class="chip" title="作家">鲁迅</span><span class="chip new" title="唐代诗人">杜甫<b>新</b></span></div>
+    <div class="chips"><span class="chip new pop" title="《火影忍者》">宇智波鼬<b class="popb">流行</b></span><span class="chip" title="作家">鲁迅</span><span class="chip new" title="唐代诗人">杜甫<b>新</b></span></div>
   </div>
-  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">柏拉图</span><span class="chip del">陀思妥耶夫斯基</span><span class="chip del">鲁迅</span><span class="chip del">特蕾莎修女</span></div></div>
+  <div class="was"><span class="lab">改前名单 <b>4</b> 位</span><div class="chips"><span class="chip del">柏拉图</span><span class="chip del">陀思妥耶夫斯基</span><span class="chip del">鲁迅</span><span class="chip del">特蕾莎修女</span></div></div>
   
   <div class="review">
     <div class="opts">
@@ -2713,7 +2750,7 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
   <header>
     <div class="code" style="color:#2D8A4E">INFP</div>
     <div class="tname">调停者型</div>
-    <div class="flag">本轮已改</div>
+    <div class="flag">已修正</div>
     <div class="grp" style="background:#2D8A4E">NF 翠绿组</div>
   </header>
   <div class="dims"><span class="dim d0">I<i>内向</i></span><span class="dim d1">N<i>直觉</i></span><span class="dim d2">F<i>情感</i></span><span class="dim d3">P<i>感知</i></span></div>
@@ -2726,7 +2763,7 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
     <div class="lab">其余代表人物 <b>3</b></div>
     <div class="chips"><span class="chip new" title="法国作家 / 飞行员">圣埃克苏佩里<b>新</b></span><span class="chip" title="启蒙思想家">卢梭</span><span class="chip" title="唐代诗人">李白</span></div>
   </div>
-  <div class="was"><span class="lab">本轮改前 <b>4</b> 位</span><div class="chips"><span class="chip del">莎士比亚</span><span class="chip del">梵高</span><span class="chip del">卢梭</span><span class="chip del">李白</span></div></div>
+  <div class="was"><span class="lab">改前名单 <b>4</b> 位</span><div class="chips"><span class="chip del">莎士比亚</span><span class="chip del">梵高</span><span class="chip del">卢梭</span><span class="chip del">李白</span></div></div>
   
   <div class="review">
     <div class="opts">
@@ -2788,7 +2825,7 @@ document.addEventListener('input',function(e){
   state[code]=state[code]||{};state[code].note=e.target.value;save();
 });
 document.getElementById('export').addEventListener('click',function(){
-  var out={exportedAt:new Date().toISOString(),stats:{"types":81,"people":307,"slots":307,"dup":0,"dupMains":0,"stories":81,"fields":295,"hand":16,"handDrift":0,"problems":0,"minSlots":3},changed:[{"code":"ABCD","before":["曾国藩","冯道","李沆","吕端"],"after":["曾国藩","亚里士多德","歌德","张謇"]},{"code":"ABCJ","before":["李斯","申不害","田穰苴","赵充国"],"after":["李斯","李鸿章","俾斯麦"]},{"code":"ABFD","before":["马斯洛","米哈伊·契克森米哈伊","川端康成","杨绛"],"after":["马斯洛","林语堂","川端康成","杨绛"]},{"code":"ABTD","before":["亚当·斯密","凯恩斯","管仲","桑弘羊"],"after":["亚当·斯密","凯恩斯","吴敬琏"]},{"code":"ABTJ","before":["司马迁","司马光","荀子","韩非子"],"after":["司马迁","弗朗西斯·培根","荀子","马基雅维利"]},{"code":"ANCP","before":["冯·诺依曼","香农","姚期智","帕斯卡"],"after":["冯·诺依曼","香农","杨振宁","帕斯卡"]},{"code":"ANFD","before":["荣格","维克多·弗兰克尔","梁漱溟","萨特"],"after":["荣格","维克多·弗兰克尔","史铁生","萨特"]},{"code":"ANFJ","before":["林徽因","村上春树","奥黛丽·赫本","泰戈尔"],"after":["林徽因","村上春树","杨澜","泰戈尔"]},{"code":"ANTD","before":["图灵","约翰·纳什","赫伯特·西蒙","郭守敬"],"after":["图灵","约翰·纳什","赫伯特·西蒙","诺伯特·维纳"]},{"code":"ANTJ","before":["迈克尔·波特","德鲁克","钱学森","张良"],"after":["迈克尔·波特","钱学森","张良"]},{"code":"ANTP","before":["霍金","费曼","卡尔·波普尔","史蒂芬·平克"],"after":["霍金","道金斯","卡尔·波普尔","史蒂芬·平克"]},{"code":"ASCD","before":["于谦","文天祥","史可法","李纲"],"after":["于谦","文天祥","史可法","苏武"]},{"code":"ASCP","before":["米开朗基罗","罗丹","卡地亚","王羲之"],"after":["米开朗基罗","罗丹","王羲之"]},{"code":"ASFD","before":["宋慈","况钟","海瑞","徐有功"],"after":["宋慈","钟南山","海瑞"]},{"code":"ASTJ","before":["孔子","包拯","海瑞","司马光"],"after":["孔子","包拯","李光耀"]},{"code":"EBCD","before":["范蠡","刘晏","曾国藩","郑观应"],"after":["范蠡","沈万三","胡雪岩"]},{"code":"EBCJ","before":["吕不韦","子产","张居正","姚崇"],"after":["吕不韦","张仪","基辛格","姚崇"]},{"code":"EBCP","before":["贝尔·格里尔斯","安东尼·波登","弗雷德·阿斯泰尔","埃尔维斯·普雷斯利"],"after":["贝尔·格里尔斯","大张伟","埃尔维斯·普雷斯利"]},{"code":"EBFJ","before":["南丁格尔","晏阳初","陶行知","史怀哲"],"after":["南丁格尔","白求恩","陶行知","史怀哲"]},{"code":"EBFP","before":["沃尔特·惠特曼","舒马赫","三毛","大仲马"],"after":["沃尔特·惠特曼","蔡澜","三毛","大仲马"]},{"code":"EBTD","before":["稻盛和夫","沃伦·巴菲特","安德鲁·卡内基","王永庆"],"after":["稻盛和夫","山姆·沃尔顿","安德鲁·卡内基"]},{"code":"EBTJ","before":["亨利·福特","洛克菲勒","乔治·巴顿","董明珠"],"after":["亨利·福特","洛克菲勒","安迪·格鲁夫","贝索斯"]},{"code":"EBTP","before":["费曼","卡尔·萨根","刘慈欣","迈克尔·克莱顿"],"after":["费曼","卡尔·萨根","刘慈欣","黄渤"]},{"code":"ENCJ","before":["比尔·盖茨","彼得·德鲁克","柳传志","艾森豪威尔"],"after":["比尔·盖茨","彼得·德鲁克","柳传志","孙正义"]},{"code":"ENCP","before":["爱迪生","尼古拉·特斯拉","马化腾","富兰克林"],"after":["爱迪生","马化腾","富兰克林"]},{"code":"ENFD","before":["马丁·路德·金","马拉拉","孟子","特蕾莎修女"],"after":["马丁·路德·金","马拉拉","孟子","罗翔"]},{"code":"ENFP","before":["罗宾·威廉姆斯","宫崎骏","苏轼","汪曾祺"],"after":["罗宾·威廉姆斯","周星驰","苏轼","汪曾祺"]},{"code":"ENTJ","before":["拿破仑","撒切尔夫人","罗斯福","任正非"],"after":["拿破仑","撒切尔夫人","富兰克林·罗斯福","任正非"]},{"code":"IBCD","before":["郑国","李冰","西门豹","召信臣"],"after":["屠呦呦","李冰","西门豹"]},{"code":"IBCJ","before":["管仲","慎到","韩非","商鞅"],"after":["管仲","韩非","商鞅"]},{"code":"IBFJ","before":["赫尔曼·黑塞","契诃夫","沈从文","佩索阿"],"after":["赫尔曼·黑塞","契诃夫","沈从文","余华"]},{"code":"IBTD","before":["约瑟夫·熊彼特","哈耶克","商鞅","吴起"],"after":["约瑟夫·熊彼特","哈耶克","塔勒布"]},{"code":"IBTJ","before":["马可·奥勒留","曾国藩","塞涅卡","左宗棠"],"after":["马可·奥勒留","查理·芒格","塞涅卡"]},{"code":"IBTP","before":["孟德尔","道尔顿","徐霞客","郦道元"],"after":["孟德尔","袁隆平","徐霞客","珍·古道尔"]},{"code":"INCD","before":["哥白尼","伽利略","徐光启","麦克斯韦"],"after":["哥白尼","伽利略","居里夫人","麦克斯韦"]},{"code":"INFJ","before":["柏拉图","陀思妥耶夫斯基","鲁迅","特蕾莎修女"],"after":["柏拉图","陀思妥耶夫斯基","鲁迅","杜甫"]},{"code":"INFP","before":["莎士比亚","梵高","卢梭","李白"],"after":["莎士比亚","圣埃克苏佩里","卢梭","李白"]},{"code":"INTD","before":["康德","叔本华","朱熹","孙武"],"after":["康德","叔本华","朱熹","海德格尔"]},{"code":"INTP","before":["爱因斯坦","达尔文","庄子","亚当·斯密"],"after":["爱因斯坦","尼古拉·特斯拉","老子","庄子"]},{"code":"ISCD","before":["贾思勰","宋应星","李诫","徐光启"],"after":["祖冲之","宋应星","詹天佑","徐光启"]},{"code":"ISCJ","before":["班固","陈寿","司马光","刘知几"],"after":["班固","陈寿","司马光","陈寅恪"]},{"code":"ISCP","before":["蔡伦","李春","沈寿","马钧"],"after":["蔡伦","贝聿铭","沈寿"]},{"code":"ISFJ","before":["特蕾莎修女","凯特王妃","孟母","岳母"],"after":["特蕾莎修女","凯特王妃","林巧稚"]},{"code":"ISFP","before":["梵高","李白","齐白石","张大千"],"after":["梵高","王菲","齐白石","张大千"]},{"code":"ISTJ","before":["巴菲特","乔治·华盛顿","曾参","诸葛亮"],"after":["巴菲特","默克尔","曾参"]},{"code":"ISTP","before":["安藤忠雄","乔布斯","原研哉","乔纳森·艾维"],"after":["安藤忠雄","詹姆斯·戴森","原研哉","乔纳森·艾维"]}],review:state};
+  var out={exportedAt:new Date().toISOString(),stats:{"types":81,"people":307,"slots":307,"dup":0,"dupMains":0,"stories":81,"fields":307,"hand":16,"handDrift":0,"pop":12,"popTypes":12,"problems":0,"minSlots":3},changed:[{"code":"ABCD","before":["曾国藩","冯道","李沆","吕端"],"after":["曾国藩","亚里士多德","歌德","张謇"]},{"code":"ABCJ","before":["李斯","申不害","田穰苴","赵充国"],"after":["李斯","李鸿章","俾斯麦"]},{"code":"ABFD","before":["马斯洛","米哈伊·契克森米哈伊","川端康成","杨绛"],"after":["马斯洛","林语堂","川端康成","杨绛"]},{"code":"ABTD","before":["亚当·斯密","凯恩斯","管仲","桑弘羊"],"after":["亚当·斯密","凯恩斯","吴敬琏"]},{"code":"ABTJ","before":["司马迁","司马光","荀子","韩非子"],"after":["司马迁","弗朗西斯·培根","荀子","马基雅维利"]},{"code":"ANCP","before":["冯·诺依曼","香农","姚期智","帕斯卡"],"after":["冯·诺依曼","香农","杨振宁","帕斯卡"]},{"code":"ANFD","before":["荣格","维克多·弗兰克尔","梁漱溟","萨特"],"after":["荣格","维克多·弗兰克尔","史铁生","萨特"]},{"code":"ANFJ","before":["林徽因","村上春树","奥黛丽·赫本","泰戈尔"],"after":["林徽因","村上春树","杨澜","泰戈尔"]},{"code":"ANTD","before":["图灵","约翰·纳什","赫伯特·西蒙","郭守敬"],"after":["图灵","约翰·纳什","赫伯特·西蒙","诺伯特·维纳"]},{"code":"ANTJ","before":["迈克尔·波特","德鲁克","钱学森","张良"],"after":["迈克尔·波特","钱学森","张良"]},{"code":"ANTP","before":["霍金","费曼","卡尔·波普尔","史蒂芬·平克"],"after":["霍金","道金斯","卡尔·波普尔","史蒂芬·平克"]},{"code":"ASCD","before":["于谦","文天祥","史可法","李纲"],"after":["于谦","文天祥","史可法","苏武"]},{"code":"ASCP","before":["米开朗基罗","罗丹","卡地亚","王羲之"],"after":["米开朗基罗","罗丹","王羲之"]},{"code":"ASFD","before":["宋慈","况钟","海瑞","徐有功"],"after":["宋慈","钟南山","海瑞"]},{"code":"ASTJ","before":["孔子","包拯","海瑞","司马光"],"after":["孔子","包拯","李光耀"]},{"code":"EBCD","before":["范蠡","刘晏","曾国藩","郑观应"],"after":["范蠡","沈万三","胡雪岩"]},{"code":"EBCJ","before":["吕不韦","子产","张居正","姚崇"],"after":["吕不韦","张仪","基辛格","姚崇"]},{"code":"EBCP","before":["贝尔·格里尔斯","安东尼·波登","弗雷德·阿斯泰尔","埃尔维斯·普雷斯利"],"after":["贝尔·格里尔斯","大张伟","埃尔维斯·普雷斯利"]},{"code":"EBFJ","before":["南丁格尔","晏阳初","陶行知","史怀哲"],"after":["南丁格尔","白求恩","陶行知","史怀哲"]},{"code":"EBFP","before":["沃尔特·惠特曼","舒马赫","三毛","大仲马"],"after":["沃尔特·惠特曼","蔡澜","三毛","大仲马"]},{"code":"EBTD","before":["稻盛和夫","沃伦·巴菲特","安德鲁·卡内基","王永庆"],"after":["稻盛和夫","山姆·沃尔顿","安德鲁·卡内基"]},{"code":"EBTJ","before":["亨利·福特","洛克菲勒","乔治·巴顿","董明珠"],"after":["亨利·福特","洛克菲勒","安迪·格鲁夫","贝索斯"]},{"code":"EBTP","before":["费曼","卡尔·萨根","刘慈欣","迈克尔·克莱顿"],"after":["费曼","卡尔·萨根","刘慈欣","黄渤"]},{"code":"ENCJ","before":["比尔·盖茨","彼得·德鲁克","柳传志","艾森豪威尔"],"after":["比尔·盖茨","彼得·德鲁克","柳传志","孙正义"]},{"code":"ENCP","before":["爱迪生","尼古拉·特斯拉","马化腾","富兰克林"],"after":["爱迪生","马化腾","富兰克林"]},{"code":"ENFD","before":["马丁·路德·金","马拉拉","孟子","特蕾莎修女"],"after":["马丁·路德·金","马拉拉","孟子","罗翔"]},{"code":"ENFP","before":["罗宾·威廉姆斯","宫崎骏","苏轼","汪曾祺"],"after":["罗宾·威廉姆斯","漩涡鸣人","周星驰","苏轼"]},{"code":"ENTD","before":["亚历山大大帝","杰克·韦尔奇","张一鸣","凯撒"],"after":["亚历山大大帝","钢铁侠","张一鸣","凯撒"]},{"code":"ENTJ","before":["拿破仑","撒切尔夫人","罗斯福","任正非"],"after":["拿破仑","江户川柯南","富兰克林·罗斯福","任正非"]},{"code":"ENTP","before":["丘吉尔","达·芬奇","马克·吐温","马云"],"after":["丘吉尔","五条悟","达·芬奇","马云"]},{"code":"ESFJ","before":["比尔·克林顿","泰勒·斯威夫特","周恩来","雷锋"],"after":["比尔·克林顿","灶门炭治郎","泰勒·斯威夫特","周恩来"]},{"code":"ESFP","before":["玛丽莲·梦露","埃尔顿·约翰","邓丽君","碧梨"],"after":["玛丽莲·梦露","蒙奇·D·路飞","邓丽君","碧梨"]},{"code":"ESTJ","before":["乔治·华盛顿","伊丽莎白二世","李嘉诚","董明珠"],"after":["乔治·华盛顿","赫敏·格兰杰","李嘉诚","董明珠"]},{"code":"IBCD","before":["郑国","李冰","西门豹","召信臣"],"after":["屠呦呦","李冰","西门豹"]},{"code":"IBCJ","before":["管仲","慎到","韩非","商鞅"],"after":["管仲","韩非","商鞅"]},{"code":"IBFJ","before":["赫尔曼·黑塞","契诃夫","沈从文","佩索阿"],"after":["赫尔曼·黑塞","契诃夫","沈从文","余华"]},{"code":"IBTD","before":["约瑟夫·熊彼特","哈耶克","商鞅","吴起"],"after":["约瑟夫·熊彼特","哈耶克","塔勒布"]},{"code":"IBTJ","before":["马可·奥勒留","曾国藩","塞涅卡","左宗棠"],"after":["马可·奥勒留","查理·芒格","塞涅卡"]},{"code":"IBTP","before":["孟德尔","道尔顿","徐霞客","郦道元"],"after":["孟德尔","袁隆平","徐霞客","珍·古道尔"]},{"code":"INCD","before":["哥白尼","伽利略","徐光启","麦克斯韦"],"after":["哥白尼","伽利略","居里夫人","麦克斯韦"]},{"code":"INFJ","before":["柏拉图","陀思妥耶夫斯基","鲁迅","特蕾莎修女"],"after":["柏拉图","宇智波鼬","鲁迅","杜甫"]},{"code":"INFP","before":["莎士比亚","梵高","卢梭","李白"],"after":["莎士比亚","圣埃克苏佩里","卢梭","李白"]},{"code":"INTD","before":["康德","叔本华","朱熹","孙武"],"after":["康德","叔本华","朱熹","海德格尔"]},{"code":"INTP","before":["爱因斯坦","达尔文","庄子","亚当·斯密"],"after":["爱因斯坦","L","尼古拉·特斯拉","老子"]},{"code":"ISCD","before":["贾思勰","宋应星","李诫","徐光启"],"after":["祖冲之","宋应星","詹天佑","徐光启"]},{"code":"ISCJ","before":["班固","陈寿","司马光","刘知几"],"after":["班固","陈寿","司马光","陈寅恪"]},{"code":"ISCP","before":["蔡伦","李春","沈寿","马钧"],"after":["蔡伦","贝聿铭","沈寿"]},{"code":"ISFJ","before":["特蕾莎修女","凯特王妃","孟母","岳母"],"after":["特蕾莎修女","哆啦A梦","凯特王妃"]},{"code":"ISFP","before":["梵高","李白","齐白石","张大千"],"after":["梵高","王菲","齐白石","张大千"]},{"code":"ISTJ","before":["巴菲特","乔治·华盛顿","曾参","诸葛亮"],"after":["巴菲特","利威尔·阿克曼","默克尔"]},{"code":"ISTP","before":["安藤忠雄","乔布斯","原研哉","乔纳森·艾维"],"after":["安藤忠雄","流川枫","詹姆斯·戴森","乔纳森·艾维"]}],review:state};
   var blob=new Blob([JSON.stringify(out,null,2)],{type:'application/json'});
   var a=document.createElement('a');
   a.href=URL.createObjectURL(blob);a.download='mbti-pro-celebrity-review.json';a.click();

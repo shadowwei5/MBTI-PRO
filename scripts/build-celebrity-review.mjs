@@ -12,6 +12,7 @@ const STORIES = readFileSync(resolve(ROOT, 'server/src/content/celebrity-stories
 const FIELDS = readFileSync(resolve(ROOT, 'server/src/content/celebrity-fields.ts'), 'utf8')
 const DEMO = resolve(ROOT, 'client/public/demo/types.json')
 const BASELINE = resolve(ROOT, 'scripts/celebrity-baseline.json')
+const POP = JSON.parse(readFileSync(resolve(ROOT, 'scripts/pop-culture-reps.json'), 'utf8'))
 
 /* ---------- 解析 ---------- */
 const block = (src, marker) => {
@@ -124,6 +125,11 @@ for (const code of allCodes) {
 
 const handDrift = Object.keys(handCopy).filter(c => handCopy[c].join() !== (celebrityMap[c] || []).join())
 
+const popRows = Object.entries(POP)
+  .map(([name, work]) => ({ name, work, codes: owner.get(name) || [] }))
+  .filter((r) => r.codes.length)
+const popCodes = [...new Set(popRows.flatMap((r) => r.codes))]
+
 const stats = {
   types: allCodes.length,
   people: owner.size,
@@ -134,6 +140,8 @@ const stats = {
   fields: Object.keys(fields).length,
   hand: Object.keys(handCopy).length,
   handDrift: handDrift.length,
+  pop: popRows.length,
+  popTypes: popCodes.length,
   problems: problems.length,
   minSlots: Math.min(...allCodes.map(c => (celebrityMap[c] || []).length)),
 }
@@ -187,10 +195,11 @@ const codeCard = code => {
   const others = list.filter(n => !f || n !== f.name)
     .map(n => {
       const isNew = ch && ch.added.includes(n)
-      return `<span class="chip${isNew ? ' new' : ''}" title="${esc(fields[n] || '身份待补')}">${esc(n)}${isNew ? '<b>新</b>' : ''}</span>`
+      const isPop = !!POP[n]
+      return `<span class="chip${isNew ? ' new' : ''}${isPop ? ' pop' : ''}" title="${esc(isPop ? POP[n] : fields[n] || '身份待补')}">${esc(n)}${isPop ? '<b class="popb">流行</b>' : isNew ? '<b>新</b>' : ''}</span>`
     }).join('')
   const beforeRow = ch
-    ? `<div class="was"><span class="lab">本轮改前 <b>${ch.before.length}</b> 位</span><div class="chips">${
+    ? `<div class="was"><span class="lab">改前名单 <b>${ch.before.length}</b> 位</span><div class="chips">${
         ch.before.map(n => `<span class="chip del">${esc(n)}</span>`).join('') || '<span class="chip muted">—</span>'
       }</div></div>`
     : ''
@@ -199,13 +208,13 @@ const codeCard = code => {
   <header>
     <div class="code" style="color:${hex}">${code}</div>
     <div class="tname">${esc(typeNames[code] || '—')}</div>
-    ${ch ? '<div class="flag">本轮已改</div>' : ''}
+    ${ch ? '<div class="flag">已修正</div>' : ''}
     <div class="grp" style="background:${hex}">${esc(GROUPS[g].name)}</div>
   </header>
   <div class="dims">${dims}</div>
   ${f ? `<div class="main">
     <div class="lab">主人物 / 结果页展示</div>
-    <div class="pname">${esc(f.name)}<span>${esc(f.field || fields[f.name] || '')}</span></div>
+    <div class="pname">${esc(f.name)}${POP[f.name] ? '<i class="popmark">流行参照</i>' : ''}<span>${esc(f.field || fields[f.name] || '')}</span></div>
     <p class="story">${esc(f.story)}</p>
   </div>` : `<div class="main empty"><div class="lab">主人物 / 结果页展示</div><p class="story">（缺侧写）</p></div>`}
   <div class="others">
@@ -230,7 +239,7 @@ const sections = Object.keys(GROUPS).map(g => {
   const changedInGroup = codesInGroup.filter(c => changedSet.has(c)).length
   return `<section class="group" data-group="${g}">
     <h2><span class="swatch" style="background:${GROUPS[g].hex}"></span>${esc(GROUPS[g].name)}
-      <em>${esc(GROUPS[g].desc)} · ${codesInGroup.length} 型${changedInGroup ? ` · 本轮改 ${changedInGroup}` : ''}</em></h2>
+      <em>${esc(GROUPS[g].desc)} · ${codesInGroup.length} 型${changedInGroup ? ` · 已改 ${changedInGroup}` : ''}</em></h2>
     <div class="grid">${codesInGroup.map(codeCard).join('')}</div>
   </section>`
 }).join('\n')
@@ -308,6 +317,9 @@ code{font-family:'DM Mono',monospace;background:#F3EEE4;padding:1px 5px;border-r
 .chip b{color:var(--new);font-weight:600;margin-left:5px;font-size:11px}
 .chip.new{border-color:#BFDCCB;background:#F4FAF6}
 .chip.del{color:#8A7F73;background:#F6F2EA;text-decoration:line-through;text-decoration-color:#C9B9A4}
+.chip.pop{border-color:#CBB6E0;background:#F7F2FD}
+.chip.pop b.popb{color:#6B3FA0}
+.popmark{font-style:normal;font-size:10px;color:#6B3FA0;border:1px solid #CBB6E0;background:#F7F2FD;border-radius:9px;padding:1px 7px;margin-left:8px;vertical-align:middle}
 .check{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px}
 .chk{border:1px solid var(--rule);border-radius:6px;padding:10px 12px;background:#FDFBF7}
 .chk.ok{border-left:3px solid var(--ok)}
@@ -364,7 +376,7 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
     <div class="sp"></div>
     <input type="search" id="q" placeholder="搜类型码 / 中文名 / 人物名…">
     <select id="group"><option value="">全部 9 组</option>${Object.entries(GROUPS).map(([k, v]) => `<option value="${k}">${v.name}</option>`).join('')}</select>
-    <button id="only">只看本轮改过的</button>
+    <button id="only">只看改过的</button>
     <button id="todo">只看没审的</button>
     <button id="export">导出审核结果</button>
   </div>
@@ -373,7 +385,7 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
 <div class="wrap">
   <div class="hero">
     <h1>81 型代表人物已按三条准则全库改完，这是改动清单与审核入口</h1>
-    <p>准则一「一眼认出」：换掉只在小圈子里有名的人（教科书人物、地方史人物、冷门学者）；准则二「四维无硬伤」：人选要能自圆其说地落在该坐标上；准则三「不与其它型共用」：同一个人只在一个型里出现。下方 81 张卡就是<b>产品里会显示的全部内容</b>，标「本轮已改」的卡片底部附了改动前的名单。</p>
+    <p>准则一「一眼认出」：换掉只在小圈子里有名的人（教科书人物、地方史人物、冷门学者）；准则二「四维无硬伤」：人选要能自圆其说地落在该坐标上；准则三「不与其它型共用」：同一个人只在一个型里出现。下方 81 张卡就是<b>产品里会显示的全部内容</b>，标「已修正」的卡片底部附了改动前的名单。</p>
     <div class="meta">数据源 server/src/content/types.ts · 生成时间 ${esc(stamp)} · 由 node scripts/build-celebrity-review.mjs 生成，改代码后重跑即可刷新</div>
   </div>
 
@@ -382,9 +394,10 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
     <div class="kpi"><b>${stats.slots}</b><span>代表人物位次</span></div>
     <div class="kpi good"><b>${stats.people}</b><span>去重人数（=位次，无共用）</span></div>
     <div class="kpi good"><b>${stats.dup}</b><span>跨型共用的人</span></div>
-    <div class="kpi acc"><b>${changes.length}</b><span>本轮改过名单的型</span></div>
-    <div class="kpi acc"><b>${slotMoves}</b><span>本轮变动位次</span></div>
+    <div class="kpi acc"><b>${changes.length}</b><span>改过名单的型</span></div>
+    <div class="kpi acc"><b>${slotMoves}</b><span>变动位次</span></div>
     <div class="kpi"><b>${entered.length} / ${exited.length}</b><span>新进入 / 移出人数</span></div>
+    <div class="kpi"><b>${stats.pop}</b><span>流行角色（${stats.popTypes} 型有）</span></div>
     <div class="kpi good"><b>${stats.problems}</b><span>自动校验硬伤</span></div>
   </div>
 
@@ -411,7 +424,15 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
   </div>
 
   <div class="panel">
-    <h3>本轮换人明细 <em>${changes.length} 个型 · ${slotMoves} 个位次 · 删除线为移出、绿底为新增</em></h3>
+    <h3>流行角色覆盖 <em>${stats.pop} 位 · 分布在 ${stats.popTypes} / 81 型 · 每型只放一位，排在第 2 位（紧跟主人物）</em></h3>
+    <div class="lv-list">
+      ${popRows.sort((a, b) => a.codes[0].localeCompare(b.codes[0])).map(r => `<div class="lv-row"><div class="k"><code>${r.codes.join(' / ')}</code>${esc(typeNames[r.codes[0]] || '')}</div><div class="v"><b>${esc(r.name)}</b> · ${esc(r.work)}</div></div>`).join('')}
+    </div>
+    <p class="story" style="margin-top:10px">只加「明显对应」的：角色本身的四维要能说清楚，不为覆盖而硬凑。所以 81 型里还有 69 型没有流行角色——其中 27 个「均衡组」（A / B / C / D 中间档）几乎是空白，因为热门角色多是端值性格，中间档很难找到公认对应的人，这部分要继续找。</p>
+  </div>
+
+  <div class="panel">
+    <h3>换人明细 <em>${changes.length} 个型 · ${slotMoves} 个位次 · 删除线为移出、绿底为新增</em></h3>
     <table>
       <thead><tr><th style="width:150px">类型</th><th style="width:130px">组</th><th style="width:36%">移出</th><th>新增（附身份）</th></tr></thead>
       <tbody>${changeRows || '<tr><td colspan="4" class="muted">与基线相比无变化。</td></tr>'}</tbody>
@@ -433,7 +454,7 @@ textarea{width:100%;border:1px solid var(--rule);border-radius:4px;padding:6px 8
 
   <div class="panel">
     <h3>怎么审 <em>这次要你判断的只有一件事：这 81 组人，认不认得出、说不说得通</em></h3>
-    <p class="story">① 点右上「只看本轮改过的」，只看 ${changes.length} 张改过的卡，重点看绿标「新」与卡底灰掉的改前名单。
+    <p class="story">① 点右上「只看改过的」，只看 ${changes.length} 张改过的卡，重点看绿标「新」与卡底灰掉的改前名单。
     ② 每张卡自问三句：主人物一眼能认出吗？其余三位有凑数的吗？这四个人放在这个坐标上说得通吗？
     ③ 逐张点「通过 / 需改 / 存疑」并写一句意见，点「导出审核结果」把 JSON 发我，我按你的标记再改一轮。</p>
   </div>

@@ -258,6 +258,7 @@ onUnmounted(() => { jsonLdScript?.remove() })
               <span class="person-field">{{ person.field }}</span>
             </div>
           </div>
+          <p class="person-note">标注作品名的为虚构角色，仅作性格类比，与作品版权方无关联；真人部分只引用公开可查的经历，不代表本人测评或认可。</p>
         </section>
 
         <section v-if="typeData?.eiModule || typeData?.snModule || typeData?.tfModule || typeData?.pjModule" class="result-section">
@@ -491,6 +492,7 @@ onUnmounted(() => { jsonLdScript?.remove() })
 .person-index { color: var(--accent); font-family: "DM Mono", "SF Mono", Consolas, "Roboto Mono", monospace; font-size: 10px; }
 .person-name { font-family: "Playfair Display", "Songti SC", "STSong", SimSun, "Noto Serif CJK SC", "Source Han Serif SC", serif; font-size: 18px; font-weight: 600; }
 .person-field { color: var(--muted); font-size: 12px; text-align: right; }
+.person-note { margin: 12px 0 0; color: var(--muted); font-size: 11px; line-height: 1.7; }
 
 .depth-person { margin-bottom: 28px; padding: 22px 24px; border-left: 2px solid var(--accent); background: rgba(166, 61, 44, .045); }
 .depth-person-kicker { margin: 0 0 10px; color: var(--accent); font-family: "DM Mono", "SF Mono", Consolas, "Roboto Mono", monospace; font-size: 9px; letter-spacing: .08em; }
