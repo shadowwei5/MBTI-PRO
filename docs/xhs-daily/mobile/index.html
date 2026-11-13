@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Day1 发布包 · 鸣人靠直觉，还是靠经验</title>
+<style>
+  :root{
+    --bg:#F4F0E9; --ink:#1F1C19; --muted:#8A837A; --accent:#A63A2B; --rule:#DED7CC; --card:#FBF8F3;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    font-size:16px;line-height:1.75;padding:0 0 48px}
+  header{padding:22px 18px 16px;border-bottom:1px solid var(--rule)}
+  .kicker{font-size:11px;letter-spacing:.22em;color:var(--accent);font-family:ui-monospace,Menlo,monospace}
+  h1{font-family:"Songti SC","STSong",serif;font-size:24px;line-height:1.45;margin:8px 0 6px;font-weight:600}
+  .sub{font-size:13px;color:var(--muted)}
+  section{padding:20px 18px;border-bottom:1px solid var(--rule)}
+  .h{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:10px}
+  .h b{font-size:15px;font-weight:600;letter-spacing:.02em}
+  .h span{font-size:11px;letter-spacing:.16em;color:var(--muted);font-family:ui-monospace,Menlo,monospace}
+  button.copy{border:1px solid var(--accent);background:transparent;color:var(--accent);
+    border-radius:999px;padding:6px 14px;font-size:12px;letter-spacing:.08em;font-family:inherit}
+  button.copy:active{background:var(--accent);color:#fff}
+  .box{background:var(--card);border:1px solid var(--rule);border-radius:12px;padding:14px 15px;
+    font-size:15px;line-height:1.85;white-space:pre-wrap;word-break:break-word;user-select:text;-webkit-user-select:text}
+  .box.small{font-size:14px;line-height:1.9;color:#3B3630}
+  .titlebox{font-size:19px;font-weight:600;letter-spacing:.01em}
+  ol.steps{margin:0;padding-left:22px;font-size:14px;line-height:2}
+  ol.steps b{color:var(--accent);font-weight:600}
+  .tip{font-size:12.5px;color:var(--muted);margin-top:10px}
+  .grid{display:grid;gap:14px}
+  figure{margin:0}
+  figure img{width:100%;display:block;border-radius:10px;border:1px solid var(--rule);background:#fff}
+  figcaption{font-size:12px;color:var(--muted);margin-top:6px;display:flex;justify-content:space-between}
+  .savebar{position:sticky;top:0;z-index:5;background:rgba(244,240,233,.94);backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--rule);padding:10px 18px;font-size:12.5px;color:var(--muted)}
+  .toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,20px);opacity:0;pointer-events:none;
+    background:#1F1C19;color:#fff;padding:9px 18px;border-radius:999px;font-size:13px;transition:.22s}
+  .toast.on{opacity:1;transform:translate(-50%,0)}
+  footer{padding:22px 18px;font-size:11.5px;color:var(--muted);line-height:1.9}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="kicker">XHS · DAY 1 / 2026-11-13</div>
+  <h1>鸣人靠直觉，还是靠经验</h1>
+  <div class="sub">9 张图 + 可直接复制的文案 · 长按图片存相册</div>
+</header>
+
+<div class="savebar">竖屏从上往下滑 → 每张图<b>长按 → 存储到照片</b>；文案点右上「复制」</div>
+
+<section>
+  <div class="h"><b>发布步骤</b><span>5 STEPS</span></div>
+  <ol class="steps">
+    <li>小红书「+」→ 图文 → 按 01→09 顺序选 9 张</li>
+    <li>粘贴<b>标题</b> → 粘贴<b>正文</b> → 填 <b>7 个话题</b></li>
+    <li>底部「<b>添加商品</b>」→ 选 0.99 的 81 型档案商品卡</li>
+    <li>位置不填 → 发布</li>
+    <li>10 分钟内发<b>置顶评论</b>，并回前 5 条真实评论</li>
+  </ol>
+</section>
+
+<section>
+  <div class="h"><b>标题</b><span>11 字</span><button class="copy" data-copy="t-title">复制</button></div>
+  <div class="box titlebox" id="t-title">鸣人靠直觉，还是靠经验</div>
+</section>
+
+<section>
+  <div class="h"><b>正文</b><span>519 字</span><button class="copy" data-copy="t-body">复制</button></div>
+  <div class="box small" id="t-body">吵、冲动、爱出风头，可他从没放弃过任何一个人——这大概是鸣人最容易被记住的样子。
+
+但真要把他塞进 16 型，麻烦就来了：E、F、P 三维几乎没人有意见，唯独第二维（认知方式：靠直觉还是靠经验），粉丝吵了很多年。
+
+说他像 N 的人抓住这一点：他要改的不是某一场仗的输赢，而是「忍者为什么要互相仇杀」这件事本身。这个目标看不见，也没人能验证，他还是拿命去换。
+说他像 S 的人也很有理：他学什么都靠身体记。讲一遍原理他听不懂，练一百遍就会了。计划、推演、长期布局，他一样都不做。
+
+这一维之所以吵不完，是因为他两头都占：目标远得没人信，方法土得只剩练。16 型只能在这里二选一，81 型却在这一维留了中间档 B——既认一个说不清的目标，也全靠具体经验往前挪。很多人在这一维其实就停在中间。
+
+档案里第 29 题正好在问这里：「我更关注当下正在发生的事，先把眼前的事情做好」对「我时常思考人生的意义和本质，喜欢追问事物存在和发展的根本原因」。五档，中间三档都算数。整套 40 题，约 6–8 分钟，做完会告诉你在 81 格里落在哪一格——包括这一维的中间档。
+
+你是目标先来，还是经验先来？
+
+本内容仅供自我探索与娱乐参考，不构成心理诊断、医疗建议或招聘依据。MBTI-PRO 与 MBTI 官方机构无关联。</div>
+</section>
+
+<section>
+  <div class="h"><b>话题标签</b><span>7 个</span><button class="copy" data-copy="t-tags">复制</button></div>
+  <div class="box small" id="t-tags">#人格测试 #MBTI #自我探索 #火影忍者 #ENFP #漩涡鸣人 #性格分析</div>
+</section>
+
+<section>
+  <div class="h"><b>作者置顶评论</b><span>发布后 10 分钟</span><button class="copy" data-copy="t-pin">复制</button></div>
+  <div class="box small" id="t-pin">我先来：目标先来，但方法是练出来的。</div>
+</section>
+
+<section>
+  <div class="h"><b>9 张图</b><span>01 → 09 按序上传</span></div>
+  <div class="grid" id="grid"></div>
+  <div class="tip">第 1 张是封面。存图时按 01→09 顺序存，上传时相册里倒序也好看得出来。</div>
+</section>
+
+<footer>
+  MBTI-PRO · Day1 发布包（2026-11-13）· 本页仅供本人搬运素材，不对外分享<br>
+  图片为本地 HTML/CSS 渲染，非 AI 生成图
+</footer>
+
+<div class="toast" id="toast">已复制</div>
+
+<script>
+const CAPS = [
+  '封面 · 漩涡鸣人 / 钩子',
+  '争议 · 直觉还是经验',
+  '一边 · 说他靠直觉',
+  '另一边 · 说他靠经验',
+  '另外三维没争议',
+  '结论 · 他两头都占',
+  '原题 #29 · 五档',
+  '人物卡 · 鸣人',
+  '互动 + 免责'
+];
+const grid = document.getElementById('grid');
+// 静态托管要求每个资源都带 sharecode，否则图片 403；这里把当前查询串拼到图片地址上
+const Q = location.search || '';
+CAPS.forEach((cap, i) => {
+  const n = String(i + 1).padStart(2, '0');
+  const fig = document.createElement('figure');
+  fig.innerHTML = `<img src="img/${n}.png${Q}" alt="P${i+1} ${cap}" loading="lazy">
+    <figcaption><span>P${i+1} · ${cap}</span><span>${n}.png</span></figcaption>`;
+  grid.appendChild(fig);
+});
+
+const toast = document.getElementById('toast');
+function showToast(msg) {
+  toast.textContent = msg;
+  toast.classList.add('on');
+  setTimeout(() => toast.classList.remove('on'), 1400);
+}
+document.querySelectorAll('button.copy').forEach(btn => {
+  btn.addEventListener('click', async () => {
+    const el = document.getElementById(btn.dataset.copy);
+    const text = el.innerText.trim();
+    try {
+      await navigator.clipboard.writeText(text);
+      showToast('已复制');
+    } catch (e) {
+      const r = document.createRange();
+      r.selectNodeContents(el);
+      const sel = getSelection();
+      sel.removeAllRanges();
+      sel.addRange(r);
+      showToast('已选中，长按复制');
+    }
+  });
+});
+</script>
+</body>
+</html>

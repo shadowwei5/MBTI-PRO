@@ -88,3 +88,6 @@ scripts/video-pipeline/_patch*
 # ── 小红书发布包：图片副本（本地生成物，传手机用）─────────
 # 重生成：node scripts/xhs-daily/build-publish-pack.mjs --note day1 --date YYYY-MM-DD
 docs/xhs-daily/week1/*-发布包-*/
+
+# 手机取图页的图片副本（源图在 week1/dayN，部署前复制过来即可）
+docs/xhs-daily/mobile/img/

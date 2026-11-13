@@ -1,0 +1,5 @@
+appId: wbapp_6qxBJXWAtyrLk0sZLmZPkF
+name: 小红书 Day1 发布包
+localDir: H:\ccwork\MBTI-PRO\docs\xhs-daily\mobile
+appType: web
+entryHtml: index.html

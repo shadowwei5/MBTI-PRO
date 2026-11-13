@@ -213,11 +213,11 @@ const NOTE_LIBRARY = {
     },
     "cta": "目标先来，\n还是经验先来？",
     "hint": "评论区聊聊，我们先来：目标先来，但方法是练出来的。",
-    "title": "鸣人到底是 N 还是 S",
+    "title": "鸣人靠直觉，还是靠经验",
     "tags": "#人格测试 #MBTI #自我探索 #火影忍者 #ENFP #漩涡鸣人 #性格分析",
     "body": [
       "吵、冲动、爱出风头，可他从没放弃过任何一个人——这大概是鸣人最容易被记住的样子。",
-      "但真要把他塞进 16 型，麻烦就来了：E、F、P 三维几乎没人有意见，唯独第二维（认知方式），粉丝吵了很多年。",
+      "但真要把他塞进 16 型，麻烦就来了：E、F、P 三维几乎没人有意见，唯独第二维（认知方式：靠直觉还是靠经验），粉丝吵了很多年。",
       "说他像 N 的人抓住这一点：他要改的不是某一场仗的输赢，而是「忍者为什么要互相仇杀」这件事本身。这个目标看不见，也没人能验证，他还是拿命去换。\n说他像 S 的人也很有理：他学什么都靠身体记。讲一遍原理他听不懂，练一百遍就会了。计划、推演、长期布局，他一样都不做。",
       "这一维之所以吵不完，是因为他两头都占：目标远得没人信，方法土得只剩练。16 型只能在这里二选一，81 型却在这一维留了中间档 B——既认一个说不清的目标，也全靠具体经验往前挪。很多人在这一维其实就停在中间。",
       "档案里第 29 题正好在问这里：「我更关注当下正在发生的事，先把眼前的事情做好」对「我时常思考人生的意义和本质，喜欢追问事物存在和发展的根本原因」。五档，中间三档都算数。整套 40 题，约 6–8 分钟，做完会告诉你在 81 格里落在哪一格——包括这一维的中间档。",
@@ -237,8 +237,8 @@ const NOTE_LIBRARY = {
       "link": "想得远，也肯把刚定的方案当场推翻。"
     },
     "coverLines": [
-      "他不是 ESTJ",
-      "是 ENTD"
+      "他真是计划型吗",
+      "还是随时改"
     ],
     "coverHighlight": "是 ENTD",
     "dispute": {
@@ -308,7 +308,7 @@ const NOTE_LIBRARY = {
     },
     "cta": "你是计划型，\n还是随时改？",
     "hint": "评论区聊聊，我们先来：大方向不改，路线随时改。",
-    "title": "钢铁侠不是 ESTJ，是 ENTD",
+    "title": "钢铁侠是计划型，还是随时改",
     "tags": "#人格测试 #MBTI #自我探索 #漫威 #钢铁侠 #ENTD #性格分析",
     "body": [
       "发布会、记者会、听证会，越多人看着他越来劲；战甲从 Mark I 一路迭代，做的都是当时还不存在的东西。E、N、T 三维在钢铁侠（托尼·斯塔克）身上几乎不用争。",
@@ -593,7 +593,7 @@ const NOTE_LIBRARY = {
     },
     "cta": "你是台前型，\n还是幕后型？",
     "hint": "评论区聊聊，我们先来：幕后推完，台前只说结论。",
-    "title": "柯南到底是 E 还是 I",
+    "title": "柯南是台前型，还是幕后型",
     "tags": "#人格测试 #MBTI #自我探索 #名侦探柯南 #ENTJ #江户川柯南 #性格分析",
     "body": [
       "一到现场就接管局面：问谁、查哪、下一步做什么，全由他开口安排。N、T、J 三维在柯南身上口径一致。",
@@ -826,12 +826,21 @@ const namePx = cnLen <= 2 ? 168 : cnLen === 3 ? 140 : 118;
 const maxHook = Math.max(...NOTE.coverLines.map(l => [...l].length));
 const hookPx = maxHook <= 6 ? 78 : maxHook <= 8 ? 70 : 62;
 
+// 争议维注脚用中文档位，不直接甩 S/B/N 这类字母（读者看不懂）
+const SCALE_ZH = {
+  'S / B / N': '实感/均衡/直觉',
+  'J / D / P': '判断/动态/感知',
+  'T / C / F': '思考/复合/情感',
+  'E / A / I': '外向/平衡/内向'
+};
+const scaleZh = SCALE_ZH[D.scale] || D.scale;
+
 const p1 = `<div class="p1" style="position:absolute;inset:0">
   <div class="name-wrap"><div class="cover-name serif" style="font-size:${namePx}px">${esc(coverName)}</div></div>
   <div class="person-work">${esc(NOTE.person.work || '')} · 流行参照</div>
   <div class="cover-title serif" style="font-size:${hookPx}px">${NOTE.coverLines.map(t => esc(t)).join('<br>')}</div>
   <div class="person-link">${esc(NOTE.person.link)}</div>
-  <div class="dtag mono">争议维 · <b>${esc(D.dimNo)} ${esc(D.dimName)}</b> · ${esc(D.scale)}</div>
+  <div class="dtag mono">争议维 · <b>${esc(D.dimNo)} ${esc(D.dimName)}</b> · ${esc(scaleZh)}</div>
 </div>`;
 
 const p2 = `<div class="p2" style="position:absolute;inset:0">
