@@ -4,15 +4,55 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>MBTI-PRO 81 型人格测评</title>
-<meta http-equiv="refresh" content="0;url=/">
 <style>
+  * { box-sizing: border-box; }
   body { margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center;
-         background: #f2ede3; color: #1a1a1a; font-family: system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; }
-  a { color: #0f6b54; }
+         background: #f2ede3; color: #1a1a1a; padding: 24px;
+         font-family: system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; }
+  .card { width: 100%; max-width: 360px; text-align: center; }
+  .brand { font-size: 13px; letter-spacing: .18em; color: #8a8175; margin: 0 0 18px; }
+  .title { font-size: 26px; line-height: 1.35; margin: 0 0 14px; font-weight: 600; }
+  .desc { font-size: 14px; line-height: 1.8; color: #6b6258; margin: 0 0 28px; }
+  .btn { display: block; width: 100%; padding: 16px 0; border-radius: 999px;
+         background: #1a1a1a; color: #f2ede3; text-decoration: none;
+         font-size: 16px; letter-spacing: .06em; }
+  .btn:active { opacity: .82; }
+  .tip { margin: 18px 0 0; font-size: 12px; line-height: 1.7; color: #9a9186; }
+  .tip a { color: #0f6b54; text-decoration: underline; }
 </style>
 </head>
 <body>
-<p>正在进入 MBTI-PRO 81 型人格测评… <a href="/">点击直达</a></p>
-<script>location.replace("/");</script>
+<main class="card">
+  <p class="brand">MBTI-PRO</p>
+  <h1 class="title">81 型人格测评</h1>
+  <p class="desc" id="desc">正在为你打开测评…</p>
+  <a class="btn" id="go" href="/">立即进入</a>
+  <p class="tip">如果长时间停留本页，请点上方按钮。<br>遇到问题请在店铺里联系客服。</p>
+</main>
+<script>
+(function () {
+  var code = '';
+  try {
+    code = new URLSearchParams(window.location.search).get('code') || '';
+  } catch (e) { code = ''; }
+  var target = code ? '/?code=' + encodeURIComponent(code) : '/';
+  var go = document.getElementById('go');
+  var desc = document.getElementById('desc');
+
+  go.setAttribute('href', target);
+  if (code) {
+    desc.textContent = '正在自动兑换并进入测评…';
+  }
+
+  // 只用 location.assign，不用 meta refresh / location.replace：
+  // 小红书、微信等内置 webview 会拦截这两种自动跳转，表现为"点了没反应"。
+  // 同时保留按钮作为兜底，跳转失败时用户仍能手动进入。
+  setTimeout(function () {
+    try {
+      window.location.assign(target);
+    } catch (e) { /* 忽略，按钮兜底 */ }
+  }, 400);
+})();
+</script>
 </body>
 </html>
