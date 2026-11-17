@@ -147,7 +147,61 @@ body { background:#DDD8CE; padding:40px 0; }
 .p7 .scale div b { color:var(--accent); font-weight:500; }
 .p7 .scale .scale-tip { border:1px solid var(--rule); background:var(--paper-light); color:var(--ink); font-size:16px; }
 .p7 .qfoot { position:absolute; left:96px; top:900px; font-size:26px; color:var(--muted); }
-/* ===== P2 三题版 =====
+/* ===== 答题型专用样式（NOTE.kind === 'quiz'）===== */
+/* 单题页：题目占主位，下方是 A/B/C 选择提示 + 进度 */
+.p7.quiz-page .q-title { top:250px; font-size:64px; }
+.p7.quiz-page .q-sub { top:352px; font-size:24px; color:var(--muted); }
+.p7.quiz-page .qwrap.single { top:430px; height:400px; display:flex;
+  border-top:1px solid var(--rule); border-bottom:1px solid var(--rule); }
+.p7.quiz-page .qcol { flex:1; position:relative; padding:74px 40px 30px; font-size:34px; line-height:1.8; }
+.p7.quiz-page .qcol small { position:absolute; top:26px; left:40px; font-size:19px; letter-spacing:.14em; color:var(--muted); }
+.p7.quiz-page .qpick { position:absolute; left:96px; right:96px; top:880px; display:flex; align-items:center; gap:14px; }
+.p7.quiz-page .qpick .pick { width:76px; height:76px; border:2px solid var(--ink); border-radius:50%;
+  display:flex; align-items:center; justify-content:center; font-size:30px; color:var(--ink); }
+.p7.quiz-page .qpick .pick:nth-child(2) { border-color:var(--accent); color:var(--accent); }
+.p7.quiz-page .qpick .pick-tip { margin-left:16px; font-size:26px; color:var(--muted); letter-spacing:.04em; }
+.p7.quiz-page .qprogress { position:absolute; left:96px; right:96px; top:1010px; display:flex;
+  justify-content:space-between; font-size:22px; color:var(--muted); letter-spacing:.1em; }
+.p7.quiz-page .qprogress .on { color:var(--accent); }
+
+/* P5 结果对照表：读者自己的坐标，可存 */
+.p5.result-map { background:#FBF6EC; }
+.p5.result-map .rm-title { position:absolute; left:96px; top:230px; width:888px; font-size:56px; line-height:1.35; }
+.p5.result-map .rm-sub { position:absolute; left:96px; top:330px; font-size:24px; color:var(--muted); letter-spacing:.06em; }
+.p5.result-map .rm-list { position:absolute; left:96px; right:96px; top:392px; display:flex; flex-direction:column; gap:20px; }
+.p5.result-map .rm { border:1px solid var(--rule); background:#FFFFFF; padding:24px 30px; }
+.p5.result-map .rm-head { display:flex; align-items:baseline; gap:18px; margin-bottom:12px; }
+.p5.result-map .rm-head b { font-size:48px; line-height:1; color:var(--accent); font-weight:700;
+  font-family:'DM Mono','Consolas',monospace; }
+.p5.result-map .rm-head span { font-size:32px; font-weight:600; color:var(--ink); letter-spacing:.01em; }
+.p5.result-map .rm-desc { margin:0; font-size:24px; line-height:1.7; color:var(--muted); }
+.p5.result-map .rm-foot { position:absolute; left:96px; right:96px; bottom:250px; font-size:23px;
+  color:var(--muted); letter-spacing:.08em; text-align:center; }
+
+/* P6 角色锚点：上方一句判断 + 该角色在【争议维】上的落点 + 人物卡
+   答题型没有大幅画像，卡片改为左下横向排布，给文字留出空间 */
+.p8.anchor .anchor-note { position:absolute; left:96px; top:236px; font-size:26px; color:var(--muted); letter-spacing:.04em; }
+.p8.anchor .anchor-pos { position:absolute; left:96px; right:96px; top:290px; padding:24px 30px;
+  background:var(--paper-light); border-left:4px solid var(--accent); }
+.p8.anchor .ap-scale { display:flex; align-items:center; gap:14px; margin-bottom:12px; }
+.p8.anchor .ap-scale .ap-pole { font-size:40px; color:var(--muted); font-family:'DM Mono','Consolas',monospace; }
+.p8.anchor .ap-scale .ap-pole.is-hot { color:var(--accent); font-weight:700; }
+.p8.anchor .ap-scale i { color:var(--rule); font-style:normal; }
+.p8.anchor .ap-cap { font-size:23px; color:var(--muted); letter-spacing:.04em; }
+.p8.anchor .hook { top:492px; width:888px; font-size:52px; line-height:1.5; }
+.p8.anchor .card { left:96px; right:96px; width:auto; height:auto; top:660px;
+  border:1px solid var(--rule); background:var(--paper-light); padding:30px 34px; }
+.p8.anchor .card .c-no { font-size:18px; }
+.p8.anchor .card .c-code { margin-top:14px; font-size:17px; }
+.p8.anchor .card .c-work { margin-top:8px; font-size:19px; }
+.p8.anchor .card .c-name { font-size:56px; margin-top:4px; }
+.p8.anchor .card .c-name.long { font-size:40px; }
+.p8.anchor .card .c-field { font-size:21px; margin-top:6px; }
+.p8.anchor .card .c-rule { margin:10px 0 8px; }
+.p8.anchor .card .c-story { font-size:21px; line-height:1.6; }
+.p8.anchor .card .c-foot { position:static; margin-top:14px; font-size:16px; line-height:1.5; }
+
+/* ===== P2 三题版（角色型，一页放 3 题）=====
    封面承诺「3 道题」就必须真给 3 道（爆款「6 道题」也是真给 6 道，承诺必须兑现）。
    三题横排会挤，故改为竖排三段，每段一道双极题。 */
 .p7.has-quiz3 .q-title { top:252px; font-size:56px; }
@@ -1289,7 +1343,191 @@ const NOTE_LIBRARY = {
       "在评论区打出你的 3 个字母，然后 @点点，她会给你一段专属分析。",
       "本内容仅供自我探索与娱乐参考，不构成心理诊断、医疗建议或招聘依据。MBTI-PRO 与 MBTI 官方机构无关联。"
     ],
-    "pinned": "我先来：靠独处想清楚，再一口气说完。"
+    "pinned": "我先来：E。有话必须当场说完，憋着才难受。你也可以打出 3 个字母，@点点 会给你一段专属分析。"
+  },
+  "day8": {
+    "key": "day8",
+    "no": 8,
+    "kind": "quiz",
+    "person": {
+      "name": "柯南",
+      "alias": "江户川柯南 · Detective Conan",
+      "work": "《名侦探柯南》",
+      "field": "高中生侦探",
+      "story": "工藤新一被卷入事件后身体缩小，从此以小学生身份出现，仍靠碎片证据一步步把真相收网。",
+      "link": "现场他开口，幕后他消失。"
+    },
+    "coverLines": [
+      "回完消息",
+      "要不要缓半小时"
+    ],
+    "coverHighlight": "要不要缓半小时",
+    "posterKicker": "3 道题 · 测出你是哪一种",
+    "posterResults": [
+      {
+        "k": "E",
+        "v": "现场就开口\n电量当场充"
+      },
+      {
+        "k": "A",
+        "v": "看场合切换\n两边都来劲"
+      },
+      {
+        "k": "I",
+        "v": "先观察再融\n独处才回血"
+      }
+    ],
+    "posterNote": "群里最安静的，往往是话最多的那个人——\n他只是把话留到了没人的地方。",
+    "posterFoot": "3 道题，60 秒做完",
+    "coverIcon": "magnifier",
+    "coverIconCap": "一只放大镜 · 一个领结 · 一条线索",
+    "footStrip": [
+      [
+        "3 道题",
+        "当场就能做"
+      ],
+      [
+        "约 1 分钟",
+        "不用跳转"
+      ],
+      [
+        "81 型",
+        "含中间档"
+      ]
+    ],
+    "showWebShot": false,
+    "dispute": {
+      "dimNo": "01",
+      "dimName": "能量来源",
+      "scale": "E / A / I",
+      "stanceA": "E",
+      "stanceB": "I",
+      "claim": "你在人群里和独处时，是同一个人吗？",
+      "note": "这里测的是能量来源，跟聪明不聪明没关系。",
+      "forA": {
+        "title": "像 E 的地方",
+        "desc": "群里消息一多你就想回；想法还没成型，先说出来再说。"
+      },
+      "forB": {
+        "title": "像 I 的地方",
+        "desc": "回完消息要缓半小时；不是不想说，是需要先在心里排好队。"
+      },
+      "other": {
+        "title": "别急着对号入座",
+        "desc": "这一维只有三档，81 型给中间留了位置——很多人是「看场合切换」，不是二选一。"
+      },
+      "verdict": "没有社恐，只有充电方式不同。",
+      "why": "现场充电的人，独处时会显得安静；独处充电的人，人多时反而更来劲。两种都正常。",
+      "punch": "回完消息要缓半小时，\n不是不喜欢聊天。"
+    },
+    "dims": [
+      {
+        "k": "01 能量来源",
+        "v": "E / A / I",
+        "letter": "E",
+        "dot": 12,
+        "hot": true
+      },
+      {
+        "k": "02 认知方式",
+        "v": "S / B / N",
+        "letter": "N",
+        "dot": 88
+      },
+      {
+        "k": "03 决策方式",
+        "v": "T / C / F",
+        "letter": "T",
+        "dot": 12
+      },
+      {
+        "k": "04 生活态度",
+        "v": "J / D / P",
+        "letter": "J",
+        "dot": 12
+      }
+    ],
+    "question": {
+      "id": 1,
+      "dim": "E_I",
+      "label": "40q-v1 · 原题 #1 · 能量来源",
+      "left": "参加大型聚会后，我感到精力充沛、心情愉悦。",
+      "right": "参加大型聚会后，我需要独处一段时间来恢复精力。",
+      "foot": "三档 · A 正方 / B 两边都像 / C 反方"
+    },
+    "quiz3": [
+      {
+        "no": 1,
+        "id": 1,
+        "left": "参加大型聚会后，我感到精力充沛、心情愉悦。",
+        "right": "参加大型聚会后，我需要独处一段时间来恢复精力。"
+      },
+      {
+        "no": 2,
+        "id": 6,
+        "left": "在团队讨论中，我通常是发言最多的人之一。",
+        "right": "在团队讨论中，我更多是倾听和观察，深思熟虑后再发言。"
+      },
+      {
+        "no": 3,
+        "id": 20,
+        "left": "我通过与他人交流来整理和厘清自己的想法。",
+        "right": "我的内心世界很丰富，常常进行自我对话和反思。"
+      }
+    ],
+    "resultMap": [
+      {
+        "k": "E",
+        "v": "你是 E：现场就开口",
+        "d": "人群对你来说是充电，独处才是消耗。你在群里话多，一个人时安静——这不是双标，是你的节奏。"
+      },
+      {
+        "k": "A",
+        "v": "你是 A：看场合切换",
+        "d": "你在人多的地方和独处时判若两人，但这两种都是真的。81 型在中间这一档留了位置给你。"
+      },
+      {
+        "k": "I",
+        "v": "你是 I：先观察再融",
+        "d": "你回完消息要缓半小时。你不是不想聊，是需要先在心里把话排好队。"
+      }
+    ],
+    "result": {
+      "code": "ENTJ",
+      "name": "指挥官型",
+      "group": "NT 深紫组",
+      "color": "#6B3FA0"
+    },
+    "vote": [
+      {
+        "k": "E",
+        "d": "现场就开口\n电量当场充"
+      },
+      {
+        "k": "A",
+        "d": "看场合切换\n两边都来劲"
+      },
+      {
+        "k": "I",
+        "d": "先观察再融\n独处才回血"
+      }
+    ],
+    "ask": "在评论区打出你的 3 个字母，然后 @点点 拿专属分析。",
+    "cta": "你是 E、A\n还是 I？",
+    "hint": "先打字母，再补一句你为什么选它。",
+    "title": "你回完消息要缓半小时，其实分三种",
+    "tags": "#测一测你是哪一种 #e人i人 #人格测试 #MBTI #自我探索 #社交能量 #81型人格",
+    "body": [
+      "群里消息一多，你就想回；可回完那一长串，又想一个人待会儿。",
+      "你不是社恐。你只是属于下面三种人之一。",
+      "先做那 3 道题，每道选 A / B / C，记住你的 3 个字母（题目在图上）。",
+      "三道题全 A，你就是 E：人群对你来说是充电，独处才是消耗。\n全 C，你是 I：回完消息要缓半小时，不是讨厌聊天，是要先在心里把话排好队。\n有 A 有 C，你是 A：看场合切换，两种都是真的——这一档 16 型里根本没有位置。",
+      "如果你觉得自己「一会儿很外向一会儿很内向」，你多半就是 A 档。这不是矛盾，是能量来源本来就分三档，不是两档。",
+      "整套 40 题，约 6–8 分钟，做完会告诉你在 81 格里落在哪一格——是端值，还是中间。",
+      "在评论区打出你的 3 个字母，然后 @点点，她会给你一段专属分析。",
+      "本内容仅供自我探索与娱乐参考，不构成心理诊断、医疗建议或招聘依据。MBTI-PRO 与 MBTI 官方机构无关联。"
+    ],
+    "pinned": "我先来：E。群里消息一多就想回，回完再缓一会儿。你打几个字母？@点点 会给你一段专属分析。"
   }
 };
 /* ==== NOTES:END ==== */
@@ -1302,6 +1540,8 @@ const esc = s => String(s).replace(/[&<>]/g, c => ({ '&':'&amp;', '<':'&lt;', '>
 const nl = s => esc(s).replace(/\n/g, '<br>');
 const no2 = String(NOTE.no).padStart(2, '0');
 const LABELS = ['COVER', 'DO IT NOW', 'SIGN', 'SIGN', 'VERDICT', 'RESULT', 'COMMENT'];
+// 答题型页眉标签：P2/P3/P4 是「第 N 题」，不是证据页
+const QUIZ_LABELS = ['COVER', 'QUESTION 1', 'QUESTION 2', 'QUESTION 3', 'YOUR RESULT', 'POP REFERENCE', 'COMMENT'];
 const D = NOTE.dispute;
 
 // 81 型人格画像：渲染脚本会用 window.__PORTRAIT_BASE 覆盖成 file:// 绝对路径
@@ -1401,15 +1641,18 @@ const BRUSH = `<svg viewBox="0 0 300 300" width="100%" height="100%" preserveAsp
 const COVER_ICONS = { strawhat: STRAWHAT, magnifier: MAGNIFIER, cake: CAKE, quill: QUILL, brush: BRUSH };
 
 // 封面（P1）不带任何文档元素：调查结论是栏目名/页码/页脚会让缩略图主文案只占 35%
-const shell = (inner, n) => `<section class="page">
+const shell = (inner, n) => {
+  const LB = NOTE.kind === 'quiz' ? QUIZ_LABELS : LABELS;
+  return `<section class="page">
   ${n === 1 ? '' : `<div class="head mono">
     <span class="h-l">MBTI — PRO</span>
-    <span>PERSONALITY ARCHIVE / ${LABELS[n - 1]}</span>    <span class="h-r">${String(n).padStart(2, '0')} / 07</span>
+    <span>PERSONALITY ARCHIVE / ${LB[n - 1]}</span>    <span class="h-r">${String(n).padStart(2, '0')} / 07</span>
   </div>
-  <div class="eyebrow mono">${String(n).padStart(2, '0')} / ${LABELS[n - 1]}</div>`}
+  <div class="eyebrow mono">${String(n).padStart(2, '0')} / ${LB[n - 1]}</div>`}
   ${inner}
   ${n === 1 ? '' : `<div class="footer mono"><span>81-TYPE PERSONALITY ARCHIVE</span><span>NO.${no2}</span></div>`}
 </section>`;
+};
 
 // 封面人物名优先：名字按字数分档放大，钩子按最长一行自动降档，避免压住下方关系句
 const coverName = NOTE.person.coverName || NOTE.person.name;
@@ -1515,6 +1758,64 @@ const nameCls = nameLen <= 3 ? '' : (nameLen <= 5 ? ' mid' : ' long');
 // 剧情文字按长度分档缩字号：卡片底部空间固定，最长的一篇（柯南 41 字）不降档会压到下面的类型码与免责
 const storyLen = [...(NOTE.person.story || '')].length;
 const storyCls = storyLen > 40 ? ' s' : (storyLen > 36 ? ' m' : '');
+// ===== 答题型笔记（NOTE.kind === 'quiz'）=====
+// 核心差异：读者在图上当场做完 3 道题，P5 直接给出「你的字母 → 属于哪一档」，
+// 不跳去网站才知道结果。角色降为 P6 的锚点，不再是主角。
+// P1 封面(三档直接列出) → P2/P3/P4 三道题 → P5 结果对照表 → P6 角色锚点 → P7 互动
+
+// 单题页（P2/P3/P4 复用）
+const qPage = (q, idx) => `<div class="p7 quiz-page" style="position:absolute;inset:0">
+  <div class="q-title serif">第 ${q.no} 题</div>
+  <div class="q-sub mono">40q-v1 · 原题 #${q.id} · 能量来源</div>
+  <div class="qwrap single">
+    <div class="qcol serif"><small class="mono">A · 正方</small>${esc(q.left)}</div>
+    <div class="qcol serif"><small class="mono">C · 反方</small>${esc(q.right)}</div>
+  </div>
+  <div class="qpick mono">
+    <span class="pick">A</span><span class="pick">B</span><span class="pick">C</span>
+    <span class="pick-tip">选一个，把字母记下来</span>
+  </div>
+  <div class="qprogress mono">
+    <span class="on">第 ${idx + 1} 题</span><span>共 3 题</span>
+  </div>
+</div>`;
+
+// P5 结果对照表：读者自己的 3 个字母 → 属于哪一档（这是「可存」的东西）
+const pMap = `<div class="p5 result-map" style="position:absolute;inset:0">
+  <div class="rm-title serif">你的 3 个字母，属于哪一档？</div>
+  <div class="rm-sub mono">对照一下你刚才选的那 3 个</div>
+  <div class="rm-list">${(NOTE.resultMap || []).map((r) => `
+    <div class="rm">
+      <div class="rm-head"><b>${esc(r.k)}</b><span>${esc(r.v)}</span></div>
+      <p class="rm-desc">${esc(r.d)}</p>
+    </div>`).join('')}</div>
+  <div class="rm-foot mono">存下来，对照完你就是自己的坐标</div>
+</div>`;
+
+// P6 角色锚点：这个角色属于哪一档
+// 注意口径：读者刚测的是「争议维」（如 E/I 能量来源），所以这里必须展示该角色
+// 在【这一维】上的落点，而不是整套 81 型画像——否则跨维度，读者会困惑。
+const pAnchor = `<div class="p8 anchor" style="position:absolute;inset:0">
+  <div class="hook serif">${nl(D.punch)}</div>
+  <div class="anchor-note">同一种能量，在这个人身上是这样的</div>
+  <div class="anchor-pos">
+    <div class="ap-scale">
+      ${D.scale.split(' / ').map((p) => `<span class="ap-pole${p === NOTE.dims.find(d=>d.hot)?.letter ? ' is-hot' : ''}">${esc(p)}</span>`).join('<i>·</i>')}
+    </div>
+    <div class="ap-cap mono">${esc(NOTE.person.name)} 在第 ${esc(D.dimNo)} 维（${esc(D.dimName)}）落在 ${esc(NOTE.dims.find(d=>d.hot)?.letter || '')}</div>
+  </div>
+  <div class="card">
+    <div class="c-no mono">POP REFERENCE / 01</div>
+    <div class="c-code mono">${esc(NOTE.result.code)} · ${esc(NOTE.result.name)}</div>
+    <div class="c-work">${esc(NOTE.person.work || '')}</div>
+    <div class="c-name serif${nameCls}">${esc(NOTE.person.name)}</div>
+    <div class="c-field">${esc(NOTE.person.field)}</div>
+    <div class="c-rule"></div>
+    <div class="c-story${storyCls}">${esc(NOTE.person.story)}</div>
+    <div class="c-foot mono">${NOTE.person.fictionNote ? NOTE.person.fictionNote.replace(/&lt;br&gt;/g, '<br>').replace(/<br>/g, '<br>') : '虚构角色 · 仅作性格类比<br>与作品版权方无关联 · 非官方'}</div>
+  </div>
+</div>`;
+
 const p8 = `<div class="p8" style="position:absolute;inset:0">
   <div class="hook serif">${nl(D.punch)}</div>
   <div class="type-tag">${esc(NOTE.result.code)} / ${esc(NOTE.result.name)}</div>
@@ -1551,12 +1852,17 @@ const p9 = `<div class="p9${vote ? ' has-vote' : ''}" style="position:absolute;i
   <div class="endbar"></div>
 </div>`;
 
-document.getElementById('root').innerHTML = [
-  // 7 图结构（2026-11-17 调研结论：爆款是 6-7 张，且题目必须在 P2 就让读者当场能做）
-  // P1 封面 → P2 当场做题 → P3/P4 两侧证据 → P5 结论 → P6 结果卡 → P7 @点点互动
-  shell(p1, 1), shell(p7, 2), ...signs.slice(0, 2).map((s, i) => shell(s, i + 3)),
-  shell(p6, 5), shell(p8, 6), shell(p9, 7)
-].join('');
+document.getElementById('root').innerHTML = NOTE.kind === 'quiz'
+  ? [
+    // 答题型 7 图（2026-11-18）：读者当场做完并得到结果
+    shell(p1, 1), ...NOTE.quiz3.map((q, i) => shell(qPage(q, i), i + 2)),
+    shell(pMap, 5), shell(pAnchor, 6), shell(p9, 7)
+  ].join('')
+  : [
+    // 角色型 7 图（2026-11-17）：P1 封面 → P2 当场做题 → P3/P4 两侧证据 → P5 结论 → P6 结果卡 → P7 互动
+    shell(p1, 1), shell(p7, 2), ...signs.slice(0, 2).map((s, i) => shell(s, i + 3)),
+    shell(p6, 5), shell(p8, 6), shell(p9, 7)
+  ].join('');
 </script>
 </body>
 </html>

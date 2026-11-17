@@ -51,7 +51,6 @@ for (const t of targets) {
   // 2026-11-17 起改为 7 图结构（爆款调研结论：6-7 张，题目提前到 P2）
   const EXPECTED = 7;
   if (count !== EXPECTED) throw new Error(`[${t.note}] 期望 ${EXPECTED} 页，实际 ${count} 页，请检查 cards.html 的页面组装`);
-
   for (let i = 0; i < count; i++) {
     const name = `${String(i + 1).padStart(2, '0')}.png`;
     const file = resolve(t.out, name);

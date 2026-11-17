@@ -7,7 +7,7 @@ import { pathToFileURL } from 'node:url';
 
 const ROOT = resolve(import.meta.dirname, '..', '..');
 const HTML = resolve(ROOT, 'docs', 'xhs-daily', 'template', 'cards.html');
-const WEEK = ['day1', 'day2', 'day3', 'day4', 'day5', 'day6', 'day7'];
+const WEEK = ['day1', 'day2', 'day3', 'day4', 'day5', 'day6', 'day7', 'day8'];
 const SEL = '.cover-title,.person-line,.person-link,.dtag,.scene,.note,.spec,' +
   '.idx,.bar,.title,.desc,.body,.footnote,.q-title,.q-sub,.qwrap,.scale,.qfoot,' +
   '.hook,.type-tag,.dispute,.group,.card,.cta,.hint,.disc,.qcol,' +
