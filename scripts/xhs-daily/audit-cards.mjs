@@ -10,7 +10,15 @@ const HTML = resolve(ROOT, 'docs', 'xhs-daily', 'template', 'cards.html');
 const WEEK = ['day1', 'day2', 'day3', 'day4', 'day5', 'day6', 'day7'];
 const SEL = '.cover-title,.person-line,.person-link,.dtag,.scene,.note,.spec,' +
   '.idx,.bar,.title,.desc,.body,.footnote,.q-title,.q-sub,.qwrap,.scale,.qfoot,' +
-  '.hook,.type-tag,.dispute,.group,.card,.cta,.hint,.disc,.qcol';
+  '.hook,.type-tag,.dispute,.group,.card,.cta,.hint,.disc,.qcol,' +
+  // P8 结果卡内部：画像与下面几行文字容易互相压住，必须纳入检测
+  '.c-no,.c-portrait,.c-portrait-cap,.c-work,.c-name,.c-field,.c-rule,.c-story,.c-code,.c-foot,' +
+  // P1 封面别名行 + 封面画像 + 信息条
+  '.person-alias,.cover-name,.name-wrap,.cover-portrait,.cover-portrait-cap,.foot-strip,' +
+  // P3/P4/P5 证据页：desc 与 quote 之间容易挤压
+  '.quote,.q-txt,.q-src,' +
+  // P7 四维坐标条
+  '.shot,.cs-head,.cs-row,.shot-cap';
 
 const browser = await chromium.launch();
 let bad = 0;
@@ -58,4 +66,4 @@ for (const note of WEEK) {
   await page.close();
 }
 await browser.close();
-console.log(bad ? `共 ${bad} 处问题` : '全部 63 页：无溢出、无压页脚、无重叠');
+console.log(bad ? `共 ${bad} 处问题` : `全部 ${WEEK.length * 7} 页：无溢出、无压页脚、无重叠`);

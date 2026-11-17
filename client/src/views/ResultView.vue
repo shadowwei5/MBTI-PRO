@@ -215,6 +215,17 @@ onUnmounted(() => { jsonLdScript?.remove() })
         </aside>
       </section>
 
+      <section v-if="hasTestData" class="share-card-cta">
+        <div class="share-card-copy">
+          <p class="share-card-kicker">你的结果卡 · 可保存 / 可分享</p>
+          <p class="share-card-title">{{ typeCode }} · {{ typeData?.name || typeName }}</p>
+          <p class="share-card-desc">一张 3:4 竖版档案卡，长按即可存到相册，直接发小红书或朋友圈。</p>
+        </div>
+        <button type="button" class="share-card-btn" @click="showSharePoster = true">
+          生成结果卡 <span aria-hidden="true">↗</span>
+        </button>
+      </section>
+
       <section v-if="hasTestData" class="result-section">
         <div class="section-head"><span>01 / COORDINATE + PORTRAIT</span><h2>四维坐标与日常画像</h2></div>
         <DimensionSpectrum
@@ -235,11 +246,16 @@ onUnmounted(() => { jsonLdScript?.remove() })
         </div>
       </section>
 
+      <!-- 付费入口：不再依赖 scores。
+           旧逻辑 v-if="hasTestData && ..." 会导致「从笔记/外链直接进入结果页」的用户
+           完全看不到购买按钮——这是一个真实的付费转化断点（2026-11-18 修正）。 -->
       <AccessGate
-        v-if="hasTestData && typeData && !paidReport"
+        v-if="typeData && !paidReport"
         compact
-        title="解锁完整 81 型报告"
-        description="在小红书店铺购买 0.99 元商品后，输入订单里的兑换码。兑换成功后，本页全部内容立即解锁，不再需要邮箱、分享或二次付费。"
+        :title="hasTestData ? '解锁完整 81 型报告' : '这份报告的完整版在这里'"
+        :description="hasTestData
+          ? '在小红书店铺购买 0.99 元商品后，输入订单里的兑换码。兑换成功后，本页全部内容立即解锁，不再需要邮箱、分享或二次付费。'
+          : '你正在看的是这份报告的免费预览。在小红书店铺购买 0.99 元商品后，输入订单里的兑换码，即可解锁四维完整解读、代表人物与成长建议——不再需要邮箱、分享或二次付费。'"
         @unlocked="onAccessUnlocked"
       />
 
@@ -474,6 +490,24 @@ onUnmounted(() => { jsonLdScript?.remove() })
 }
 
 .result-section { padding: 48px 0 52px; border-top: 1px solid var(--rule); }
+/* 结果卡 CTA：爆款验证过「一张能晒的标签卡」才是转化钩子，故提到首屏英雄区之后 */
+.share-card-cta {
+  display: flex; align-items: center; justify-content: space-between; gap: 28px; flex-wrap: wrap;
+  margin: 0 0 8px; padding: 26px 30px;
+  background: var(--paper-light, #F8F4EC); border: 1px solid var(--rule); border-left: 3px solid var(--accent, #A63D2C);
+}
+.share-card-kicker { margin: 0 0 8px; color: var(--accent, #A63D2C); font-family: "DM Mono", "SF Mono", Consolas, monospace; font-size: 10px; letter-spacing: .1em; }
+.share-card-title { margin: 0 0 6px; font-family: "Playfair Display", "Songti SC", "STSong", SimSun, serif; font-size: clamp(20px, 2.4vw, 26px); font-weight: 600; letter-spacing: -.02em; }
+.share-card-desc { margin: 0; max-width: 460px; color: var(--muted); font-size: 13px; line-height: 1.7; }
+.share-card-btn {
+  flex: none; padding: 14px 26px; border: 1px solid var(--ink); background: var(--ink); color: var(--paper, #F2EDE3);
+  font-size: 14px; letter-spacing: .04em; cursor: pointer; transition: opacity .18s ease;
+}
+.share-card-btn:hover { opacity: .82; }
+@media (max-width: 720px) {
+  .share-card-cta { padding: 20px 22px; gap: 18px; }
+  .share-card-btn { width: 100%; justify-content: center; }
+}
 .section-head { display: flex; align-items: baseline; gap: 26px; margin-bottom: 30px; }
 .section-head span { color: var(--accent); font-family: "DM Mono", "SF Mono", Consolas, "Roboto Mono", monospace; font-size: 10px; letter-spacing: .08em; white-space: nowrap; }
 .section-head h2 { margin: 0; font-family: "Playfair Display", "Songti SC", "STSong", SimSun, "Noto Serif CJK SC", "Source Han Serif SC", serif; font-size: clamp(30px, 3.4vw, 40px); font-weight: 600; letter-spacing: -.04em; }

@@ -44,7 +44,9 @@ for (const n of NOTES) {
     `| P6 | **争议结论（大字主位）** + 81 型中间档说明 ｜ 公式与四维字母降为页脚注脚（争议维高亮） |`,
     `| P7 | 原题 #${n.question.id} 双极题（${d.dimName}）｜ A–E 五档量表 |`,
     `| P8 | **主：${n.person.name}（大字人物名 + 剧情卡）** ｜ \`${n.result.code} / ${n.result.name}\` 缩为小标签 ｜ 争议维标注 ｜ ${n.result.group} ｜ 虚构角色 · 仅作性格类比 |`,
-    `| P9 | 互动提问 + 固定免责 |`
+    Array.isArray(n.vote) && n.vote.length === 3
+      ? `| P9 | 互动提问 + **${n.vote.map((v) => v.k).join(' / ')} 三选一投票框** + 「评论区打个字母」+ 固定免责 |`
+      : `| P9 | 互动提问 + 固定免责 |`
   ].join('\n');
 
   const checks = [

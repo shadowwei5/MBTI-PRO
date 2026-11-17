@@ -36,6 +36,9 @@ for (const t of targets) {
   mkdirSync(t.out, { recursive: true });
   const page = await browser.newPage({ viewport: { width: 1080, height: 1440 }, deviceScaleFactor: 1 });
   await page.addInitScript(k => { window.__NOTE_OVERRIDE = k; }, t.note);
+  // 81 型人格画像用 file:// 绝对路径，避免相对路径在 file 协议下解析错位
+  const portraitBase = pathToFileURL(resolve(ROOT, 'server', 'generated_images')).href + '/';
+  await page.addInitScript(base => { window.__PORTRAIT_BASE = base; }, portraitBase);
   await page.goto(pathToFileURL(HTML).href, { waitUntil: 'load' });
   await page.waitForSelector('.page');
   await page.evaluate(() => document.fonts.ready);
@@ -45,7 +48,9 @@ for (const t of targets) {
   if (keys.length && !keys.includes(t.note)) {
     throw new Error(`[${t.note}] 不在 NOTE_LIBRARY（${keys.join('/')}）里，请先在 notes-data.mjs 补该篇`);
   }
-  if (count !== 9) throw new Error(`[${t.note}] 期望 9 页，实际 ${count} 页，请检查 NOTE.dispute 三张证据卡`);
+  // 2026-11-17 起改为 7 图结构（爆款调研结论：6-7 张，题目提前到 P2）
+  const EXPECTED = 7;
+  if (count !== EXPECTED) throw new Error(`[${t.note}] 期望 ${EXPECTED} 页，实际 ${count} 页，请检查 cards.html 的页面组装`);
 
   for (let i = 0; i < count; i++) {
     const name = `${String(i + 1).padStart(2, '0')}.png`;

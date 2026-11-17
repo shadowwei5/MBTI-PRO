@@ -186,6 +186,41 @@ resultRoutes.get('/', async (_req, res, next) => {
   }
 })
 
+/**
+ * 免费层试读（2026-11-18）
+ *
+ * 背景：未付费时线上只返回一句 91 字简介，四维模块全空，撑不起「值得付费」，
+ * 也让免费用户无法判断这份报告到底讲了什么。
+ *
+ * 规则：每个维度模块只给开头一段（按句号切），保留「付费可得完整版」的差异感；
+ * 截断处以省略号标记，不做假内容。
+ */
+function previewOf(text: string | null | undefined, sentences = 2): string {
+  if (!text) return ''
+  const clean = text.trim()
+  if (clean.length <= 90) return clean
+  const parts = clean.split(/(?<=。)/).filter(Boolean)
+  let out = ''
+  for (const p of parts) {
+    if (out.length + p.length > 110) break
+    out += p
+    if (out.length > 40 && out.split(/(?<=。)/).length >= sentences) break
+  }
+  if (!out) out = clean.slice(0, 100)
+  const truncated = out.length < clean.length
+  return (truncated ? out.replace(/[。．.；;，,]+$/, '') + '……' : out)
+}
+
+function getFreePreviewModules(code: string) {
+  const full = getLifeAdviceModules(code)
+  return {
+    eiModule: previewOf(full.eiModule),
+    snModule: previewOf(full.snModule),
+    tfModule: previewOf(full.tfModule),
+    pjModule: previewOf(full.pjModule),
+  }
+}
+
 // GET /api/results/:typeCode/summary - compact result for listing
 resultRoutes.get('/:typeCode/summary', async (req, res, next) => {
   try {
@@ -227,6 +262,18 @@ resultRoutes.get('/:typeCode', async (req, res, next) => {
     const dbCelebrities: string[] = JSON.parse(type.celebrities || '[]')
     const celebrities = paid ? getCelebrityNames(type.code, dbCelebrities) : []
 
+    // 免费层试读（2026-11-18）：未付费时也给出内容，否则用户点进来只看到一句 91 字简介，
+    // 撑不起「值得付费」。这里只截取每个模块的开头一段，保留付费差异。
+    const freeModules = paid ? null : getFreePreviewModules(type.code)
+    const freeList = (json: string | null, n: number) => {
+      try {
+        const arr = JSON.parse(json || '[]')
+        return Array.isArray(arr) ? arr.slice(0, n) : []
+      } catch {
+        return []
+      }
+    }
+
     // Parse JSON fields
     res.json({
       success: true,
@@ -237,12 +284,12 @@ resultRoutes.get('/:typeCode', async (req, res, next) => {
         summary: TYPE_SUMMARIES[type.code] ?? null,
         overview: paid ? type.overview : '',
         population: paid ? scalePopulationFor81(type.population) : null,
-        eiModule: dimModules?.eiModule ?? null,
-        snModule: dimModules?.snModule ?? null,
-        tfModule: dimModules?.tfModule ?? null,
-        pjModule: dimModules?.pjModule ?? null,
-        strengths: paid ? JSON.parse(type.strengths) : [],
-        growthAreas: paid ? JSON.parse(type.growthAreas) : [],
+        eiModule: dimModules?.eiModule ?? freeModules?.eiModule ?? null,
+        snModule: dimModules?.snModule ?? freeModules?.snModule ?? null,
+        tfModule: dimModules?.tfModule ?? freeModules?.tfModule ?? null,
+        pjModule: dimModules?.pjModule ?? freeModules?.pjModule ?? null,
+        strengths: paid ? JSON.parse(type.strengths) : freeList(type.strengths, 1),
+        growthAreas: paid ? JSON.parse(type.growthAreas) : freeList(type.growthAreas, 1),
         careers: paid ? JSON.parse(type.careers) : [],
         suitableFields: paid ? JSON.parse(type.suitableFields) : [],
         celebrities,

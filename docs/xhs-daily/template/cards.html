@@ -32,8 +32,13 @@ body { background:#DDD8CE; padding:40px 0; }
 
 /* 主：知名人物 + 钩子文案 + 争议点；次：关系句；注脚：类型码/坐标/公式/九组色 */
 /* 封面把「人物名」提到第一位并放到最大：15–35 岁受众先认人，再读钩子 */
-.p1 .name-wrap { position:absolute; left:96px; top:232px; height:206px; display:flex; align-items:flex-end; }
+.p1 .name-wrap { position:absolute; left:96px; top:232px; height:150px; display:flex; align-items:flex-end; overflow:visible; }
 .p1 .cover-name { line-height:1; color:var(--accent); letter-spacing:.01em; font-weight:500; }
+.p1 .person-alias { position:absolute; left:96px; top:430px; font-size:24px; letter-spacing:.05em;
+  color:var(--ink); font-weight:500; }
+/* 有别名行时，作品行下移，避免与别名重叠 */
+.p1.has-alias .person-work { top:492px; }
+.p1.has-alias .cover-title { top:548px; }
 .p1 .person-work { position:absolute; left:96px; top:468px; font-size:22px; letter-spacing:.14em;
   color:var(--muted); font-family:'DM Mono','Consolas',monospace; }
 .p1 .cover-title { position:absolute; left:96px; top:518px; font-size:78px; line-height:1.52; font-weight:500; }
@@ -42,6 +47,56 @@ body { background:#DDD8CE; padding:40px 0; }
 .p1 .dtag { position:absolute; left:96px; top:1000px; width:560px; padding-top:22px;
   border-top:1px solid var(--rule); font-size:22px; letter-spacing:.1em; color:var(--muted); }
 .p1 .dtag b { color:var(--accent); font-weight:500; }
+/* ===== P1 海报式封面 =====
+   依据：爆款封面（1.4万/9003/1.1万/1219赞）实测结论——
+   无栏目名页码、主文案占宽 70%+、荧光高亮关键词、封面上直接列结果分类。
+   我们原封面主文案只占 35%，且被品牌名/页码/信息条挤掉一半版面。 */
+.p1.poster { background:#EAF2FB; }        /* 浅蓝底：与信息流米白背景拉开，缩略图更跳 */
+.p1.poster .poster-icon { position:absolute; right:64px; top:96px; width:148px; height:148px; opacity:.88; }
+.p1.poster .poster-kicker { position:absolute; left:86px; top:104px; font-size:30px; letter-spacing:.06em;
+  color:#5A6B7C; font-weight:500; }
+.p1.poster .poster-title { position:absolute; left:86px; top:176px; width:908px;
+  font-size:96px; line-height:1.42; font-weight:700; color:#1C2B3A; letter-spacing:-.01em; }
+.p1.poster .poster-title .hl { background:linear-gradient(transparent 60%, #FFE96B 60%); color:#A63D2C; }
+.p1.poster .poster-results { position:absolute; left:86px; top:556px; width:908px;
+  display:flex; gap:14px; }
+.p1.poster .poster-results .pr { flex:1; padding:26px 10px; background:#FFFFFF; border-radius:8px;
+  box-shadow:0 2px 10px rgba(28,43,58,.07); text-align:center; }
+.p1.poster .poster-results .pr b { display:block; font-size:54px; line-height:1;
+  color:#2C6FB5; font-weight:700; font-family:'DM Mono','Consolas',monospace; }
+.p1.poster .poster-results .pr span { display:block; margin-top:12px; font-size:22px; line-height:1.55; color:#4A5A6A; }
+/* 结果卡下方的「你可能是」提示条，填满中部并强化对号入座 */
+.p1.poster .poster-note { position:absolute; left:86px; top:876px; width:908px; padding:26px 30px;
+  background:rgba(255,255,255,.72); border-left:5px solid #2C6FB5; font-size:30px; line-height:1.6; color:#1C2B3A; }
+.p1.poster .poster-foot { position:absolute; left:86px; right:86px; bottom:104px;
+  font-size:32px; letter-spacing:.04em; color:#1C2B3A; font-weight:500; }
+.p1.poster .poster-foot::before { content:"→ "; color:#2C6FB5; font-weight:700; }
+/* 海报封面底部补一条浅色条，压住下缘空白 */
+.p1.poster::after { content:""; position:absolute; left:0; right:0; bottom:0; height:20px; background:#2C6FB5; }
+.p1 .cover-portrait { position:absolute; right:96px; top:232px; width:286px; height:330px;
+  background:#EFE9DD; border:1px solid var(--faint); overflow:hidden; display:flex;
+  align-items:center; justify-content:center; padding:10px; }
+.p1 .cover-portrait img { max-height:100%; max-width:100%; width:auto; height:auto; object-fit:contain; display:block; }
+/* 封面图标（CSS/SVG 手绘）：铺满方框、居中 */
+.p1 .cover-portrait svg { display:block; }
+.p1 .cover-portrait-cap { position:absolute; right:96px; top:574px; width:286px; text-align:center;
+  font-size:15px; letter-spacing:.04em; color:var(--muted); font-family:'DM Mono','Consolas',monospace; }
+.p1.has-cover-art .cover-name { font-size:96px; }
+/* 有封面图时：人物名仍是第一视觉，但要给眉标留出上方空间 */
+.p1.has-cover-art .cover-name { font-size:132px; }
+/* 单字符拉丁名（如「L」）：大写字母高度只占字号约 7 成，需额外放大才与中文名等重 */
+.p1.has-cover-art .cover-name.latin1 { font-size:184px; letter-spacing:.02em; }
+.p1.has-cover-art .name-wrap { top:236px; height:150px; }
+.p1.has-cover-art .person-alias { top:404px; font-size:22px; width:600px; }
+.p1.has-cover-art .person-work { top:450px; font-size:19px; }
+.p1.has-cover-art .cover-title { top:496px; width:600px; font-size:60px; line-height:1.42; }
+.p1.has-cover-art .person-link { top:748px; width:600px; font-size:28px; }
+.p1.has-cover-art .dtag { top:880px; width:888px; }
+/* 封面底部补一条产品信息条，填满下半版面并给出「测什么、多久、怎么测」 */
+.p1 .foot-strip { position:absolute; left:96px; right:96px; top:980px; display:flex; gap:0;
+  border-top:1px solid var(--rule); padding-top:18px; }
+.p1 .foot-strip div { flex:1; font-size:19px; letter-spacing:.06em; color:var(--muted); }
+.p1 .foot-strip div b { display:block; font-size:26px; color:var(--ink); font-weight:500; letter-spacing:.02em; margin-bottom:4px; }
 
 .p2 .spine { position:absolute; left:96px; top:300px; width:3px; height:660px; background:var(--accent); }
 .p2 .scene { position:absolute; left:142px; top:340px; width:790px; font-size:58px; line-height:1.8; }
@@ -58,6 +113,11 @@ body { background:#DDD8CE; padding:40px 0; }
 .sign .bar { position:absolute; left:96px; top:420px; width:72px; height:4px; background:var(--accent); }
 .sign .title { position:absolute; left:96px; top:480px; font-size:76px; }
 .sign .desc { position:absolute; left:96px; top:620px; width:840px; font-size:42px; line-height:1.8; color:#3A3833; }
+/* 证据页加一段「原话」引用块：让证据可验证，也填满下半版面 */
+.sign .quote { position:absolute; left:96px; right:96px; top:1000px; padding:28px 32px;
+  border-left:3px solid var(--accent); background:var(--paper-light); }
+.sign .quote .q-txt { font-size:30px; line-height:1.75; color:var(--ink); }
+.sign .quote .q-src { margin-top:14px; font-size:17px; letter-spacing:.1em; color:var(--muted); }
 
 .p6 .body { position:absolute; left:96px; top:290px; width:888px; }
 .p6 .lead { font-size:58px; line-height:1.7; font-weight:500; }
@@ -80,10 +140,46 @@ body { background:#DDD8CE; padding:40px 0; }
 .p7 .qcol small { position:absolute; top:26px; left:42px; font-size:20px; letter-spacing:.14em; color:var(--muted); }
 .p7 .qcol.tight { font-size:29px; line-height:1.7; }
 .p7 .scale { position:absolute; left:96px; right:96px; top:820px; display:flex; }
-.p7 .scale div { flex:1; height:48px; border:1px solid var(--rule); border-right:none;
-  display:flex; align-items:center; justify-content:center; font-size:18px; color:var(--muted); }
+.p7 .scale div { flex:1; height:56px; flex-direction:column; border:1px solid var(--rule); border-right:none;
+  display:flex; align-items:center; justify-content:center; font-size:18px; line-height:1.35; color:var(--muted); }
+.p7 .scale div em { font-style:normal; font-size:15px; color:var(--muted); opacity:.8; }
 .p7 .scale div:last-child { border-right:1px solid var(--rule); }
-.p7 .qfoot { position:absolute; left:96px; top:950px; font-size:28px; color:var(--muted); }
+.p7 .scale div b { color:var(--accent); font-weight:500; }
+.p7 .scale .scale-tip { border:1px solid var(--rule); background:var(--paper-light); color:var(--ink); font-size:16px; }
+.p7 .qfoot { position:absolute; left:96px; top:900px; font-size:26px; color:var(--muted); }
+/* ===== P2 三题版 =====
+   封面承诺「3 道题」就必须真给 3 道（爆款「6 道题」也是真给 6 道，承诺必须兑现）。
+   三题横排会挤，故改为竖排三段，每段一道双极题。 */
+.p7.has-quiz3 .q-title { top:252px; font-size:56px; }
+.p7.has-quiz3 .q-sub { top:344px; font-size:24px; }
+.p7.has-quiz3 .quiz3 { position:absolute; left:96px; right:96px; top:404px; }
+.p7.has-quiz3 .qz { }
+.p7.has-quiz3 .qz-gap { margin-top:26px; }
+.p7.has-quiz3 .qz-head { display:flex; justify-content:space-between; align-items:baseline;
+  font-size:20px; letter-spacing:.1em; color:var(--accent); margin-bottom:8px; }
+.p7.has-quiz3 .qz-head span:last-child { color:var(--muted); font-size:17px; }
+.p7.has-quiz3 .qwrap { position:static; height:auto; display:flex;
+  border-top:1px solid var(--rule); border-bottom:1px solid var(--rule); }
+.p7.has-quiz3 .qcol { flex:1; position:relative; padding:46px 30px 18px; font-size:25px; line-height:1.6; }
+.p7.has-quiz3 .qcol small { position:absolute; top:14px; left:30px; font-size:16px; letter-spacing:.12em; }
+.p7.has-quiz3 .scale { top:1024px; }
+.p7.has-quiz3 .qfoot { top:1104px; font-size:22px; }
+.p7.has-quiz3 .shot { display:none; }
+.p7.has-quiz3 .shot-cap { display:none; }
+/* 真实界面带：直接画四维坐标条（不用截图，避免价格/链接风险，也比缩略图看得清） */
+.p7 .shot { position:absolute; left:96px; top:948px; width:888px; height:238px;
+  border:1px solid var(--rule); background:var(--paper-light); padding:18px 26px 0; }
+.p7 .shot .cs-head { display:flex; justify-content:space-between; align-items:baseline;
+  font-size:17px; letter-spacing:.16em; color:var(--muted); }
+.p7 .shot .cs-row { display:flex; align-items:center; gap:0; margin-top:13px; height:32px; }
+.p7 .shot .cs-row .cs-k { width:150px; font-size:17px; color:var(--muted); letter-spacing:.04em; }
+.p7 .shot .cs-row .cs-pole { font-size:24px; color:var(--ink); font-weight:500; width:26px; text-align:center; }
+.p7 .shot .cs-row .cs-pole.is-hot { color:var(--accent); }
+.p7 .shot .cs-row .cs-line { flex:1; height:1px; background:var(--rule); position:relative; margin:0 8px; }
+.p7 .shot .cs-row .cs-line i { position:absolute; left:50%; top:-9px; width:1px; height:19px; background:var(--rule); }
+.p7 .shot .cs-row .cs-mid { width:26px; text-align:center; font-size:20px; color:var(--accent); font-weight:500; }
+.p7 .shot-cap { position:absolute; left:96px; top:1188px; font-size:18px; letter-spacing:.1em;
+  color:var(--muted); font-family:'DM Mono','Consolas',monospace; }
 
 .p8 .hook { position:absolute; left:96px; top:300px; width:490px; font-size:60px; line-height:1.65; font-weight:500; }
 .p8 .type-tag { position:absolute; left:96px; top:720px; font-size:22px; letter-spacing:.14em;
@@ -96,18 +192,40 @@ body { background:#DDD8CE; padding:40px 0; }
 .p8 .card { position:absolute; right:96px; top:250px; width:364px; height:800px;
   border:1px solid var(--rule); background:var(--paper-light); padding:30px; }
 .p8 .card .c-no { font-size:19px; letter-spacing:.14em; color:var(--accent); }
-.p8 .card .c-work { margin-top:22px; font-size:21px; letter-spacing:.12em; color:var(--muted); }
-.p8 .card .c-name { font-size:76px; font-weight:500; margin-top:10px; }
-.p8 .card .c-name.mid { font-size:60px; }
-.p8 .card .c-name.long { font-size:48px; }
-.p8 .card .c-field { font-size:24px; color:var(--muted); margin-top:12px; }
-.p8 .card .c-rule { height:1px; background:var(--rule); margin:26px 0 24px; }
-.p8 .card .c-story { font-size:28px; line-height:1.75; color:#3A3833; }
-.p8 .card .c-foot { position:absolute; left:30px; right:30px; bottom:28px;
-  font-size:17px; letter-spacing:.06em; color:var(--muted); }
+/* 人格画像：81 型专属插画，放在卡片标题下、剧情之上 */
+/* 人格画像：81 型专属插画。原图为 3:4 竖版，容器必须用 contain 才能完整显示人物，
+   用 cover 会裁掉上下、只露中间一段 */
+.p8 .card .c-portrait { margin-top:14px; height:282px; display:flex; align-items:center; justify-content:center;
+  background:#EFE9DD; border:1px solid var(--faint); overflow:hidden; }
+.p8 .card .c-portrait img { max-height:100%; max-width:100%; width:auto; height:auto; object-fit:contain; display:block; }
+/* 画像紧跟类型码上方，必须标明「这是这一型的画像，不是角色本人」，否则会被误读 */
+.p8 .card .c-portrait-cap { margin-top:7px; font-size:14px; letter-spacing:.04em; color:var(--muted); }
+.p8 .card .c-code { margin-top:12px; font-size:16px; letter-spacing:.14em; color:var(--accent); }
+.p8 .card .c-work { margin-top:12px; font-size:20px; letter-spacing:.12em; color:var(--muted); }
+.p8 .card .c-name { font-size:64px; font-weight:500; margin-top:6px; }
+.p8 .card .c-name.mid { font-size:52px; }
+.p8 .card .c-name.long { font-size:44px; }
+.p8 .card .c-field { font-size:22px; color:var(--muted); margin-top:8px; }
+.p8 .card .c-rule { height:1px; background:var(--rule); margin:12px 0 10px; }
+.p8 .card .c-story { font-size:21px; line-height:1.58; color:#3A3833; }
+.p8 .card .c-story.m { font-size:20px; line-height:1.55; }
+.p8 .card .c-story.s { font-size:19px; line-height:1.52; }
+.p8 .card .c-foot { position:absolute; left:30px; right:30px; bottom:20px;
+  font-size:15px; letter-spacing:.06em; color:var(--muted); }
 
 .p9 .cta { position:absolute; left:96px; top:320px; width:880px; font-size:88px; line-height:1.5; font-weight:500; }
-.p9 .hint { position:absolute; left:96px; top:620px; font-size:34px; color:var(--muted); }
+.p9 .hint { position:absolute; left:96px; top:620px; width:888px; font-size:34px; line-height:1.7; color:var(--muted); }
+/* 带三选一投票框的 P9 另排一套版面，避免与标题重叠 */
+.p9.has-vote .cta { top:270px; font-size:80px; }
+.p9.has-vote .hint { top:960px; font-size:24px; }
+.p9 .vote { position:absolute; left:96px; top:600px; width:888px; display:flex; gap:18px; }
+.p9 .vote .vc { flex:1; padding:26px 22px 24px; border:1px solid var(--rule); text-align:center; }
+.p9 .vote .vc.mid { border-color:var(--accent); background:var(--paper-light); }
+.p9 .vote .vc b { display:block; font-size:52px; line-height:1; color:var(--accent); font-weight:500; }
+.p9 .vote .vc span { display:block; margin-top:14px; font-size:22px; line-height:1.7; color:var(--muted); }
+.p9 .ask { position:absolute; left:96px; top:856px; width:888px; font-size:32px; line-height:1.6; }
+.p9 .ask b { color:var(--accent); font-weight:500; }
+.p9 .ask-why { position:absolute; left:96px; top:912px; width:888px; font-size:22px; line-height:1.6; color:var(--muted); }
 .p9 .disc { position:absolute; left:96px; right:96px; bottom:300px; font-size:26px; line-height:1.9; color:var(--muted); }
 .p9 .endbar { position:absolute; left:0; right:0; bottom:0; height:16px; background:var(--moss); }
 </style>
@@ -203,8 +321,28 @@ const NOTE_LIBRARY = {
       "label": "40q-v1 · 原题 #29 · 认知方式",
       "left": "我更关注当下正在发生的事，先把眼前的事情做好。",
       "right": "我时常思考人生的意义和本质，喜欢追问事物存在和发展的根本原因。",
-      "foot": "5 点量表 · 允许停在中间"
+      "foot": "三档 · A 正方 / B 两边都像 / C 反方"
     },
+    "quiz3": [
+      {
+        "no": 1,
+        "id": 26,
+        "left": "我做事注重细节和具体步骤，相信「眼见为实」。",
+        "right": "我关注事物背后的整体图景和规律，相信直觉的指引。"
+      },
+      {
+        "no": 2,
+        "id": 27,
+        "left": "比起抽象理论，我更信任亲身经验和实际案例。",
+        "right": "我对理论框架有天然的亲近感，喜欢用它们来理解世界。"
+      },
+      {
+        "no": 3,
+        "id": 29,
+        "left": "我更关注当下正在发生的事，先把眼前的事情做好。",
+        "right": "我时常思考人生的意义和本质，喜欢追问事物存在的根本原因。"
+      }
+    ],
     "result": {
       "code": "ENFP",
       "name": "竞选者型",
@@ -212,18 +350,19 @@ const NOTE_LIBRARY = {
       "color": "#2D8A4E"
     },
     "cta": "目标先来，\n还是经验先来？",
-    "hint": "评论区聊聊，我们先来：目标先来，但方法是练出来的。",
-    "title": "鸣人靠直觉，还是靠经验",
-    "tags": "#人格测试 #MBTI #自我探索 #火影忍者 #ENFP #漩涡鸣人 #性格分析",
+    "hint": "先打字母，再补一句你为什么选它。",
+    "title": "鸣人这种性格，在81型里是哪一格",
+    "tags": "#81型人格 #人格测试 #MBTI #16型人格 #火影忍者 #漩涡鸣人 #自我探索",
     "body": [
-      "吵、冲动、爱出风头，可他从没放弃过任何一个人——这大概是鸣人最容易被记住的样子。",
+      "81 型里，鸣人这种「目标看不见、方法全靠练」的人，16 型只能硬塞进一格。吵、冲动、爱出风头，可他从没放弃过任何一个人。",
       "但真要把他塞进 16 型，麻烦就来了：E、F、P 三维几乎没人有意见，唯独第二维（认知方式：靠直觉还是靠经验），粉丝吵了很多年。",
       "说他像 N 的人抓住这一点：他要改的不是某一场仗的输赢，而是「忍者为什么要互相仇杀」这件事本身。这个目标看不见，也没人能验证，他还是拿命去换。\n说他像 S 的人也很有理：他学什么都靠身体记。讲一遍原理他听不懂，练一百遍就会了。计划、推演、长期布局，他一样都不做。",
       "这一维之所以吵不完，是因为他两头都占：目标远得没人信，方法土得只剩练。16 型只能在这里二选一，81 型却在这一维留了中间档 B——既认一个说不清的目标，也全靠具体经验往前挪。很多人在这一维其实就停在中间。",
       "档案里第 29 题正好在问这里：「我更关注当下正在发生的事，先把眼前的事情做好」对「我时常思考人生的意义和本质，喜欢追问事物存在和发展的根本原因」。五档，中间三档都算数。整套 40 题，约 6–8 分钟，做完会告诉你在 81 格里落在哪一格——包括这一维的中间档。",
-      "你是目标先来，还是经验先来？",
+      "在评论区打出你的 3 个字母，然后 @点点，她会给你一段专属分析。",
       "本内容仅供自我探索与娱乐参考，不构成心理诊断、医疗建议或招聘依据。MBTI-PRO 与 MBTI 官方机构无关联。"
     ],
+    "ask": "在评论区打出你的 3 个字母，然后 @点点 拿专属分析。",
     "pinned": "我先来：目标先来，但方法是练出来的。"
   },
   "day2": {
@@ -231,16 +370,17 @@ const NOTE_LIBRARY = {
     "no": 2,
     "person": {
       "name": "钢铁侠",
+      "alias": "托尼·斯塔克 · Tony Stark",
       "work": "漫威",
       "field": "复仇者联盟核心成员",
       "story": "从武器商人到造出战甲，想的永远是还没存在的东西；方案一旦不成立，当场推翻重做。",
-      "link": "想得远，也肯把刚定的方案当场推翻。"
+      "link": "他不是没计划，是计划和即兴各管一半。"
     },
     "coverLines": [
-      "他真是计划型吗",
-      "还是随时改"
+      "计划排到明年",
+      "方案改到今晚"
     ],
-    "coverHighlight": "是 ENTD",
+    "coverHighlight": "方案改到今晚",
     "dispute": {
       "dimNo": "04",
       "dimName": "生活态度",
@@ -298,8 +438,29 @@ const NOTE_LIBRARY = {
       "label": "40q-v1 · 原题 #52 · 生活态度",
       "left": "我喜欢把事情安排得井井有条，不喜欢临时变动。",
       "right": "我喜欢随时根据新情况调整安排，不被既定计划束缚。",
-      "foot": "5 点量表 · 允许停在中间"
+      "foot": "三档 · A 正方 / B 两边都像 / C 反方"
     },
+    "quiz3": [
+      {
+        "no": 1,
+        "id": 51,
+        "left": "我凡事喜欢提前制定计划并按时完成，拖延会让我焦虑。",
+        "right": "我不喜欢过早锁定计划，事情往往在最后一刻自然会有最好的呈现。"
+      },
+      {
+        "no": 2,
+        "id": 52,
+        "left": "我喜欢把事情安排得井井有条，不喜欢临时变动。",
+        "right": "我喜欢随时根据新情况调整安排，不被既定计划束缚。"
+      },
+      {
+        "no": 3,
+        "id": 54,
+        "left": "清晰的时间表和计划让我感到安心和有掌控感。",
+        "right": "开放自由的时间安排让我感到轻松，可以随心所欲地支配时间。"
+      }
+    ],
+    "showWebShot": true,
     "result": {
       "code": "ENTD",
       "name": "战略家型",
@@ -307,120 +468,209 @@ const NOTE_LIBRARY = {
       "color": "#6B3FA0"
     },
     "cta": "你是计划型，\n还是随时改？",
-    "hint": "评论区聊聊，我们先来：大方向不改，路线随时改。",
-    "title": "钢铁侠是计划型，还是随时改",
-    "tags": "#人格测试 #MBTI #自我探索 #漫威 #钢铁侠 #ENTD #性格分析",
+    "vote": [
+      {
+        "k": "J",
+        "d": "大方向先定死\n路线按表走"
+      },
+      {
+        "k": "D",
+        "d": "框架不动\n路径随时改"
+      },
+      {
+        "k": "P",
+        "d": "边做边看\n计划追不上我"
+      }
+    ],
+    "ask": "在评论区打出你的 3 个字母，然后 @点点 拿专属分析。",
+    "hint": "先打字母，再补一句你为什么选它。",
+    "title": "钢铁侠的性格，81型里还剩几格",
+    "tags": "#81型人格 #MBTI #人格测试 #16型人格 #钢铁侠 #漫威 #J人",
     "body": [
-      "发布会、记者会、听证会，越多人看着他越来劲；战甲从 Mark I 一路迭代，做的都是当时还不存在的东西。E、N、T 三维在钢铁侠（托尼·斯塔克）身上几乎不用争。",
-      "争的是最后一维：他到底是 J 还是 P？",
+      "81 型里，钢铁侠（托尼·斯塔克）这种「框架稳、路径随便改」的人，正好卡在 J 和 P 中间。发布会不按稿子讲，方案当场推翻，战甲却从 Mark I 排到了几十代。",
+      "E、N、T 三维在他身上几乎不用争。争的是最后一维：他到底是计划型（J），还是随时改（P）？",
       "像 J 的地方很硬：改哪一代、先改什么、下一版什么时候上，全排得清清楚楚；公司、议程、对外口径，也都在他手里。\n像 P 的地方也很硬：刚定下的方案，现场就能推翻；发布会不按稿子讲；承诺过的路线，说换就换。",
       "所以他不是 J，也不是 P。他是「框架稳、路径随便改」——大方向不轻易动，怎么走到那儿随时改。这一档 16 型里没有，81 型把它单独放在中间，叫 D。",
-      "40 题里有一道正对着这里：「我喜欢把事情安排得井井有条，不喜欢临时变动」对「我喜欢随时根据新情况调整安排，不被既定计划束缚」。不少人两条都想选。",
-      "你是计划型，还是随时改的那类？",
+      "整套 40 题，约 6–8 分钟，做完会告诉你在 81 格里落在哪一格。前面那几道只是让你先感受一下题目长什么样。",
+      "在评论区打出你的 3 个字母，然后 @点点，她会给你一段专属分析。",
+      "你是哪一种？先在 J、D、P 里选一个，再往下看第 9 张。",
       "本内容仅供自我探索与娱乐参考，不构成心理诊断、医疗建议或招聘依据。MBTI-PRO 与 MBTI 官方机构无关联。"
     ],
-    "pinned": "我先来：大方向不改，路线随时改。"
+    "pinned": "我先来：D。目标定了就死磕，怎么走随时改。你打 J 还是 P？"
   },
   "day3": {
     "key": "day3",
     "no": 3,
     "person": {
-      "name": "宇智波鼬",
-      "work": "《火影忍者》",
-      "field": "宇智波一族",
-      "story": "在家族与村子之间做取舍，很少解释自己，却早早把很多步之后的事都安排好了。",
-      "link": "很少解释，不代表心里没有要守的东西。"
+      "name": "曾国藩",
+      "alias": "曾国藩 · 晚清名臣 · 湘军之父",
+      "work": "晚清",
+      "field": "书生带兵 · 湘军统帅",
+      "story": "书生带兵，组建湘军平定太平天国。以日记和家书自律，也因镇压手段受争议；一生是「结硬寨、打呆仗」的长期主义。",
+      "link": "他不是天才，是把笨事做了一辈子。",
+      "fictionNote": "真实历史人物 · 仅作性格类比<br>不构成对其人格的评价或定论"
     },
     "coverLines": [
-      "他是冷血",
-      "还是深情"
+      "狠了一辈子",
+      "却没几个人懂他"
     ],
-    "coverHighlight": "还是深情",
+    "coverHighlight": "却没几个人懂他",
+    "coverIcon": "brush",
+    "coverIconCap": "一箱书 · 一支笔 · 一场硬仗",
+    "footStrip": [
+      [
+        "40 题",
+        "情境题"
+      ],
+      [
+        "6-8 分钟",
+        "可中断续答"
+      ],
+      [
+        "81 型",
+        "含中间档"
+      ]
+    ],
     "dispute": {
       "dimNo": "03",
       "dimName": "决策方式",
       "scale": "T / C / F",
       "stanceA": "T",
       "stanceB": "F",
-      "claim": "一个人灭掉自己全族，这算冷血，还是算深情？",
-      "note": "I、N、J 三维没什么分歧，吵的全是第 03 维。",
+      "claim": "他到底是冷血的狠人，还是菩萨心肠？",
+      "note": "他的四个维度全部落在中间——不是某一维卡住，是每一维都到不了两端。",
       "forA": {
-        "title": "像 T 的地方",
-        "desc": "他把村子、家族、弟弟三条命数放在一张桌上算，选了代价最小的那条。这个动作冷静到不像人。"
+        "title": "狠的那一面",
+        "desc": "对敌人不留余地，靠铁腕把湘军立起来。治军极严，几次要部下以军法处置自己人，谁求情都没用。",
+        "quote": {
+          "txt": "「近来见得天地之道，刚柔互用，不可偏废。」",
+          "src": "致沅弟 · 同治元年"
+        }
       },
       "forB": {
-        "title": "像 F 的地方",
-        "desc": "算到最后，唯一被他保下来的变量是弟弟。所有布局都绕着一个人转，不是绕着胜负。"
+        "title": "软的那一面",
+        "desc": "同一本日记里，他把自己骂得极狠：不该去看行刑，心里难过，回家的路上徘徊良久。",
+        "quote": {
+          "txt": "「旷日荒谬至此，尚得为人乎？」",
+          "src": "曾国藩日记 · 道光二十二年"
+        }
       },
       "other": {
-        "title": "另外三维没争议",
-        "desc": "I 不用争：最重的决定全是一个人做完，连身边人也不说。N 不用争：他把弟弟往后很多年都算进了布局。J 不用争：一旦定下就不回头。"
+        "title": "另外三维，也卡在中间",
+        "desc": "能量来源：独处能干活，见人也能聊。认知方式：不靠理论也不靠直觉，靠一件件具体的事磨出判断。生活态度：作息几十年不改，打法却随时调整。",
+        "quote": {
+          "txt": "「大约以能立能达为体，以不怨不尤为用。」",
+          "src": "致沅弟 · 家书"
+        }
       },
-      "verdict": "他不是把感情关掉了，是把感情放进了算式里最重的那一项。",
-      "why": "二元口径下，这类人只能被写成「冷血」或「恋爱脑」。81 型在中间留了 C：逻辑和牵挂同时在算，两笔账一起结。",
-      "punch": "灭族这笔账，\n是替一个人算的。"
+      "verdict": "他不是心硬，是他先算清了代价，才允许自己心软。",
+      "why": "16 型只能在 T 和 F 里挑一个，所以他这类人总被写成「狠人」或「圣母」。81 型在中间留了 C：账算得清清楚楚，算的时候心也疼着，两笔一起结。而他不止这一维居中——四个维度全部落在中间，这才是 16 型装不下他的真正原因。",
+      "punch": "狠是给别人看的，\n软是他自己的。"
     },
     "dims": [
       {
         "k": "01 能量来源",
         "v": "E / A / I",
-        "letter": "I",
-        "dot": 88
+        "letter": "A",
+        "dot": 50,
+        "hot": true
       },
       {
         "k": "02 认知方式",
         "v": "S / B / N",
-        "letter": "N",
-        "dot": 88
+        "letter": "B",
+        "dot": 50,
+        "hot": true
       },
       {
         "k": "03 决策方式",
         "v": "T / C / F",
-        "letter": "F",
-        "dot": 88,
+        "letter": "C",
+        "dot": 50,
         "hot": true
       },
       {
         "k": "04 生活态度",
         "v": "J / D / P",
-        "letter": "J",
-        "dot": 12
+        "letter": "D",
+        "dot": 50,
+        "hot": true
       }
     ],
     "question": {
-      "id": 76,
+      "id": 83,
       "dim": "T_F",
-      "label": "40q-v1 · 原题 #76 · 决策方式",
-      "left": "做决定时，我优先考虑逻辑分析和客观利弊。",
-      "right": "做决定时，我优先考虑对人的影响和大家的感受。",
-      "foot": "5 点量表 · 允许停在中间"
+      "label": "40q-v1 · 原题 #83 · 决策方式",
+      "left": "我更欣赏能力强、思路清晰但性格偏冷淡的同事。",
+      "right": "我更欣赏能力一般但温暖友善、乐于助人的同事。",
+      "foot": "三档 · A 正方 / B 两边都像 / C 反方"
     },
+    "quiz3": [
+      {
+        "no": 1,
+        "id": 76,
+        "left": "做决定时，我优先考虑逻辑分析和客观利弊。",
+        "right": "做决定时，我优先考虑对人的影响和大家的感受。"
+      },
+      {
+        "no": 2,
+        "id": 77,
+        "left": "我认为公平公正比照顾每个人的感受更重要。",
+        "right": "我认为维护人际关系的和谐比遵循抽象的公平原则更重要。"
+      },
+      {
+        "no": 3,
+        "id": 79,
+        "left": "在重要决策中，我倾向于用数据和事实说服别人。",
+        "right": "在重要决策中，我会充分考虑自己的情感反应，它们包含重要信息。"
+      }
+    ],
     "result": {
-      "code": "INFJ",
-      "name": "提倡者型",
-      "group": "NF 翠绿组",
-      "color": "#2D8A4E"
+      "code": "ABCD",
+      "name": "全能者型",
+      "group": "BC 月光银灰组",
+      "color": "#8B95A0"
     },
-    "cta": "先算账，\n还是先看人？",
-    "hint": "评论区聊聊，我们先来：都算，只是不一定说出口。",
-    "title": "宇智波鼬是冷血，还是深情",
-    "tags": "#人格测试 #MBTI #自我探索 #火影忍者 #INFJ #宇智波鼬 #性格分析",
+    "cta": "你是狠人，\n还是暖人？",
+    "vote": [
+      {
+        "k": "T",
+        "d": "先算代价\n心里不亏"
+      },
+      {
+        "k": "C",
+        "d": "账算得清\n心也软着"
+      },
+      {
+        "k": "F",
+        "d": "先看人\n再说代价"
+      }
+    ],
+    "ask": "在评论区打出你的 3 个字母，然后 @点点 拿专属分析。",
+    "hint": "先打字母，再补一句你为什么选它。",
+    "showWebShot": true,
+    "title": "曾国藩这种人，81型里只剩一格",
+    "tags": "#81型人格 #人格测试 #MBTI #16型人格 #曾国藩 #历史人物 #自我探索",
     "body": [
-      "在家族和村子之间做取舍，把弟弟往后很多年都算进布局里，却几乎不解释自己。I、N、J 三维在宇智波鼬身上没什么分歧。",
-      "分歧全在第三维：一个人灭掉自己全族，这算冷血，还是算深情？",
-      "说他像 T：他把村子、家族、弟弟三条命数放在一张桌上算，选了代价最小的那条。这个动作冷静到不像人。\n说他像 F：算到最后，唯一被他保下来的变量是弟弟。所有布局都绕着一个人转，不是绕着胜负。",
-      "他不是把感情关掉了，是把感情放进了算式里最重的那一项。16 型只能在 T 和 F 里挑一个，所以这类人总被写成「冷血」或「恋爱脑」。81 型在中间留了 C：逻辑和牵挂同时在算，两笔账一起结。",
-      "40 题里有一道正对着这里：「做决定时，我优先考虑逻辑分析和客观利弊」对「做决定时，我优先考虑对人的影响和大家的感受」。",
-      "你做决定时先算账，还是先看人？",
+      "81 型里，曾国藩这种人四个维度全部落在中间——16 型装不下他，81 型给他留了一整格。",
+      "狠：治军极严，几次要部下以军法处置自己人，谁求情都没用。",
+      "软：同一本日记里，他把自己骂得极狠——去看了一次行刑，心里难受，回去的路上一边走一边想自己是不是还算个人。",
+      "同一个人，同一本日记，两面都是真的。这才是他最难归类的地方。",
+      "16 型只能让你选 T（讲逻辑）或者 F（讲感受），所以他这类人只能被写成「冷血」或「圣母」。",
+      "而且他不只是这一维卡在中间——能量来源、认知方式、生活态度，四个维度全部落在中间。16 型给他找不到一格，81 型给他留了一整格。",
+      "但 81 型在中间留了 C：账算得清清楚楚，算的时候心也疼着，两笔一起结。",
+      "整套 40 题，约 6–8 分钟，做完会告诉你在 81 格里落在哪一格——他落在哪一格，你可能也会。",
+      "在评论区打出你的 3 个字母，然后 @点点，她会给你一段专属分析。",
       "本内容仅供自我探索与娱乐参考，不构成心理诊断、医疗建议或招聘依据。MBTI-PRO 与 MBTI 官方机构无关联。"
     ],
-    "pinned": "我先来：都算，只是不一定说出口。"
+    "pinned": "我先来：C。账算得清，心也软着。你呢？"
   },
   "day4": {
     "key": "day4",
     "no": 4,
     "person": {
       "name": "路飞",
+      "alias": "蒙奇·D·路飞 · Monkey D. Luffy",
       "work": "《海贼王》",
       "field": "草帽一伙船长",
       "story": "为成为海贼王出海，靠身体和当下直觉一路往前；伙伴有难就立刻掉头，从不先算代价。",
@@ -431,6 +681,23 @@ const NOTE_LIBRARY = {
       "靠眼前这一拳"
     ],
     "coverHighlight": "靠眼前这一拳",
+    "coverIcon": "strawhat",
+    "coverIconCap": "一顶草帽 · 一只拳头 · 一片大海",
+    "footStrip": [
+      [
+        "40 题",
+        "情境题"
+      ],
+      [
+        "6-8 分钟",
+        "可中断续答"
+      ],
+      [
+        "81 型",
+        "含中间档"
+      ]
+    ],
+    "showWebShot": true,
     "dispute": {
       "dimNo": "02",
       "dimName": "认知方式",
@@ -451,9 +718,9 @@ const NOTE_LIBRARY = {
         "title": "另外三维没争议",
         "desc": "E 不用争：他一出现，人就聚过来。F 不用争：伙伴有难立刻掉头，从不先算代价。P 不用争：他从没计划过航线。"
       },
-      "verdict": "他不是不思考，是思考在前一秒就做完了，剩下的全是行动。",
-      "why": "81 型在这一维留了 B：不推演，但也不只看眼前，靠的是一种被经验磨出来的整体判断。这种判断说不清，却常常准。",
-      "punch": "讲不出理由，\n但几乎没看错人。"
+      "verdict": "他不是靠直觉，是身体比脑子先做完了判断。",
+      "why": "那些「说不清的直觉」，拆开看全是身体记下的具体经验：哪招打疼过、哪种人骗过他——他都记着。这仍是 S，不是 N。81 型在这一维留了 B（中间档），但路飞不在中间，他就是 S 这一端。",
+      "punch": "说不清的直觉，\n其实是练出来的。"
     },
     "dims": [
       {
@@ -488,8 +755,28 @@ const NOTE_LIBRARY = {
       "label": "40q-v1 · 原题 #34 · 认知方式",
       "left": "做决定时，我主要依据过去的经验和已知的事实。",
       "right": "做决定时，我常常相信自己的直觉和对未来的预感。",
-      "foot": "5 点量表 · 允许停在中间"
+      "foot": "三档 · A 正方 / B 两边都像 / C 反方"
     },
+    "quiz3": [
+      {
+        "no": 1,
+        "id": 26,
+        "left": "我做事注重细节和具体步骤，相信「眼见为实」。",
+        "right": "我关注事物背后的整体图景和规律，相信直觉的指引。"
+      },
+      {
+        "no": 2,
+        "id": 28,
+        "left": "我喜欢按照既定的流程和方法来完成任务。",
+        "right": "我喜欢探索和尝试各种新方法来完成任务。"
+      },
+      {
+        "no": 3,
+        "id": 34,
+        "left": "做决定时，我主要依据过去的经验和已知的事实。",
+        "right": "做决定时，我常常相信自己的直觉和对未来的预感。"
+      }
+    ],
     "result": {
       "code": "ESFP",
       "name": "表演者型",
@@ -497,19 +784,34 @@ const NOTE_LIBRARY = {
       "color": "#C8963E"
     },
     "cta": "你信经验，\n还是信直觉？",
-    "hint": "评论区聊聊，我们先来：先信直觉，再用结果验证。",
-    "title": "路飞靠眼睛，还是靠直觉",
-    "tags": "#人格测试 #MBTI #自我探索 #海贼王 #ESFP #路飞 #性格分析",
+    "vote": [
+      {
+        "k": "S",
+        "d": "信眼前事实\n靠身体记忆"
+      },
+      {
+        "k": "B",
+        "d": "两边都沾\n说不清哪个多"
+      },
+      {
+        "k": "N",
+        "d": "信第一直觉\n不问为什么"
+      }
+    ],
+    "ask": "在评论区打出你的 3 个字母，然后 @点点 拿专属分析。",
+    "hint": "先打字母，再补一句你为什么选它。",
+    "title": "路飞这种性格，在81型里是哪一格",
+    "tags": "#81型人格 #人格测试 #MBTI #16型人格 #海贼王 #路飞 #自我探索",
     "body": [
-      "不推演大道理，靠眼前这一拳做判断。E、F、P 三维在路飞身上口径很清楚。",
+      "81 型里，路飞这种「不推演、靠眼前这一拳」的人，落在 S 这一端。E、F、P 三维在他身上口径很清楚。",
       "唯独第二维一直有人不服：他靠的是眼睛，还是那种说不清的直觉？",
       "说他像 S：讲原理他听不懂，只能靠身体一遍遍练。眼前这一拳、这一顿饭，就是他全部的信息来源。\n说他像 N：他从没调查过谁的底细，见一面就决定信不信这个人——后来发生的事，往往证明他第一眼是对的。",
-      "他不是不思考，是思考在前一秒就做完了，剩下的全是行动。81 型在这一维留了 B：不推演，但也不只看眼前，靠的是一种被经验磨出来的整体判断。这种判断说不清，却常常准。",
-      "40 题里有一道正对着这里：「做决定时，我主要依据过去的经验和已知的事实」对「做决定时，我常常相信自己的直觉和对未来的预感」。",
-      "你更信经验，还是更信直觉？",
+      "他不是靠直觉，是身体比脑子先做完了判断。那些「说不清的直觉」，拆开看全是身体记下的具体经验：哪招打疼过、哪种人骗过他，他都记着。这仍是 S，不是 N。",
+      "16 型把他放进 ESFP，81 型验证了：第 02 维他落在 S 这一端，不在中间。整套 40 题，约 6–8 分钟，做完会告诉你在 81 格里落在哪一格。",
+      "在评论区打出你的 3 个字母，然后 @点点，她会给你一段专属分析。",
       "本内容仅供自我探索与娱乐参考，不构成心理诊断、医疗建议或招聘依据。MBTI-PRO 与 MBTI 官方机构无关联。"
     ],
-    "pinned": "我先来：先信直觉，再用结果验证。"
+    "pinned": "我先来：S。原理听不懂就身体练，眼前这一拳就是全部信息。你打 S、B 还是 N？"
   },
   "day5": {
     "key": "day5",
@@ -522,10 +824,27 @@ const NOTE_LIBRARY = {
       "link": "线索越碎，他越能先看到整张图。"
     },
     "coverLines": [
-      "台前他在调度",
-      "幕后他在推演"
+      "破案时全是他开口",
+      "平时却像个隐形人"
     ],
-    "coverHighlight": "幕后他在推演",
+    "coverHighlight": "像个隐形人",
+    "posterKicker": "《名侦探柯南》· 测测你是哪一种",
+    "posterResults": [
+      {
+        "k": "E",
+        "v": "现场就开口\n电量当场充"
+      },
+      {
+        "k": "A",
+        "v": "看场合切换\n两边都来劲"
+      },
+      {
+        "k": "I",
+        "v": "先观察再融\n独处才回血"
+      }
+    ],
+    "posterNote": "很多人不是内向，只是「现场充电、独处放电」——\n这不叫社恐，叫 A 档。",
+    "posterFoot": "3 道题，先看你在哪边",
     "dispute": {
       "dimNo": "01",
       "dimName": "能量来源",
@@ -547,7 +866,7 @@ const NOTE_LIBRARY = {
         "desc": "N 不用争：别人看到线索，他看到还没显形的真相。T 不用争：动机再合理，也要能被现场细节验证。J 不用争：一旦锁定方向就不再摇摆。"
       },
       "verdict": "他不是忽冷忽热，是「该出手时全是 E，一个人时全是 I」。",
-      "why": "E 和 I 之间，16 型没留位置。81 型的 A 档就放在那儿——社交电量够用，但真正的工作必须独处完成。",
+      "why": "看似 I 的部分，其实是恢复方式，不是能量来源：他的电量是在现场充的，独处只是降温。81 型在这一维留了 A（中间档），但柯南不在中间，他落在 E 这一端。",
       "punch": "现场他开口，\n推演他消失。"
     },
     "dims": [
@@ -583,25 +902,78 @@ const NOTE_LIBRARY = {
       "label": "40q-v1 · 原题 #2 · 能量来源",
       "left": "我喜欢成为众人关注的焦点。",
       "right": "我更喜欢在幕后默默贡献，不习惯成为注意力的中心。",
-      "foot": "5 点量表 · 允许停在中间"
+      "foot": "三档 · A 正方 / B 两边都像 / C 反方"
     },
+    "quiz3": [
+      {
+        "no": 1,
+        "id": 1,
+        "left": "参加大型聚会后，我感到精力充沛、心情愉悦。",
+        "right": "参加大型聚会后，我需要独处一段时间来恢复精力。"
+      },
+      {
+        "no": 2,
+        "id": 6,
+        "left": "在团队讨论中，我通常是发言最多的人之一。",
+        "right": "在团队讨论中，我更多是倾听和观察，深思熟虑后再发言。"
+      },
+      {
+        "no": 3,
+        "id": 20,
+        "left": "我通过与他人交流来整理和厘清自己的想法。",
+        "right": "我的内心世界很丰富，常常进行自我对话和反思。"
+      }
+    ],
     "result": {
       "code": "ENTJ",
       "name": "指挥官型",
       "group": "NT 深紫组",
       "color": "#6B3FA0"
     },
+    "coverIcon": "magnifier",
+    "coverIconCap": "一只放大镜 · 一个领结 · 一条线索",
+    "footStrip": [
+      [
+        "40 题",
+        "情境题"
+      ],
+      [
+        "6-8 分钟",
+        "可中断续答"
+      ],
+      [
+        "81 型",
+        "含中间档"
+      ]
+    ],
+    "showWebShot": true,
+    "vote": [
+      {
+        "k": "E",
+        "d": "现场就开口\n电量当场充"
+      },
+      {
+        "k": "A",
+        "d": "看场合切换\n两边都来劲"
+      },
+      {
+        "k": "I",
+        "d": "先观察再融\n独处才回血"
+      }
+    ],
+    "ask": "在评论区打出你的 3 个字母，然后 @点点 拿专属分析。",
     "cta": "你是台前型，\n还是幕后型？",
-    "hint": "评论区聊聊，我们先来：幕后推完，台前只说结论。",
-    "title": "柯南是台前型，还是幕后型",
-    "tags": "#人格测试 #MBTI #自我探索 #名侦探柯南 #ENTJ #江户川柯南 #性格分析",
+    "hint": "先打字母，再补一句你为什么选它。",
+    "title": "破案时全是他开口，平时却像隐形人",
+    "tags": "#测一测你是哪一种 #e人i人 #人格测试 #MBTI #81型人格 #名侦探柯南 #自我探索",
     "body": [
-      "一到现场就接管局面：问谁、查哪、下一步做什么，全由他开口安排。N、T、J 三维在柯南身上口径一致。",
-      "分歧在第一维：他到底算 E 还是 I？破案时和平时，完全是两个人。",
+      "有的人一到现场就接管局面，问谁、查哪、下一步做什么，全由他开口安排；可一回到家，就像隐形人，一句话都不想说。",
+      "这不是忽冷忽热，也不是社恐。这是能量来源落在了「中间」——现场充电，独处放电。",
+      "柯南就是这样的人。16 型只能给他 E 或者 I，所以他一直被写成「外向的侦探」。",
       "像 E：场面一乱他就开口，从不等人；该问谁、该查哪，一句话就把所有人调动起来。\n像 I：平时缩在角落，把结论借别人的嘴说出来；最关键的推演，永远是一个人做完的。",
-      "他不是忽冷忽热，是「该出手时全是 E，一个人时全是 I」。16 型只能给他 E 或 I。81 型的 A 档就在中间：社交电量够用，但真正的工作必须独处完成。",
-      "40 题里有一道正对着这里：「我喜欢成为众人关注的焦点」对「我更喜欢在幕后默默贡献，不习惯成为注意力的中心」。",
-      "你是台前型，还是幕后型？",
+      "81 型的 A 档就在中间：社交电量够用，但真正的工作必须独处完成。这不是折中，是两个都真。",
+      "整套 40 题，约 6–8 分钟，做完会告诉你在 81 格里落在哪一格——是端值，还是中间。",
+      "在评论区打出你的 3 个字母，然后 @点点，她会给你一段专属分析。",
       "本内容仅供自我探索与娱乐参考，不构成心理诊断、医疗建议或招聘依据。MBTI-PRO 与 MBTI 官方机构无关联。"
     ],
     "pinned": "我先来：幕后推完，台前只说结论。"
@@ -611,16 +983,51 @@ const NOTE_LIBRARY = {
     "no": 6,
     "person": {
       "name": "L",
+      "alias": "L · Lawliet · 世界第一名侦探",
       "work": "《死亡笔记》",
       "field": "名侦探",
       "story": "几乎不露面，靠抽象假设和概率推演逼近真相；作息与办案方式都异于常人。",
       "link": "不按常理，但每一步都是算出来的。"
     },
     "coverLines": [
-      "不按常理",
-      "但每步都算过"
+      "算到极致",
+      "却从不守时"
     ],
-    "coverHighlight": "但每步都算过",
+    "coverHighlight": "却从不守时",
+    "posterKicker": "《死亡笔记》· 测测你是哪一种",
+    "posterResults": [
+      {
+        "k": "J",
+        "v": "每步提前布\n按表收网"
+      },
+      {
+        "k": "D",
+        "v": "目标定死\n过程随它去"
+      },
+      {
+        "k": "P",
+        "v": "方案随时扔\n过程全即兴"
+      }
+    ],
+    "posterNote": "把「目标」算到极致、把「过程」完全放掉——\n这不是邋遢，这是另一档。",
+    "posterFoot": "3 道题，先看你在哪边",
+    "coverIcon": "cake",
+    "coverIconCap": "一块蛋糕 · 一支蜡烛 · 一局算尽的棋",
+    "footStrip": [
+      [
+        "40 题",
+        "情境题"
+      ],
+      [
+        "6-8 分钟",
+        "可中断续答"
+      ],
+      [
+        "81 型",
+        "含中间档"
+      ]
+    ],
+    "showWebShot": true,
     "dispute": {
       "dimNo": "04",
       "dimName": "生活态度",
@@ -642,7 +1049,7 @@ const NOTE_LIBRARY = {
         "desc": "I 不用争：连露面都交给代理人。N 不用争：先立假设再验证，而不是挨个排查。T 不用争：情感、立场、面子都不进他的计算。"
       },
       "verdict": "他把「目标」算到了极致，把「过程」完全放掉了。",
-      "why": "16 型里 J 和 P 互斥，所以他要么被写成控制狂，要么被写成邋遢天才。81 型的 D 档把这两件事分开算。",
+      "why": "看似 J 的部分只存在于「目标」上；执行过程他随时整盘重排，从不守方案。81 型在这一维留了 D（中间档），但 L 不在中间，他落在 P 这一端。",
       "punch": "局算到最后，\n饭点从没准过。"
     },
     "dims": [
@@ -678,34 +1085,70 @@ const NOTE_LIBRARY = {
       "label": "40q-v1 · 原题 #57 · 生活态度",
       "left": "我喜欢列清单，并享受逐一勾选已完成任务的成就感。",
       "right": "我喜欢凭感觉行事，而不是被清单和计划所限制。",
-      "foot": "5 点量表 · 允许停在中间"
+      "foot": "三档 · A 正方 / B 两边都像 / C 反方"
     },
+    "quiz3": [
+      {
+        "no": 1,
+        "id": 52,
+        "left": "我喜欢把事情安排得井井有条，不喜欢临时变动。",
+        "right": "我喜欢随时根据新情况调整安排，不被既定计划束缚。"
+      },
+      {
+        "no": 2,
+        "id": 60,
+        "left": "我习惯一次性把事情做完，不喜欢留尾巴。",
+        "right": "我经常在事情做到一半时发现新的兴趣点，自然地转向下一个方向。"
+      },
+      {
+        "no": 3,
+        "id": 57,
+        "left": "我喜欢列清单，并享受逐一勾选已完成任务的成就感。",
+        "right": "我喜欢凭感觉行事，而不是被清单和计划所限制。"
+      }
+    ],
     "result": {
       "code": "INTP",
       "name": "逻辑学家型",
       "group": "NT 深紫组",
       "color": "#6B3FA0"
     },
+    "vote": [
+      {
+        "k": "J",
+        "d": "每步提前布\n按表收网"
+      },
+      {
+        "k": "D",
+        "d": "目标定死\n过程随它去"
+      },
+      {
+        "k": "P",
+        "d": "方案随时扔\n过程全即兴"
+      }
+    ],
+    "ask": "在评论区打出你的 3 个字母，然后 @点点 拿专属分析。",
     "cta": "你算目标，\n还是算过程？",
-    "hint": "评论区聊聊，我们先来：算目标，过程随它去。",
-    "title": "《死亡笔记》的 L 到底有没有计划",
-    "tags": "#人格测试 #MBTI #自我探索 #死亡笔记 #INTP #L #性格分析",
+    "hint": "先打字母，再补一句你为什么选它。",
+    "title": "你是不是那种，算到极致却从不守时的人",
+    "tags": "#人格测试 #MBTI #j人p人 #测一测你是哪一种 #自我探索 #死亡笔记 #81型人格",
     "body": [
-      "《死亡笔记》里的 L 几乎不露面，靠抽象假设和概率推演逼近真相。I、N、T 三维在他身上没什么可争的。",
+      "有人能把一整盘棋算到最后一步，却连自己的饭点都定不下来；有人做完计划第二天就整盘推翻。",
       "争的是最后一维：他到底是把局算尽了，还是根本没什么计划？",
       "像 J：整场对决的每一步都提前布好——谁去查、哪一步设套、什么时候收网，连自己会怎么死都算进去了。\n像 P：作息、吃饭、坐姿全无规律；案情一变就整盘重排，从不守昨天的方案。",
-      "他把「目标」算到了极致，把「过程」完全放掉了。16 型只能在 J 和 P 里选一个，所以他要么被写成控制狂，要么被写成邋遢天才。81 型的 D 档，把这两件事分开算。",
+      "L 就是这样的人。《死亡笔记》里的 L 几乎不露面，靠抽象假设和概率推演逼近真相。16 型只能在 J 和 P 里选一个，所以他要么被写成控制狂，要么被写成邋遢天才。81 型在这一维留了 D 档，把「目标定死」和「过程随它去」分开算。",
       "40 题里有一道正对着这里：「我喜欢列清单，并享受逐一勾选已完成任务的成就感」对「我喜欢凭感觉行事，而不是被清单和计划所限制」。",
-      "你是算目标的那种，还是算过程的那种？",
+      "在评论区打出你的 3 个字母，然后 @点点，她会给你一段专属分析。",
       "本内容仅供自我探索与娱乐参考，不构成心理诊断、医疗建议或招聘依据。MBTI-PRO 与 MBTI 官方机构无关联。"
     ],
-    "pinned": "我先来：算目标，过程随它去。"
+    "pinned": "我先来：P。目标算到极致，过程随它去。你也可以打出 3 个字母，@点点 会给你一段专属分析。"
   },
   "day7": {
     "key": "day7",
     "no": 7,
     "person": {
       "name": "赫敏",
+      "alias": "赫敏·格兰杰 · Hermione Granger",
       "work": "《哈利·波特》",
       "field": "格兰芬多学生",
       "story": "把课本、规则和复习计划都安排得清清楚楚，靠可验证的事实把朋友一次次拉出麻烦。",
@@ -716,6 +1159,23 @@ const NOTE_LIBRARY = {
       "是不说难受"
     ],
     "coverHighlight": "是不说难受",
+    "coverIcon": "quill",
+    "coverIconCap": "一支羽毛笔 · 一本书 · 一条规则",
+    "footStrip": [
+      [
+        "40 题",
+        "情境题"
+      ],
+      [
+        "6-8 分钟",
+        "可中断续答"
+      ],
+      [
+        "81 型",
+        "含中间档"
+      ]
+    ],
+    "showWebShot": true,
     "dispute": {
       "dimNo": "01",
       "dimName": "能量来源",
@@ -737,7 +1197,7 @@ const NOTE_LIBRARY = {
         "desc": "S 不用争：只信查得到、验证过的东西。T 不用争：对朋友也先把事实和后果摆出来。J 不用争：复习计划能提前几个月排好。"
       },
       "verdict": "她的 E 用在「必须说出来」，她的 I 用在「必须一个人学」。",
-      "why": "表达和恢复本来就是两件事，16 型却只能填一个字母。81 型的 A 档把它们分开：对外很外放，对内完全靠独处。",
+      "why": "看似 I 的部分是恢复方式，不是能量来源：她的电量在课堂上、在争论里充。81 型在这一维留了 A（中间档），但赫敏不在中间，她落在 E 这一端。",
       "punch": "课堂上最吵，\n图书馆最静。"
     },
     "dims": [
@@ -773,25 +1233,60 @@ const NOTE_LIBRARY = {
       "label": "40q-v1 · 原题 #20 · 能量来源",
       "left": "我通过与他人交流来整理和厘清自己的想法。",
       "right": "我的内心世界很丰富，常常进行自我对话和反思。",
-      "foot": "5 点量表 · 允许停在中间"
+      "foot": "三档 · A 正方 / B 两边都像 / C 反方"
     },
+    "quiz3": [
+      {
+        "no": 1,
+        "id": 1,
+        "left": "参加大型聚会后，我感到精力充沛、心情愉悦。",
+        "right": "参加大型聚会后，我需要独处一段时间来恢复精力。"
+      },
+      {
+        "no": 2,
+        "id": 6,
+        "left": "在团队讨论中，我通常是发言最多的人之一。",
+        "right": "在团队讨论中，我更多是倾听和观察，深思熟虑后再发言。"
+      },
+      {
+        "no": 3,
+        "id": 20,
+        "left": "我通过与他人交流来整理和厘清自己的想法。",
+        "right": "我的内心世界很丰富，常常进行自我对话和反思。"
+      }
+    ],
     "result": {
       "code": "ESTJ",
       "name": "总经理型",
       "group": "SJ 藏蓝组",
       "color": "#2C5F8A"
     },
+    "vote": [
+      {
+        "k": "E",
+        "d": "有话当场说\n说完才痛快"
+      },
+      {
+        "k": "A",
+        "d": "看场合切换\n分人分场景"
+      },
+      {
+        "k": "I",
+        "d": "先想后说\n独处才回血"
+      }
+    ],
+    "ask": "在评论区打出你的 3 个字母，然后 @点点 拿专属分析。",
     "cta": "你靠说话，\n还是靠独处？",
-    "hint": "评论区聊聊，我们先来：靠独处想清楚，再一口气说完。",
-    "title": "赫敏到底算不算外向",
-    "tags": "#人格测试 #MBTI #自我探索 #哈利波特 #ESTJ #赫敏 #性格分析",
+    "hint": "先打字母，再补一句你为什么选它。",
+    "title": "你是不是那种，憋不住必须当场说出来的人",
+    "tags": "#人格测试 #MBTI #e人i人 #测一测你是哪一种 #自我探索 #哈利波特 #81型人格",
     "body": [
-      "第一个举手、第一个纠正别人、第一个把规则念出来。S、T、J 三维在赫敏身上没什么分歧。",
+      "81 型里，赫敏这种「有话必须当场说」的人，能量来源落在 E 这一端。第一个举手、第一个纠正别人、第一个把规则念出来。",
       "分歧在第一维：她到底是班里最吵的那个，还是图书馆里最安静的那个？",
       "像 E：有话必须当场说完，绝不憋着；课堂上、行动里，都是她先把话说明白。\n像 I：真正让她恢复的地方是图书馆和自习室；聚会能不去就不去，社交是消耗不是充电。",
       "她的 E 用在「必须说出来」，她的 I 用在「必须一个人学」。16 型只能给她 E 或 I。81 型的 A 档在中间：表达上很外放，恢复上完全靠独处。这两件事本来就可以分开。",
       "40 题里有一道正对着这里：「我通过与他人交流来整理和厘清自己的想法」对「我的内心世界很丰富，常常进行自我对话和反思」。",
-      "你是靠说话理清，还是靠独处理清？",
+      "在评论区打出你的 3 个字母，然后 @点点，她会给你一段专属分析。",
       "本内容仅供自我探索与娱乐参考，不构成心理诊断、医疗建议或招聘依据。MBTI-PRO 与 MBTI 官方机构无关联。"
     ],
     "pinned": "我先来：靠独处想清楚，再一口气说完。"
@@ -806,23 +1301,122 @@ const NOTE = NOTE_LIBRARY[pick] || NOTE_LIBRARY.day1;
 const esc = s => String(s).replace(/[&<>]/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;' }[c]));
 const nl = s => esc(s).replace(/\n/g, '<br>');
 const no2 = String(NOTE.no).padStart(2, '0');
-const LABELS = ['COVER', 'SCENE', 'SIGN', 'SIGN', 'SIGN', 'VERDICT', 'QUESTION', 'RESULT', 'NOTE'];
+const LABELS = ['COVER', 'DO IT NOW', 'SIGN', 'SIGN', 'VERDICT', 'RESULT', 'COMMENT'];
 const D = NOTE.dispute;
 
+// 81 型人格画像：渲染脚本会用 window.__PORTRAIT_BASE 覆盖成 file:// 绝对路径
+const PORTRAIT_BASE = window.__PORTRAIT_BASE || '../../../server/generated_images/';
+// 是否在 P7 附一条「四维坐标」示意（纯 CSS 绘制，不含价格/链接/二维码，故无导流风险）
+const SHOW_COORD = !!NOTE.showWebShot;
+// 封面图标：全部为 CSS/SVG 手绘原创符号（非官方图，零版权风险）
+// 统一视觉语言：细线光芒 + 主体图形 + 朱砂点缀 + 同色系（纸色/墨色/赭金/朱砂）
+const ICON_FRAME_OPEN = `<g stroke="#D8CDB8" stroke-width="3.5" stroke-linecap="round">
+    <line x1="150" y1="36" x2="150" y2="8"/>
+    <line x1="92" y1="54" x2="66" y2="32"/>
+    <line x1="208" y1="54" x2="234" y2="32"/>
+    <line x1="56" y1="104" x2="26" y2="90"/>
+    <line x1="244" y1="104" x2="274" y2="90"/>
+  </g>`;
+const ICON_SPARK = `<g fill="#A63D2C">
+    <path d="M 250 254 l 7 16 16 7 -16 7 -7 16 -7 -16 -16 -7 16 -7 Z"/>
+    <circle cx="216" cy="236" r="4.5"/>
+    <circle cx="58" cy="252" r="3.5"/>
+  </g>`;
+
+// 路飞：草帽
+const STRAWHAT = `<svg viewBox="0 0 300 300" width="100%" height="100%" preserveAspectRatio="xMidYMid meet">
+  ${ICON_FRAME_OPEN}
+  <g transform="rotate(-7 150 170)">
+    <path d="M 62 166 Q 66 46 150 46 Q 234 46 238 166 Z" fill="#EFE0BC" stroke="#1E1D1A" stroke-width="4.5" stroke-linejoin="round"/>
+    <path d="M 80 96 Q 150 60 220 96" fill="none" stroke="#C9A96A" stroke-width="3"/>
+    <path d="M 72 128 Q 150 90 228 128" fill="none" stroke="#C9A96A" stroke-width="3"/>
+    <path d="M 66 152 Q 150 118 234 152 L 235 180 Q 150 144 65 180 Z" fill="#A63D2C"/>
+    <ellipse cx="150" cy="182" rx="140" ry="34" fill="#F2E4C4" stroke="#1E1D1A" stroke-width="4.5"/>
+    <ellipse cx="150" cy="182" rx="100" ry="21" fill="none" stroke="#C9A96A" stroke-width="2.5"/>
+  </g>
+  ${ICON_SPARK}
+</svg>`;
+
+// 柯南：放大镜 + 领结（侦探的识别符号，不画人物）
+const MAGNIFIER = `<svg viewBox="0 0 300 300" width="100%" height="100%" preserveAspectRatio="xMidYMid meet">
+  ${ICON_FRAME_OPEN}
+  <g transform="rotate(-12 150 150)">
+    <circle cx="128" cy="126" r="76" fill="#F2E4C4" stroke="#1E1D1A" stroke-width="6"/>
+    <circle cx="128" cy="126" r="62" fill="none" stroke="#C9A96A" stroke-width="2.5"/>
+    <path d="M 96 92 Q 128 68 164 92" fill="none" stroke="#D8CDB8" stroke-width="5" stroke-linecap="round"/>
+    <rect x="184" y="182" width="30" height="92" rx="14" transform="rotate(-42 199 228)" fill="#A63D2C" stroke="#1E1D1A" stroke-width="4"/>
+  </g>
+  <path d="M 118 236 l 22 -26 22 26 -22 12 z" fill="#A63D2C" stroke="#1E1D1A" stroke-width="4" stroke-linejoin="round"/>
+  ${ICON_SPARK}
+</svg>`;
+
+// L：蛋糕（层叠奶油蛋糕 + 樱桃，简笔但可辨识）
+const CAKE = `<svg viewBox="0 0 300 300" width="100%" height="100%" preserveAspectRatio="xMidYMid meet">
+  ${ICON_FRAME_OPEN}
+  <g>
+    <ellipse cx="150" cy="238" rx="104" ry="16" fill="#D8CDB8" opacity=".55"/>
+    <path d="M 60 176 L 240 176 L 240 226 Q 150 242 60 226 Z" fill="#EFE0BC" stroke="#1E1D1A" stroke-width="5" stroke-linejoin="round"/>
+    <path d="M 60 176 Q 150 160 240 176" fill="none" stroke="#1E1D1A" stroke-width="5"/>
+    <path d="M 68 200 Q 150 188 232 200" fill="none" stroke="#A63D2C" stroke-width="4" stroke-linecap="round"/>
+    <path d="M 74 150 L 226 150 L 226 176 Q 150 188 74 176 Z" fill="#F2E4C4" stroke="#1E1D1A" stroke-width="5" stroke-linejoin="round"/>
+    <path d="M 90 138 Q 108 126 126 138 Q 144 150 162 138 Q 180 126 198 138 Q 210 145 212 150 L 88 150 Q 90 144 90 138 Z" fill="#FBF6EC" stroke="#1E1D1A" stroke-width="4"/>
+    <circle cx="150" cy="112" r="15" fill="#A63D2C" stroke="#1E1D1A" stroke-width="3.5"/>
+    <path d="M 150 97 Q 156 84 168 82" fill="none" stroke="#1E1D1A" stroke-width="4" stroke-linecap="round"/>
+  </g>
+  ${ICON_SPARK}
+</svg>`;
+
+// 赫敏：羽毛笔 + 书本（学识与规则的符号，不画人物）
+const QUILL = `<svg viewBox="0 0 300 300" width="100%" height="100%" preserveAspectRatio="xMidYMid meet">
+  ${ICON_FRAME_OPEN}
+  <g>
+    <path d="M 62 214 L 150 200 L 238 214 L 238 258 L 150 244 L 62 258 Z" fill="#F2E4C4" stroke="#1E1D1A" stroke-width="5" stroke-linejoin="round"/>
+    <path d="M 150 200 L 150 244" stroke="#1E1D1A" stroke-width="4"/>
+    <g transform="rotate(14 168 140)">
+      <path d="M 168 52 Q 206 96 196 156 Q 168 176 148 158 Q 142 100 168 52 Z" fill="#EFE0BC" stroke="#1E1D1A" stroke-width="4.5" stroke-linejoin="round"/>
+      <path d="M 168 56 L 172 156" stroke="#C9A96A" stroke-width="2.5"/>
+      <path d="M 158 116 L 178 112 M 155 138 L 182 133" stroke="#C9A96A" stroke-width="2"/>
+    </g>
+    <path d="M 156 158 L 92 250" stroke="#1E1D1A" stroke-width="5" stroke-linecap="round"/>
+  </g>
+  ${ICON_SPARK}
+</svg>`;
+
+// 曾国藩：书箱 + 毛笔（书生带兵，不画人物）
+const BRUSH = `<svg viewBox="0 0 300 300" width="100%" height="100%" preserveAspectRatio="xMidYMid meet">
+  ${ICON_FRAME_OPEN}
+  <g>
+    <path d="M 56 186 L 186 186 L 186 252 L 56 252 Z" fill="#EFE0BC" stroke="#1E1D1A" stroke-width="5" stroke-linejoin="round"/>
+    <path d="M 56 186 L 186 186" stroke="#1E1D1A" stroke-width="5"/>
+    <path d="M 68 206 L 174 206 M 68 226 L 174 226 M 68 244 L 140 244" stroke="#C9A96A" stroke-width="3" stroke-linecap="round"/>
+    <g transform="rotate(24 214 140)">
+      <rect x="204" y="60" width="20" height="96" rx="6" fill="#F2E4C4" stroke="#1E1D1A" stroke-width="4"/>
+      <path d="M 204 156 L 224 156 L 218 196 Q 214 206 210 196 Z" fill="#1E1D1A"/>
+      <rect x="204" y="52" width="20" height="12" rx="4" fill="#A63D2C"/>
+    </g>
+  </g>
+  ${ICON_SPARK}
+</svg>`;
+
+const COVER_ICONS = { strawhat: STRAWHAT, magnifier: MAGNIFIER, cake: CAKE, quill: QUILL, brush: BRUSH };
+
+// 封面（P1）不带任何文档元素：调查结论是栏目名/页码/页脚会让缩略图主文案只占 35%
 const shell = (inner, n) => `<section class="page">
-  <div class="head mono">
+  ${n === 1 ? '' : `<div class="head mono">
     <span class="h-l">MBTI — PRO</span>
-    <span>PERSONALITY ARCHIVE / ${LABELS[n - 1]}</span>    <span class="h-r">${String(n).padStart(2, '0')} / 09</span>
+    <span>PERSONALITY ARCHIVE / ${LABELS[n - 1]}</span>    <span class="h-r">${String(n).padStart(2, '0')} / 07</span>
   </div>
-  <div class="eyebrow mono">${String(n).padStart(2, '0')} / ${LABELS[n - 1]}</div>
+  <div class="eyebrow mono">${String(n).padStart(2, '0')} / ${LABELS[n - 1]}</div>`}
   ${inner}
-  <div class="footer mono"><span>81-TYPE PERSONALITY ARCHIVE</span><span>NO.${no2}</span></div>
+  ${n === 1 ? '' : `<div class="footer mono"><span>81-TYPE PERSONALITY ARCHIVE</span><span>NO.${no2}</span></div>`}
 </section>`;
 
 // 封面人物名优先：名字按字数分档放大，钩子按最长一行自动降档，避免压住下方关系句
 const coverName = NOTE.person.coverName || NOTE.person.name;
 const cnLen = [...coverName].length;
 const namePx = cnLen <= 2 ? 168 : cnLen === 3 ? 140 : 118;
+// 封面人物名下方补一行别名（含外文名/全名），解决「钢铁侠」这类代号认不出本名的问题
+const aliasLine = NOTE.person.alias || '';
 const maxHook = Math.max(...NOTE.coverLines.map(l => [...l].length));
 const hookPx = maxHook <= 6 ? 78 : maxHook <= 8 ? 70 : 62;
 
@@ -835,12 +1429,18 @@ const SCALE_ZH = {
 };
 const scaleZh = SCALE_ZH[D.scale] || D.scale;
 
-const p1 = `<div class="p1" style="position:absolute;inset:0">
-  <div class="name-wrap"><div class="cover-name serif" style="font-size:${namePx}px">${esc(coverName)}</div></div>
-  <div class="person-work">${esc(NOTE.person.work || '')} · 流行参照</div>
-  <div class="cover-title serif" style="font-size:${hookPx}px">${NOTE.coverLines.map(t => esc(t)).join('<br>')}</div>
-  <div class="person-link">${esc(NOTE.person.link)}</div>
-  <div class="dtag mono">争议维 · <b>${esc(D.dimNo)} ${esc(D.dimName)}</b> · ${esc(scaleZh)}</div>
+// 封面 = 海报，不是书封。三条硬规则（来自爆款封面拆解）：
+//   1. 无栏目名/页码/页脚；2. 主文案占宽 70%+ 并高亮关键词；3. 封面上直接列出结果分类（可存、可对号入座）
+const p1 = `<div class="p1 poster" style="position:absolute;inset:0">
+  ${NOTE.coverIcon ? `<div class="poster-icon">${COVER_ICONS[NOTE.coverIcon] || ''}</div>` : ''}
+  <div class="poster-kicker">${esc(NOTE.posterKicker || NOTE.person.work || '')}</div>
+  <div class="poster-title serif">${NOTE.coverLines.map((line, i) =>
+    i === 0 ? esc(line) : `<span class="hl">${esc(line)}</span>`
+  ).join('<br>')}</div>
+  ${NOTE.posterResults ? `<div class="poster-results">${NOTE.posterResults.map((r) => `
+    <div class="pr"><b>${esc(r.k)}</b><span>${esc(r.v)}</span></div>`).join('')}</div>` : ''}
+  ${NOTE.posterNote ? `<div class="poster-note">${nl(NOTE.posterNote)}</div>` : ''}
+  <div class="poster-foot">${esc(NOTE.posterFoot || '')}</div>
 </div>`;
 
 const p2 = `<div class="p2" style="position:absolute;inset:0">
@@ -850,7 +1450,7 @@ const p2 = `<div class="p2" style="position:absolute;inset:0">
   <div class="spec">
     <div class="srow serif">${D.scale.split(' / ').map((s, i) =>
       `<div class="scell${i === 1 ? ' mid' : ''}">${esc(s)}</div>`).join('')}</div>
-    <div class="snote mono">16 型只能二选一 · 81 型在这一维留了中间档</div>
+    <div class="snote mono">16 型在这一维二选一 · 81 型留了中间档 C</div>
   </div>
 </div>`;
 
@@ -859,8 +1459,11 @@ const signs = [D.forA, D.forB, D.other].map((s, i) => `<div class="sign" style="
   <div class="bar"></div>
   <div class="title serif">${esc(s.title)}</div>
   <div class="desc">${esc(s.desc)}</div>
+  ${s.quote ? `<div class="quote"><div class="q-txt serif">${esc(s.quote.txt)}</div><div class="q-src mono">${esc(s.quote.src)}</div></div>` : ''}
 </div>`);
 
+// 全居中型（四维都 hot）不能用「第 X 维就是争议点」的说法，否则与「四维都卡中间」矛盾
+const allMid = NOTE.dims.every(d => d.hot);
 const dimline = NOTE.dims.map(d =>
   `<span class="${d.hot ? 'hot' : ''}">${esc(d.v)}</span>`).join('<i>   ·   </i>');
 
@@ -872,23 +1475,46 @@ const p6 = `<div class="p6" style="position:absolute;inset:0">
   <div class="footnote">
     <div class="formula serif">3 × 3 × 3 × 3 = 81</div>
     <div class="dimline">${dimline}</div>
-    <div class="hotnote mono">↑ 第 ${esc(D.dimNo)} 维就是这次的争议点</div>
+    <div class="hotnote mono">↑ ${allMid ? `四个维度全部落在中间 · 这次展开讲的是第 ${esc(D.dimNo)} 维` : `第 ${esc(D.dimNo)} 维就是这次的争议点`}</div>
   </div>
 </div>`;
 
-const p7 = `<div class="p7" style="position:absolute;inset:0">
-  <div class="q-title serif">哪一种更像平时的你？</div>
-  <div class="q-sub mono">${esc(NOTE.question.label)}</div>
+const p7 = `<div class="p7${NOTE.quiz3 ? ' has-quiz3' : ''}" style="position:absolute;inset:0">
+  <div class="q-title serif">${NOTE.quiz3 ? `先做 ${NOTE.quiz3.length} 道，看看你在哪边` : '先做 3 道，看看你在哪边'}</div>
+  <div class="q-sub mono">${NOTE.quiz3 ? '40q-v1 原题 · 每道选 A / B / C' : esc(NOTE.question.label) + ' · 每道选 A / B / C'}</div>
+  ${NOTE.quiz3 ? `<div class="quiz3">${NOTE.quiz3.map((q, qi) => `
+    <div class="qz${qi ? ' qz-gap' : ''}">
+      <div class="qz-head mono"><span>第 ${q.no} 题</span><span>原题 #${q.id}</span></div>
+      <div class="qwrap">
+        <div class="qcol serif"><small class="mono">A · 正方</small>${esc(q.left)}</div>
+        <div class="qcol serif"><small class="mono">C · 反方</small>${esc(q.right)}</div>
+      </div>
+    </div>`).join('')}</div>` : `
   <div class="qwrap">
-    <div class="qcol serif${NOTE.question.left.length > 28 ? ' tight' : ''}"><small class="mono">左偏陈述 / LEFT</small>${esc(NOTE.question.left)}</div>
-    <div class="qcol serif${NOTE.question.right.length > 28 ? ' tight' : ''}"><small class="mono">右偏陈述 / RIGHT</small>${esc(NOTE.question.right)}</div>
-  </div>
-  <div class="scale mono"><div>A 非常接近左</div><div>B 接近左</div><div>C 两者之间</div><div>D 接近右</div><div>E 非常接近右</div></div>
+    <div class="qcol serif${NOTE.question.left.length > 28 ? ' tight' : ''}"><small class="mono">A · 正方</small>${esc(NOTE.question.left)}</div>
+    <div class="qcol serif${NOTE.question.right.length > 28 ? ' tight' : ''}"><small class="mono">C · 反方</small>${esc(NOTE.question.right)}</div>
+  </div>`}
+  <div class="scale mono"><div>选 <b>A</b> 偏正方</div><div>选 <b>B</b> 两边都像</div><div>选 <b>C</b> 偏反方</div><div class="scale-tip">← 记住你的 3 个字母</div></div>
   <div class="qfoot">${esc(NOTE.question.foot)} · 读两段描述，没有标准答案。</div>
+  ${SHOW_COORD && !NOTE.quiz3 ? `<div class="shot">
+    <div class="cs-head mono"><span>YOUR COORDINATE</span><span>81 TYPES</span></div>
+    ${NOTE.dims.map((d) => {
+      const poles = d.v.split(' / ');
+      const seg = poles.map((p, pi) =>
+        `<span class="cs-pole${p === d.letter ? ' is-hot' : ''}">${esc(p)}</span>` +
+        (pi < poles.length - 1 ? '<span class="cs-line"><i></i></span>' : '')
+      ).join('');
+      return `<div class="cs-row"><span class="cs-k">${esc(d.k)}</span>${seg}</div>`;
+    }).join('')}
+  </div>
+  <div class="shot-cap">↑ 产品里的四个维度，<b>红色是这一型落的位置</b></div>` : ''}
 </div>`;
 
 const nameLen = [...NOTE.person.name].length;
 const nameCls = nameLen <= 3 ? '' : (nameLen <= 5 ? ' mid' : ' long');
+// 剧情文字按长度分档缩字号：卡片底部空间固定，最长的一篇（柯南 41 字）不降档会压到下面的类型码与免责
+const storyLen = [...(NOTE.person.story || '')].length;
+const storyCls = storyLen > 40 ? ' s' : (storyLen > 36 ? ' m' : '');
 const p8 = `<div class="p8" style="position:absolute;inset:0">
   <div class="hook serif">${nl(D.punch)}</div>
   <div class="type-tag">${esc(NOTE.result.code)} / ${esc(NOTE.result.name)}</div>
@@ -896,25 +1522,40 @@ const p8 = `<div class="p8" style="position:absolute;inset:0">
   <div class="group"><span class="swatch" style="background:${esc(NOTE.result.color || '#8B95A0')}"></span>${esc(NOTE.result.group)}</div>
   <div class="card">
     <div class="c-no mono">POP REFERENCE / 01</div>
+    ${NOTE.result.code ? `<div class="c-portrait"><img src="${esc(PORTRAIT_BASE)}${esc(NOTE.result.code)}.jpg" alt=""></div>
+    <div class="c-portrait-cap mono">↑ ${esc(NOTE.result.code)} 这一型的人格画像 · 非角色本人</div>` : ''}
+    <div class="c-code mono">${esc(NOTE.result.code)} · ${esc(NOTE.result.name)}</div>
     <div class="c-work">${esc(NOTE.person.work || '')}</div>
     <div class="c-name serif${nameCls}">${esc(NOTE.person.name)}</div>
     <div class="c-field">${esc(NOTE.person.field)}</div>
     <div class="c-rule"></div>
-    <div class="c-story">${esc(NOTE.person.story)}</div>
-    <div class="c-foot mono">虚构角色 · 仅作性格类比<br>与作品版权方无关联 · 非官方</div>
+    <div class="c-story${storyCls}">${esc(NOTE.person.story)}</div>
+    <div class="c-foot mono">${NOTE.person.fictionNote ? NOTE.person.fictionNote.replace(/&lt;br&gt;/g, '<br>').replace(/<br>/g, '<br>') : '虚构角色 · 仅作性格类比<br>与作品版权方无关联 · 非官方'}</div>
   </div>
 </div>`;
 
-const p9 = `<div class="p9" style="position:absolute;inset:0">
-  <div class="cta serif">${nl(NOTE.cta)}</div>
+// P9 三选一投票框：只有 NOTE.vote 存在时才渲染（数据驱动，避免每篇硬套 J/D/P）
+const vote = Array.isArray(NOTE.vote) && NOTE.vote.length === 3
+  ? `<div class="vote">${NOTE.vote.map((v, i) =>
+      `<div class="vc${i === 1 ? ' mid' : ''}"><b class="mono">${esc(v.k)}</b><span>${nl(v.d)}</span></div>`
+    ).join('')}</div>`
+  : '';
+
+const p9 = `<div class="p9${vote ? ' has-vote' : ''}" style="position:absolute;inset:0">
+  <div class="cta serif">${nl(NOTE.cta || '')}</div>
+  ${vote}
+  <div class="ask">打出你的 <b>3 个字母</b>，再 <b>@点点</b> 拿专属分析</div>
+  <div class="ask-why">（别人打「ca b c」都能收到她的回复，你也可以）</div>
   <div class="hint">${esc(NOTE.hint)}</div>
   <div class="disc">${nl(DISCLAIMER)}</div>
   <div class="endbar"></div>
 </div>`;
 
 document.getElementById('root').innerHTML = [
-  shell(p1, 1), shell(p2, 2), ...signs.map((s, i) => shell(s, i + 3)),
-  shell(p6, 6), shell(p7, 7), shell(p8, 8), shell(p9, 9)
+  // 7 图结构（2026-11-17 调研结论：爆款是 6-7 张，且题目必须在 P2 就让读者当场能做）
+  // P1 封面 → P2 当场做题 → P3/P4 两侧证据 → P5 结论 → P6 结果卡 → P7 @点点互动
+  shell(p1, 1), shell(p7, 2), ...signs.slice(0, 2).map((s, i) => shell(s, i + 3)),
+  shell(p6, 5), shell(p8, 6), shell(p9, 7)
 ].join('');
 </script>
 </body>
